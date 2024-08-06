@@ -26,6 +26,7 @@
         </div>
         <div
           class="p-2 rounded-full bg-gray-100 relative hover:bg-gray-400 w-12 h-12"
+          @click="openUserMenu"
         >
           <img src="@/assets/icon/svg/icon-user.svg" class="w-6 h-6 m-auto" />
         </div>
@@ -42,6 +43,8 @@ import { Badge } from "@/components/ui/badge";
 import TabsSection from "@/components/layouts/TabsSection.vue";
 
 const userRole = "admin";
+const { clear } = useUserSession()
+const  router = useRouter()
 
 const allTabs = [
   { value: "events", label: "Eventos" },
@@ -49,7 +52,10 @@ const allTabs = [
   { value: "users", label: "Usuarios" },
   { value: "roles", label: "Roles" },
 ];
-
+const openUserMenu = async() => {
+  await clear()
+  router.push('/auth/login')
+};
 const tabs = computed(() => {
   if (userRole === "admin") {
     return allTabs;

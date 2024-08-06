@@ -44,12 +44,21 @@ import { EyeOpenIcon, EyeClosedIcon } from '@radix-icons/vue'
 const email = ref('')
 const password = ref('')
 const showPassword = ref(false)
-
+const  router = useRouter()
 const togglePassword = () => {
   showPassword.value = !showPassword.value
 }
-
-const handleSubmit = () => {
-  // Lógica para manejar el envío del formulario
+const { fetch, loggedIn } = useUserSession()
+const handleSubmit = async() => {
+  // Logic to handle form submission
+  await $fetch("/api/auth/login", {
+    method: 'POST',
+    body: {
+      email: email.value,
+      password: password.value
+    },
+  })
+  await fetch()
+  router.push("/dashboard")
 }
 </script>
