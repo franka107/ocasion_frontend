@@ -1,9 +1,9 @@
 <template>
   <div class="bg-white rounded-lg shadow-md p-6 w-full">
-    <h2 class="text-2xl font-semibold text-cyan-500 mb-2">
+    <h2 :class="['text-2xl font-semibold mb-2', titleClass]">
       {{ title }}
     </h2>
-    <p v-if="subtitle" class="text-sm text-[#0E7490] mb-6">
+    <p v-if="subtitle" :class="['text-sm mb-6', subtitleClass]">
       {{ subtitle }}
     </p>
     <form @submit.prevent="$emit('submit')" class="space-y-4">
@@ -11,7 +11,7 @@
       <Button 
         :class="[
           'w-full', 
-          submitClass || 'bg-cyan-500 hover:bg-cyan-600'
+          submitClass || 'bg-cyan-500 '
         ]" 
         type="submit"
       >
@@ -28,7 +28,9 @@ defineProps({
   title: String,
   subtitle: String,
   submitText: String,
-  submitClass: String
+  submitClass: String,
+  titleClass: String,
+  subtitleClass: String
 })
 
 defineEmits(['submit'])
