@@ -1,5 +1,4 @@
 <template>
-  <div>
     <header
       class="bg-white text-gray-800 p-4 flex items-center justify-between border-b-2 shadow-sm"
     >
@@ -32,35 +31,32 @@
         </div>
       </div>
     </header>
-    <main class="flex-grow p-4 bg-[#f1f5f9] flex flex-col">
-      <slot />
-    </main>
-  </div>
-</template>
-
-<script setup lang="ts">
-import { Badge } from "@/components/ui/badge";
-import TabsSection from "@/components/layouts/TabsSection.vue";
-
-const userRole = "admin";
-const { clear } = useUserSession()
-const  router = useRouter()
-
-const allTabs = [
-  { value: "events", label: "Eventos" },
-  { value: "reports", label: "Reportes" },
-  { value: "users", label: "Usuarios" },
-  { value: "roles", label: "Roles" },
-];
-const openUserMenu = async() => {
-  await clear()
-  router.push('/auth/login')
-};
-const tabs = computed(() => {
-  if (userRole === "admin") {
-    return allTabs;
-  } else {
-    return allTabs.filter((tab) => tab.value !== "roles");
-  }
-});
-</script>
+  </template>
+  
+  <script setup lang="ts">
+  import { Badge } from "@/components/ui/badge";
+  import TabsSection from "@/components/layouts/TabsSection.vue";
+  
+  const userRole = "admin";
+  const { clear } = useUserSession()
+  const  router = useRouter()
+  
+  const allTabs = [
+    { value: "events", label: "Eventos" },
+    { value: "reports", label: "Reportes" },
+    { value: "users", label: "Usuarios" },
+    { value: "roles", label: "Roles" },
+  ];
+  const openUserMenu = async() => {
+    await clear()
+    router.push('/auth/login')
+  };
+  const tabs = computed(() => {
+    if (userRole === "admin") {
+      return allTabs;
+    } else {
+      return allTabs.filter((tab) => tab.value !== "roles");
+    }
+  });
+  </script>
+  

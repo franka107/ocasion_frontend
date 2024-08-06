@@ -40,7 +40,6 @@ import BaseForm from '~/components/auth/baseForm.vue'
 import Input from '~/components/ui/input/Input.vue'
 import Button from '~/components/ui/button/Button.vue'
 import { EyeOpenIcon, EyeClosedIcon } from '@radix-icons/vue'
-
 const email = ref('')
 const password = ref('')
 const showPassword = ref(false)

@@ -1,9 +1,5 @@
 <template>
-  <div class="bg-white shadow-md rounded-lg p-6">
-    <h2 class="text-xl font-bold">Panel Super administrador</h2>
-    <p class="text-gray-600">Gestiona eventos, usuarios y reportes</p>
-  </div>
-  <div class="flex-grow flex flex-col pt-6">
+   <div class="flex-grow flex flex-col pt-6">
     <div class="flex space-x-4">
       <NuxtLink to="/users/administrators" class="py-2 px-4 rounded-t-lg" :class="{
         'bg-white text-[#2D5979]': isActive('/users/administrators'),
