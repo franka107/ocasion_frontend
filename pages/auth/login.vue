@@ -4,7 +4,7 @@
       title="Bienvenido" 
       subtitle="Inicia sesión con tus credenciales."
       submit-text="Ingresar"
-      submit-class="text-gray-300 bg-[#F1F5F9] hover:bg-[#09314F] hover:text-white"
+      submit-class="text-gray-300 bg-primary hover:bg-[#09314F] hover:text-white"
       @submit="handleSubmit"
     >
       <div class="space-y-4">
