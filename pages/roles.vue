@@ -1,11 +1,5 @@
 <template>
-    <div>
-    </div>
+  <div>
+    <h1>Roles</h1>
+  </div>
 </template>
-
-<script setup>
-</script>
-
-<style scoped>
-/* Add your page-specific styles here */
-</style>
