@@ -2,7 +2,7 @@ export default defineEventHandler(async (event) => {
     const { apiUrl } = useRuntimeConfig(event)
     const body = await readBody(event)
     try {
-        const user: any = await $fetch(apiUrl + '/auth/email/login',{
+        const user: any = await $fetch(apiUrl + '/auth-management/login-user',{
             method: 'POST',
             body,
             headers: {
