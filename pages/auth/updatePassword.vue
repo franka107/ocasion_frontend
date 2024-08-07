@@ -1,15 +1,15 @@
 <template>
     <NuxtLayout logo-subtitle="Acceso Admin">
       <BaseForm 
-        title="Crea una nueva contraseña" 
+        title="Actualizar contraseña" 
         submit-text="Continuar"
         submit-class="text-gray-300 bg-[#F1F5F9] hover:bg-[#052339] hover:text-white"
         @submit="handleSubmit"
       >
         <div class="space-y-4 mt-6">
           <!-- Input Nueva Contraseña -->
-          <div class="relative border rounded-md">
-            <label for="password" class="absolute -top-3 left-3 bg-white px-1 text-gray-400 text-xs">Nueva contraseña</label>
+          <div class="relative border rounded-sm">
+            <label for="password" class="absolute -top-3 left-3 bg-white px-1 text-gray-400 text-xs">Contraseña</label>
             <Input 
               id="password"
               v-model="password" 
@@ -29,18 +29,25 @@
   
           <!-- Input Confirmar Contraseña -->
           <div class="relative border rounded-md">
-            <label for="confirmPassword" class="absolute -top-3 left-3 bg-white px-1 text-gray-400 text-xs">Confirma tu contraseña</label>
             <Input 
-              id="confirmPassword"
               v-model="confirmPassword" 
               type="password" 
-              placeholder=" "
+              placeholder="Confirma tu contraseña"
               class="rounded-md border-none px-3 py-2"
             />
+            <Button 
+              @click="togglePassword" 
+              type="button"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center bg-transparent hover:bg-transparent border-none"
+            >
+              <EyeClosedIcon v-if="!showPassword" class="h-5 w-5 text-gray-400" />
+              <EyeOpenIcon v-else class="h-5 w-5 text-gray-400" />
+            </Button>
+            
           </div>
         </div>
   
-        <!-- Requisitos de Contraseña -->
+        
         <div v-if="showPasswordRequirements" class="text-xs text-gray-600 mt-4 bg-[#F8FAFC] p-4">
           <p>Tu contraseña debe tener al menos 3 de los siguientes requisitos:</p>
           <ul class="list-none pl-5 mt-2">
@@ -51,6 +58,18 @@
           </ul>
         </div>
       </BaseForm>
+      <Dialog 
+      v-model:open="isDialogOpen"
+      :iconSrc="messageIconSrc"
+      iconAlt="Icono de alerta"
+      title="Contraseña creada"
+      description="La contraseña se ha creado correctamente."
+      subDescription=" Por favor inicie sesión"
+      buttonText="Aceptar"
+      iconBgColor="bg-[#00BB8E]"
+      @close="closeDialog"
+      @action="goToUpdatePassword"
+    />
     </NuxtLayout>
   </template>
   
@@ -61,11 +80,14 @@
   import Input from '~/components/ui/input/Input.vue'
   import { Button } from '@/components/ui/button'
   import { EyeOpenIcon, EyeClosedIcon, CheckIcon } from '@radix-icons/vue'
+  import Dialog from '~/components/auth/dialogForm.vue'
+  import messageIcon from '~/assets/icon/png/check-icon.png'
   
   const password = ref('')
   const confirmPassword = ref('')
   const showPassword = ref(false)
   const showPasswordRequirements = ref(false)
+  const isDialogOpen = ref(false)
   
   const passwordRequirements = [
     'Al menos 8 caracteres',
@@ -81,11 +103,18 @@
   
   const handleSubmit = () => {
     // Lógica para manejar el envío del formulario
+    console.log('Enviar formulario de  contraseña')
+    isDialogOpen.value = true
   }
+  const closeDialog = () => {
+  isDialogOpen.value = false
+}
+
   
   // Observa los cambios en la contraseña para mostrar u ocultar los requisitos
   watch(password, (newVal) => {
     showPasswordRequirements.value = newVal.length > 0
   })
+  const messageIconSrc = messageIcon
   </script>
   
