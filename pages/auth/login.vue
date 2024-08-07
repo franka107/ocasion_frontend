@@ -72,7 +72,7 @@ const { fetch, loggedIn } = useUserSession()
 const handleSubmit = async() => {
   // Abre el diálogo cuando el usuario hace clic en "Ingresar"
   console.log('Enviar formulario de  contraseña')
-  isDialogOpen.value = true
+  // isDialogOpen.value = true
 
   // Logic to handle form submission
   await $fetch("/api/auth/login", {

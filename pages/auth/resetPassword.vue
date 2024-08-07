@@ -13,7 +13,7 @@
         <Button 
           @click="volverAEnviar" 
           type="button"
-          class="w-full py-2 mt-4 bg-[#FFFFFF] text-[#052339] rounded hover:bg-transparent"
+          class="w-full py-2 mt-4 bg-background text-[#052339] rounded hover:bg-transparent"
         >
           <img 
             :src="emailIconSrc" 
