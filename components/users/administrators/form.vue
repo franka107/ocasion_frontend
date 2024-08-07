@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from "vue";
 import { useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
@@ -16,7 +17,7 @@ const formSchema = toTypedSchema(
   })
 );
 
-const { handleSubmit } = useForm({
+const { handleSubmit, meta } = useForm({
   validationSchema: formSchema,
 });
 
@@ -31,7 +32,7 @@ const onSubmit = handleSubmit((values) => {
       <SheetTitle>Crear usuario</SheetTitle>
     </SheetHeader>
 
-    <div class="border-primary border-[1px]"></div>
+    <div class="border-primary border-t-[1px]"></div>
 
     <form class="flex flex-col gap-4 flex-grow" @submit="onSubmit">
       <FormField v-slot="{ componentField }" name="fullName">
@@ -48,19 +49,28 @@ const onSubmit = handleSubmit((values) => {
       </FormField>
 
       <div class="flex gap-2">
-        <FormField v-slot="{ componentField }" name="documentType" class="w-2/5">
-          <FormItem class="w-2/5">
+        <FormField
+          v-slot="{ componentField }"
+          name="documentType"
+          class="w-2/5"
+        >
+          <FormItem class="w-1/2">
             <Select v-bind="componentField">
               <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Tipo de documento" />
+                <SelectTrigger class="p-2">
+                  <SelectValue
+                    placeholder="Tipo de documento"
+                    class="text-left"
+                  />
                 </SelectTrigger>
               </FormControl>
-              <SelectContent>
+              <SelectContent class="p-0">
                 <SelectGroup>
-                  <SelectItem value="dni">DNI</SelectItem>
-                  <SelectItem value="passport">Pasaporte</SelectItem>
-                  <SelectItem value="other">Otro</SelectItem>
+                  <SelectItem value="dni" class="px-2 py-1">DNI</SelectItem>
+                  <SelectItem value="passport" class="px-2 py-1"
+                    >Pasaporte</SelectItem
+                  >
+                  <SelectItem value="other" class="px-2 py-1">Otro</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
@@ -68,8 +78,8 @@ const onSubmit = handleSubmit((values) => {
           </FormItem>
         </FormField>
 
-        <FormField v-slot="{ componentField }" name="documentNumber" class="w-3/5">
-          <FormItem class="w-3/5">
+        <FormField v-slot="{ componentField }" name="documentNumber">
+          <FormItem class="w-1/2">
             <FormControl>
               <Input
                 type="text"
@@ -113,7 +123,7 @@ const onSubmit = handleSubmit((values) => {
           <Select v-bind="componentField">
             <FormControl>
               <SelectTrigger>
-                <SelectValue placeholder="Seleccione el tipo de usuario" />
+                <SelectValue placeholder="Tipo de usuario" />
               </SelectTrigger>
             </FormControl>
             <SelectContent>
@@ -132,7 +142,7 @@ const onSubmit = handleSubmit((values) => {
           <Select v-bind="componentField">
             <FormControl>
               <SelectTrigger>
-                <SelectValue placeholder="Seleccione la organización" />
+                <SelectValue placeholder="Organización" />
               </SelectTrigger>
             </FormControl>
             <SelectContent>
@@ -152,7 +162,7 @@ const onSubmit = handleSubmit((values) => {
           <Select v-bind="componentField">
             <FormControl>
               <SelectTrigger>
-                <SelectValue placeholder="Seleccione el rol de usuario" />
+                <SelectValue placeholder="Rol de usuario" />
               </SelectTrigger>
             </FormControl>
             <SelectContent>
@@ -168,7 +178,20 @@ const onSubmit = handleSubmit((values) => {
       </FormField>
 
       <SheetFooter class="mt-auto">
-        <Button type="submit" class="w-full"> Crear usuario </Button>
+        <Button
+          :disabled="!meta.valid"
+          type="submit"
+          :class="
+            cn(
+              'w-full',
+              !meta.valid
+                ? 'text-primary bg-bgtheme'
+                : 'hover:text-primary hover:bg-bgtheme'
+            )
+          "
+        >
+          Crear usuario
+        </Button>
       </SheetFooter>
     </form>
   </SheetContent>
