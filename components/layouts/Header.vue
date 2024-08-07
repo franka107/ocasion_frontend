@@ -1,6 +1,6 @@
 <template>
     <header
-      class="bg-white text-gray-800 p-4 flex items-center justify-between border-b-2 shadow-sm"
+      class="bg-white h-20 p-4 flex items-center justify-between border-b-2 shadow-sm"
     >
       <div class="h-11 ml-4">
         <img

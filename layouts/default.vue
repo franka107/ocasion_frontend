@@ -2,7 +2,9 @@
   <main>
     <Header />
     <section class="flex-grow p-4 bg-bgtheme flex flex-col">
-      <slot />
+      <Sheet>
+        <slot />
+      </Sheet>
     </section>
   </main>
 </template>
