@@ -40,22 +40,22 @@
   const userRole = "admin";
   const { clear } = useUserSession()
   const  router = useRouter()
+  const allTabs = useState<{value: string, label: string, url: string}[]>('tabs',() =>[
+    { value: "events", label: "Eventos", url: "/dashboard/events" },
+    { value: "reports", label: "Reportes", url: "/dashboard/reports" },
+    { value: "users", label: "Usuarios", url: "/dashboard/users" },
+    { value: "roles", label: "Roles", url: "/dashboard/roles" },
+  ])
   
-  const allTabs = [
-    { value: "events", label: "Eventos" },
-    { value: "reports", label: "Reportes" },
-    { value: "users", label: "Usuarios" },
-    { value: "roles", label: "Roles" },
-  ];
   const openUserMenu = async() => {
     await clear()
     router.push('/auth/login')
   };
   const tabs = computed(() => {
     if (userRole === "admin") {
-      return allTabs;
+      return allTabs.value;
     } else {
-      return allTabs.filter((tab) => tab.value !== "roles");
+      return allTabs.value.filter((tab) => tab.value !== "roles");
     }
   });
   </script>
