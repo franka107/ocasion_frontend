@@ -1,33 +1,27 @@
 <template>
     <div class="w-full overflow-auto">
         <div class="w-full flex flex-row py-6 gap-x-4">
-            <Input v-model="searchByName" placeholder="Buscar..." class="ml-auto w-[200px] mb-4" />
-            <Input v-model="searchByRuc" placeholder="Buscar RUC..." class="w-[200px] mb-4" />
-            <Select v-model="searchByStatus">
-                <SelectTrigger class="w-[180px]">
-                <SelectValue placeholder="Select a fruit" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectGroup>
-                        <SelectLabel>Fruits</SelectLabel>
-                        <SelectItem value="apple">
-                        Apple
-                        </SelectItem>
-                        <SelectItem value="banana">
-                        Banana
-                        </SelectItem>
-                        <SelectItem value="blueberry">
-                        Blueberry
-                        </SelectItem>
-                        <SelectItem value="grapes">
-                        Grapes
-                        </SelectItem>
-                        <SelectItem value="pineapple">
-                        Pineapple
-                        </SelectItem>
-                    </SelectGroup>
-                </SelectContent>
-            </Select>
+            <template v-for="(item, i) in searchComponents" :index="i">
+                <template v-if="item.search">
+                    <template v-if="item.search.type === 'text'">
+                        <Input v-model="item.search.model" type="string" :placeholder="item.search.placeholder" class="w-[200px]" />
+                    </template>
+                    <template  v-else-if="item.search.type === 'select'">
+                        <Select v-model="item.search.model">
+                            <SelectTrigger class="w-[180px]">
+                                <SelectValue :placeholder="item.search.placeholder" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    <SelectItem v-for="selectItem in item.search.items" :value="selectItem.value">
+                                        {{ selectItem.text }}
+                                    </SelectItem>
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                    </template>
+                </template>
+            </template>
             <Button variant="default">Agregar organización</Button>
         </div>
         <table class="table w-full">
@@ -36,7 +30,7 @@
                     <th class="h-[54px] px-[16px] " v-for="header in props.header" :class="header.align ==='center'? 'text-center' : header.align ==='right'? 'text-right': 'text-left' " :key="header.key">
                         <div v-if="header.sortable" class="flex flex-row items-center">
                             <div>{{ header.label }}</div>
-                            <CustomIcons name="Arrowdown" class="w-4 h-4 ml-2" />
+                            <CustomIcons name="Arrowdown" class="w-4 h-4 ml-2 cursor-pointer" @click="emit('onSort',header)" />
                         </div>
                         <template v-else>
                             {{ header.label }}
@@ -60,18 +54,29 @@
 import CustomIcons from '@/components/ui/custom-icons/CustomIcons.vue';
 
 
-interface DataItem {
+export interface DataItem {
     [key: string]: any
+}
+interface SearchSelectItem {
+    value: string
+    text: string
+}
+export interface SearchItem {
+    type: 'text' | 'select' | 'date' | 'number',
+    placeholder?: string
+    position?: number
+    model: any
+    items?: SearchSelectItem[]
 }
 export interface HeaderItem {
     key: string
     label: string
     sortable: boolean
     align?: 'center' | 'left' | 'right' | undefined
+    search?: SearchItem
 }
 const props = defineProps<{ data: DataItem[], header: HeaderItem[], class?: string | object }>()
-const searchByName = ref('')
-const searchByRuc = ref('')
-const searchByStatus = ref('')
+const emit = defineEmits(["onSort"])
+const searchComponents = computed(() => props.header.filter(item => item.search))
 </script>
 

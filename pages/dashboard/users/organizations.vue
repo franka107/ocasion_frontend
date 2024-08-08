@@ -1,7 +1,7 @@
 <template>
   <div class="w-full flex flex-col">
     <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
-      <CustomTable :data="data" :header="header">
+      <CustomTable :data="orderData" :header="header" @onSort="onSort">
         <template #actions="props">
           <div class="flex justify-center">
             <DropdownMenu>
@@ -33,12 +33,12 @@
             </DropdownMenu>
           </div>
         </template>
-        <template #active="{ row }">
-          <CustomChip :text="row.active? 'Activo': 'Suspendido'" :variant="row.active? 'default':'destructive'"></CustomChip>
+        <template #status="{ row }">
+          <CustomChip :text="row.status === 'ACTIVE'? 'Activo': 'Suspendido'" :variant="row.status === 'ACTIVE'? 'default':'destructive'"></CustomChip>
         </template>
       </CustomTable>
     </div>
-    <CustomPagination class="mt-5 mb-[19px]" />
+    <CustomPagination class="mt-5 mb-[19px]" :total="data.count" :limit="data.limit" v-model:page="page" />
   </div>
 </template>
 <script setup lang="ts">
@@ -47,29 +47,93 @@ import type { HeaderItem } from '@/components/ui/custom-table/CustomTable.vue';
 import CustomChip from '@/components/ui/custom-chip/CustomChip.vue';
 import CustomIcons from '@/components/ui/custom-icons/CustomIcons.vue';
 import CustomPagination from '@/components/ui/custom-pagination/CustomPagination.vue';
+import type { OrderItem } from '@/types/Order.ts';
 
+const page = ref(1)
+const rucValue = ref("")
+const nameValue = ref("")
+const statusValue = ref("")
+const filterOptions = ref('[]')
+const sortOptions = ref('[]')
+
+// const filterOptions = ref('[{"field":"rucNumber","type":"like","value":"0"}]')
+watch([rucValue, nameValue, statusValue], () => {
+  filterOptions.value = JSON.stringify([
+    { field: 'rucNumber', type: 'like', value: rucValue.value },
+    { field: 'name', type: 'like', value: nameValue.value },
+    // { field: 'status', type: 'equal', value: statusValue.value }
+  ])
+})
+const onSort = (item) => {
+  const jsonSort = JSON.parse(sortOptions.value)
+  const ind = jsonSort.findIndex((sortItem: any) => sortItem.field === item.key)
+    if (ind !== -1) {
+      jsonSort[ind].order = jsonSort[ind].order === 'asc' ? 'desc' : 'asc'
+    } else {
+      jsonSort.push({ field: item.key, order: 'asc' })
+    }
+    sortOptions.value = JSON.stringify(jsonSort)
+    // sortOptions: `[{"field":"rucNumber","order":"asc"}]`
+    console.log('sort', sortOptions.value)
+}
+const { data } : any = await useAPI('/organization-management/find-organizations', {
+  query: {
+    limit: 8,
+    page,
+    filterOptions,
+    sortOptions
+  },
+} as any);
+
+const orderData= computed(() => data.value.data.map((item: OrderItem) => ({
+    "date": item.contractStartDate + ' - ' + item.contractEndDate,
+    ...item
+  })))
+const test = ""
 const header: HeaderItem[] = [{
-    key: 'ruc',
+    key: 'rucNumber',
     label: 'RUC',
-    sortable: true
+    sortable: true,
+    search: {
+      type: 'text',
+      placeholder: 'Buscar RUC',
+      position: 1,
+      model: rucValue
+    }
   }, {
     key: 'name',
     label: 'Razón social',
-    sortable: true
+    sortable: true,
+    search: {
+      type: 'text',
+      placeholder: 'Buscar nombre de organización',
+      position: 2,
+      model: nameValue
+    }
   }, {
     key: 'date',
     label: 'Fecha de inicio y fecha de fin del contrato',
     sortable: true
   },{
-    key: 'active',
+    key: 'status',
     label: 'Estado',
-    sortable: true
+    sortable: true,
+    search: {
+      type: 'select',
+      placeholder: 'Filtrar por estado',
+      items: [
+        { text: 'Activo', value: 'ACTIVE' },
+        { text: 'Suspendido', value: 'SUSPENDED' }
+      ],
+      position: 3,
+      model: statusValue
+    }
   },{
-    key: 'user',
+    key: 'representativeFullName',
     label: 'Usuario',
     sortable: true
   },{
-    key: 'phone',
+    key: 'representativePhoneNumber',
     label: 'Número de administrador',
     sortable: true
   },{
@@ -78,12 +142,4 @@ const header: HeaderItem[] = [{
     sortable: false,
     align: 'center'
   }]
-  const data = [
-    { id: 1, name: 'Nombre de razón social', ruc: '1234567891021', date: '01/01/2021 - 01/01/2022', active: true, user: 'Admin. Organizacion', phone: '123456789' },
-    { id: 2, name: 'Nombre de razón social', ruc: '1234567891021', date: '01/01/2021 - 01/01/2022', active: true, user: 'Admin. Organizacion', phone: '123456789' },
-    { id: 3, name: 'Nombre de razón social', ruc: '1234567891021', date: '01/01/2021 - 01/01/2022', active: true, user: 'Admin. Organizacion', phone: '123456789' },
-    { id: 4, name: 'Nombre de razón social', ruc: '1234567891021', date: '01/01/2021 - 01/01/2022', active: false, user: 'Admin. Organizacion', phone: '123456789' },
-    { id: 5, name: 'Nombre de razón social', ruc: '1234567891021', date: '01/01/2021 - 01/01/2022', active: false, user: 'Admin. Organizacion', phone: '123456789' },
-    { id: 6, name: 'Nombre de razón social', ruc: '1234567891021', date: '01/01/2021 - 01/01/2022', active: false, user: 'Admin. Organizacion', phone: '123456789' },
-    ]
 </script>
