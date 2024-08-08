@@ -42,7 +42,7 @@
       </NuxtLink>
     </div>
     <div
-      class="bg-white shadow-md rounded-lg px-6 flex-1 flex justify-center items-center"
+      class="flex justify-center flex-grow"
     >
       <NuxtPage />
     </div>
