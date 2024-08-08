@@ -34,7 +34,7 @@ const onSubmit = handleSubmit((values) => {
 
     <div class="border-primary border-t-[1px]"></div>
 
-    <form class="flex flex-col gap-4 flex-grow" @submit="onSubmit">
+    <form class="flex flex-col gap-4 flex-grow p-1" @submit="onSubmit">
       <FormField v-slot="{ componentField }" name="fullName">
         <FormItem>
           <FormControl>
@@ -49,11 +49,7 @@ const onSubmit = handleSubmit((values) => {
       </FormField>
 
       <div class="flex gap-2">
-        <FormField
-          v-slot="{ componentField }"
-          name="documentType"
-          class="w-2/5"
-        >
+        <FormField v-slot="{ componentField }" name="documentType">
           <FormItem class="w-1/2">
             <Select v-bind="componentField">
               <FormControl>
