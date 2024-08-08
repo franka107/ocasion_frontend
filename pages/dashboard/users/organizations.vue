@@ -1,7 +1,7 @@
 <template>
   <div class="w-full flex flex-col">
     <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
-      <CustomTable :data="orderData" :header="header" @onSort="onSort">
+      <CustomTable :data="orderData" :header="header" @onSort="onSort" @onSearch="onSearch">
         <template #actions="props">
           <div class="flex justify-center">
             <DropdownMenu>
@@ -17,17 +17,17 @@
               <DropdownMenuContent align="start" class="bg-primary text-white">
                 <DropdownMenuItem @click="">
                   Suspender
-                  <CustomIcons name="Forbidden" class="ml-auto text-muted-foreground/70" />
+                  <CustomIcons name="Forbidden" class="ml-auto" />
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem @click="">
                   Activar
-                  <CustomIcons name="Reload" class="ml-auto text-muted-foreground/70" />
+                  <CustomIcons name="Reload" class="ml-auto" />
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem @click="">
                   Actualizar datos
-                  <CustomIcons name="ArrowLeft" class="ml-auto text-muted-foreground/70" />
+                  <CustomIcons name="ArrowLeft" class="ml-auto" />
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -50,31 +50,21 @@ import CustomPagination from '@/components/ui/custom-pagination/CustomPagination
 import type { OrderItem } from '@/types/Order.ts';
 
 const page = ref(1)
-const rucValue = ref("")
-const nameValue = ref("")
-const statusValue = ref("")
 const filterOptions = ref('[]')
 const sortOptions = ref('[]')
 
-// const filterOptions = ref('[{"field":"rucNumber","type":"like","value":"0"}]')
-watch([rucValue, nameValue, statusValue], () => {
+const onSort = (sortObject: { [key: string]: string }[]) => {
+  console.log('sort', sortObject);
+  sortOptions.value = JSON.stringify(sortObject)
+}
+
+const onSearch = (item: {[key: string]: string }) => {
   filterOptions.value = JSON.stringify([
-    { field: 'rucNumber', type: 'like', value: rucValue.value },
-    { field: 'name', type: 'like', value: nameValue.value },
-    // { field: 'status', type: 'equal', value: statusValue.value }
+    { field: 'rucNumber', type: 'like', value: item.rucNumber || '' },
+    { field: 'name', type: 'like', value: item.name || '' },
+    { field: 'status', type: 'equal', value: item.status || '' }
   ])
-})
-const onSort = (item) => {
-  const jsonSort = JSON.parse(sortOptions.value)
-  const ind = jsonSort.findIndex((sortItem: any) => sortItem.field === item.key)
-    if (ind !== -1) {
-      jsonSort[ind].order = jsonSort[ind].order === 'asc' ? 'desc' : 'asc'
-    } else {
-      jsonSort.push({ field: item.key, order: 'asc' })
-    }
-    sortOptions.value = JSON.stringify(jsonSort)
-    // sortOptions: `[{"field":"rucNumber","order":"asc"}]`
-    console.log('sort', sortOptions.value)
+    console.log('searc', item)
 }
 const { data } : any = await useAPI('/organization-management/find-organizations', {
   query: {
@@ -89,7 +79,6 @@ const orderData= computed(() => data.value.data.map((item: OrderItem) => ({
     "date": item.contractStartDate + ' - ' + item.contractEndDate,
     ...item
   })))
-const test = ""
 const header: HeaderItem[] = [{
     key: 'rucNumber',
     label: 'RUC',
@@ -98,7 +87,6 @@ const header: HeaderItem[] = [{
       type: 'text',
       placeholder: 'Buscar RUC',
       position: 1,
-      model: rucValue
     }
   }, {
     key: 'name',
@@ -108,12 +96,10 @@ const header: HeaderItem[] = [{
       type: 'text',
       placeholder: 'Buscar nombre de organización',
       position: 2,
-      model: nameValue
     }
   }, {
     key: 'date',
     label: 'Fecha de inicio y fecha de fin del contrato',
-    sortable: true
   },{
     key: 'status',
     label: 'Estado',
@@ -126,7 +112,6 @@ const header: HeaderItem[] = [{
         { text: 'Suspendido', value: 'SUSPENDED' }
       ],
       position: 3,
-      model: statusValue
     }
   },{
     key: 'representativeFullName',
