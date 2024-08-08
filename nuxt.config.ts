@@ -3,7 +3,9 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
   runtimeConfig: {
-    apiUrl: process.env.NUXT_API_URL
+    public: {
+      apiUrl: process.env.NUXT_API_URL
+    }
   },
   modules: ["@nuxtjs/tailwindcss", "shadcn-nuxt", "nuxt-auth-utils"],
   shadcn: {

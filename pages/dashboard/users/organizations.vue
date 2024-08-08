@@ -1,159 +1,145 @@
 <template>
-  <div>
-    <h1>Organizations</h1>
-
-    <OrganizationForm
-      :organization="selectedOrganization"
-      :onsubmit="onFormSubmit"
-    />
-
-    <div>
-      <div class="w-full flex justify-end mb-4">
-        <SheetTrigger>
-          <Button class="">
-            <PlusIcon class="w-4 h-4 mr-2 text-white" />
-            Agregar Empresa
-          </Button>
-        </SheetTrigger>
-      </div>
-      <Table>
-        <TableCaption>Lista de organizaciones recientes</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead class="w-[200px]">RUC Number</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Representative Full Name</TableHead>
-            <TableHead>Document Type</TableHead>
-            <TableHead>Document Identifier</TableHead>
-            <TableHead>Phone Number</TableHead>
-            <TableHead>Billing Email</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <TableRow
-            v-for="organization in organizations"
-            :key="organization.rucNumber"
-          >
-            <TableCell class="font-medium">{{
-              organization.rucNumber
-            }}</TableCell>
-            <TableCell>{{ organization.name }}</TableCell>
-            <TableCell>{{ organization.representativeFullName }}</TableCell>
-            <TableCell>{{ organization.representativeDocumentType }}</TableCell>
-            <TableCell>{{
-              organization.representativeDocumentIdentifier
-            }}</TableCell>
-            <TableCell>{{ organization.representativePhoneNumber }}</TableCell>
-            <TableCell>{{ organization.billingEmail }}</TableCell>
-            <TableCell>
-              <SheetTrigger>
+  <div class="w-full flex flex-col">
+    <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
+      <CustomTable :data="orderData" :header="header" @onSort="onSort">
+        <template #actions="props">
+          <div class="flex justify-center">
+            <DropdownMenu>
+              <DropdownMenuTrigger as-child>
                 <Button
-                  variant="ghost"
-                  size="icon"
-                  @click="editOrganization(organization)"
+                variant="ghost"
+                size="sm"
+                class="h-8 data-[state=open]:bg-accent"
                 >
-                  <DotsHorizontalIcon />
+                  <CustomIcons name="VerticalDots" class="w-6 h-6" />
                 </Button>
-              </SheetTrigger>
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" class="bg-primary text-white">
+                <DropdownMenuItem @click="">
+                  Suspender
+                  <CustomIcons name="Forbidden" class="ml-auto text-muted-foreground/70" />
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem @click="">
+                  Activar
+                  <CustomIcons name="Reload" class="ml-auto text-muted-foreground/70" />
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem @click="">
+                  Actualizar datos
+                  <CustomIcons name="ArrowLeft" class="ml-auto text-muted-foreground/70" />
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </template>
+        <template #status="{ row }">
+          <CustomChip :text="row.status === 'ACTIVE'? 'Activo': 'Suspendido'" :variant="row.status === 'ACTIVE'? 'default':'destructive'"></CustomChip>
+        </template>
+      </CustomTable>
     </div>
+    <CustomPagination class="mt-5 mb-[19px]" :total="data.count" :limit="data.limit" v-model:page="page" />
   </div>
 </template>
-
 <script setup lang="ts">
-import OrganizationForm from "@/components/users/organizations/form.vue";
+import CustomTable from '@/components/ui/custom-table/CustomTable.vue';
+import type { HeaderItem } from '@/components/ui/custom-table/CustomTable.vue';
+import CustomChip from '@/components/ui/custom-chip/CustomChip.vue';
+import CustomIcons from '@/components/ui/custom-icons/CustomIcons.vue';
+import CustomPagination from '@/components/ui/custom-pagination/CustomPagination.vue';
+import type { OrderItem } from '@/types/Order.ts';
 
-import { ref } from "vue";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { PlusIcon, DotsHorizontalIcon } from "@radix-icons/vue";
+const page = ref(1)
+const rucValue = ref("")
+const nameValue = ref("")
+const statusValue = ref("")
+const filterOptions = ref('[]')
+const sortOptions = ref('[]')
 
-import { Button } from "@/components/ui/button";
-import type { IOrganization } from "~/models/organizations";
-
-const selectedOrganization = ref<IOrganization | null>(null);
-
-const onFormSubmit = () => {
-  console.log("Hello");
-};
-
-const editOrganization = (organization: IOrganization) => {
-  selectedOrganization.value = organization;
-};
-
-const organizations = ref([
-  {
-    rucNumber: "31478108862",
-    name: "Krajcik, Sipes and Rau",
-    economicActivity: { id: "1" },
-    representativeFullName: "John Doe",
-    representativeDocumentType: "DNI",
-    representativeDocumentIdentifier: "76876655",
-    representativePhoneNumber: "987678977",
-    billingEmail: "homero@gmail.com",
-    startPercentage: 12.67,
-    contractStartDate: "2024-08-11",
-    contractEndDate: "2022-08-30",
-    address: {
-      addressLine1: "Calle San Juan 123",
-      district: { id: "1+0+0" },
-    },
-    attachedFiles: [],
+// const filterOptions = ref('[{"field":"rucNumber","type":"like","value":"0"}]')
+watch([rucValue, nameValue, statusValue], () => {
+  filterOptions.value = JSON.stringify([
+    { field: 'rucNumber', type: 'like', value: rucValue.value },
+    { field: 'name', type: 'like', value: nameValue.value },
+    // { field: 'status', type: 'equal', value: statusValue.value }
+  ])
+})
+const onSort = (item) => {
+  const jsonSort = JSON.parse(sortOptions.value)
+  const ind = jsonSort.findIndex((sortItem: any) => sortItem.field === item.key)
+    if (ind !== -1) {
+      jsonSort[ind].order = jsonSort[ind].order === 'asc' ? 'desc' : 'asc'
+    } else {
+      jsonSort.push({ field: item.key, order: 'asc' })
+    }
+    sortOptions.value = JSON.stringify(jsonSort)
+    // sortOptions: `[{"field":"rucNumber","order":"asc"}]`
+    console.log('sort', sortOptions.value)
+}
+const { data } : any = await useAPI('/organization-management/find-organizations', {
+  query: {
+    limit: 8,
+    page,
+    filterOptions,
+    sortOptions
   },
-  {
-    rucNumber: "21548966201",
-    name: "Smith, Johnson and Clark",
-    economicActivity: { id: "2" },
-    representativeFullName: "Jane Smith",
-    representativeDocumentType: "Passport",
-    representativeDocumentIdentifier: "A12345678",
-    representativePhoneNumber: "987654321",
-    billingEmail: "jane@gmail.com",
-    startPercentage: 15.45,
-    contractStartDate: "2023-07-21",
-    contractEndDate: "2024-07-20",
-    address: {
-      addressLine1: "Avenida Siempre Viva 742",
-      district: { id: "2+0+0" },
-    },
-    attachedFiles: [],
-  },
-]);
+} as any);
 
-const fetchOrganizations = async () => {
-  try {
-    const result = await $fetch(
-      "https://back.deocasion.mrmisti.com/v1/organization-management/find-organizations",
-      {
-        method: "GET",
-        body: {
-          limit: 10,
-          page: 1
-        },
-        headers: {
-          "Content-Type": "application/json",
-          accept: "application/json",
-        },
-      }
-    );
-    console.log(result);
-  } catch (error) {
-    console.error("Failed to fetch organizations", error);
-  }
-};
-
-onMounted(() => {
-  fetchOrganizations();
-});
+const orderData= computed(() => data.value.data.map((item: OrderItem) => ({
+    "date": item.contractStartDate + ' - ' + item.contractEndDate,
+    ...item
+  })))
+const test = ""
+const header: HeaderItem[] = [{
+    key: 'rucNumber',
+    label: 'RUC',
+    sortable: true,
+    search: {
+      type: 'text',
+      placeholder: 'Buscar RUC',
+      position: 1,
+      model: rucValue
+    }
+  }, {
+    key: 'name',
+    label: 'Razón social',
+    sortable: true,
+    search: {
+      type: 'text',
+      placeholder: 'Buscar nombre de organización',
+      position: 2,
+      model: nameValue
+    }
+  }, {
+    key: 'date',
+    label: 'Fecha de inicio y fecha de fin del contrato',
+    sortable: true
+  },{
+    key: 'status',
+    label: 'Estado',
+    sortable: true,
+    search: {
+      type: 'select',
+      placeholder: 'Filtrar por estado',
+      items: [
+        { text: 'Activo', value: 'ACTIVE' },
+        { text: 'Suspendido', value: 'SUSPENDED' }
+      ],
+      position: 3,
+      model: statusValue
+    }
+  },{
+    key: 'representativeFullName',
+    label: 'Usuario',
+    sortable: true
+  },{
+    key: 'representativePhoneNumber',
+    label: 'Número de administrador',
+    sortable: true
+  },{
+    key: 'actions',
+    label: 'Acciones',
+    sortable: false,
+    align: 'center'
+  }]
 </script>
