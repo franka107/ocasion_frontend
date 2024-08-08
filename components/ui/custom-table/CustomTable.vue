@@ -4,10 +4,10 @@
             <template v-for="(item, i) in searchComponents" :index="i">
                 <template v-if="item.search">
                     <template v-if="item.search.type === 'text'">
-                        <Input v-model="searchValues[item.key]" type="string" :placeholder="item.search.placeholder" class="w-[200px]" />
+                        <Input v-model="searchValues[item.key]" type="string" :class="item.search.elementClass" :placeholder="item.search.placeholder" class="w-[200px]" />
                     </template>
                     <template  v-else-if="item.search.type === 'select'">
-                        <Select v-model="searchValues[item.key]">
+                        <Select v-model="searchValues[item.key]" :class="item.search.elementClass">
                             <SelectTrigger class="w-[180px]">
                                 <SelectValue :placeholder="item.search.placeholder" />
                             </SelectTrigger>
@@ -66,6 +66,7 @@ export interface SearchItem {
     placeholder?: string
     position?: number
     items?: SearchSelectItem[]
+    elementClass?: string
 }
 export interface HeaderItem {
     key: string

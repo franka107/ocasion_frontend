@@ -1,8 +1,8 @@
 <template>
   <div class="w-full flex flex-col">
     <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
-      <CustomTable :data="orderData" :header="header" @onSort="onSort" @onSearch="onSearch">
-        <template #actions="props">
+      <CustomTable :data="orderData" :header="organizationHeader" @onSort="onSort" @onSearch="onSearch">
+        <template #actions="{ row }">
           <div class="flex justify-center">
             <DropdownMenu>
               <DropdownMenuTrigger as-child>
@@ -15,12 +15,12 @@
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" class="bg-primary text-white">
-                <DropdownMenuItem @click="">
+                <DropdownMenuItem @click="handleSuspend(row.rucNumber)" :disabled="row.status !== 'ACTIVE'">
                   Suspender
                   <CustomIcons name="Forbidden" class="ml-auto" />
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem @click="">
+                <DropdownMenuItem @click="handleActivate(row.rucNumber)"  :disabled="row.status === 'ACTIVE'">
                   Activar
                   <CustomIcons name="Reload" class="ml-auto" />
                 </DropdownMenuItem>
@@ -43,30 +43,14 @@
 </template>
 <script setup lang="ts">
 import CustomTable from '@/components/ui/custom-table/CustomTable.vue';
-import type { HeaderItem } from '@/components/ui/custom-table/CustomTable.vue';
 import CustomChip from '@/components/ui/custom-chip/CustomChip.vue';
 import CustomIcons from '@/components/ui/custom-icons/CustomIcons.vue';
 import CustomPagination from '@/components/ui/custom-pagination/CustomPagination.vue';
 import type { OrderItem } from '@/types/Order.ts';
-
-const page = ref(1)
-const filterOptions = ref('[]')
-const sortOptions = ref('[]')
-
-const onSort = (sortObject: { [key: string]: string }[]) => {
-  console.log('sort', sortObject);
-  sortOptions.value = JSON.stringify(sortObject)
-}
-
-const onSearch = (item: {[key: string]: string }) => {
-  filterOptions.value = JSON.stringify([
-    { field: 'rucNumber', type: 'like', value: item.rucNumber || '' },
-    { field: 'name', type: 'like', value: item.name || '' },
-    { field: 'status', type: 'equal', value: item.status || '' }
-  ])
-    console.log('searc', item)
-}
-const { data } : any = await useAPI('/organization-management/find-organizations', {
+import { organizationHeader } from '~/constants/organization';
+const { page, filterOptions, sortOptions, onSort, onSearch } = useOrder()
+const BASE_ORG_URL = '/organization-management'
+const { data, refresh } : any = await useAPI(`${BASE_ORG_URL}/find-organizations`, {
   query: {
     limit: 8,
     page,
@@ -79,52 +63,30 @@ const orderData= computed(() => data.value.data.map((item: OrderItem) => ({
     "date": item.contractStartDate + ' - ' + item.contractEndDate,
     ...item
   })))
-const header: HeaderItem[] = [{
-    key: 'rucNumber',
-    label: 'RUC',
-    sortable: true,
-    search: {
-      type: 'text',
-      placeholder: 'Buscar RUC',
-      position: 1,
-    }
-  }, {
-    key: 'name',
-    label: 'Razón social',
-    sortable: true,
-    search: {
-      type: 'text',
-      placeholder: 'Buscar nombre de organización',
-      position: 2,
-    }
-  }, {
-    key: 'date',
-    label: 'Fecha de inicio y fecha de fin del contrato',
-  },{
-    key: 'status',
-    label: 'Estado',
-    sortable: true,
-    search: {
-      type: 'select',
-      placeholder: 'Filtrar por estado',
-      items: [
-        { text: 'Activo', value: 'ACTIVE' },
-        { text: 'Suspendido', value: 'SUSPENDED' }
-      ],
-      position: 3,
-    }
-  },{
-    key: 'representativeFullName',
-    label: 'Usuario',
-    sortable: true
-  },{
-    key: 'representativePhoneNumber',
-    label: 'Número de administrador',
-    sortable: true
-  },{
-    key: 'actions',
-    label: 'Acciones',
-    sortable: false,
-    align: 'center'
-  }]
+
+const handleSuspend = async (rucNumber: string) => {
+  console.log("rucNumber", rucNumber);
+  
+  const { status: suspendStatus } : any = await useAPI(`${BASE_ORG_URL}/suspend-organization`,{
+      method: 'POST',
+      body: {
+        rucNumber, 
+      }
+    } as any);
+  refresh()
+}
+
+
+
+const handleActivate = async (rucNumber: string) => {
+  console.log("rucNumber", rucNumber);
+  
+  const { status: activateStatus } : any = await useAPI(`${BASE_ORG_URL}/activate-organization`,{
+      method: 'POST',
+      body: {
+        rucNumber, 
+      }
+    } as any);
+  refresh()
+}
 </script>
