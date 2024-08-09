@@ -24,7 +24,7 @@ const props = withDefaults(defineProps<Props>(), {
   >
     <slot>
         <div :class="iconVariants({ variant })"/>
-        <span class="ml-1 relative top-[-1px]">{{ text }}</span>
+        <span class="ml-1 relative top-[-1px] whitespace-nowrap">{{ text }}</span>
     </slot>
   </Primitive>
 </template>

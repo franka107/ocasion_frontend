@@ -1,4 +1,4 @@
-export interface OrderItem {
+export interface OrganizationItem {
     createdAt: string
     updatedAt: string
     rucNumber: string

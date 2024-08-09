@@ -21,6 +21,10 @@
  
     --primary: 205 84% 12%;
     --primary-foreground: 0 0% 98%;
+
+    
+    --purple: 205 84% 12%;
+    --purple-foreground: 0 0% 98%;
  
     --secondary: 0 84% 60%;
     --secondary-foreground: 0 0% 9%;
@@ -88,4 +92,7 @@
       -ms-overflow-style: none;  /* IE and Edge */
       scrollbar-width: none;  /* Firefox */
 }
+}
+html {
+  font-family: Inter,ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }

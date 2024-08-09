@@ -1,17 +1,17 @@
-export interface RefDataResponse2 {
-    value: DataResponse
+export interface RefDataResponse2<T> {
+    value: IDataResponse<T>
 }
-export interface RefData {
-    data?: RefDataResponse2
+export interface RefData<T> {
+    data?: RefDataResponse2<T>
     status?: any
     error?: Function
     refresh?: Function
     clear?: Function
 }
-export interface DataResponse {
+export interface IDataResponse<T> {
     count: number
     limit: number
     page: number
-    data: any[]
+    data: T[]
 }
   
