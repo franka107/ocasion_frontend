@@ -88,4 +88,21 @@
       -ms-overflow-style: none;  /* IE and Edge */
       scrollbar-width: none;  /* Firefox */
 }
+/* Agrega esto en tu archivo CSS global o en el archivo de estilos de tu proyecto */
+@layer components {
+  .fade-enter-active, .fade-leave-active {
+    transition: opacity 3 s ease;
+  }
+  .fade-enter, .fade-leave-to /* .fade-leave-active en <2.1.8 */ {
+    opacity: 0;
+  }
+}
+@layer base {
+  .fade-enter-active, .fade-leave-active {
+    transition: opacity 0.5s ease-in-out;
+  }
+  .fade-enter, .fade-leave-to /* .fade-leave-active en <2.1.8 */ {
+    opacity: 0;
+  }
+}
 }
