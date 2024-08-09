@@ -1,6 +1,6 @@
 
 // by convention, composable function names start with "use"
-export function useOrder() {
+export function useOrganization() {
     // state encapsulated and managed by the composable
     const page = ref(1)
     const filterOptions = ref('[]')

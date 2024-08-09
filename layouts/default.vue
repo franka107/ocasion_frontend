@@ -1,7 +1,7 @@
 <template>
   <main>
     <Header />
-    <section class="flex-grow p-4 bg-bgtheme flex flex-col min-h-[calc(100vh_-_80px)]">
+    <section class="flex-grow py-4 bg-bgtheme flex flex-col min-h-[calc(100vh_-_80px)]">
       <Sheet>
         <slot />
       </Sheet>

@@ -32,6 +32,15 @@ module.exports = {
         orange: {
           DEFAULT: "#EA580C",
         },
+        purple: {
+          DEFAULT: "#D946EF",
+        },
+        brown: {
+          DEFAULT: "#78716C",
+        },
+        green: {
+          DEFAULT: "#16A34A",
+        },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
