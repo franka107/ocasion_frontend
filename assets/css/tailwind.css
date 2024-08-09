@@ -92,7 +92,6 @@
       -ms-overflow-style: none;  /* IE and Edge */
       scrollbar-width: none;  /* Firefox */
 }
-<<<<<<< HEAD
 /* Agrega esto en tu archivo CSS global o en el archivo de estilos de tu proyecto */
 @layer components {
   .fade-enter-active, .fade-leave-active {
@@ -110,9 +109,7 @@
     opacity: 0;
   }
 }
-=======
 }
 html {
   font-family: Inter,ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
->>>>>>> main
 }
