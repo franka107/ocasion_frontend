@@ -18,26 +18,22 @@
                   <CustomIcons name="VerticalDots" class="w-6 h-6" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" class="bg-primary text-white">
+              <DropdownMenuContent align="start" class="bg-primary text-white w-40">
                 <DropdownMenuItem>
-                  <NuxtLink :to="`/dashboard/events/organization/${row.rucNumber}`">Ver Organización</NuxtLink>
+                  <NuxtLink :to="`/dashboard/events/organization/${row.rucNumber}`">Ver Evento</NuxtLink>
                   <CustomIcons name="EyeIcon" class="ml-auto" />
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem @click="handleSuspend(row.rucNumber)" :disabled="row.status !== 'ACTIVE'">
-                  Suspender
-                  <CustomIcons name="Forbidden" class="ml-auto" />
+                <DropdownMenuItem @click="handleSuspend(row.rucNumber)">
+                  Editar
+                  <CustomIcons name="Pen" class="ml-auto" />
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem @click="handleActivate(row.rucNumber)"  :disabled="row.status === 'ACTIVE'">
-                  Activar
-                  <CustomIcons name="Reload" class="ml-auto" />
+                <DropdownMenuItem @click="handleActivate(row.rucNumber)" >
+                  Cancelar
+                  <CustomIcons name="Close" class="ml-auto" />
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem @click="">
-                  Actualizar datos
-                  <CustomIcons name="ArrowLeft" class="ml-auto" />
-                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -68,9 +64,7 @@ const router = useRoute()
 const filterOptions = ref(`[]`)
 const onSearch = (item: {[key: string]: string }) => {
     filterOptions.value = JSON.stringify([
-      { field: 'rucNumber', type: 'like', value: item.rucNumber || '' },
       { field: 'name', type: 'like', value: item.name || '' },
-      { field: 'status', type: 'equal', value: item.status || '' }
     ])
 }
 const BASE_ORG_URL = '/event-management'

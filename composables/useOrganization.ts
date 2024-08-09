@@ -10,11 +10,14 @@ export function useOrganization() {
     }
       
     const onSearch = (item: {[key: string]: string }) => {
-        filterOptions.value = JSON.stringify([
+        const filters = [
           { field: 'rucNumber', type: 'like', value: item.rucNumber || '' },
           { field: 'name', type: 'like', value: item.name || '' },
-          { field: 'status', type: 'equal', value: item.status || '' }
-        ])
+        ]
+        if(item.status) {
+          filters.push({ field: 'status', type: 'equal', value: item.status })
+        }
+        filterOptions.value = JSON.stringify(filters)
     }
   return { page, filterOptions, sortOptions, onSort, onSearch }
 }
