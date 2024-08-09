@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-lg mb-20 shadow-md p-6 w-[572px] transition-all duration-300 ease-in-out" :style="{ minHeight: containerHeight }">
+  <div class="bg-white rounded-lg shadow-md p-6 w-[572px] transition-all duration-300 ease-in-out" :style="{ minHeight: containerHeight }">
     <h2 :class="['text-[40px] font-roboto font-semibold mb-2', titleClass]">
       {{ title }}
     </h2>

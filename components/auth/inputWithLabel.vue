@@ -20,22 +20,13 @@
     >
       {{ label }}
     </label>
-    <button
-      v-if="props.type === 'password'"
-      @click="togglePassword"
-      type="button"
-      class="absolute right-3 top-1/2 transform -translate-y-1/2 focus:outline-none"
-    >
-      <EyeClosedIcon v-if="!showPassword" class="h-5 w-5 text-black" />
-      <EyeOpenIcon v-else class="h-5 w-5 text-black" />
-    </button>
+    <slot name="icon-right" />
     <p v-if="error" class="mt-1 text-sm text-red-500">{{ error }}</p>
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue';
-import { EyeOpenIcon, EyeClosedIcon } from '@radix-icons/vue';
 
 const props = defineProps({
   id: {
@@ -69,9 +60,6 @@ const togglePassword = () => {
 };
 
 const inputType = computed(() => {
-  if (props.type === 'password' && showPassword.value) {
-    return 'text';
-  }
   return props.type;
 });
 </script>

@@ -11,30 +11,44 @@
       <div class="mb-6 relative">
         <InputWithLabel
           id="password"
-          type="password"
           label="Contraseña"
+          :type="showPassword ? 'text': 'password'"
           v-model="password"
-        />
+        >
+        <template #icon-right>
+            <button
+                @click="showPassword = !showPassword"
+                type="button"
+                class="absolute right-3 top-1/2 transform -translate-y-1/2 focus:outline-none"
+              >
+              <CustomIcons :name="showPassword ? 'EyeIconClosed': 'EyeIcon'" class="w-10 h-10" />
+            </button>
+          </template>
+        </InputWithLabel>  
       </div>
       <div class="mb-6 relative">
         <InputWithLabel
           id="confirmPassword"
-          type="password"
+          :type="showPasswordConfirm ? 'text': 'password'"
           label="Confirmar contraseña"
           v-model="confirmPassword"
-        />
+        >
+          <template #icon-right>
+            <button
+                @click="showPasswordConfirm = !showPasswordConfirm"
+                type="button"
+                class="absolute right-3 top-1/2 transform -translate-y-1/2 focus:outline-none"
+              >
+              <CustomIcons :name="showPasswordConfirm ? 'EyeIconClosed': 'EyeIcon'" class="w-10 h-10" />
+            </button>
+          </template>
+      </InputWithLabel>
       </div>
       <div v-if="showPasswordRequirements" class="text-custom-16 font-roboto text-gray-600 mt-4 bg-[#F8FAFC] p-4 rounded-md shadow-md mb-12">
         <p class="text-base font-roboto mb-2">Tu contraseña debe tener al menos 3 de los siguientes requisitos:</p>
         <ul class="list-none pl-5 mt-2">
           <li v-for="(req, index) in passwordRequirements" :key="index" class="flex items-center mb-2">
-            <img 
-              v-if="isRequirementFulfilled(req)"
-              :src="messageIconSrc" 
-              alt="Ícono de verificación" 
-              class="h-4 w-4 text-green-500 mr-2" 
-            />
-            <span :class="getRequirementClass(req)">{{ req }}</span>
+            <span :class="isRequirementFulfilled(req)? 'text-primary': 'text-secondary'">{{ req }}</span>
           </li>
         </ul>
       </div>
@@ -67,13 +81,14 @@ const { password, validationResult } = useValidationForm();
 const confirmPassword = ref('');
 const isDialogOpen = ref(false);
 const showPasswordRequirements = ref(false);
-
+const showPassword = ref(false);
+const showPasswordConfirm = ref(false);
 const passwordRequirements = [
-  'Al menos 8 caracteres',
-  'Letras minúsculas (a-z)',
-  'Letras mayúsculas (A-Z)',
-  'Números (0-9)',
-  'Caracteres especiales (@$!%*#?&)'
+  '✓ Al menos 8 caracteres',
+  '✓ Letras minúsculas (a-z)',
+  '✓ Letras mayúsculas (A-Z)',
+  '✓ Números (0-9)',
+  '✓ Caracteres especiales (@$!%*#?&)'
 ];
 
 // Activar el botón cuando se ingrese cualquier carácter en el campo de contraseña

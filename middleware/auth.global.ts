@@ -1,4 +1,4 @@
-const PUBLIC_ROUTES = ['/auth/login', '/auth/register', '/auth/recover-password']
+const PUBLIC_ROUTES = ['/auth/login', '/auth/register', '/auth/update-password']
 export default defineNuxtRouteMiddleware((to, from) => {
     const { loggedIn } = useUserSession()
     
