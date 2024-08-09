@@ -15,7 +15,7 @@
       :for="id"
       class="absolute left-3 -top-2.5 bg-white px-1 text-xs text-gray-600 transition-all 
         peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 
-        peer-focus:-top-2.5 peer-focus:text-custom-12 font-inter peer-focus:text-borderPrimaryDark"
+        peer-focus:-top-2.5 peer-focus:text-xs font-inter peer-focus:text-borderPrimaryDark"
         :class="{ 'text-red-500': error }"
     >
       {{ label }}

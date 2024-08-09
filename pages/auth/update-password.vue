@@ -25,7 +25,7 @@
         />
       </div>
       <div v-if="showPasswordRequirements" class="text-custom-16 font-roboto text-gray-600 mt-4 bg-[#F8FAFC] p-4 rounded-md shadow-md mb-12">
-        <p class="text-custom-16 font-roboto mb-2">Tu contraseña debe tener al menos 3 de los siguientes requisitos:</p>
+        <p class="text-base font-roboto mb-2">Tu contraseña debe tener al menos 3 de los siguientes requisitos:</p>
         <ul class="list-none pl-5 mt-2">
           <li v-for="(req, index) in passwordRequirements" :key="index" class="flex items-center mb-2">
             <img 

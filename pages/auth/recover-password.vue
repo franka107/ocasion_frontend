@@ -14,7 +14,7 @@
             v-model="email" 
             type="email" 
             placeholder="Ingresa tu correo"
-            class="w-full p-2 border rounded border border-black"
+            class="w-full p-2 rounded border border-black"
           />
           <Button 
           @click="redirectToLogin" 

@@ -74,16 +74,6 @@ module.exports = {
         sm: "calc(var(--radius) - 4px)",
         btn: "8px", 
       },
-      spacing: {
-        '26': '26px', // Agrega el valor del gap
-        '8': '8px', 
-        '4': '4px'
-      },
-      fontSize: {
-        'custom-40': '40px',
-        'custom-12': '12px',
-        'custom-16': '16px'
-      },
       fontFamily: {
         sans: ['Inter', 'Roboto', 'sans-serif'], 
         inter: ['Inter', 'sans-serif'],

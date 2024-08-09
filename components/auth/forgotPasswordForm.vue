@@ -9,7 +9,7 @@
     titleClass="text-primary"
     subtitleClass="text-xs text-grayCustom"
   >
-    <div class="space-y-4">
+    <div>
       <InputWithLabel
         id="email"
         type="text"
@@ -17,7 +17,7 @@
         v-model="email"
         :error="error"
       />
-      <div class="flex gap-4">
+      <div class="flex">
         <button
           @click="onSubmit"
           :class="buttonClass"
