@@ -8,8 +8,11 @@
         @onSearch="onSearch"
       >
         <template #action-button>
-          <SheetTrigger @click="openSheet('organization-form')">
-            <Button variant="default">Crear organización</Button>
+          <SheetTrigger @click="() => { handleResetData(); openSheet('organization-form'); }">
+            <Button
+              variant="default"
+              >Crear organización</Button
+            >
           </SheetTrigger>
         </template>
         <template #actions="{ row }">
@@ -42,7 +45,7 @@
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <SheetTrigger @click="openSheet('organization-form')">
-                  <DropdownMenuItem @click="handleUpdate(row)">
+                  <DropdownMenuItem @click="handleUpdateForm(row)">
                     Actualizar datos
                     <CustomIcons name="ArrowLeft" class="ml-auto" />
                   </DropdownMenuItem>
@@ -65,7 +68,7 @@
       >
         <OrganizationForm
           :organization="selectedOrganization"
-          :onsubmit="handleCreate"
+          :onsubmit="selectedOrganization ? handleEdit : handleCreate"
         />
       </SheetContent>
       <!-- Fomulario -->
@@ -88,7 +91,8 @@ import type { OrderItem } from "@/types/Order.ts";
 import { organizationHeader } from "~/constants/organization";
 import { useSheetStore } from "@/composables/useSheetStore.js";
 
-const selectedOrganization = ref(null);
+// const selectedOrganization = ref(null);
+const selectedOrganization = ref<any | null>(null);
 const { currentSheet, openSheet } = useSheetStore();
 const { page, filterOptions, sortOptions, onSort, onSearch } = useOrder();
 const BASE_ORG_URL = "/organization-management";
@@ -159,8 +163,87 @@ const handleCreate = async (values: any) => {
   }
 };
 
-const handleUpdate = (organization: any) => {
-  selectedOrganization.value = organization;
-  openSheet('organization-form');
+const handleResetData = () => {
+  selectedOrganization.value = null; // Limpiar selectedOrganization
+}
+
+const handleUpdateForm = async (organization: any) => {
+  // selectedOrganization.value = organization;
+  await fetchOrganizationDetails(organization.rucNumber);
+  openSheet("organization-form");
+};
+
+const handleEdit = async (values: any) => {
+  try {
+    const { status: updateStatus }: any = await useAPI(
+      `${BASE_ORG_URL}/update-organization`,
+      {
+        method: "PUT",
+        body: {
+          ...(selectedOrganization.value ?? {}), // Fallback a un objeto vacío si es null
+          ...values, // Merge existing details with new values
+        },
+      } as any
+    );
+    console.log("Organización actualizada exitosamente");
+    refresh(); // Actualiza la tabla después de actualizar la organización
+    selectedOrganization.value = null; // Limpiar selectedOrganization
+  } catch (error) {
+    selectedOrganization.value = null; // Limpiar selectedOrganization
+    console.error("Error al actualizar la organización", error);
+  }
+};
+
+const fetchOrganizationDetails = async (rucNumber: string) => {
+  try {
+    const { data: organizationDetails }: any = await useAPI(
+      `${BASE_ORG_URL}/get-organization-detail`,
+      {
+        method: "GET",
+        query: {
+          rucNumber,
+        },
+      } as any
+    );
+
+    const {
+      name,
+      rucNumber: ruc,
+      billingEmail,
+      economicActivity,
+      address,
+      contractStartDate,
+      contractEndDate,
+      startPercentage,
+      representativeFullName,
+      representativeDocumentType,
+      representativeDocumentIdentifier,
+      representativePhoneNumber,
+      attachedFiles,
+    } = organizationDetails.value;
+
+    selectedOrganization.value = {
+      name,
+      rucNumber: ruc,
+      billingEmail: billingEmail || null,
+      economicActivityId: economicActivity?.id || null,
+      addressLine1: address?.addressLine1 || "",
+      department: address?.district?.id.split("+")[0] || "",
+      province: address?.district?.id.split("+")[1] || "",
+      districtId: address?.district?.id.split("+")[2] || "",
+      contractStartDate: contractStartDate || "",
+      contractEndDate: contractEndDate || "",
+      startPercentage: startPercentage || 0,
+      representativeFullName: representativeFullName || "",
+      representativeDocumentType: representativeDocumentType || "DNI",
+      representativeDocumentIdentifier: representativeDocumentIdentifier || "",
+      representativePhoneNumber: representativePhoneNumber || "",
+      attachedFiles: attachedFiles || [],
+    };
+
+    console.log(selectedOrganization.value);
+  } catch (error) {
+    console.error("Error al obtener los detalles de la organización", error);
+  }
 };
 </script>

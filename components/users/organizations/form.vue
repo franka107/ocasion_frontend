@@ -10,11 +10,8 @@ const formSchema = toTypedSchema(
   z.object({
     name: z.string().min(1, "La razón social es requerida"),
     rucNumber: z.string().min(1, "El número de RUC es requerido"),
-    billingEmail: z
-      .string()
-      .email("El correo de facturación no es válido")
-      .nullable(),
-    economicActivityId: z.string().nullable(),
+    billingEmail: z.string().optional().nullable(),
+    economicActivityId: z.string().optional().nullable(),
     addressLine1: z.string().min(1, "La dirección es requerida"),
     department: z.string().min(1, "El departamento es requerido"),
     province: z.string().min(1, "La provincia es requerida"),
@@ -24,7 +21,7 @@ const formSchema = toTypedSchema(
       .min(1, "La fecha de inicio del contrato es requerida"),
     contractEndDate: z
       .string()
-      .min(1, "La fecha de fin del contrato es requerida"),
+      .min(0, "La fecha de fin del contrato es requerida"),
     startPercentage: z.number().min(0, "El porcentaje de inicio es requerido"),
     representativeFullName: z
       .string()
@@ -33,9 +30,7 @@ const formSchema = toTypedSchema(
     representativeDocumentIdentifier: z
       .string()
       .min(1, "El DNI del representante es requerido"),
-    representativePhoneNumber: z
-      .string()
-      .min(1, "El teléfono del representante es requerido"),
+    representativePhoneNumber: z.string().optional().nullable(),
     attachedFiles: z
       .array(z.any())
       .min(1, "Debe subir al menos un archivo")
@@ -140,8 +135,8 @@ watch(
 );
 
 watch(form.values, (newValues) => {
-  console.log('Form values:', newValues);
-  console.log('Attached Files:', newValues.attachedFiles); // Revisa este log
+  console.log("Form values:", newValues);
+  console.log("Attached Files:", newValues.attachedFiles); // Revisa este log
 });
 
 const onSubmit = form.handleSubmit((values) => {
@@ -156,7 +151,7 @@ const onSubmit = form.handleSubmit((values) => {
       district: { id: districtId },
     },
   };
-  // console.log(formattedValues);
+  console.log("submit", formattedValues);
   props.onsubmit(formattedValues);
 });
 
@@ -168,7 +163,9 @@ const handleFilesChange = (files: File[]) => {
 <template>
   <SheetHeader>
     <SheetTitle>{{
-      props.organization ? "Editar empresa" : "Registrar empresa"
+      props.organization
+        ? "Actualizar datos de organización"
+        : "Registrar organización"
     }}</SheetTitle>
   </SheetHeader>
 
@@ -190,7 +187,9 @@ const handleFilesChange = (files: File[]) => {
         </FormItem>
       </FormField>
 
-      <h2>Datos Básicos</h2>
+      <h2 class="text-primary text-base font-normal leading-5">
+        Datos Básicos
+      </h2>
       <!-- Razón Social -->
       <FormField v-slot="{ componentField }" name="name">
         <FormItem>
@@ -212,34 +211,6 @@ const handleFilesChange = (files: File[]) => {
             <Input
               type="text"
               placeholder="Número de RUC"
-              v-bind="componentField"
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-
-      <!-- Correo de Facturación -->
-      <FormField v-slot="{ componentField }" name="billingEmail">
-        <FormItem>
-          <FormControl>
-            <Input
-              type="email"
-              placeholder="Correo de Facturación"
-              v-bind="componentField"
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-
-      <!-- Porcentaje de Inicio -->
-      <FormField v-slot="{ componentField }" name="startPercentage">
-        <FormItem>
-          <FormControl>
-            <Input
-              type="number"
-              placeholder="Porcentaje de Inicio"
               v-bind="componentField"
             />
           </FormControl>
@@ -272,14 +243,16 @@ const handleFilesChange = (files: File[]) => {
         </FormItem>
       </FormField>
 
-      <h2>Ubicación</h2>
-      <!-- Dirección -->
-      <FormField v-slot="{ componentField }" name="addressLine1">
+      <h2 class="text-primary text-base font-normal leading-5">
+        Representante Legal
+      </h2>
+      <!-- Nombre Completo -->
+      <FormField v-slot="{ componentField }" name="representativeFullName">
         <FormItem>
           <FormControl>
             <Input
               type="text"
-              placeholder="Dirección"
+              placeholder="Nombre Completo"
               v-bind="componentField"
             />
           </FormControl>
@@ -287,89 +260,98 @@ const handleFilesChange = (files: File[]) => {
         </FormItem>
       </FormField>
 
-      <!-- Departamento -->
-      <FormField v-slot="{ componentField }" name="department">
+      <div class="flex gap-2">
+        <!-- Tipo de Documento -->
+        <FormField
+          v-slot="{ componentField }"
+          name="representativeDocumentType"
+        >
+          <FormItem class="w-1/2">
+            <FormControl>
+              <Select v-bind="componentField">
+                <SelectTrigger class="px-2">
+                  <SelectValue placeholder="Tipo de Documento" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="DNI">DNI</SelectItem>
+                    <SelectItem value="CE">CE</SelectItem>
+                    <SelectItem value="PT">PT</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+        <!-- Número de Documento -->
+        <FormField
+          v-slot="{ componentField }"
+          name="representativeDocumentIdentifier"
+        >
+          <FormItem class="w-1/2">
+            <FormControl>
+              <Input
+                type="text"
+                placeholder="Número de Documento"
+                v-bind="componentField"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+      </div>
+
+      <!-- Teléfono -->
+      <FormField v-slot="{ componentField }" name="representativePhoneNumber">
         <FormItem>
           <FormControl>
-            <Select
+            <Input
+              type="text"
+              placeholder="Número de contacto"
               v-bind="componentField"
-              @update:modelValue="handleStateChange(componentField.modelValue)"
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Departamento" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem
-                    v-for="state in states"
-                    :key="state.id"
-                    :value="state.id"
-                  >
-                    {{ state.name }}
-                  </SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+            />
           </FormControl>
           <FormMessage />
         </FormItem>
       </FormField>
 
-      <!-- Provincia -->
-      <FormField v-slot="{ componentField }" name="province">
+      <!-- Correo de Facturación -->
+      <FormField v-slot="{ componentField }" name="billingEmail">
         <FormItem>
           <FormControl>
-            <Select
+            <Input
+              type="email"
+              placeholder="Correo de facturación"
               v-bind="componentField"
-              @update:modelValue="handleCityChange(componentField.modelValue)"
-              :disabled="!form.values.department"
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Provincia" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem
-                    v-for="city in cities"
-                    :key="city.id"
-                    :value="city.id"
-                  >
-                    {{ city.name }}
-                  </SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+            />
           </FormControl>
           <FormMessage />
         </FormItem>
       </FormField>
 
-      <!-- Distrito -->
-      <FormField v-slot="{ componentField }" name="districtId">
+      <h2 class="text-primary text-base font-normal leading-5">
+        Porcentaje de inicio de subasta
+      </h2>
+      <!-- Porcentaje de Inicio -->
+      <FormField v-slot="{ componentField }" name="startPercentage">
         <FormItem>
           <FormControl>
-            <Select v-bind="componentField" :disabled="!form.values.province">
-              <SelectTrigger>
-                <SelectValue placeholder="Distrito" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem
-                    v-for="district in districts"
-                    :key="district.id"
-                    :value="district.id"
-                  >
-                    {{ district.name }}
-                  </SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+            <Input
+              type="number"
+              step="0.01"
+              min="0"
+              placeholder="Porcentaje de Inicio"
+              v-bind="componentField"
+            />
           </FormControl>
           <FormMessage />
         </FormItem>
       </FormField>
 
-      <h2>Duración de Contrato</h2>
+      <h2 class="text-primary text-base font-normal leading-5">
+        Duración de Contrato
+      </h2>
       <!-- Fecha de Inicio del Contrato -->
       <div class="flex gap-2">
         <FormField v-slot="{ componentField }" name="contractStartDate">
@@ -400,34 +382,27 @@ const handleFilesChange = (files: File[]) => {
         </FormField>
       </div>
 
-      <h2>Representante Legal</h2>
-      <!-- Nombre Completo -->
-      <FormField v-slot="{ componentField }" name="representativeFullName">
+      <h2 class="text-primary text-base font-normal leading-5">Ubicación</h2>
+      <!-- Departamento -->
+      <FormField v-slot="{ componentField }" name="department">
         <FormItem>
           <FormControl>
-            <Input
-              type="text"
-              placeholder="Nombre Completo"
+            <Select
               v-bind="componentField"
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-
-      <!-- Tipo de Documento -->
-      <FormField v-slot="{ componentField }" name="representativeDocumentType">
-        <FormItem>
-          <FormControl>
-            <Select v-bind="componentField">
+              @update:modelValue="handleStateChange(componentField.modelValue)"
+            >
               <SelectTrigger>
-                <SelectValue placeholder="Tipo de Documento" />
+                <SelectValue placeholder="Departamento" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectItem value="DNI">DNI</SelectItem>
-                  <SelectItem value="CE">CE</SelectItem>
-                  <SelectItem value="PT">PT</SelectItem>
+                  <SelectItem
+                    v-for="state in states"
+                    :key="state.id"
+                    :value="state.id"
+                  >
+                    {{ state.name }}
+                  </SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
@@ -436,38 +411,75 @@ const handleFilesChange = (files: File[]) => {
         </FormItem>
       </FormField>
 
-      <!-- Número de Documento -->
       <div class="flex gap-2">
-        <FormField
-          v-slot="{ componentField }"
-          name="representativeDocumentIdentifier"
-        >
+        <!-- Provincia -->
+        <FormField v-slot="{ componentField }" name="province">
           <FormItem class="w-1/2">
             <FormControl>
-              <Input
-                type="text"
-                placeholder="Número de Documento"
+              <Select
                 v-bind="componentField"
-              />
+                @update:modelValue="handleCityChange(componentField.modelValue)"
+                :disabled="!form.values.department"
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Provincia" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem
+                      v-for="city in cities"
+                      :key="city.id"
+                      :value="city.id"
+                    >
+                      {{ city.name }}
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
 
-        <!-- Teléfono -->
-        <FormField v-slot="{ componentField }" name="representativePhoneNumber">
+        <!-- Distrito -->
+        <FormField v-slot="{ componentField }" name="districtId">
           <FormItem class="w-1/2">
             <FormControl>
-              <Input
-                type="text"
-                placeholder="Teléfono"
-                v-bind="componentField"
-              />
+              <Select v-bind="componentField" :disabled="!form.values.province">
+                <SelectTrigger>
+                  <SelectValue placeholder="Distrito" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem
+                      v-for="district in districts"
+                      :key="district.id"
+                      :value="district.id"
+                    >
+                      {{ district.name }}
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
       </div>
+
+      <!-- Dirección -->
+      <FormField v-slot="{ componentField }" name="addressLine1">
+        <FormItem>
+          <FormControl>
+            <Input
+              type="text"
+              placeholder="Dirección"
+              v-bind="componentField"
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
 
       <!-- Botón de Submit -->
       <!-- <Button type="submit">Guardar</Button> -->
@@ -485,7 +497,7 @@ const handleFilesChange = (files: File[]) => {
               )
             "
           >
-            Registrar
+            {{ props.organization ? "Actualizar datos" : "Registrar" }}
           </Button>
         </SheetClose>
       </SheetFooter>

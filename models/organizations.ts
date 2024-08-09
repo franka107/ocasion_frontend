@@ -24,7 +24,7 @@ export const organizationSchema = z.object({
   representativeFullName: z.string(),
   representativeDocumentType: z.enum(['DNI', 'CE', 'PT']),
   representativeDocumentIdentifier: z.string(),
-  representativePhoneNumber: z.string(),
+  representativePhoneNumber: z.string().nullable(),
   billingEmail: z.string().nullable(),
   startPercentage: z.number(),
   contractStartDate: z.string(),

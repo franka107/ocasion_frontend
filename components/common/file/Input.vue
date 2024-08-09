@@ -12,7 +12,8 @@ const props = defineProps({
     default: "Cargar máximo hasta 3 archivos (xlsx, docx o pdf)",
   },
   modelValue: {
-    type: Array as () => string[],
+    // type: Array as () => string[],
+    type: Array as () => { id: string; path: string }[],
     default: () => [],
   },
   errorMessage: {
@@ -21,12 +22,16 @@ const props = defineProps({
   },
 });
 
-const files = ref<File[]>([]);
+// const files = ref<File[]>([]);
+const files = ref<{ id: string; path: string; name: string }[]>([]);
 const fileInputRef = ref<HTMLInputElement | null>(null);
 
 const emit = defineEmits(["update:modelValue"]);
 
-const uploadFile = async (file: File): Promise<string> => {
+// const uploadFile = async (file: File): Promise<string> => {
+const uploadFile = async (
+  file: File
+): Promise<{ id: string; path: string }> => {
   try {
     const formData = new FormData();
     formData.append("file", file);
@@ -37,7 +42,8 @@ const uploadFile = async (file: File): Promise<string> => {
     } as any);
 
     console.log("File uploaded successfully:", data.value.file);
-    return data.value.file.id;
+    // return data.value.file.id;
+    return { id: data.value.file.id, path: data.value.file.path };
   } catch (error) {
     console.error("An error occurred during file upload:", error);
     throw new Error("File upload failed due to an error");
@@ -49,19 +55,24 @@ const handleFileChange = async (event: Event) => {
   if (input.files) {
     const newFiles = Array.from(input.files).slice(0, 3 - files.value.length); // Limitar a 3 archivos
     const newFileIds: string[] = [];
+    // const newFileData: { id: string; path: string }[] = [];
 
     for (const file of newFiles) {
       try {
-        const fileId = await uploadFile(file); // Subir el archivo
-        files.value.push(file); // Agregar el archivo a la lista de archivos
-        props.modelValue.push(fileId); // Agregar el ID del archivo a modelValue
-        newFileIds.push(fileId); // Agregar solo el ID del archivo a la lista de IDs
+        // const fileId = await uploadFile(file); // Subir el archivo
+        const fileData = await uploadFile(file); // Subir el archivo
+        const fileName = file.name; // Nombre del archivo subido
+        files.value.push({ ...fileData, name: fileName }); // Agregar el archivo a la lista con nombre
+        props.modelValue.push(fileData); // Agregar el ID del archivo a modelValue
+        newFileIds.push(fileData.id); // Agregar solo el ID del archivo a la lista de IDs
+        // newFileIds.push(fileId); // Agregar solo el ID del archivo a la lista de IDs
+        // newFileData.push(fileData); // Agregar el objeto con id y path a la lista de datos
       } catch (error) {
         console.error(error);
       }
     }
-    // emit("update:modelValue", props.modelValue); // Emitir los IDs actualizados
     emit("update:modelValue", newFileIds); // Emitir los IDs actualizados
+    // emit("update:modelValue", newFileData); // Emitir los datos actualizados
   }
 };
 
@@ -78,6 +89,19 @@ const triggerFileInput = () => {
 // watch(files.value, (newVal) => {
 //   console.log(newVal)
 // })
+const getFileNameFromPath = (path: string): string => {
+  return path.split('/').pop() || "Unknown file"; // Obtén el nombre del archivo desde la URL
+};
+
+// Inicializa los archivos existentes
+onMounted(() => {
+  files.value = props.modelValue.map(fileData => ({
+    ...fileData,
+    name: getFileNameFromPath(fileData.path)
+  }));
+});
+
+
 </script>
 
 <template>
