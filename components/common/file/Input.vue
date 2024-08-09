@@ -12,8 +12,7 @@ const props = defineProps({
     default: "Cargar máximo hasta 3 archivos (xlsx, docx o pdf)",
   },
   modelValue: {
-    type: Array as () => File[],
-    // type: Array,
+    type: Array as () => string[],
     default: () => [],
   },
   errorMessage: {
@@ -27,19 +26,49 @@ const fileInputRef = ref<HTMLInputElement | null>(null);
 
 const emit = defineEmits(["update:modelValue"]);
 
-const handleFileChange = (event: Event) => {
+const uploadFile = async (file: File): Promise<string> => {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const { status, data }: any = await useAPI("/files/upload", {
+      method: "POST",
+      body: formData,
+    } as any);
+
+    console.log("File uploaded successfully:", data.value.file);
+    return data.value.file.id;
+  } catch (error) {
+    console.error("An error occurred during file upload:", error);
+    throw new Error("File upload failed due to an error");
+  }
+};
+
+const handleFileChange = async (event: Event) => {
   const input = event.target as HTMLInputElement;
   if (input.files) {
     const newFiles = Array.from(input.files).slice(0, 3 - files.value.length); // Limitar a 3 archivos
-    files.value = [...files.value, ...newFiles];
-    emit("update:modelValue", files.value);
-    // input.value = ""; // Resetear input
+    const newFileIds: string[] = [];
+
+    for (const file of newFiles) {
+      try {
+        const fileId = await uploadFile(file); // Subir el archivo
+        files.value.push(file); // Agregar el archivo a la lista de archivos
+        props.modelValue.push(fileId); // Agregar el ID del archivo a modelValue
+        newFileIds.push(fileId); // Agregar solo el ID del archivo a la lista de IDs
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    // emit("update:modelValue", props.modelValue); // Emitir los IDs actualizados
+    emit("update:modelValue", newFileIds); // Emitir los IDs actualizados
   }
 };
 
 const removeFile = (index: number) => {
   files.value.splice(index, 1);
-  emit("update:modelValue", files.value);
+  props.modelValue.splice(index, 1); // Eliminar el ID correspondiente en modelValue
+  emit("update:modelValue", props.modelValue); // Emitir los IDs actualizados
 };
 
 const triggerFileInput = () => {
@@ -49,7 +78,6 @@ const triggerFileInput = () => {
 // watch(files.value, (newVal) => {
 //   console.log(newVal)
 // })
-
 </script>
 
 <template>
