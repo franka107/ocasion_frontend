@@ -8,14 +8,14 @@ export const customChipVariants = cva(
     variants: {
       variant: {
         default: 'text-blue bg-blue/10',
+        blue: 'text-blue bg-blue/10',
+        purple: 'text-purple bg-purple/10',
+        red: 'text-[#DB2777] bg-[#DB2777]/10',
+        green: 'text-green bg-green/10',
+        orange: 'text-orange bg-orange/10',
+        brown: 'text-brown bg-brown/10',
         destructive:
           'text-destructive bg-destructive/10',
-        outline:
-          'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
-        secondary:
-          'text-destructive bg-destructive/10',
-        ghost: 'hover:bg-accent hover:text-accent-foreground',
-        link: 'text-primary underline-offset-4 hover:underline',
       }
     },
     defaultVariants: {
@@ -29,14 +29,14 @@ export const iconVariants = cva(
       variants: {
         variant: {
           default: 'bg-blue',
+          blue: 'bg-blue',
+          purple: 'bg-purple',
+          red: 'bg-[#DB2777]',
+          green: 'bg-green',
+          orange: 'bg-orange',
+          brown: 'bg-brown',
           destructive:
             'bg-destructive',
-          outline:
-            'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
-          secondary:
-            'bg-destructive',
-          ghost: 'hover:bg-accent hover:text-accent-foreground',
-          link: 'text-primary underline-offset-4 hover:underline',
         }
       },
       defaultVariants: {

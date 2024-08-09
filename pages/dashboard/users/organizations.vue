@@ -28,10 +28,11 @@
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" class="bg-primary text-white">
-                <DropdownMenuItem
-                  @click="handleSuspend(row.rucNumber)"
-                  :disabled="row.status !== 'ACTIVE'"
-                >
+                <DropdownMenuItem>
+                  <NuxtLink :to="`/dashboard/events/organization/${row.rucNumber}`">Ver Organización</NuxtLink>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem @click="handleSuspend(row.rucNumber)" :disabled="row.status !== 'ACTIVE'">
                   Suspender
                   <CustomIcons name="Forbidden" class="ml-auto" />
                 </DropdownMenuItem>
@@ -87,33 +88,29 @@ import CustomTable from "@/components/ui/custom-table/CustomTable.vue";
 import CustomChip from "@/components/ui/custom-chip/CustomChip.vue";
 import CustomIcons from "@/components/ui/custom-icons/CustomIcons.vue";
 import CustomPagination from "@/components/ui/custom-pagination/CustomPagination.vue";
-import type { OrderItem } from "@/types/Order.ts";
+import type { OrganizationItem } from '@/types/Order.ts';
 import { organizationHeader } from "~/constants/organization";
 import { useSheetStore } from "@/composables/useSheetStore.js";
+import { useOrganization } from "@/composables/useOrganization";
 
 // const selectedOrganization = ref(null);
 const selectedOrganization = ref<any | null>(null);
 const { currentSheet, openSheet } = useSheetStore();
-const { page, filterOptions, sortOptions, onSort, onSearch } = useOrder();
-const BASE_ORG_URL = "/organization-management";
-const { data, refresh }: any = await useAPI(
-  `${BASE_ORG_URL}/find-organizations`,
-  {
-    query: {
-      limit: 8,
-      page,
-      filterOptions,
-      sortOptions,
-    },
-  } as any
-);
+const { page, filterOptions, sortOptions, onSort, onSearch } = useOrganization()
+const BASE_ORG_URL = '/organization-management'
+const { data, refresh } : any = await useAPI(`${BASE_ORG_URL}/find-organizations`, {
+  query: {
+    limit: 8,
+    page,
+    filterOptions,
+    sortOptions
+  },
+} as any);
 
-const orderData = computed(() =>
-  data.value.data.map((item: OrderItem) => ({
-    date: item.contractStartDate + " - " + item.contractEndDate,
-    ...item,
-  }))
-);
+const orderData= computed(() => data.value.data.map((item: OrganizationItem) => ({
+    "date": item.contractStartDate + ' - ' + item.contractEndDate,
+    ...item
+  })))
 
 const handleSuspend = async (rucNumber: string) => {
   console.log("rucNumber", rucNumber);
@@ -123,12 +120,11 @@ const handleSuspend = async (rucNumber: string) => {
     {
       method: "POST",
       body: {
-        rucNumber,
-      },
-    } as any
-  );
-  refresh();
-};
+        rucNumber, 
+      }
+    } as any);
+  refresh()
+}
 
 const handleActivate = async (rucNumber: string) => {
   console.log("rucNumber", rucNumber);
