@@ -1,49 +1,36 @@
 import { z } from 'zod';
 
-export interface IOrganization {
-  rucNumber: string;
-  name: string;
-  economicActivity: {
-    id: string;
-  };
-  representativeFullName: string;
-  representativeDocumentType: string;
-  representativeDocumentIdentifier: string;
-  representativePhoneNumber: string;
-  billingEmail: string;
-  startPercentage: number;
-  contractStartDate: string;
-  contractEndDate: string;
-  address: {
-    addressLine1: string;
-    district: {
-      id: string;
-    };
-  };
-  attachedFiles: string[];
-}
+export const economicActivitySchema = z.object({
+  id: z.string(),
+});
+
+export const districtSchema = z.object({
+  id: z.string(),
+});
+
+export const addressSchema = z.object({
+  addressLine1: z.string(),
+  district: districtSchema,
+});
+
+export const attachedFileSchema = z.object({
+  id: z.string(),
+});
 
 export const organizationSchema = z.object({
   rucNumber: z.string(),
   name: z.string(),
-  economicActivity: z.object({
-    id: z.string(),
-  }),
+  economicActivity: economicActivitySchema.nullable(),
   representativeFullName: z.string(),
-  representativeDocumentType: z.string(),
+  representativeDocumentType: z.enum(['DNI', 'CE', 'PT']),
   representativeDocumentIdentifier: z.string(),
-  representativePhoneNumber: z.string(),
-  billingEmail: z.string(),
+  representativePhoneNumber: z.string().nullable(),
+  billingEmail: z.string().nullable(),
   startPercentage: z.number(),
   contractStartDate: z.string(),
   contractEndDate: z.string(),
-  address: z.object({
-    addressLine1: z.string(),
-    district: z.object({
-      id: z.string(),
-    }),
-  }),
-  attachedFiles: z.array(z.string()),
+  address: addressSchema,
+  attachedFiles: z.array(attachedFileSchema),
 });
 
 export type Organization = z.infer<typeof organizationSchema>;
