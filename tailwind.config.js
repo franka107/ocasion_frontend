@@ -65,12 +65,34 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        borderPrimaryDark: "#0B3859",
       },
       borderRadius: {
       	xl: "calc(var(--radius) + 4px)",
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        btn: "8px", 
+      },
+      spacing: {
+        '26': '26px', // Agrega el valor del gap
+        '8': '8px', 
+        '4': '4px'
+      },
+      fontSize: {
+        'custom-40': '40px',
+        'custom-12': '12px',
+        'custom-16': '16px'
+      },
+      fontFamily: {
+        sans: ['Inter', 'Roboto', 'sans-serif'], 
+        inter: ['Inter', 'sans-serif'],
+        roboto: ['Roboto', 'sans-serif'], // Añadir la fuente Roboto
+      },
+      fontWeight: {
+        'regular': 400,
+        'semibold': 500,  // Añadir peso semibold
+        'bold': 700,
       },
       keyframes: {
         "accordion-down": {

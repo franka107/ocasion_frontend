@@ -1,40 +1,48 @@
 <template>
-  <NuxtLayout logo-subtitle="Acceso Super Admin">
+  <AuthForm logo-subtitle="Acceso Super Admin">
     <BaseForm 
+      v-if="!showForgotPassword" 
       title="Bienvenido" 
       subtitle="Inicia sesión con tus credenciales."
       submit-text="Ingresar"
-      submit-class="text-gray-300 bg-primary hover:bg-[#09314F] hover:text-white"
+      :submitClass="submitButtonClass"
+      :isActive="isActive"
       @submit="handleSubmit"
     >
-      <div class="space-y-4">
-        <Input 
-          v-model="email" 
-          type="email" 
-          placeholder="Ingresa tu correo"
+      <div class="mb-6 relative">
+        <InputWithLabel 
+          id="email"
+          type="email"
+          label="Correo electrónico"
+          v-model="email"
+          :error="errors.email"
+          :class="{ 'border-red-500': errors.email }"
         />
-        <div class="relative flex flex-col">
-          <Input 
-            v-model="password" 
-            :type="showPassword ? 'text' : 'password'" 
-            placeholder="Contraseña"
-          />
-          <div class="flex items-center mt-2">
-            <Button 
-              @click="togglePassword" 
-              type="button"
-              class="absolute inset-y-0 right-0 pr-3 flex items-center bg-transparent hover:bg-transparent border-none"
-            >
-              <EyeClosedIcon v-if="!showPassword" class="h-5 w-5 text-gray-400" />
-              <EyeOpenIcon v-else class="h-5 w-5 text-gray-400" />
-            </Button>
-            <a href="" class="ml-auto font-semibold text-xs text-[#09314F] hover:underline">
-              ¿Olvidaste tu contraseña?
-            </a>
-          </div>
+      </div>
+      <div class="mb-6 relative">
+        <InputWithLabel 
+          id="password"
+          type="password"
+          label="Contraseña"
+          v-model="password"
+          :error="errors.password"
+          :class="{ 'border-red-500': errors.password }"
+        />
+        <div class="flex justify-end mt-2">
+          <a
+            @click.prevent="toggleForgotPassword" 
+            href="#" 
+            class="font-semibold text-xs text-primary hover:underline w-[161px] h-[20px] rounded-tl-[2px] opacity-100"
+          >
+            ¿Olvidaste tu contraseña?
+          </a>
         </div>
       </div>
     </BaseForm>
+    <ForgotPasswordForm 
+      v-else 
+      @back="toggleForgotPassword" 
+    />
     <Dialog 
       v-model:open="isDialogOpen"
       :iconSrc="messageIconSrc"
@@ -46,55 +54,41 @@
       @close="closeDialog"
       @action="goToUpdatePassword"
     />
-  </NuxtLayout>
+  </AuthForm>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import NuxtLayout from '~/components/auth/authForm.vue'
+import AuthForm from '~/components/auth/authForm.vue'
 import BaseForm from '~/components/auth/baseForm.vue'
-import Input from '~/components/ui/input/Input.vue'
-import Button from '~/components/ui/button/Button.vue'
-import { EyeOpenIcon, EyeClosedIcon } from '@radix-icons/vue'
+import InputWithLabel from '~/components/auth/inputWithLabel.vue'
 import Dialog from '~/components/auth/dialogForm.vue'
+import ForgotPasswordForm from '~/components/auth/forgotPasswordForm.vue'
+import { useLoginForm } from '~/composables/useLoginForm'
 import messageIcon from '~/assets/icon/png/priority-high.png'
 
-const email = ref('')
-const password = ref('')
-const showPassword = ref(false)
-const isDialogOpen = ref(false)
-const router = useRouter()
-const togglePassword = () => {
-  showPassword.value = !showPassword.value
-}
-const { fetch, loggedIn } = useUserSession()
-const handleSubmit = async() => {
-  // Abre el diálogo cuando el usuario hace clic en "Ingresar"
-  console.log('Enviar formulario de  contraseña')
-  // isDialogOpen.value = true
+const {
+  email,
+  password,
+  showPassword,
+  showForgotPassword,
+  isDialogOpen,
+  errors,
+  handleSubmit,
+  togglePassword,
+  toggleForgotPassword,
+  closeDialog,
+  goToUpdatePassword
+} = useLoginForm()
 
-  // Logic to handle form submission
-  await $fetch("/api/auth/login", {
-    method: 'POST',
-    body: {
-      email: email.value,
-      password: password.value
-    },
-  })
-  await fetch()
-  router.push("/dashboard")
-}
+// Computa si el campo de correo electrónico tiene texto
+const isActive = computed(() => email.value.length > 0)
 
-const closeDialog = () => {
-  isDialogOpen.value = false
-}
-
-const goToUpdatePassword = () => {
-  console.log('Redirigiendo a la vista de actualización de contraseña')
-  //closeDialog()
-  router.push('/auth/updatePassword')
-}
-
+const submitButtonClass = computed(() => {
+  return isActive.value
+    ? 'w-full py-2 mt-4 bg-primary text-white rounded focus:outline-none focus:ring-2 focus:ring-primary'
+    : 'w-full py-2 mt-4 bg-gray-200 text-gray-400 rounded cursor-not-allowed'
+})
 const messageIconSrc = messageIcon
 </script>
