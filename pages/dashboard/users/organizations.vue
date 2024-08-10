@@ -8,7 +8,7 @@
         @onSearch="onSearch"
       >
         <template #action-button>
-          <SheetTrigger @click="() => { handleResetData(); openSheet('organization-form'); }">
+          <SheetTrigger @click="() => { organizationRucNo = undefined; openSheet('organization-form'); }">
             <Button
               variant="default"
               >Crear organización</Button
@@ -68,7 +68,7 @@
         class="flex flex-col h-full"
       >
         <OrganizationForm
-          :organization="selectedOrganization"
+          :ruc-number="organizationRucNo"
           :onsubmit="selectedOrganization ? handleEdit : handleCreate"
         />
       </SheetContent>
@@ -96,7 +96,7 @@ import { useOrganization } from "@/composables/useOrganization";
 // const selectedOrganization = ref(null);
 const selectedOrganization = ref<any | null>(null);
 const { currentSheet, openSheet } = useSheetStore();
-const { page, filterOptions, sortOptions, onSort, onSearch } = useOrganization()
+const { page, filterOptions, sortOptions, onSort, onSearch, suspendOrganization, activateOrganization, createOrganization, editOrganization } = useOrganization()
 const BASE_ORG_URL = '/organization-management'
 const { data, refresh } : any = await useAPI(`${BASE_ORG_URL}/find-organizations`, {
   query: {
@@ -106,6 +106,7 @@ const { data, refresh } : any = await useAPI(`${BASE_ORG_URL}/find-organizations
     sortOptions
   },
 } as any);
+const organizationRucNo = ref<number | undefined>(undefined)
 
 const orderData= computed(() => data.value.data.map((item: OrganizationItem) => ({
     "date": item.contractStartDate + ' - ' + item.contractEndDate,
@@ -113,50 +114,18 @@ const orderData= computed(() => data.value.data.map((item: OrganizationItem) => 
   })))
 
 const handleSuspend = async (rucNumber: string) => {
-  console.log("rucNumber", rucNumber);
-
-  const { status: suspendStatus }: any = await useAPI(
-    `${BASE_ORG_URL}/suspend-organization`,
-    {
-      method: "POST",
-      body: {
-        rucNumber, 
-      }
-    } as any);
+  await suspendOrganization(rucNumber)
   refresh()
 }
 
 const handleActivate = async (rucNumber: string) => {
-  console.log("rucNumber", rucNumber);
-
-  const { status: activateStatus }: any = await useAPI(
-    `${BASE_ORG_URL}/activate-organization`,
-    {
-      method: "POST",
-      body: {
-        rucNumber,
-      },
-    } as any
-  );
+  await activateOrganization(rucNumber)
   refresh();
 };
 
 const handleCreate = async (values: any) => {
-  try {
-    const { status: createStatus }: any = await useAPI(
-      `${BASE_ORG_URL}/create-organization`,
-      {
-        method: "POST",
-        body: values,
-      } as any
-    );
-    if (createStatus === 201) {
-      console.log("Organización creada exitosamente");
-      refresh(); // Actualiza la tabla después de crear la organización
-    }
-  } catch (error) {
-    console.error("Error al crear la organización", error);
-  }
+  await createOrganization(values)
+  refresh();
 };
 
 const handleResetData = () => {
@@ -165,81 +134,12 @@ const handleResetData = () => {
 
 const handleUpdateForm = async (organization: any) => {
   // selectedOrganization.value = organization;
-  await fetchOrganizationDetails(organization.rucNumber);
+  organizationRucNo.value = organization.rucNumber;
   openSheet("organization-form");
 };
 
 const handleEdit = async (values: any) => {
-  try {
-    const { status: updateStatus }: any = await useAPI(
-      `${BASE_ORG_URL}/update-organization`,
-      {
-        method: "PUT",
-        body: {
-          ...(selectedOrganization.value ?? {}), // Fallback a un objeto vacío si es null
-          ...values, // Merge existing details with new values
-        },
-      } as any
-    );
-    console.log("Organización actualizada exitosamente");
-    refresh(); // Actualiza la tabla después de actualizar la organización
-    selectedOrganization.value = null; // Limpiar selectedOrganization
-  } catch (error) {
-    selectedOrganization.value = null; // Limpiar selectedOrganization
-    console.error("Error al actualizar la organización", error);
-  }
-};
-
-const fetchOrganizationDetails = async (rucNumber: string) => {
-  try {
-    const { data: organizationDetails }: any = await useAPI(
-      `${BASE_ORG_URL}/get-organization-detail`,
-      {
-        method: "GET",
-        query: {
-          rucNumber,
-        },
-      } as any
-    );
-
-    const {
-      name,
-      rucNumber: ruc,
-      billingEmail,
-      economicActivity,
-      address,
-      contractStartDate,
-      contractEndDate,
-      startPercentage,
-      representativeFullName,
-      representativeDocumentType,
-      representativeDocumentIdentifier,
-      representativePhoneNumber,
-      attachedFiles,
-    } = organizationDetails.value;
-
-    selectedOrganization.value = {
-      name,
-      rucNumber: ruc,
-      billingEmail: billingEmail || null,
-      economicActivityId: economicActivity?.id || null,
-      addressLine1: address?.addressLine1 || "",
-      department: address?.district?.id.split("+")[0] || "",
-      province: address?.district?.id.split("+")[1] || "",
-      districtId: address?.district?.id.split("+")[2] || "",
-      contractStartDate: contractStartDate || "",
-      contractEndDate: contractEndDate || "",
-      startPercentage: startPercentage || 0,
-      representativeFullName: representativeFullName || "",
-      representativeDocumentType: representativeDocumentType || "DNI",
-      representativeDocumentIdentifier: representativeDocumentIdentifier || "",
-      representativePhoneNumber: representativePhoneNumber || "",
-      attachedFiles: attachedFiles || [],
-    };
-
-    console.log(selectedOrganization.value);
-  } catch (error) {
-    console.error("Error al obtener los detalles de la organización", error);
-  }
+  await editOrganization(values)
+  refresh();
 };
 </script>

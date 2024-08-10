@@ -52,13 +52,6 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['update:modelValue']);
-
-const showPassword = ref(false);
-
-const togglePassword = () => {
-  showPassword.value = !showPassword.value;
-};
-
 const inputType = computed(() => {
   return props.type;
 });

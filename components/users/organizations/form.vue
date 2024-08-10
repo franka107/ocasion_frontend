@@ -5,6 +5,10 @@ import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
 import InputFile from "@/components/common/file/Input.vue";
 import type { Organization } from "~/models/organizations";
+const BASE_ORG_URL = '/organization-management'
+let organizationData: Organization | undefined;
+let form: any;
+const props = defineProps<{rucNumber: number | undefined,  onsubmit: (values: any) => void;}>();
 
 const formSchema = toTypedSchema(
   z.object({
@@ -37,28 +41,17 @@ const formSchema = toTypedSchema(
       .max(3, "Puede subir un máximo de 3 archivos"),
   })
 );
+interface OrganizationForm extends Organization {
+  department?: string;
+  province?: string;
+  districtId?: string; 
+  addressLine1?: string;
+  economicActivityId?: string; 
+}
+const { fetchCities, fetchDistricts, fetchStates, states, cities, districts } = useAddress()
 
-const props = defineProps<{
-  organization?: Organization | null;
-  // organization?: z.infer<typeof formSchema> | null;
-  onsubmit: (values: any) => void;
-}>();
-
-const form = useForm({
-  validationSchema: formSchema,
-  initialValues: props.organization || {},
-});
-
-// Estado para almacenar las actividades económicas
 const economicActivities = ref<Array<{ id: string; name: string }>>([]);
-// Estado para almacenar los departamentos
-const states = ref<Array<{ id: string; name: string }>>([]);
-// Estado para almacenar las provincias
-const cities = ref<Array<{ id: string; name: string }>>([]);
-// Estado para almacenar los distritos
-const districts = ref<Array<{ id: string; name: string }>>([]);
 
-// Función para obtener las actividades económicas desde el endpoint
 const fetchEconomicActivities = async () => {
   try {
     const { data } = await useAPI("/economic-activities", {
@@ -70,51 +63,37 @@ const fetchEconomicActivities = async () => {
   }
 };
 
-// Función para obtener los departamentos desde el endpoint
-const fetchStates = async () => {
-  try {
-    const { data } = await useAPI("/locations/states", {
-      default: () => [],
-    });
-    states.value = data.value;
-  } catch (error) {
-    console.error("Error al cargar los departamentos:", error);
-  }
-};
+if (props.rucNumber) {
+      const { data: organizationData } = await useAPI<Organization>(
+        `${BASE_ORG_URL}/get-organization-detail`,
+        {
+          method: "GET",
+          query: {
+            rucNumber: props.rucNumber,
+          },
+        } as any
+      );
+      const orgData: OrganizationForm  = { ...organizationData.value}
+      orgData.department = orgData.address?.district?.id.split("+")[0] || ""
+      orgData.province = `${orgData.department}+${orgData.address?.district?.id.split("+")[1]}` || ""
+      orgData.districtId = orgData.address.district.id
+      orgData.economicActivityId = orgData.economicActivity?.id
+      orgData.addressLine1 = orgData.address.addressLine1
+      await Promise.all([fetchCities(orgData.department), fetchDistricts(orgData.province), fetchEconomicActivities(), fetchStates()])
+      console.log('orgData', orgData);
+        
+      form = useForm({
+        validationSchema: formSchema,
+        initialValues: orgData,
+      });
+} else {
+      await Promise.all([fetchEconomicActivities(), fetchStates()])
+      form = useForm({ validationSchema: formSchema });
+}
 
-// Función para obtener las provincias desde el endpoint
-const fetchCities = async (stateId: string) => {
-  try {
-    const { data } = await useAPI(`/locations/states/${stateId}/cities`, {
-      default: () => [],
-    });
-    cities.value = data.value;
-  } catch (error) {
-    console.error(
-      `Error al cargar las provincias del departamento ${stateId}:`,
-      error
-    );
-  }
-};
-
-// Función para obtener los distritos desde el endpoint
-const fetchDistricts = async (cityId: string) => {
-  try {
-    const { data } = await useAPI(`/locations/cities/${cityId}/districts`, {
-      default: () => [],
-    });
-    districts.value = data.value;
-  } catch (error) {
-    console.error("Error al cargar actividades económicas:", error);
-  }
-};
-
-watchEffect(() => {
-  fetchEconomicActivities();
-  fetchStates();
-});
 
 const handleStateChange = (stateId: string) => {
+  console.log('stateId', stateId);
   cities.value = []; // Limpiar las provincias
   districts.value = []; // Limpiar los distritos
   fetchCities(stateId);
@@ -125,21 +104,12 @@ const handleCityChange = (cityId: string) => {
   fetchDistricts(cityId);
 };
 
-watch(
-  () => props.organization,
-  (newOrganization) => {
-    form.resetForm({
-      values: newOrganization || {},
-    });
-  }
-);
-
 watch(form.values, (newValues) => {
   console.log("Form values:", newValues);
   console.log("Attached Files:", newValues.attachedFiles); // Revisa este log
 });
 
-const onSubmit = form.handleSubmit((values) => {
+const onSubmit = form.handleSubmit((values: OrganizationForm) => {
   const { economicActivityId, addressLine1, districtId, ...restValues } =
     values;
 
@@ -163,7 +133,7 @@ const handleFilesChange = (files: File[]) => {
 <template>
   <SheetHeader>
     <SheetTitle>{{
-      props.organization
+      props.rucNumber
         ? "Actualizar datos de organización"
         : "Registrar organización"
     }}</SheetTitle>
@@ -497,7 +467,7 @@ const handleFilesChange = (files: File[]) => {
               )
             "
           >
-            {{ props.organization ? "Actualizar datos" : "Registrar" }}
+            {{ props.rucNumber ? "Actualizar datos" : "Registrar" }}
           </Button>
         </SheetClose>
       </SheetFooter>
