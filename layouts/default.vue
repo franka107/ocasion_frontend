@@ -5,10 +5,12 @@
       <Sheet>
         <slot />
       </Sheet>
+    <ConfirmModal />
     </section>
   </main>
 </template>
 
 <script setup lang="ts">
 import Header from "@/components/layouts/Header.vue";
+import ConfirmModal from "~/components/ui/confirm-modal/ConfirmModal.vue";
 </script>

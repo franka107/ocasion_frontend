@@ -74,7 +74,6 @@
       </SheetContent>
       <!-- Fomulario -->
     </div>
-    <ConfirmModal />
     <CustomPagination
       class="mt-5 mb-[19px]"
       :total="data.count"
@@ -107,7 +106,7 @@ const { data, refresh } : any = await useAPI(`${BASE_ORG_URL}/find-organizations
   },
 } as any);
 const organizationRucNo = ref<number | undefined>(undefined)
-
+const { openConfirmModal, closeConfirmModal } = useConfirmModal()
 const orderData= computed(() => data.value.data.map((item: OrganizationItem) => ({
     "date": item.contractStartDate + ' - ' + item.contractEndDate,
     ...item
@@ -130,26 +129,32 @@ const handleUpdateForm = async (organization: any) => {
 };
 
 const handleCreate = async (values: any) => {
-  const { status, error } : any = await createOrganization(values)
-  if(status.value === 'success') {
-      console.log("Organización creada exitosamente");
-      closeSheet();
-      refresh();
-  } else {
-      closeSheet();
-      console.log("error", error);
-  } 
+  openConfirmModal('Crear organización', '¿Estás seguro de que deseas crear esta organización?', async() => {
+    const { status, error } : any = await createOrganization(values)
+    if(status.value === 'success') {
+        console.log("Organización creada exitosamente");
+        closeSheet();
+        refresh();
+    } else {
+        closeSheet();
+        console.log("error", error);
+    } 
+    closeConfirmModal()
+  })
 };
 
 const handleEdit = async (values: any) => {
-  const { status, error } : any = await editOrganization(values)
-  console.log('status.value', status.value);
-  if(status.value === 'success') {
-      refresh();
-      console.log("Organización actualizada exitosamente");
-      closeSheet();
-  } else {
-    console.log("error", error);
-  } 
+  openConfirmModal('Actualizar organización', '¿Estás seguro de que deseas actualizar esta organización?', async() => {
+    const { status, error } : any = await editOrganization(values)
+    if(status.value === 'success') {
+        console.log("Organización actualizada exitosamente");
+        closeSheet();
+        refresh();
+    } else {
+        closeSheet();
+        console.log("error", error);
+    } 
+    closeConfirmModal()
+  })
 };
 </script>

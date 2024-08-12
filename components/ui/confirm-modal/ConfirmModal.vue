@@ -10,28 +10,23 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
+
+const { showModal, confirmModalTitle, confirmModalMessage, confirmModalCallback } = useConfirmModal()
 </script>
 
 <template>
-  <AlertDialog>
-    <AlertDialogTrigger as-child>
-      <Button variant="outline">
-        Show Dialog
-      </Button>
-    </AlertDialogTrigger>
+  <AlertDialog v-model:open="showModal">
     <AlertDialogContent>
-      <AlertDialogHeader>
-        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-        <AlertDialogDescription>
-          This action cannot be undone. This will permanently delete your
-          account and remove your data from our servers.
-        </AlertDialogDescription>
-      </AlertDialogHeader>
-      <AlertDialogFooter>
-        <AlertDialogCancel>Cancel</AlertDialogCancel>
-        <AlertDialogAction>Continue</AlertDialogAction>
-      </AlertDialogFooter>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{{ confirmModalTitle }}</AlertDialogTitle>
+          <AlertDialogDescription>
+            {{ confirmModalMessage}}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction @click="confirmModalCallback">Continue</AlertDialogAction>
+        </AlertDialogFooter>
     </AlertDialogContent>
   </AlertDialog>
 </template>
