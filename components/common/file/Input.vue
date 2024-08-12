@@ -20,6 +20,10 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  hideRemoveIcon: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 // const files = ref<File[]>([]);
@@ -145,6 +149,7 @@ onMounted(() => {
         <div class="flex items-center space-x-2">
           <CheckIcon class="h-6 w-6 text-green-500" />
           <TrashIcon
+            v-if="!hideRemoveIcon"
             class="h-6 w-6 text-red-500 cursor-pointer"
             @click="removeFile(index)"
           />

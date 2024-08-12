@@ -1,6 +1,6 @@
 <template>
     <section>
-        <EventDetails :data="organizationSummary" /> 
+        <OrganizationDetails :data="organizationSummary" /> 
         <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto mt-4">
       <CustomTable :data="eventsData" :header="eventListHeaders" @onSort="onSort" @onSearch="onSearch">
         <template #type="{ row }">
@@ -20,7 +20,7 @@
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" class="bg-primary text-white w-40">
                 <DropdownMenuItem>
-                  <NuxtLink :to="`/dashboard/events/organization/${row.rucNumber}`">Ver Evento</NuxtLink>
+                  <NuxtLink :to="`/dashboard/events/organization/${row.rucNumber}/event/${row.id}`">Ver Evento</NuxtLink>
                   <CustomIcons name="EyeIcon" class="ml-auto" />
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -48,7 +48,7 @@
     </section>
 </template>
 <script setup lang="ts">
-import EventDetails from '~/components/events/EventDetails.vue';
+import OrganizationDetails from '@/components/organizations/OrganizationDetails.vue';
 import CustomTable from '@/components/ui/custom-table/CustomTable.vue';
 import CustomChip from '@/components/ui/custom-chip/CustomChip.vue';
 import CustomIcons from '@/components/ui/custom-icons/CustomIcons.vue';
@@ -60,8 +60,8 @@ import type { IDataResponse } from '@/types/Common';
 const { page, sortOptions, onSort } = useEvent()
 
 const router = useRoute()
-const filterOptions = ref(`[{ "field": "organization.rucNumber", "type": "equal", "value": "${router.params.rucId}" }]`)
-// const filterOptions = ref(`[]`)
+// const filterOptions = ref(`[{ "field": "organization.rucNumber", "type": "equal", "value": "${router.params.rucId}" }]`)
+const filterOptions = ref(`[]`)
 const onSearch = (item: {[key: string]: string }) => {
     filterOptions.value = JSON.stringify([
       { field: 'name', type: 'like', value: item.name || '' },

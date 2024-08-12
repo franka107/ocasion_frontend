@@ -1,57 +1,56 @@
 <template>
-    <div class="py-4 px-10 rounded-xl bg-white w-full">
-        <h1 class="mb-3 text-2xl font-bold text-primary">Gestión de eventos</h1>
-        <p class="text-[18px] text-[#68686C]">Crea y gestiona tus eventos</p>
+     <div class="flex py-4 px-10 rounded-xl min-h-[88px] items-center bg-white w-full mb-6">
+        <div class="h 10 w 10">
+            <Button variant="ghost" @click="router.back">
+                <CustomIcons name="BackArrow" class="w-6 h-6 text-primary" />
+            </Button>
+        </div>
+        <div class="ml-7">
+            <p class="text-xs text-[#49454F]">Pacifico SA</p>
+            <h1 class="m text- font-bold text-primary">Evento - {{ params.eventId }}</h1>
+        </div>
     </div>
-    <div class="mt-4 grid grid-cols-[212px,_1fr,_1fr] gap-x-4">
-        <div class="bg-white rounded-xl p-6 max-w-[212px]">
-            <h2 class="text-xl font-semibold text-primary">Eventos</h2>
-            <div class="flex mt-8 mx-2 justify-between">
-                <div>
-                    <div class="text-[#64748B] text-sm">En linea</div>
-                    <div class="text-primary text-4xl"><pre>{{ data.status.onlineCount }}</pre></div>
-                </div>
-                <div>
-                    <div class="text-[#64748B] text-sm">Cerrados</div>
-                    <div class="text-primary text-4xl">{{ data.status.closedCount }}</div>
-                </div>
-            </div>
-        </div>
-        <div class="bg-white rounded-xl p-6">
-            <h2 class="text-xl font-semibold text-primary">Bienes subastados</h2>
-            <div class="flex mt-8 mx-2 justify-around">
-                <div>
-                    <div class="text-[#64748B] text-sm">Cerrados</div>
-                    <div class="text-primary text-4xl">{{ data.actionedGoods.closedCount }}</div>
-                </div>
-                <div>
-                    <div class="text-[#64748B] text-sm">Ticket promedio</div>
-                    <div class="text-primary text-4xl"><sup>S/</sup>{{ formatCurrency(data.actionedGoods.averageTicketAmount) }}</div>
-                </div>
-                <div>
-                    <div class="text-[#64748B] text-sm">Monto recaudado</div>
-                    <div class="text-primary text-4xl"><sup>S/</sup>{{ formatCurrency(data.actionedGoods.amountRaised) }}</div>
+    <div class="py-4 px-10 rounded-xl items-center bg-white w-full">
+        <div class="grid grid-cols-[2fr_1fr] gap-6">
+            <div>
+                <h3 class="mb-5 text-sm text-[#676767]">Datos del evento</h3>
+                <div class="grid grid-cols-[repeat(auto-fill,_minmax(240px,1fr))] md:grid-cols-2 gap-5">
+                    <InputWithLabel readField label="Nombre del evento" modelValue="Lote 1: vehículos seminuevos" />
+                    <InputWithLabel readField label="Tipo de Evento" modelValue="Subasta" />
+                    <div class="grid grid-cols-[repeat(auto-fill,_minmax(120px,1fr))] md:grid-cols-2 gap-5">
+                        <InputWithLabel readField label="Fecha de Inicio" modelValue="05/08/2024" />
+                        <InputWithLabel readField label="Fecha de cierre" modelValue="15/08/2024" />
+                    </div>
+                    <InputWithLabel readField label="Tipo de bien" modelValue="Vehicular" />
+                    <InputWithLabel readField label="Horario de cierre" modelValue="08:00 a.m." />
                 </div>
             </div>
-        </div>
-        <div class="bg-white rounded-xl p-6 ">
-            <h2 class="text-xl font-semibold text-primary">Meta</h2>
-            <div class="flex mt-8 mx-2 justify-around">
-                <div>
-                    <div class="text-[#64748B] text-sm">Ticket promedio</div>
-                    <div class="text-primary text-4xl"><sup>S/</sup>{{ formatCurrency(data.goal.goalAmount) }}</div>
-                </div>
-                <div>
-                    <div class="text-[#64748B] text-sm">Monto recaudado</div>
-                    <div class="text-primary text-4xl"><sup>S/</sup>{{ formatCurrency(data.goal.amountRaised) }}</div>
-                </div>
+            <div>
+                <h3 class="mb-5 text-sm text-[#676767]">Archivos subidos</h3>
+                <FormField name="attachedFiles">
+                    <FormItem>
+                    <FormControl>
+                        <InputFile
+                        hideRemoveIcon
+                        v-model="attachedFiles"
+                        />
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                </FormField>
             </div>
         </div>
     </div>
 </template>
 <script setup lang="ts">
-import type { IOrganizationSummary } from '@/types/Event';
+import InputWithLabel from '~/components/auth/inputWithLabel.vue';
+import InputFile from "@/components/common/file/Input.vue";
 
-defineProps<{data: IOrganizationSummary}>()
+const { params } = useRoute()
+const router = useRouter()
 
+const attachedFiles = [ 
+{id: "5404523e-bb7d-4927-8fd7-512ff7eb09fb", path: "asda/asdad.svg"},  
+{id: "5404523e-bb7d-4927-8fd7-512ff7eb09fb", path: "asda/asdad.svg"}
+]
 </script>

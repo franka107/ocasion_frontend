@@ -1,15 +1,16 @@
 <template>
-  <div class="mb-6 relative">
+  <div class="relative" :class="{ 'mb-6': !readField }">
     <input 
       :id="id"
       :type="inputType"
       :value="modelValue"
+      :readonly="readField"
       @input="$emit('update:modelValue', $event.target.value)"
-      class="peer w-[524px] h-[56px] px-3 pr-10 text-gray-900 placeholder-transparent border rounded focus:outline-none 
-        focus:ring-2 focus:ring-borderPrimaryDark focus:border-transparent
-        transition-all duration-300 ease-in-out"
+      class="peer w-full min-w-24 h-[56px] px-3 pr-10 text-gray-900 placeholder-transparent border rounded focus:outline-none 
+        focus:border-primary focus:border-2
+        transition-colors duration-300 ease-in-out"
       :placeholder="label"
-      :class="{ 'border-red-500': error }"
+      :class="{ 'border-red-500': error, 'border-primary focus:border cursor-default': readField}"
     />
     <label 
       :for="id"
@@ -48,6 +49,10 @@ const props = defineProps({
   error: {
     type: String,
     default: ''
+  },
+  readField : {
+    type: Boolean,
+    default: false
   }
 });
 

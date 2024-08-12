@@ -43,7 +43,7 @@
             </thead>
             <tbody>
                 <tr v-for="item in props.data" :key="item.id" class="h-12 border-b-[1px] border-[#E2E8F0]">
-                    <td v-for="headerItem in props.header" :key="headerItem.key" class="px-[16px] min-w-[140px]">
+                    <td v-for="headerItem in props.header" :key="headerItem.key" class="px-[16px] min-w-[140px]" :class="headerItem.align ==='center'? 'text-center' : headerItem.align ==='right'? 'text-right': 'text-left' ">
                         <slot :name="headerItem.key" :row="item">
                             {{ item[headerItem.key] }} 
                         </slot>
