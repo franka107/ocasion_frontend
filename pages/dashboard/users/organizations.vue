@@ -69,7 +69,7 @@
       >
         <OrganizationForm
           :ruc-number="organizationRucNo"
-          :onsubmit="organizationRucNo !== undefined ? handleEdit : handleCreate"
+          :onsubmit="organizationRucNo !== undefined ?  handleCreate : handleEdit"
         />
       </SheetContent>
       <!-- Fomulario -->
@@ -96,6 +96,7 @@ import ConfirmModal from "~/components/ui/confirm-modal/ConfirmModal.vue";
 
 const { currentSheet, openSheet, closeSheet } = useSheetStore();
 const { page, filterOptions, sortOptions, onSort, onSearch, suspendOrganization, activateOrganization, createOrganization, editOrganization } = useOrganization()
+const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const BASE_ORG_URL = '/organization-management'
 const { data, refresh } : any = await useAPI(`${BASE_ORG_URL}/find-organizations`, {
   query: {
@@ -106,7 +107,6 @@ const { data, refresh } : any = await useAPI(`${BASE_ORG_URL}/find-organizations
   },
 } as any);
 const organizationRucNo = ref<number | undefined>(undefined)
-const { openConfirmModal, closeConfirmModal } = useConfirmModal()
 const orderData= computed(() => data.value.data.map((item: OrganizationItem) => ({
     "date": item.contractStartDate + ' - ' + item.contractEndDate,
     ...item
@@ -129,32 +129,31 @@ const handleUpdateForm = async (organization: any) => {
 };
 
 const handleCreate = async (values: any) => {
-  openConfirmModal('Crear organización', '¿Estás seguro de que deseas crear esta organización?', async() => {
+  openConfirmModal({title:'Crear organización', message: '¿Estás seguro de que deseas crear esta organización?', callback: async() => {
     const { status, error } : any = await createOrganization(values)
     if(status.value === 'success') {
-        console.log("Organización creada exitosamente");
         closeSheet();
         refresh();
+        updateConfirmModal({title: 'Organización creada', message: 'La organización ha sido creada exitosamente', type: 'success'});
     } else {
-        closeSheet();
-        console.log("error", error);
+      
+        const eMsg = error.value.data?.errors?.[0].message || error.value.data.message || 'La organización no se pudo crear, intentalo más tarde'  
+        updateConfirmModal({title: 'Error al crear organización', message: eMsg, type: 'error'});
     } 
-    closeConfirmModal()
-  })
+  }})
 };
 
 const handleEdit = async (values: any) => {
-  openConfirmModal('Actualizar organización', '¿Estás seguro de que deseas actualizar esta organización?', async() => {
+  openConfirmModal({ title: 'Actualizar organización', message: '¿Estás seguro de que deseas actualizar esta organización?', callback: async() => {
     const { status, error } : any = await editOrganization(values)
     if(status.value === 'success') {
-        console.log("Organización actualizada exitosamente");
         closeSheet();
         refresh();
+        updateConfirmModal({title: 'Organización actualizada', message: 'La organización ha sido actualizada exitosamente', type: 'success'});
     } else {
-        closeSheet();
-        console.log("error", error);
+        const eMsg = error.value.data?.errors?.[0].message || error.value.data.message || 'La organización no se pudo actualizar, intentalo más tarde'  
+        updateConfirmModal({title: 'Error al crear organización', message: eMsg, type: 'error'});
     } 
-    closeConfirmModal()
-  })
+  }})
 };
 </script>
