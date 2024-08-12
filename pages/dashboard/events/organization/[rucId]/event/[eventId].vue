@@ -1,6 +1,6 @@
 <template>
     <section>
-    <EventDetails />
+    <EventDetails :eventDetail="eventDetail" />
     <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
     <CustomTable
         :data="offerData"
@@ -65,11 +65,11 @@ const BASE_OFFERS_URL = '/offer-management'
 import { offerHeader, offerStatus } from "@/constants/offer";
 import type { OfferItem } from '~/types/Offer';
 import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue';
-
+const route = useRoute()
 const page = ref(1)
 const filterOptions = ref('[]')
 const sortOptions = ref('[]')
-
+const { getEvent } = useEvent()
 const onSort = (sortObject: { [key: string]: string }[]) => {
     sortOptions.value = JSON.stringify(sortObject)
 }
@@ -79,7 +79,18 @@ const onSearch = (item: {[key: string]: string }) => {
     ]
     filterOptions.value = JSON.stringify(filters)
 }
-
+Promise.all([
+  getEvent(route.params.eventId as string),
+  useAPI(`${BASE_OFFERS_URL}/find-offers`, {
+    query: {
+      limit: 8,
+      page: 1,
+      filterOptions: '[]',
+      sortOptions: '[]'
+    },
+  } as any)
+])
+// [] = await Promise.all
 const { data, refresh } : any = await useAPI(`${BASE_OFFERS_URL}/find-offers`, {
   query: {
     limit: 8,
@@ -88,7 +99,8 @@ const { data, refresh } : any = await useAPI(`${BASE_OFFERS_URL}/find-offers`, {
     sortOptions
   },
 } as any);
-
+const { data: eventDetail } = await getEvent(route.params.eventId as string)
+console.log('eventDetail', eventDetail.value)
 const offerData= computed(() => data.value.data.map((item: OfferItem) => ({
     brandName: item.model.brand.name,
     modelName: item.model.name,

@@ -24,7 +24,6 @@
             </template>
             <slot name="action-button">
                 <!-- Default button in case no prop is passed -->
-                <Button variant="default">Agregar</Button>
             </slot>
         </div>
         <table class="table w-full">

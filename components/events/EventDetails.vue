@@ -15,14 +15,14 @@
             <div>
                 <h3 class="mb-5 text-sm text-[#676767]">Datos del evento</h3>
                 <div class="grid grid-cols-[repeat(auto-fill,_minmax(240px,1fr))] md:grid-cols-2 gap-5">
-                    <InputWithLabel readField label="Nombre del evento" modelValue="Lote 1: vehículos seminuevos" />
-                    <InputWithLabel readField label="Tipo de Evento" modelValue="Subasta" />
+                    <InputWithLabel readField label="Nombre del evento" :modelValue="eventDetail.name" />
+                    <InputWithLabel readField label="Tipo de Evento" :modelValue="eventType.get(eventDetail.type)" />
                     <div class="grid grid-cols-[repeat(auto-fill,_minmax(120px,1fr))] md:grid-cols-2 gap-5">
-                        <InputWithLabel readField label="Fecha de Inicio" modelValue="05/08/2024" />
-                        <InputWithLabel readField label="Fecha de cierre" modelValue="15/08/2024" />
+                        <InputWithLabel readField label="Fecha de Inicio" :modelValue="eventDetail.startDate" />
+                        <InputWithLabel readField label="Fecha de cierre" :modelValue="eventDetail.endDate" />
                     </div>
-                    <InputWithLabel readField label="Tipo de bien" modelValue="Vehicular" />
-                    <InputWithLabel readField label="Horario de cierre" modelValue="08:00 a.m." />
+                    <InputWithLabel readField label="Tipo de bien" :modelValue="goodType.get(eventDetail.goodType)" />
+                    <InputWithLabel readField label="Horario de cierre" :modelValue="eventTimes.get(String(eventDetail.closingTime))" />
                 </div>
             </div>
             <div>
@@ -32,7 +32,7 @@
                     <FormControl>
                         <InputFile
                         hideRemoveIcon
-                        v-model="attachedFiles"
+                        v-model="eventDetail.goodFiles"
                         />
                     </FormControl>
                     <FormMessage />
@@ -45,10 +45,13 @@
 <script setup lang="ts">
 import InputWithLabel from '~/components/auth/inputWithLabel.vue';
 import InputFile from "@/components/common/file/Input.vue";
+import type { IEventLItem } from '@/types/Event';
+import { eventType, goodType, eventTimes } from "@/constants/events";
 
 const { params } = useRoute()
 const router = useRouter()
-
+const props = defineProps<{eventDetail:IEventLItem}>()
+const { eventDetail } = toRefs(props)
 const attachedFiles = [ 
 {id: "5404523e-bb7d-4927-8fd7-512ff7eb09fb", path: "asda/asdad.svg"},  
 {id: "5404523e-bb7d-4927-8fd7-512ff7eb09fb", path: "asda/asdad.svg"}

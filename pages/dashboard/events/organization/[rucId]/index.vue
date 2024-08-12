@@ -2,7 +2,12 @@
     <section>
         <OrganizationDetails :data="organizationSummary" /> 
         <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto mt-4">
-      <CustomTable :data="eventsData" :header="eventListHeaders" @onSort="onSort" @onSearch="onSearch">
+          <CustomTable :data="eventsData" :header="eventListHeaders" @onSort="onSort" @onSearch="onSearch">
+        <template #action-button>
+          <SheetTrigger @click="() => { eventId = undefined; openSheet('event-form') }">
+            <Button>Crear evento</Button>
+          </SheetTrigger>
+        </template> 
         <template #type="{ row }">
           <span class="whitespace-nowrap">{{  eventType.get(row.type) || '' }}</span>
         </template>
@@ -24,12 +29,14 @@
                   <CustomIcons name="EyeIcon" class="ml-auto" />
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem @click="handleSuspend(row.rucNumber)">
-                  Editar
-                  <CustomIcons name="Pen" class="ml-auto" />
-                </DropdownMenuItem>
+                <SheetTrigger class="w-full" @click="() => { eventId = row.id; openSheet('event-form') }">
+                <DropdownMenuItem>
+                    Editar
+                    <CustomIcons name="Pen" class="ml-auto" />
+                  </DropdownMenuItem>
+                </SheetTrigger>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem @click="handleActivate(row.rucNumber)" >
+                <DropdownMenuItem @click="handleCreate(row.rucNumber)" >
                   Cancelar
                   <CustomIcons name="Close" class="ml-auto" />
                 </DropdownMenuItem>
@@ -39,9 +46,18 @@
           </div>
         </template>
         <template #status="{ row }">
-          <CustomChip :text="eventStatus.get(row.status)?.name || ''" :variant="eventStatus.get(row.status)?.color as any"></CustomChip>
+          <CustomChip :text="eventStatus.get(row.status)?.name || ''"  :variant="eventStatus.get(row.status)?.color as any"></CustomChip>
         </template>
       </CustomTable>
+      <SheetContent
+        class="flex flex-col h-full"
+      >
+        <EventForm
+          :id="eventId"
+          :orgRucNumber="route.params.rucId as string"
+          :onsubmit="eventId !== undefined ? handleEdit : handleCreate"
+        />
+      </SheetContent>
     </div>
     <CustomPagination class="mt-5 mb-[19px]" :total="data.count" :limit="data.limit" v-model:page="page" />
 
@@ -56,11 +72,17 @@ import CustomPagination from '@/components/ui/custom-pagination/CustomPagination
 import { eventListHeaders, eventStatus, eventType } from '~/constants/events';
 import type { IEventLItem, IOrganizationSummary } from '@/types/Event';
 import type { IDataResponse } from '@/types/Common';
+import dayjs from 'dayjs';
+import EventForm from '@/components/events/EventForm.vue';
 
-const { page, sortOptions, onSort } = useEvent()
+const { page, sortOptions, onSort, createEvent, editEvent } = useEvent()
 
-const router = useRoute()
-// const filterOptions = ref(`[{ "field": "organization.rucNumber", "type": "equal", "value": "${router.params.rucId}" }]`)
+const route = useRoute()
+// const filterOptions = ref(`[{ "field": "organization.rucNumber", "type": "equal", "value": "${route.params.rucId}" }]`)
+const eventId = ref<string | undefined>('EVE-1')
+const { currentSheet, openSheet, closeSheet } = useSheetStore();
+const { openConfirmModal, updateConfirmModal } = useConfirmModal()
+
 const filterOptions = ref(`[]`)
 const onSearch = (item: {[key: string]: string }) => {
     filterOptions.value = JSON.stringify([
@@ -77,34 +99,42 @@ const [ eventListData, organizationSummaryData]= await Promise.all([
         sortOptions
     },
     } as any),
-    useAPI<IOrganizationSummary>(`${BASE_ORG_URL}/get-events-summary`, { query: { organizationRucNumber: router.params.rucId }} as any)
+    useAPI<IOrganizationSummary>(`${BASE_ORG_URL}/get-events-summary`, { query: { organizationRucNumber: route.params.rucId }} as any)
 ])
 const { data, refresh } = eventListData
 const organizationSummary = organizationSummaryData.data.value
-const eventsData = computed(() => data.value.data)
+//fix typing
+const eventsData = computed(() => data.value.data.map((item: any) => ({
+  ...item,
+  "createdAt": dayjs(item).format("DD/MM/YYYY")
+})))
 
-const handleSuspend = async (rucNumber: string) => {
-  console.log("rucNumber", rucNumber);
-  
-  const { status: suspendStatus } : any = await useAPI(`${BASE_ORG_URL}/suspend-organization`,{
-      method: 'POST',
-      body: {
-        rucNumber, 
-      }
-    } as any);
-  refresh()
-}
+const handleCreate = async (values: any) => {
+  openConfirmModal({title:'Crear evento', message: '¿Estás seguro de que deseas crear este evento?', callback: async() => {
+    const { status, error } : any = await createEvent(values)
+    if(status.value === 'success') {
+        closeSheet();
+        refresh();
+        updateConfirmModal({title: 'Evento creado', message: 'El evento ha sido creada exitosamente', type: 'success'});
+    } else {
+      
+        const eMsg = error.value.data?.errors?.[0].message || error.value.data.message || 'El evento no se pudo crear, intentalo más tarde'  
+        updateConfirmModal({title: 'Error al crear evento', message: eMsg, type: 'error'});
+    } 
+  }})
+};
 
-const handleActivate = async (rucNumber: string) => {
-  console.log("rucNumber", rucNumber);
-  
-  const { status: activateStatus } : any = await useAPI(`${BASE_ORG_URL}/activate-organization`,{
-      method: 'POST',
-      body: {
-        rucNumber, 
-      }
-    } as any);
-  refresh()
-}
-
+const handleEdit = async (values: any) => {
+  openConfirmModal({ title: 'Actualizar evento', message: '¿Estás seguro de que deseas actualizar este evento?', callback: async() => {
+    const { status, error } : any = await editEvent(values)
+    if(status.value === 'success') {
+        closeSheet();
+        refresh();
+        updateConfirmModal({title: 'Evento actualizada', message: 'El evento ha sido actualizado exitosamente', type: 'success'});
+    } else {
+        const eMsg = error.value.data?.errors?.[0].message || error.value.data.message || 'El evento no se pudo actualizar, intentalo más tarde'  
+        updateConfirmModal({title: 'Error al crear evento', message: eMsg, type: 'error'});
+    } 
+  }})
+};
 </script>
