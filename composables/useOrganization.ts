@@ -22,9 +22,7 @@ export function useOrganization() {
   }
     
   const suspendOrganization = async (rucNumber: string) => {
-    console.log("rucNumber", rucNumber);
-
-    const { status: suspendStatus }: any = await useAPI(
+    const { status, error }: any = await useAPI(
       `${BASE_ORG_URL}/suspend-organization`,
       {
         method: "POST",
@@ -32,24 +30,22 @@ export function useOrganization() {
           rucNumber, 
         }
       } as any);
+      return {status, error}
   }
 
   const activateOrganization = async (rucNumber: string) => {
-    console.log("rucNumber", rucNumber);
-
-    const { status: activateStatus }: any = await useAPI(
+    const { status, error }: any = await useAPI(
       `${BASE_ORG_URL}/activate-organization`,
       {
         method: "POST",
         body: {
           rucNumber,
         },
-      } as any
-    );
+      } as any);
+      return {status, error}
   }
 
   const createOrganization = async (values: any) => {
-    try {
       const { status, error }: any = await useAPI(
         `${BASE_ORG_URL}/create-organization`,
         {
@@ -57,13 +53,7 @@ export function useOrganization() {
           body: values,
         } as any
       );
-      if (status === 201) {
-        console.log("Organización creada exitosamente");
-      }
       return {status, error}
-    } catch (error) {
-      console.error("Error al crear la organización", error);
-    }
   }
   
   const editOrganization = async (values: any) => {

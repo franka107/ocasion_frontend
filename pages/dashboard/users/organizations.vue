@@ -118,8 +118,15 @@ const handleSuspend = async (rucNumber: string) => {
 }
 
 const handleActivate = async (rucNumber: string) => {
-  await activateOrganization(rucNumber)
-  refresh();
+  openConfirmModal({title:'Activar organización', message: '¿Estás seguro de activar esta organización?', callback: async() => {
+    const { status, error } : any = await activateOrganization(rucNumber)
+    if (status.value === 'success') {
+      updateConfirmModal({title: '¡Activación exitosa!', message: 'La organización ha sido activada.', type: 'success'});
+      refresh();
+    } else {
+      updateConfirmModal({title: 'Error al activar', message: 'La organización no se pudo activar. \nTe recomendamos intentarlo nuevamente.', type: 'success'});
+    }
+  }})
 };
 
 
