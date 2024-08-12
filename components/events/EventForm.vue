@@ -8,6 +8,7 @@ import type { IEventLItem } from '@/types/Event';
 import { eventType, goodType, eventTimes } from "@/constants/events";
 const EVENT_BASE_URL = '/event-management'
 let form: any;
+const {getEvent} = useEvent();
 const props = defineProps<{id: string | undefined, orgRucNumber: string,  onsubmit: (values: any) => void;}>();
 const eventTypesOptions = Array.from(eventType).map(([id,name]) => ({ id, name }));
 const goodTypeOptions = Array.from(goodType).map(([id,name]) => ({ id, name }));
@@ -29,15 +30,7 @@ const formSchema = toTypedSchema(
   })
 );
 if (props.id) {
-      const { data: organizationData } = await useAPI<IEventLItem>(
-        `${EVENT_BASE_URL}/get-event-detail`,
-        {
-          method: "GET",
-          query: {
-            id: props.id,
-          },
-        } as any
-      );
+      const { data: organizationData } = await getEvent(props.id);
         
       form = useForm({
         validationSchema: formSchema,

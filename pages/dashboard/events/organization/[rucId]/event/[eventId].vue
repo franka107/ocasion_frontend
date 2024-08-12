@@ -9,10 +9,10 @@
         @onSearch="onSearch"
       >
       <template #action-button>
-          <SheetTrigger @click="() => {}">
+          <SheetTrigger @click="() => { offerId = undefined; openSheet('offer-form') }">
             <Button
               variant="default"
-              >Confirmar oferta</Button
+              >Crear oferta</Button
             >
           </SheetTrigger>
         </template>
@@ -45,11 +45,18 @@
           </div>
         </template>
         <template #status="{ row }">
-          <CustomChip :text="offerStatus.get(row.status)?.name || ''" :variant="offerStatus.get(row.status)?.color as any"></CustomChip>
+          <CustomChip :text="offerStatus.get(row.status)?.name || ''" :variant="offerStatus.get(row.status)?.color as any" ></CustomChip>
         </template>
       </CustomTable>
-      <!-- Fomulario -->
-      <!-- Fomulario -->
+      <SheetContent
+          class="flex flex-col h-full"
+        >
+          <OfferForm
+            :id="offerId"
+            :orgRucNumber="route.params.rucId as string"
+            :onsubmit="offerId !== undefined ? handleEdit : handleCreate"
+          />
+        </SheetContent>
     </div>
     <CustomPagination
       class="mt-5 mb-[19px]"
@@ -65,26 +72,21 @@ const BASE_OFFERS_URL = '/offer-management'
 import { offerHeader, offerStatus } from "@/constants/offer";
 import type { OfferItem } from '~/types/Offer';
 import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue';
+import OfferForm from '@/components/offers/OfferForm.vue';
+const { openConfirmModal, updateConfirmModal } = useConfirmModal()
+const { currentSheet, openSheet, closeSheet } = useSheetStore();
+const { page, sortOptions, filterOptions, onSort, onSearch, createOffer, editOffer } = useOfferAPI()
+
 const route = useRoute()
-const page = ref(1)
-const filterOptions = ref('[]')
-const sortOptions = ref('[]')
 const { getEvent } = useEvent()
-const onSort = (sortObject: { [key: string]: string }[]) => {
-    sortOptions.value = JSON.stringify(sortObject)
-}
-const onSearch = (item: {[key: string]: string }) => {
-    const filters = [
-      { field: 'title', type: 'like', value: item.title || '' },
-    ]
-    filterOptions.value = JSON.stringify(filters)
-}
+const offerId = ref(undefined)
+
 Promise.all([
   getEvent(route.params.eventId as string),
   useAPI(`${BASE_OFFERS_URL}/find-offers`, {
     query: {
       limit: 8,
-      page: 1,
+      page,
       filterOptions: '[]',
       sortOptions: '[]'
     },
@@ -100,11 +102,41 @@ const { data, refresh } : any = await useAPI(`${BASE_OFFERS_URL}/find-offers`, {
   },
 } as any);
 const { data: eventDetail } = await getEvent(route.params.eventId as string)
-console.log('eventDetail', eventDetail.value)
+
 const offerData= computed(() => data.value.data.map((item: OfferItem) => ({
     brandName: item.model.brand.name,
     modelName: item.model.name,
     addressCity: item.address.district.city.name,
     ...item
   })))
+
+
+  const handleCreate = async (values: any) => {
+  openConfirmModal({title:'Crear Oferta', message: '¿Estás seguro de que deseas crear este Oferta?', callback: async() => {
+    const { status, error } : any = await createOffer(values)
+    if(status.value === 'success') {
+        closeSheet();
+        refresh();
+        updateConfirmModal({title: 'Oferta creado', message: 'La oferta ha sido creada exitosamente', type: 'success'});
+    } else {
+      
+        const eMsg = error.value.data?.errors?.[0].message || error.value.data.message || 'La oferta no se pudo crear, intentalo más tarde'  
+        updateConfirmModal({title: 'Error al crear Oferta', message: eMsg, type: 'error'});
+    } 
+  }})
+};
+
+const handleEdit = async (values: any) => {
+  openConfirmModal({ title: 'Actualizar Oferta', message: '¿Estás seguro de que deseas actualizar este Oferta?', callback: async() => {
+    const { status, error } : any = await editOffer(values)
+    if(status.value === 'success') {
+        closeSheet();
+        refresh();
+        updateConfirmModal({title: 'Oferta actualizada', message: 'La oferta ha sido actualizado exitosamente', type: 'success'});
+    } else {
+        const eMsg = error.value.data?.errors?.[0].message || error.value.data.message || 'El evento no se pudo actualizar, intentalo más tarde'  
+        updateConfirmModal({title: 'Error al crear evento', message: eMsg, type: 'error'});
+    } 
+  }})
+};
 </script>
