@@ -6,6 +6,7 @@ export function useSheetStore() {
 
   // Función para abrir un Sheet específico
   function openSheet(sheetId: string) {
+    console.log(sheetId);
     currentSheet.value = sheetId;
   }
 
