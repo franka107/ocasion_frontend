@@ -16,7 +16,7 @@ const { showModal, confirmModalTitle, confirmModalMessage, confirmModalCallback 
 
 <template>
   <AlertDialog v-model:open="showModal">
-    <AlertDialogContent>
+    <AlertDialogContent class="z-[100]">
         <AlertDialogHeader>
           <AlertDialogTitle>{{ confirmModalTitle }}</AlertDialogTitle>
           <AlertDialogDescription>
