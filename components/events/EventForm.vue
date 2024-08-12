@@ -5,12 +5,13 @@ import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
 import InputFile from "@/components/common/file/Input.vue";
 import type { IEventLItem } from '@/types/Event';
-import { eventType, goodType } from "@/constants/events";
+import { eventType, goodType, eventTimes } from "@/constants/events";
 const EVENT_BASE_URL = '/event-management'
 let form: any;
 const props = defineProps<{id: string | undefined, orgRucNumber: string,  onsubmit: (values: any) => void;}>();
 const eventTypesOptions = Array.from(eventType).map(([id,name]) => ({ id, name }));
-const goodTypeptions = Array.from(goodType).map(([id,name]) => ({ id, name }));
+const goodTypeOptions = Array.from(goodType).map(([id,name]) => ({ id, name }));
+const eventTimesOptions = Array.from(eventTimes).map(([id,name]) => ({ id: Number(id), name }));
 const formSchema = toTypedSchema(
   z.object({
     goodFiles: z
@@ -65,8 +66,6 @@ const onSubmit = form.handleSubmit((values: any) => {
   if (props.id) {
     formattedValues.id = props.id;
   }
-  console.log("Formatted values:", formattedValues);
-  
   props.onsubmit(formattedValues);
   
 });
@@ -163,7 +162,7 @@ const handleFilesChange = (files: File[]) => {
               <SelectContent>
                 <SelectGroup>
                   <SelectItem
-                    v-for="activity in goodTypeptions"
+                    v-for="activity in goodTypeOptions"
                     :key="activity.id"
                     :value="activity.id"
                   >
@@ -205,11 +204,22 @@ const handleFilesChange = (files: File[]) => {
       <FormField v-slot="{ componentField }" name="closingTime">
         <FormItem>
           <FormControl>
-            <Input
-              type="number"
-              placeholder="Horario de cierre"
-              v-bind="componentField"
-            />
+            <Select v-bind="componentField">
+              <SelectTrigger>
+                <SelectValue placeholder="Horario de cierre" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem
+                    v-for="time in eventTimesOptions"
+                    :key="time.id"
+                    :value="time.id as any"
+                  >
+                    {{ time.name }}
+                  </SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </FormControl>
           <FormMessage />
         </FormItem>

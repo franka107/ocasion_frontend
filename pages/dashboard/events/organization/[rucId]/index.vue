@@ -4,7 +4,7 @@
         <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto mt-4">
           <CustomTable :data="eventsData" :header="eventListHeaders" @onSort="onSort" @onSearch="onSearch">
         <template #action-button>
-          <SheetTrigger @click="() => { openSheet('event-form') }">
+          <SheetTrigger @click="() => { eventId = undefined; openSheet('event-form') }">
             <Button>Crear evento</Button>
           </SheetTrigger>
         </template> 
@@ -29,10 +29,12 @@
                   <CustomIcons name="EyeIcon" class="ml-auto" />
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem @click="handleEdit(row.rucNumber)">
-                  Editar
-                  <CustomIcons name="Pen" class="ml-auto" />
-                </DropdownMenuItem>
+                <SheetTrigger class="w-full" @click="() => { eventId = row.id; openSheet('event-form') }">
+                <DropdownMenuItem>
+                    Editar
+                    <CustomIcons name="Pen" class="ml-auto" />
+                  </DropdownMenuItem>
+                </SheetTrigger>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem @click="handleCreate(row.rucNumber)" >
                   Cancelar
@@ -76,12 +78,12 @@ import EventForm from '@/components/events/EventForm.vue';
 const { page, sortOptions, onSort, createEvent, editEvent } = useEvent()
 
 const route = useRoute()
-const filterOptions = ref(`[{ "field": "organization.rucNumber", "type": "equal", "value": "${route.params.rucId}" }]`)
+// const filterOptions = ref(`[{ "field": "organization.rucNumber", "type": "equal", "value": "${route.params.rucId}" }]`)
 const eventId = ref<string | undefined>('EVE-1')
 const { currentSheet, openSheet, closeSheet } = useSheetStore();
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 
-// const filterOptions = ref(`[]`)
+const filterOptions = ref(`[]`)
 const onSearch = (item: {[key: string]: string }) => {
     filterOptions.value = JSON.stringify([
       { field: 'name', type: 'like', value: item.name || '' },

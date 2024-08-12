@@ -1,5 +1,6 @@
+import type { IEventLItem } from "~/types/Event"
 
-const BASE_ORG_URL = '/event-management'
+const EVENT_BASE_URL = '/event-management'
 // by convention, composable function names start with "use"
 export function useEvent() {
     // state encapsulated and managed by the composable
@@ -10,7 +11,7 @@ export function useEvent() {
     }
     const createEvent = async (values: any) => {
         const { status, error }: any = await useAPI(
-          `${BASE_ORG_URL}/create-event`,
+          `${EVENT_BASE_URL}/create-event`,
           {
             method: "POST",
             body: values,
@@ -21,7 +22,7 @@ export function useEvent() {
     
     const editEvent = async (values: any) => {
         const { status, error }: any = await useAPI(
-          `${BASE_ORG_URL}/update-event`,
+          `${EVENT_BASE_URL}/update-event`,
           {
             method: "PUT",
             body: values,
@@ -29,6 +30,18 @@ export function useEvent() {
         );
         return { status, error}
     };
-      
-  return { page,  sortOptions, onSort, createEvent, editEvent }
+          
+    const getEvent = async (id: number | string) => {
+      const { status, error, data } = await useAPI<IEventLItem>(
+        `${EVENT_BASE_URL}/get-event-detail`,
+        {
+          method: "GET",
+          query: {
+            id,
+          },
+        } as any
+      );
+      return { status, error, data}
+  };
+  return { page,  sortOptions, onSort, createEvent, editEvent, getEvent }
 }
