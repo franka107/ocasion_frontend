@@ -5,10 +5,13 @@ import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
 import InputFile from "@/components/common/file/Input.vue";
 import type { Organization } from "~/models/organizations";
-const BASE_ORG_URL = '/organization-management'
+const BASE_ORG_URL = "/organization-management";
 let organizationData: Organization | undefined;
 let form: any;
-const props = defineProps<{rucNumber: number | undefined,  onsubmit: (values: any) => void;}>();
+const props = defineProps<{
+  rucNumber: number | undefined;
+  onsubmit: (values: any) => void;
+}>();
 
 const formSchema = toTypedSchema(
   z.object({
@@ -44,11 +47,12 @@ const formSchema = toTypedSchema(
 interface OrganizationForm extends Organization {
   department?: string;
   province?: string;
-  districtId?: string; 
+  districtId?: string;
   addressLine1?: string;
-  economicActivityId?: string; 
+  economicActivityId?: string;
 }
-const { fetchCities, fetchDistricts, fetchStates, states, cities, districts } = useAddress()
+const { fetchCities, fetchDistricts, fetchStates, states, cities, districts } =
+  useAddress();
 
 const economicActivities = ref<Array<{ id: string; name: string }>>([]);
 
@@ -64,36 +68,42 @@ const fetchEconomicActivities = async () => {
 };
 
 if (props.rucNumber) {
-      const { data: organizationData } = await useAPI<Organization>(
-        `${BASE_ORG_URL}/get-organization-detail`,
-        {
-          method: "GET",
-          query: {
-            rucNumber: props.rucNumber,
-          },
-        } as any
-      );
-      const orgData: OrganizationForm  = { ...organizationData.value}
-      orgData.department = orgData.address?.district?.id.split("+")[0] || ""
-      orgData.province = `${orgData.department}+${orgData.address?.district?.id.split("+")[1]}` || ""
-      orgData.districtId = orgData.address.district.id
-      orgData.economicActivityId = orgData.economicActivity?.id
-      orgData.addressLine1 = orgData.address.addressLine1
-      await Promise.all([fetchCities(orgData.department), fetchDistricts(orgData.province), fetchEconomicActivities(), fetchStates()])
-      console.log('orgData', orgData);
-        
-      form = useForm({
-        validationSchema: formSchema,
-        initialValues: orgData,
-      });
+  const { data: organizationData } = await useAPI<Organization>(
+    `${BASE_ORG_URL}/get-organization-detail`,
+    {
+      method: "GET",
+      query: {
+        rucNumber: props.rucNumber,
+      },
+    } as any
+  );
+  const orgData: OrganizationForm = { ...organizationData.value };
+  orgData.department = orgData.address?.district?.id.split("+")[0] || "";
+  orgData.province =
+    `${orgData.department}+${orgData.address?.district?.id.split("+")[1]}` ||
+    "";
+  orgData.districtId = orgData.address.district.id;
+  orgData.economicActivityId = orgData.economicActivity?.id;
+  orgData.addressLine1 = orgData.address.addressLine1;
+  await Promise.all([
+    fetchCities(orgData.department),
+    fetchDistricts(orgData.province),
+    fetchEconomicActivities(),
+    fetchStates(),
+  ]);
+  console.log("orgData", orgData);
+
+  form = useForm({
+    validationSchema: formSchema,
+    initialValues: orgData,
+  });
 } else {
-      await Promise.all([fetchEconomicActivities(), fetchStates()])
-      form = useForm({ validationSchema: formSchema });
+  await Promise.all([fetchEconomicActivities(), fetchStates()]);
+  form = useForm({ validationSchema: formSchema });
 }
 
-
 const handleStateChange = (stateId: string) => {
-  console.log('stateId', stateId);
+  console.log("stateId", stateId);
   cities.value = []; // Limpiar las provincias
   districts.value = []; // Limpiar los distritos
   fetchCities(stateId);
@@ -122,7 +132,6 @@ const onSubmit = form.handleSubmit((values: OrganizationForm) => {
     },
   };
   props.onsubmit(formattedValues);
-  
 });
 
 const handleFilesChange = (files: File[]) => {
@@ -359,7 +368,12 @@ const handleFilesChange = (files: File[]) => {
           <FormControl>
             <Select
               v-bind="componentField"
-              @update:modelValue="handleStateChange(componentField.modelValue)"
+              @update:modelValue="
+                (value) => {
+                  form.values.department = value;
+                  handleStateChange(value);
+                }
+              "
             >
               <SelectTrigger>
                 <SelectValue placeholder="Departamento" />
@@ -388,7 +402,12 @@ const handleFilesChange = (files: File[]) => {
             <FormControl>
               <Select
                 v-bind="componentField"
-                @update:modelValue="handleCityChange(componentField.modelValue)"
+                @update:modelValue="
+                  (value) => {
+                  form.values.province = value;
+                  handleCityChange(value)
+                }
+                "
                 :disabled="!form.values.department"
               >
                 <SelectTrigger>
@@ -454,20 +473,20 @@ const handleFilesChange = (files: File[]) => {
       <!-- Botón de Submit -->
       <!-- <Button type="submit">Guardar</Button> -->
       <SheetFooter class="mt-auto">
-          <Button
-            type="submit"
-            :disabled="!form.meta.value.valid"
-            :class="
-              cn(
-                'w-full',
-                !form.meta.value.valid
-                  ? 'text-primary bg-bgtheme'
-                  : 'hover:text-primary hover:bg-bgtheme'
-              )
-            "
-          >
-            {{ props.rucNumber ? "Actualizar datos" : "Registrar" }}
-          </Button>
+        <Button
+          type="submit"
+          :disabled="!form.meta.value.valid"
+          :class="
+            cn(
+              'w-full',
+              !form.meta.value.valid
+                ? 'text-primary bg-bgtheme'
+                : 'hover:text-primary hover:bg-bgtheme'
+            )
+          "
+        >
+          {{ props.rucNumber ? "Actualizar datos" : "Registrar" }}
+        </Button>
       </SheetFooter>
     </form>
     <!-- </Form> -->

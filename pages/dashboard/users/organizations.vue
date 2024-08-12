@@ -150,11 +150,11 @@ const handleCreate = async (values: any) => {
         refresh();
         updateConfirmModal({title: 'Organización creada', message: 'La organización ha sido creada exitosamente', type: 'success'});
     } else {
-      
         const eMsg = error.value.data?.errors?.[0].message || error.value.data.message || 'La organización no se pudo crear, intentalo más tarde'  
         updateConfirmModal({title: 'Error al crear organización', message: eMsg, type: 'error'});
     } 
   }})
+
 };
 
 const handleEdit = async (values: any) => {

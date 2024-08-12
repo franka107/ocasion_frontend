@@ -1,23 +1,29 @@
 import { ref } from 'vue';
 
-export function useSheetStore() {
-  // Estado para identificar el contenido del sheet actual
+export const useSheetStore = () => {
   const currentSheet = ref<string | null>(null);
+  const isOpen = ref(false); // Nuevo estado para manejar la apertura y cierre del Sheet
 
-  // Función para abrir un Sheet específico
-  function openSheet(sheetId: string) {
-    console.log(sheetId);
-    currentSheet.value = sheetId;
-  }
+  const openSheet = (sheetId: string) => {
+    if (currentSheet.value !== sheetId || !isOpen.value) {
+      currentSheet.value = sheetId;
+      isOpen.value = true;
+      console.log("Sheet opened:", sheetId);
+    }
+  };
 
-  // Función para cerrar el Sheet
-  function closeSheet() {
-    currentSheet.value = null;
-  }
+  const closeSheet = () => {
+    if (isOpen.value) {
+      isOpen.value = false;
+      currentSheet.value = "";
+      console.log("Sheet closed");
+    }
+  };
 
   return {
     currentSheet,
+    isOpen,
     openSheet,
     closeSheet,
   };
-}
+};
