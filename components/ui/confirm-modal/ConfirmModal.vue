@@ -33,8 +33,8 @@ const { showModal, confirmModalTitle, confirmModalMessage, confirmModalCallback,
         </AlertDialogHeader>
         <AlertDialogFooter>
           <template v-if="modalType === 'confirm'">
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <Button @click="confirmModalCallback" class="ml-3">Continue</Button>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <Button @click="confirmModalCallback" class="ml-3">Confirmar</Button>
           </template>
           <template v-if="modalType === 'error'">
             <AlertDialogAction class="mx-auto">Volver a intentarlo</AlertDialogAction>

@@ -60,8 +60,8 @@ import type { IDataResponse } from '@/types/Common';
 const { page, sortOptions, onSort } = useEvent()
 
 const router = useRoute()
-// const filterOptions = ref(`[{ "field": "organization.rucNumber", "type": "equal", "value": "${router.params.rucId}" }]`)
-const filterOptions = ref(`[]`)
+const filterOptions = ref(`[{ "field": "organization.rucNumber", "type": "equal", "value": "${router.params.rucId}" }]`)
+// const filterOptions = ref(`[]`)
 const onSearch = (item: {[key: string]: string }) => {
     filterOptions.value = JSON.stringify([
       { field: 'name', type: 'like', value: item.name || '' },

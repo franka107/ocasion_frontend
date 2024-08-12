@@ -32,13 +32,13 @@
                   <NuxtLink :to="`/dashboard/events/organization/${row.rucNumber}`">Ver Organización</NuxtLink>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem @click="handleSuspend(row.rucNumber)" :disabled="row.status !== 'ACTIVE'">
+                <DropdownMenuItem @click="handleSuspend(row.rucNumber, row.name)" :disabled="row.status !== 'ACTIVE'">
                   Suspender
                   <CustomIcons name="Forbidden" class="ml-auto" />
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  @click="handleActivate(row.rucNumber)"
+                  @click="handleActivate(row.rucNumber, row.name)"
                   :disabled="row.status === 'ACTIVE'"
                 >
                   Activar
@@ -69,7 +69,7 @@
       >
         <OrganizationForm
           :ruc-number="organizationRucNo"
-          :onsubmit="organizationRucNo !== undefined ?  handleCreate : handleEdit"
+          :onsubmit="organizationRucNo !== undefined ? handleEdit : handleCreate"
         />
       </SheetContent>
       <!-- Fomulario -->
@@ -112,19 +112,26 @@ const orderData= computed(() => data.value.data.map((item: OrganizationItem) => 
     ...item
   })))
 
-const handleSuspend = async (rucNumber: string) => {
-  await suspendOrganization(rucNumber)
-  refresh()
+const handleSuspend = async (rucNumber: string, name: string) => {
+  openConfirmModal({title:'Suspender organización', message: `¿Estás seguro de suspender a ❝${name}❞?`, callback: async() => {
+    const { status, error } : any = await suspendOrganization(rucNumber)
+    if (status.value === 'success') {
+      updateConfirmModal({title: '¡Suspensión exitosa!', message: 'La organización ha sido suspendida.', type: 'success'});
+      refresh();
+    } else {
+      updateConfirmModal({title: 'Error al suspender', message: 'La organización no se pudo suspender. \nTe recomendamos intentarlo nuevamente.', type: 'error'});
+    }
+  }})
 }
 
-const handleActivate = async (rucNumber: string) => {
-  openConfirmModal({title:'Activar organización', message: '¿Estás seguro de activar esta organización?', callback: async() => {
+const handleActivate = async (rucNumber: string, name: string) => {
+  openConfirmModal({title:'Activar organización', message: `¿Estás seguro de activar a ❞${name}❞?`, callback: async() => {
     const { status, error } : any = await activateOrganization(rucNumber)
     if (status.value === 'success') {
       updateConfirmModal({title: '¡Activación exitosa!', message: 'La organización ha sido activada.', type: 'success'});
       refresh();
     } else {
-      updateConfirmModal({title: 'Error al activar', message: 'La organización no se pudo activar. \nTe recomendamos intentarlo nuevamente.', type: 'success'});
+      updateConfirmModal({title: 'Error al activar', message: 'La organización no se pudo activar. \nTe recomendamos intentarlo nuevamente.', type: 'error'});
     }
   }})
 };

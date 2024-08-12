@@ -13,6 +13,10 @@ export const eventStatus = new Map<string, { name: string, color: string}>([
     ['READY_TO_PUBLISH', { name: 'Listo para publicar', color: 'green'}],
 ]);
 
+export const  goodType = new Map<string, string>([
+    ['CARS_AND_MOTORCYCLES', "carros y motocicletas"],
+    ['HOUSE', "Casas"],
+]);
 export const eventListHeaders: HeaderItem[] = [{
     key: 'id',
     label: 'Código',
