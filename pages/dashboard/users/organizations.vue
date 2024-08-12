@@ -45,7 +45,7 @@
                   <CustomIcons name="Reload" class="ml-auto" />
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <SheetTrigger @click="openSheet('organization-form')">
+                <SheetTrigger>
                   <DropdownMenuItem @click="handleUpdateForm(row)">
                     Actualizar datos
                     <CustomIcons name="ArrowLeft" class="ml-auto" />
@@ -69,11 +69,12 @@
       >
         <OrganizationForm
           :ruc-number="organizationRucNo"
-          :onsubmit="selectedOrganization ? handleEdit : handleCreate"
+          :onsubmit="organizationRucNo !== undefined ? handleEdit : handleCreate"
         />
       </SheetContent>
       <!-- Fomulario -->
     </div>
+    <ConfirmModal />
     <CustomPagination
       class="mt-5 mb-[19px]"
       :total="data.count"
@@ -92,10 +93,9 @@ import type { OrganizationItem } from '@/types/Order.ts';
 import { organizationHeader } from "~/constants/organization";
 import { useSheetStore } from "@/composables/useSheetStore.js";
 import { useOrganization } from "@/composables/useOrganization";
+import ConfirmModal from "~/components/ui/confirm-modal/ConfirmModal.vue";
 
-// const selectedOrganization = ref(null);
-const selectedOrganization = ref<any | null>(null);
-const { currentSheet, openSheet } = useSheetStore();
+const { currentSheet, openSheet, closeSheet } = useSheetStore();
 const { page, filterOptions, sortOptions, onSort, onSearch, suspendOrganization, activateOrganization, createOrganization, editOrganization } = useOrganization()
 const BASE_ORG_URL = '/organization-management'
 const { data, refresh } : any = await useAPI(`${BASE_ORG_URL}/find-organizations`, {
@@ -123,23 +123,33 @@ const handleActivate = async (rucNumber: string) => {
   refresh();
 };
 
-const handleCreate = async (values: any) => {
-  await createOrganization(values)
-  refresh();
-};
-
-const handleResetData = () => {
-  selectedOrganization.value = null; // Limpiar selectedOrganization
-}
 
 const handleUpdateForm = async (organization: any) => {
-  // selectedOrganization.value = organization;
   organizationRucNo.value = organization.rucNumber;
   openSheet("organization-form");
 };
 
+const handleCreate = async (values: any) => {
+  const { status, error } : any = await createOrganization(values)
+  if(status.value === 'success') {
+      console.log("Organización creada exitosamente");
+      closeSheet();
+      refresh();
+  } else {
+      closeSheet();
+      console.log("error", error);
+  } 
+};
+
 const handleEdit = async (values: any) => {
-  await editOrganization(values)
-  refresh();
+  const { status, error } : any = await editOrganization(values)
+  console.log('status.value', status.value);
+  if(status.value === 'success') {
+      refresh();
+      console.log("Organización actualizada exitosamente");
+      closeSheet();
+  } else {
+    console.log("error", error);
+  } 
 };
 </script>

@@ -121,8 +121,8 @@ const onSubmit = form.handleSubmit((values: OrganizationForm) => {
       district: { id: districtId },
     },
   };
-  console.log("submit", formattedValues);
   props.onsubmit(formattedValues);
+  
 });
 
 const handleFilesChange = (files: File[]) => {
@@ -454,7 +454,6 @@ const handleFilesChange = (files: File[]) => {
       <!-- Botón de Submit -->
       <!-- <Button type="submit">Guardar</Button> -->
       <SheetFooter class="mt-auto">
-        <SheetClose as-child>
           <Button
             type="submit"
             :disabled="!form.meta.value.valid"
@@ -469,7 +468,6 @@ const handleFilesChange = (files: File[]) => {
           >
             {{ props.rucNumber ? "Actualizar datos" : "Registrar" }}
           </Button>
-        </SheetClose>
       </SheetFooter>
     </form>
     <!-- </Form> -->

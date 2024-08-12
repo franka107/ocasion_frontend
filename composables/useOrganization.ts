@@ -50,34 +50,31 @@ export function useOrganization() {
 
   const createOrganization = async (values: any) => {
     try {
-      const { status: createStatus }: any = await useAPI(
+      const { status, error }: any = await useAPI(
         `${BASE_ORG_URL}/create-organization`,
         {
           method: "POST",
           body: values,
         } as any
       );
-      if (createStatus === 201) {
+      if (status === 201) {
         console.log("Organización creada exitosamente");
       }
+      return {status, error}
     } catch (error) {
       console.error("Error al crear la organización", error);
     }
   }
   
   const editOrganization = async (values: any) => {
-    try {
-      const { status: updateStatus }: any = await useAPI(
+      const { status, error }: any = await useAPI(
         `${BASE_ORG_URL}/update-organization`,
         {
           method: "PUT",
           body: values,
         } as any
       );
-      console.log("Organización actualizada exitosamente");
-    } catch (error) {
-      console.error("Error al actualizar la organización", error);
-    }
+      return { status, error}
   };
   return { page, filterOptions, sortOptions, onSort, onSearch, suspendOrganization, activateOrganization, createOrganization, editOrganization }
 }
