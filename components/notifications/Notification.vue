@@ -19,8 +19,6 @@
             <p v-else>
               ⦿
             </p>
-            
-            
           </Badge>
           <img src="@/assets/icon/svg/icon-noti.svg" class="w-5 h-5 m-auto" />
           <span class="sr-only">Notifications</span>
@@ -90,8 +88,11 @@ import {
 import NotificationItem from "@/components/notifications/NotificationItem.vue";
 import type { Notification } from "~/types/Notification";
 import { useNotificationAPI } from "~/composables/useNotificationAPI";
-import { useWebNotification } from "@vueuse/core";
 import { domainEvents,  type NotificationCreatedDomainEvent,  type NotificationReadedDomainEvent } from "~/types/DomainEvent";
+import { useSound } from '@raffaelesgarro/vue-use-sound';
+import { useWebNotification } from "@vueuse/core";
+
+
 
 const {
   getNotReadedNotifications,
@@ -105,6 +106,13 @@ const {
 } = await getNotReadedNotifications();
 const limitedNotifications = computed(() => notifications.value.slice(0, 7));
 
+const webSound = useSound("/sounds/notification.mp3")
+const webNotification = useWebNotification({
+  title: "Nueva notificación",
+  lang: "es",
+  body: "Revisa tu historial de notificaciones",
+  icon: "/favicon.ico"
+})
 const notificationCreatedListener = listenDomainEvent<NotificationCreatedDomainEvent>(domainEvents.notificationCreated)
 const notificationReadedListener = listenDomainEvent<NotificationReadedDomainEvent>(domainEvents.notificationReaded)
 
@@ -115,6 +123,8 @@ const onArchiveButtonPressed = () => {
 }
 
 watch(notificationCreatedListener.data, (value, oldValue) => {
+  webSound.play()
+  webNotification.show()
   refresh()
 });
 watch(notificationReadedListener.data, (value, oldValue) => {

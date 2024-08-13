@@ -5,7 +5,8 @@ import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
 import InputFile from "@/components/common/file/Input.vue";
 import type { Organization } from "~/models/organizations";
-import { X } from 'lucide-vue-next'
+import { X } from "lucide-vue-next";
+import { parseDate } from "@internationalized/date";
 const BASE_ORG_URL = "/organization-management";
 let organizationData: Organization | undefined;
 let form: any;
@@ -17,8 +18,10 @@ const props = defineProps<{
 const formSchema = toTypedSchema(
   z.object({
     name: z.string().min(1, "La razón social es requerida"),
-    rucNumber: z.string().min(1, "El número de RUC es requerido"),
-    billingEmail: z.string().optional().nullable(),
+    rucNumber: z.string()
+      .regex(/^\d+$/, "Este campo debe contener solo dígitos.")
+      .length(11, "El número de RUC debe de ser 11 dígitos"),
+    billingEmail: z.string().email("Debe ser un correo electrónico").optional().nullable(),
     economicActivityId: z.string().optional().nullable(),
     addressLine1: z.string().min(1, "La dirección es requerida"),
     department: z.string().min(1, "El departamento es requerido"),
@@ -30,15 +33,20 @@ const formSchema = toTypedSchema(
     contractEndDate: z
       .string()
       .min(0, "La fecha de fin del contrato es requerida"),
-    startPercentage: z.number().min(0, "El porcentaje de inicio es requerido"),
+    startPercentage: z.number().min(0, "El porcentaje de inicio es requerido").max(100, "El porcentaje no puede exceder el 100%"),
     representativeFullName: z
       .string()
       .min(1, "El nombre y apellidos del representante es requerido"),
     representativeDocumentType: z.enum(["DNI", "CE", "PT"]),
     representativeDocumentIdentifier: z
       .string()
+      .regex(/^\d+$/, "El documento debe contener solo dígitos.")
       .min(1, "El DNI del representante es requerido"),
-    representativePhoneNumber: z.string().optional().nullable(),
+    representativePhoneNumber: z
+      .string()
+      .regex(/^\d+$/, "El número de teléfono debe contener solo dígitos.")
+      .optional()
+      .nullable(),
     attachedFiles: z
       .array(z.any())
       .min(1, "Debe subir al menos un archivo")
@@ -121,6 +129,7 @@ watch(form.values, (newValues) => {
 });
 
 const onSubmit = form.handleSubmit((values: OrganizationForm) => {
+  console.log(`QUACK  values ${JSON.stringify(values, null ,2)}`)
   const { economicActivityId, addressLine1, districtId, ...restValues } =
     values;
 
@@ -136,6 +145,7 @@ const onSubmit = form.handleSubmit((values: OrganizationForm) => {
 });
 
 const handleFilesChange = (files: File[]) => {
+  console.log(`QUACKKKKK handleFileChange ${files}`)
   form.values.attachedFiles = files.map((file) => file.name);
 };
 </script>
@@ -160,14 +170,13 @@ const handleFilesChange = (files: File[]) => {
             <FormControl>
               <InputFile
                 v-model="form.values.attachedFiles"
-                @update:value="handleFilesChange"
                 v-bind="componentField"
               />
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
-  
+
         <h2 class="text-primary text-base font-normal leading-5">
           Datos Básicos
         </h2>
@@ -184,7 +193,7 @@ const handleFilesChange = (files: File[]) => {
             <FormMessage />
           </FormItem>
         </FormField>
-  
+
         <!-- Número de RUC -->
         <FormField v-slot="{ componentField }" name="rucNumber">
           <FormItem>
@@ -198,7 +207,7 @@ const handleFilesChange = (files: File[]) => {
             <FormMessage />
           </FormItem>
         </FormField>
-  
+
         <!-- Actividad Económica -->
         <FormField v-slot="{ componentField }" name="economicActivityId">
           <FormItem>
@@ -223,7 +232,7 @@ const handleFilesChange = (files: File[]) => {
             <FormMessage />
           </FormItem>
         </FormField>
-  
+
         <h2 class="text-primary text-base font-normal leading-5">
           Representante Legal
         </h2>
@@ -240,7 +249,7 @@ const handleFilesChange = (files: File[]) => {
             <FormMessage />
           </FormItem>
         </FormField>
-  
+
         <div class="flex gap-2">
           <!-- Tipo de Documento -->
           <FormField
@@ -282,7 +291,7 @@ const handleFilesChange = (files: File[]) => {
             </FormItem>
           </FormField>
         </div>
-  
+
         <!-- Teléfono -->
         <FormField v-slot="{ componentField }" name="representativePhoneNumber">
           <FormItem>
@@ -296,7 +305,7 @@ const handleFilesChange = (files: File[]) => {
             <FormMessage />
           </FormItem>
         </FormField>
-  
+
         <!-- Correo de Facturación -->
         <FormField v-slot="{ componentField }" name="billingEmail">
           <FormItem>
@@ -310,7 +319,7 @@ const handleFilesChange = (files: File[]) => {
             <FormMessage />
           </FormItem>
         </FormField>
-  
+
         <h2 class="text-primary text-base font-normal leading-5">
           Porcentaje de inicio de subasta
         </h2>
@@ -329,7 +338,7 @@ const handleFilesChange = (files: File[]) => {
             <FormMessage />
           </FormItem>
         </FormField>
-  
+
         <h2 class="text-primary text-base font-normal leading-5">
           Duración de Contrato
         </h2>
@@ -338,31 +347,36 @@ const handleFilesChange = (files: File[]) => {
           <FormField v-slot="{ componentField }" name="contractStartDate">
             <FormItem class="w-1/2">
               <FormControl>
-                <Input
-                  type="date"
-                  placeholder="Fecha de Inicio del Contrato"
-                  v-bind="componentField"
+                <DateInput
+                  @update:modelValue="componentField.onChange"
+                  label="Fecha de inicio"
+                  :value="componentField.modelValue"
                 />
               </FormControl>
               <FormMessage />
             </FormItem>
           </FormField>
-  
+
           <!-- Fecha de Fin del Contrato -->
           <FormField v-slot="{ componentField }" name="contractEndDate">
             <FormItem class="w-1/2">
               <FormControl>
-                <Input
-                  type="date"
-                  placeholder="Fecha de Fin del Contrato"
-                  v-bind="componentField"
+                <DateInput
+                  @update:modelValue="componentField.onChange"
+                  label="Fecha de fin"
+                  :minValue="
+                    form.values.contractStartDate
+                      ? parseDate(form.values.contractStartDate)
+                      : undefined
+                  "
+                  :value="componentField.modelValue"
                 />
               </FormControl>
               <FormMessage />
             </FormItem>
           </FormField>
         </div>
-  
+
         <h2 class="text-primary text-base font-normal leading-5">Ubicación</h2>
         <!-- Departamento -->
         <FormField v-slot="{ componentField }" name="department">
@@ -396,7 +410,7 @@ const handleFilesChange = (files: File[]) => {
             <FormMessage />
           </FormItem>
         </FormField>
-  
+
         <div class="flex gap-2">
           <!-- Provincia -->
           <FormField v-slot="{ componentField }" name="province">
@@ -406,9 +420,9 @@ const handleFilesChange = (files: File[]) => {
                   v-bind="componentField"
                   @update:modelValue="
                     (value) => {
-                    form.values.province = value;
-                    handleCityChange(value)
-                  }
+                      form.values.province = value;
+                      handleCityChange(value);
+                    }
                   "
                   :disabled="!form.values.department"
                 >
@@ -431,12 +445,15 @@ const handleFilesChange = (files: File[]) => {
               <FormMessage />
             </FormItem>
           </FormField>
-  
+
           <!-- Distrito -->
           <FormField v-slot="{ componentField }" name="districtId">
             <FormItem class="w-1/2">
               <FormControl>
-                <Select v-bind="componentField" :disabled="!form.values.province">
+                <Select
+                  v-bind="componentField"
+                  :disabled="!form.values.province"
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Distrito" />
                   </SelectTrigger>
@@ -457,7 +474,7 @@ const handleFilesChange = (files: File[]) => {
             </FormItem>
           </FormField>
         </div>
-  
+
         <!-- Dirección -->
         <FormField v-slot="{ componentField }" name="addressLine1">
           <FormItem>

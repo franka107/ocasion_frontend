@@ -58,17 +58,18 @@ const handleFileChange = async (event: Event) => {
   const input = event.target as HTMLInputElement;
   if (input.files) {
     const newFiles = Array.from(input.files).slice(0, 3 - files.value.length); // Limitar a 3 archivos
-    const newFileIds: string[] = [];
+    const newFileIds: {id: string}[] = [];
     // const newFileData: { id: string; path: string }[] = [];
 
     for (const file of newFiles) {
       try {
         // const fileId = await uploadFile(file); // Subir el archivo
         const fileData = await uploadFile(file); // Subir el archivo
+        console.log(`FILE DATAAAA ${JSON.stringify(fileData)}`)
         const fileName = file.name; // Nombre del archivo subido
         files.value.push({ ...fileData, name: fileName }); // Agregar el archivo a la lista con nombre
         props.modelValue.push(fileData); // Agregar el ID del archivo a modelValue
-        newFileIds.push(fileData.id); // Agregar solo el ID del archivo a la lista de IDs
+        newFileIds.push({ id: fileData.id }); // Agregar solo el ID del archivo a la lista de IDs
         // newFileIds.push(fileId); // Agregar solo el ID del archivo a la lista de IDs
         // newFileData.push(fileData); // Agregar el objeto con id y path a la lista de datos
       } catch (error) {
@@ -141,13 +142,13 @@ onMounted(() => {
       <div
         v-for="(file, index) in files"
         :key="index"
-        class="border-2 border-green-500 rounded-lg flex items-center justify-between p-2"
+        class="border-2 border-[#22c55d] rounded-lg flex items-center justify-between p-2"
       >
         <span class="text-gray-400 text-sm font-normal leading-5">{{
           file.name
         }}</span>
         <div class="flex items-center space-x-2">
-          <CheckIcon class="h-6 w-6 text-green-500" />
+          <CheckIcon class="h-6 w-6 text-[#22c55d]" />
           <TrashIcon
             v-if="!hideRemoveIcon"
             class="h-6 w-6 text-red-500 cursor-pointer"

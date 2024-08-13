@@ -4,8 +4,11 @@ import { useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
 import InputFile from "@/components/common/file/Input.vue";
+import { X } from "lucide-vue-next";
 import type { IEventLItem } from '@/types/Event';
 import { eventType, goodType, eventTimes } from "@/constants/events";
+import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
+import Textarea from "../ui/textarea/Textarea.vue";
 const EVENT_BASE_URL = '/event-management'
 let form: any;
 const {getEvent} = useEvent();
@@ -22,6 +25,7 @@ const formSchema = toTypedSchema(
       .array(z.any())
       .min(1, "Debe subir al menos un archivo de tyc."),
     name: z.string().min(1, "El nombre del evento es requerido."),
+    description: z.string().min(1, "La descripción es requerida."),
     type: z.string().min(1, "El tipo de evento es requerido."),
     goodType: z.string().min(1, "El tipo de bien es requerido."),
     startDate: z.string().min(1, "La fecha de inicio es requerida."),
@@ -52,7 +56,6 @@ const onSubmit = form.handleSubmit((values: any) => {
 
   const formattedValues = {
     ...restValues,
-    description: "",
     organization: {
       rucNumber: props.orgRucNumber,
     },
@@ -71,18 +74,20 @@ const handleFilesChange = (files: File[]) => {
 
 <template>
   <SheetHeader>
-    <SheetTitle>{{
+    <SheetClose class="mr-4 rounded-full p-3 hover:bg-[#f1f5f9]">
+      <X class="w-4 h-4 text-muted-foreground" />
+    </SheetClose>
+    <SheetTitle class="text-xl font-medium text-[#64748B]">{{
       props.id
         ? "Actualizar evento"
         : "Crear evento"
     }}</SheetTitle>
   </SheetHeader>
 
-  <div class="border-primary border-t-[1px]"></div>
 
   <div class="flex-grow overflow-y-auto no-scrollbar flex flex-col">
     <!-- <Form> -->
-    <form class="flex flex-col gap-4 flex-grow p-1" @submit="onSubmit">
+    <form class="flex flex-col gap-4 flex-grow pt-5 pr-5 pl-5" @submit="onSubmit">
         <FormField v-slot="{ componentField }" name="goodFiles">
         <FormItem>
           <FormControl>
@@ -117,6 +122,18 @@ const handleFilesChange = (files: File[]) => {
             <Input
               type="text"
               placeholder="Nombre del evento"
+              v-bind="componentField"
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+      <FormField v-slot="{ componentField }" name="description">
+        <FormItem>
+          <FormControl>
+            <Textarea
+              type="text"
+              placeholder="Descripción"
               v-bind="componentField"
             />
           </FormControl>
@@ -173,11 +190,12 @@ const handleFilesChange = (files: File[]) => {
         <FormField v-slot="{ componentField }" name="startDate">
           <FormItem class="w-1/2">
             <FormControl>
-              <Input
-                type="date"
-                placeholder="Fecha de Inicio"
-                v-bind="componentField"
-              />
+                <DateInput
+                  @update:modelValue="componentField.onChange"
+                  label="Fecha de inicio"
+                  :value="componentField.modelValue"
+                  :minValue="today(getLocalTimeZone()).add({days: 3})"
+                />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -185,11 +203,17 @@ const handleFilesChange = (files: File[]) => {
         <FormField v-slot="{ componentField }" name="endDate">
           <FormItem class="w-1/2">
             <FormControl>
-              <Input
-                type="date"
-                placeholder="Fecha de Fin"
-                v-bind="componentField"
-              />
+              <DateInput
+                  @update:modelValue="componentField.onChange"
+                  label="Fecha de fin"
+                  :minValue="
+                    form.values.startDate
+                      ? parseDate(form.values.startDate)
+                      : undefined
+                  "
+                  :value="componentField.modelValue"
+                  :disabled="!form.values.startDate"
+                />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -218,19 +242,19 @@ const handleFilesChange = (files: File[]) => {
           <FormMessage />
         </FormItem>
       </FormField>
-      <!-- Botón de Submit -->
-      <!-- <Button type="submit">Guardar</Button> -->
+      
       <SheetFooter class="mt-auto">
           <Button
             type="submit"
             :disabled="!form.meta.value.valid"
             :class="
-              cn(
-                'w-full',
-                !form.meta.value.valid
-                  ? 'text-primary bg-bgtheme'
-                  : 'hover:text-primary hover:bg-bgtheme'
-              )
+            
+                          cn(
+              'w-full h-10 text-base bg-[#062339] hover:bg-gray-700',
+              !form.meta.value.valid
+                ? 'text-white'
+                : 'hover:text-primary hover:bg-bgtheme'
+            )
             "
           >
             {{ props.id ? "Actualizar evento" : "Crear evento" }}
