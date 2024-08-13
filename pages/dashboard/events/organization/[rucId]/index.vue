@@ -65,14 +65,15 @@
         v-else-if="currentSheet === 'cancel-event'"
         class="flex flex-col h-full"
         >
-        <div>Test</div>
+        <EventCancel :eventId="String(eventId)" :onsubmit="handleCancel" />
       </SheetContent>
     </div>
     <CustomPagination class="mt-5 mb-[19px]" :total="data.count" :limit="data.limit" v-model:page="page" />
-
-    </section>
+    
+  </section>
 </template>
 <script setup lang="ts">
+import EventCancel from '@/components/events/EventCancel.vue';
 import OrganizationDetails from '@/components/organizations/OrganizationDetails.vue';
 import CustomTable from '@/components/ui/custom-table/CustomTable.vue';
 import CustomChip from '@/components/ui/custom-chip/CustomChip.vue';
@@ -84,7 +85,7 @@ import type { IDataResponse } from '@/types/Common';
 import dayjs from 'dayjs';
 import EventForm from '@/components/events/EventForm.vue';
 
-const { page, sortOptions, onSort, createEvent, editEvent } = useEvent()
+const { page, sortOptions, onSort, createEvent, editEvent, cancelEvent } = useEvent()
 
 const route = useRoute()
 const filterOptions = ref(`[{ "field": "organization.rucNumber", "type": "equal", "value": "${route.params.rucId}" }]`)
@@ -144,6 +145,20 @@ const handleEdit = async (values: any) => {
     } else {
         const eMsg = error.value.data?.errors?.[0].message || error.value.data.message || 'El evento no se pudo actualizar, intentalo más tarde'  
         updateConfirmModal({title: 'Error al crear evento', message: eMsg, type: 'error'});
+    } 
+  }})
+};
+
+const handleCancel = async (values: any) => {
+  openConfirmModal({ title: 'Cancelar evento', message: '¿Estás seguro de que deseas cancelar este evento?', callback: async() => {
+    const { status, error } : any = await cancelEvent(values)
+    if(status.value === 'success') {
+        closeSheet();
+        refresh();
+        updateConfirmModal({title: 'Evento cancelado', message: 'El evento ha sido cancelar exitosamente', type: 'success'});
+    } else {
+        const eMsg = error.value.data?.errors?.[0].message || error.value.data.message || 'El evento no se pudo actualizar, intentalo más tarde'  
+        updateConfirmModal({title: 'Error al cancelar evento', message: eMsg, type: 'error'});
     } 
   }})
 };

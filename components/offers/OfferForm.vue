@@ -5,6 +5,7 @@ import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
 import InputFile from "@/components/common/file/Input.vue";
 import type { OfferItem } from '@/types/Offer';
+import { Textarea } from '@/components/ui/textarea'
 import { eventType, goodType, eventTimes, years } from "@/constants/events";
 const BASE_OFFERS_URL = '/offer-management'
 let form: any;
@@ -105,7 +106,9 @@ const onSubmit = form.handleSubmit((values: any) => {
     address: {
       // id: districtId,
       addressLine1: addressLine1,
-      id: districtId,
+      district: {
+        id: districtId,
+      }
     },
     organization: {
       rucNumber: props.rucId,
@@ -259,7 +262,7 @@ const handleFilesChange = (files: File[]) => {
         <FormField v-slot="{ componentField }" name="description">
           <FormItem>
             <FormControl>
-              <Input
+              <Textarea
                 type="text"
                 placeholder="Descripcion del bien"
                 v-bind="componentField"
