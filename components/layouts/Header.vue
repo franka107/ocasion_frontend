@@ -1,51 +1,50 @@
 <template>
-  <header
-    class="bg-white h-20 p-4 flex items-center justify-between border-b-2 shadow-sm"
+  <section
+    class=" h-screen px-3 py-6 flex flex-col items-start justify-between border-b-2 shadow-sm"
   >
-    <div class="h-11 ml-4">
-      <img
-        src="@/assets/img/logo.png"
-        alt="Company Logo"
-        class="rounded-md object-cover w-full h-full"
-      />
-    </div>
-
-    <TabsSection :tabs="tabs" />
-
-    <div class="flex items-center space-x-4 relative gap-2">
-      <Notification />
-      <div
-        class="p-2 rounded-full bg-gray-100 relative hover:bg-gray-400 w-10 h-10"
-        @click="openUserMenu"
-      >
-        <img src="@/assets/icon/svg/icon-user.svg" class="w-5 h-5 m-auto" />
-      </div>
-    </div>
-  </header>
+    <section class="w-full">
+      <figure class="h-11 mb-7">
+        <img
+          :src="logoSrc"
+          alt="Company Logo"
+          class="rounded-md object-contain h-full"
+        />
+      </figure>
+  
+      <TabsSection :tabs="tabs" />
+    </section>
+  </section>
 </template>
 
 <script setup lang="ts">
 import { Badge } from "@/components/ui/badge";
 import TabsSection from "@/components/layouts/TabsSection.vue";
 import Notification from "@/components/notifications/Notification.vue";
+import dashboardImage from '@/assets/img/dashboard.png';
+import workOutlineImage from '@/assets/img/work_outline.png';
+import groupsImage from '@/assets/img/groups.png';
+import eventImage from '@/assets/img/event.png';
+import settingsImage from '@/assets/img/settings.png';
+import smallLogo from '@/assets/img/small_logo.png';
+import alternativeLogo from '@/assets/img/alternative_logo.png';
+const props = defineProps<{ collapsed: boolean }>();
 
 const userRole = "admin";
-const { clear } = useUserSession();
-const router = useRouter();
-const allTabs = useState<{ value: string; label: string; url: string }[]>(
+const allTabs = useState<{ value: string; label: string; url: string, srcImage: string}[]>(
   "tabs",
   () => [
-    { value: "events", label: "Eventos", url: "/dashboard/events" },
-    { value: "reports", label: "Reportes", url: "/dashboard/reports" },
-    { value: "users", label: "Usuarios", url: "/dashboard/users" },
-    { value: "roles", label: "Roles", url: "/dashboard/roles" },
+    { value: "dashboard", label: "Dashboard", url: "/dashboard/reports", srcImage: dashboardImage },
+    { value: "roles", label: "Roles", url: "/dashboard/roles", srcImage: workOutlineImage },
+    { value: "users", label: "Usuarios", url: "/dashboard/users", srcImage: groupsImage },
+    { value: "events", label: "Eventos", url: "/dashboard/events", srcImage: eventImage },
+    { value: "configuración", label: "Configuración", url: "/dashboard/reports", srcImage: settingsImage },
   ]
 );
 
-const openUserMenu = async () => {
-  await clear();
-  router.push("/auth/login");
-};
+const logoSrc = computed(() => {
+  return props.collapsed ? smallLogo : alternativeLogo;
+});
+
 const tabs = computed(() => {
   if (userRole === "admin") {
     return allTabs.value;
