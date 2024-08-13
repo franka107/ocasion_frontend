@@ -14,6 +14,16 @@ export function useNotificationAPI() {
 		return { status, error, data, refresh }
 	};
 
+	const listenDomainEvents  = <T> (event: string) => {
+		const { apiUrl } = useRuntimeConfig().public;
+		const eventSource = useEventSource(
+      `${apiUrl}${NOTIFICATION_BASE_URL}/listen-domain-events`,
+      [event],
+			{ autoReconnect: true  },
+    );
+		return {  data: eventSource.data as Ref<T>}
+	}
+
 	const removeNotifications = async (ids: string[]) => {
 		const { status, error, data, refresh } = await useAPI<void>(
 			`${NOTIFICATION_BASE_URL}/mark-notifications-as-read`,
@@ -27,25 +37,7 @@ export function useNotificationAPI() {
 		return { status, error, data, refresh }
 	};
 
-	const listenNotificationReadedEvent = () => {
-		const { apiUrl } = useRuntimeConfig().public;
-		const eventSource = useEventSource(
-      `${apiUrl}${NOTIFICATION_BASE_URL}/listen-notification-readed-event`,
-      ["NotificationReadedDomainEvent"],
-      { autoReconnect: true }
-    );
-		return eventSource
-	}
 
-	const listenNotificationCreatedEvent = () => {
-		const { apiUrl } = useRuntimeConfig().public;
-		const eventSource = useEventSource(
-      `${apiUrl}${NOTIFICATION_BASE_URL}/listen-notification-created-event`,
-      ["NotificationCreatedDomainEvent"],
-      { autoReconnect: true }
-    );
-		return eventSource
-	}
-  return { getNotReadedNotifications, listenNotificationCreatedEvent, listenNotificationRemovedEvent: listenNotificationReadedEvent, removeNotifications };
+  return { getNotReadedNotifications, listenDomainEvents,   removeNotifications };
 
 }

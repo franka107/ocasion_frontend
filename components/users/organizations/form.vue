@@ -478,7 +478,7 @@ const handleFilesChange = (files: File[]) => {
       <SheetFooter class="mt-auto">
         <Button
           type="submit"
-          :disabled="form.meta.value.valid"
+          :disabled="!form.meta.value.valid"
           :class="
             cn(
               'w-full h-10 text-base bg-[#062339] hover:bg-gray-700',

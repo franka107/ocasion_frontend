@@ -16,6 +16,11 @@
             >
               {{ notifications.length }}
             </p>
+            <p v-else>
+              ⦿
+            </p>
+            
+            
           </Badge>
           <img src="@/assets/icon/svg/icon-noti.svg" class="w-5 h-5 m-auto" />
           <span class="sr-only">Notifications</span>
@@ -86,11 +91,11 @@ import NotificationItem from "@/components/notifications/NotificationItem.vue";
 import type { Notification } from "~/types/Notification";
 import { useNotificationAPI } from "~/composables/useNotificationAPI";
 import { useWebNotification } from "@vueuse/core";
+import { domainEvents,  type NotificationCreatedDomainEvent,  type NotificationReadedDomainEvent } from "~/types/DomainEvent";
 
 const {
   getNotReadedNotifications,
-  listenNotificationCreatedEvent,
-  listenNotificationRemovedEvent,
+  listenDomainEvents: listenDomainEvent,
   removeNotifications
 } = useNotificationAPI();
 const {
@@ -100,19 +105,21 @@ const {
 } = await getNotReadedNotifications();
 const limitedNotifications = computed(() => notifications.value.slice(0, 7));
 
-const onCreatedNotificationListener = listenNotificationCreatedEvent();
-const onRemovedNotificationListener = listenNotificationRemovedEvent();
+const notificationCreatedListener = listenDomainEvent<NotificationCreatedDomainEvent>(domainEvents.notificationCreated)
+const notificationReadedListener = listenDomainEvent<NotificationReadedDomainEvent>(domainEvents.notificationReaded)
+
+
 
 const onArchiveButtonPressed = () => {
   removeNotifications(limitedNotifications.value.map(e => e.id))
-
 }
 
-watch(onCreatedNotificationListener.data, (value, oldValue) => {
-  refresh();
+watch(notificationCreatedListener.data, (value, oldValue) => {
+  refresh()
+});
+watch(notificationReadedListener.data, (value, oldValue) => {
+  refresh()
 });
 
-watch(onRemovedNotificationListener.data, (value, oldValue) => {
-  refresh();
-});
+
 </script>
