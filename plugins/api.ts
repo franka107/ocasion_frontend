@@ -1,8 +1,7 @@
 export default defineNuxtPlugin((nuxtApp) => {
     const { apiUrl } = useRuntimeConfig().public
-    const { session, user } = useUserSession()
+    const { session, user, clear } = useUserSession()
     console.log("user", apiUrl);
-    // console.log("session", session.user);
     
     const api = $fetch.create({
       baseURL: String(apiUrl),
