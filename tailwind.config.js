@@ -75,7 +75,7 @@ module.exports = {
         btn: "8px", 
       },
       fontFamily: {
-        sans: ['Inter', 'Roboto', 'sans-serif'], 
+        sans: ['Roboto', 'Inter', 'sans-serif'], 
         inter: ['Inter', 'sans-serif'],
         roboto: ['Roboto', 'sans-serif'], // Añadir la fuente Roboto
       },

@@ -5,6 +5,7 @@ import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
 import InputFile from "@/components/common/file/Input.vue";
 import type { Organization } from "~/models/organizations";
+import { X } from 'lucide-vue-next'
 const BASE_ORG_URL = "/organization-management";
 let organizationData: Organization | undefined;
 let form: any;
@@ -141,121 +142,80 @@ const handleFilesChange = (files: File[]) => {
 
 <template>
   <SheetHeader>
-    <SheetTitle>{{
+    <SheetClose class="mr-4 rounded-full p-3 hover:bg-[#f1f5f9]">
+      <X class="w-4 h-4 text-muted-foreground" />
+    </SheetClose>
+    <SheetTitle class="text-xl font-medium text-[#64748B]">{{
       props.rucNumber
         ? "Actualizar datos de organización"
         : "Registrar organización"
     }}</SheetTitle>
   </SheetHeader>
-
-  <div class="border-primary border-t-[1px]"></div>
-
   <div class="flex-grow overflow-y-auto no-scrollbar flex flex-col">
     <!-- <Form> -->
-    <form class="flex flex-col gap-4 flex-grow p-1" @submit="onSubmit">
-      <FormField v-slot="{ componentField }" name="attachedFiles">
-        <FormItem>
-          <FormControl>
-            <InputFile
-              v-model="form.values.attachedFiles"
-              @update:value="handleFilesChange"
-              v-bind="componentField"
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-
-      <h2 class="text-primary text-base font-normal leading-5">
-        Datos Básicos
-      </h2>
-      <!-- Razón Social -->
-      <FormField v-slot="{ componentField }" name="name">
-        <FormItem>
-          <FormControl>
-            <Input
-              type="text"
-              placeholder="Razón Social"
-              v-bind="componentField"
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-
-      <!-- Número de RUC -->
-      <FormField v-slot="{ componentField }" name="rucNumber">
-        <FormItem>
-          <FormControl>
-            <Input
-              type="text"
-              placeholder="Número de RUC"
-              v-bind="componentField"
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-
-      <!-- Actividad Económica -->
-      <FormField v-slot="{ componentField }" name="economicActivityId">
-        <FormItem>
-          <FormControl>
-            <Select v-bind="componentField">
-              <SelectTrigger>
-                <SelectValue placeholder="Actividad Económica" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem
-                    v-for="activity in economicActivities"
-                    :key="activity.id"
-                    :value="activity.id"
-                  >
-                    {{ activity.name }}
-                  </SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-
-      <h2 class="text-primary text-base font-normal leading-5">
-        Representante Legal
-      </h2>
-      <!-- Nombre Completo -->
-      <FormField v-slot="{ componentField }" name="representativeFullName">
-        <FormItem>
-          <FormControl>
-            <Input
-              type="text"
-              placeholder="Nombre Completo"
-              v-bind="componentField"
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-
-      <div class="flex gap-2">
-        <!-- Tipo de Documento -->
-        <FormField
-          v-slot="{ componentField }"
-          name="representativeDocumentType"
-        >
-          <FormItem class="w-1/2">
+    <form @submit="onSubmit">
+      <section class="flex flex-col gap-4 flex-grow p-5">
+        <FormField v-slot="{ componentField }" name="attachedFiles">
+          <FormItem>
+            <FormControl>
+              <InputFile
+                v-model="form.values.attachedFiles"
+                @update:value="handleFilesChange"
+                v-bind="componentField"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+  
+        <h2 class="text-primary text-base font-normal leading-5">
+          Datos Básicos
+        </h2>
+        <!-- Razón Social -->
+        <FormField v-slot="{ componentField }" name="name">
+          <FormItem>
+            <FormControl>
+              <Input
+                type="text"
+                placeholder="Razón Social"
+                v-bind="componentField"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+  
+        <!-- Número de RUC -->
+        <FormField v-slot="{ componentField }" name="rucNumber">
+          <FormItem>
+            <FormControl>
+              <Input
+                type="text"
+                placeholder="Número de RUC"
+                v-bind="componentField"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+  
+        <!-- Actividad Económica -->
+        <FormField v-slot="{ componentField }" name="economicActivityId">
+          <FormItem>
             <FormControl>
               <Select v-bind="componentField">
-                <SelectTrigger class="px-2">
-                  <SelectValue placeholder="Tipo de Documento" />
+                <SelectTrigger>
+                  <SelectValue placeholder="Actividad Económica" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectItem value="DNI">DNI</SelectItem>
-                    <SelectItem value="CE">CE</SelectItem>
-                    <SelectItem value="PT">PT</SelectItem>
+                    <SelectItem
+                      v-for="activity in economicActivities"
+                      :key="activity.id"
+                      :value="activity.id"
+                    >
+                      {{ activity.name }}
+                    </SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -263,164 +223,171 @@ const handleFilesChange = (files: File[]) => {
             <FormMessage />
           </FormItem>
         </FormField>
-        <!-- Número de Documento -->
-        <FormField
-          v-slot="{ componentField }"
-          name="representativeDocumentIdentifier"
-        >
-          <FormItem class="w-1/2">
+  
+        <h2 class="text-primary text-base font-normal leading-5">
+          Representante Legal
+        </h2>
+        <!-- Nombre Completo -->
+        <FormField v-slot="{ componentField }" name="representativeFullName">
+          <FormItem>
             <FormControl>
               <Input
                 type="text"
-                placeholder="Número de Documento"
+                placeholder="Nombre Completo"
                 v-bind="componentField"
               />
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
-      </div>
-
-      <!-- Teléfono -->
-      <FormField v-slot="{ componentField }" name="representativePhoneNumber">
-        <FormItem>
-          <FormControl>
-            <Input
-              type="text"
-              placeholder="Número de contacto"
-              v-bind="componentField"
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-
-      <!-- Correo de Facturación -->
-      <FormField v-slot="{ componentField }" name="billingEmail">
-        <FormItem>
-          <FormControl>
-            <Input
-              type="email"
-              placeholder="Correo de facturación"
-              v-bind="componentField"
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-
-      <h2 class="text-primary text-base font-normal leading-5">
-        Porcentaje de inicio de subasta
-      </h2>
-      <!-- Porcentaje de Inicio -->
-      <FormField v-slot="{ componentField }" name="startPercentage">
-        <FormItem>
-          <FormControl>
-            <Input
-              type="number"
-              step="0.01"
-              min="0"
-              placeholder="Porcentaje de Inicio"
-              v-bind="componentField"
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-
-      <h2 class="text-primary text-base font-normal leading-5">
-        Duración de Contrato
-      </h2>
-      <!-- Fecha de Inicio del Contrato -->
-      <div class="flex gap-2">
-        <FormField v-slot="{ componentField }" name="contractStartDate">
-          <FormItem class="w-1/2">
+  
+        <div class="flex gap-2">
+          <!-- Tipo de Documento -->
+          <FormField
+            v-slot="{ componentField }"
+            name="representativeDocumentType"
+          >
+            <FormItem class="w-1/2">
+              <FormControl>
+                <Select v-bind="componentField">
+                  <SelectTrigger class="px-2">
+                    <SelectValue placeholder="Tipo de Documento" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="DNI">DNI</SelectItem>
+                      <SelectItem value="CE">CE</SelectItem>
+                      <SelectItem value="PT">PT</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+          <!-- Número de Documento -->
+          <FormField
+            v-slot="{ componentField }"
+            name="representativeDocumentIdentifier"
+          >
+            <FormItem class="w-1/2">
+              <FormControl>
+                <Input
+                  type="text"
+                  placeholder="Número de Documento"
+                  v-bind="componentField"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+        </div>
+  
+        <!-- Teléfono -->
+        <FormField v-slot="{ componentField }" name="representativePhoneNumber">
+          <FormItem>
             <FormControl>
               <Input
-                type="date"
-                placeholder="Fecha de Inicio del Contrato"
+                type="text"
+                placeholder="Número de contacto"
                 v-bind="componentField"
               />
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
-
-        <!-- Fecha de Fin del Contrato -->
-        <FormField v-slot="{ componentField }" name="contractEndDate">
-          <FormItem class="w-1/2">
+  
+        <!-- Correo de Facturación -->
+        <FormField v-slot="{ componentField }" name="billingEmail">
+          <FormItem>
             <FormControl>
               <Input
-                type="date"
-                placeholder="Fecha de Fin del Contrato"
+                type="email"
+                placeholder="Correo de facturación"
                 v-bind="componentField"
               />
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
-      </div>
-
-      <h2 class="text-primary text-base font-normal leading-5">Ubicación</h2>
-      <!-- Departamento -->
-      <FormField v-slot="{ componentField }" name="department">
-        <FormItem>
-          <FormControl>
-            <Select
-              v-bind="componentField"
-              @update:modelValue="
-                (value) => {
-                  form.values.department = value;
-                  handleStateChange(value);
-                }
-              "
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Departamento" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem
-                    v-for="state in states"
-                    :key="state.id"
-                    :value="state.id"
-                  >
-                    {{ state.name }}
-                  </SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-
-      <div class="flex gap-2">
-        <!-- Provincia -->
-        <FormField v-slot="{ componentField }" name="province">
-          <FormItem class="w-1/2">
+  
+        <h2 class="text-primary text-base font-normal leading-5">
+          Porcentaje de inicio de subasta
+        </h2>
+        <!-- Porcentaje de Inicio -->
+        <FormField v-slot="{ componentField }" name="startPercentage">
+          <FormItem>
+            <FormControl>
+              <Input
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="Porcentaje de Inicio"
+                v-bind="componentField"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+  
+        <h2 class="text-primary text-base font-normal leading-5">
+          Duración de Contrato
+        </h2>
+        <!-- Fecha de Inicio del Contrato -->
+        <div class="flex gap-2">
+          <FormField v-slot="{ componentField }" name="contractStartDate">
+            <FormItem class="w-1/2">
+              <FormControl>
+                <Input
+                  type="date"
+                  placeholder="Fecha de Inicio del Contrato"
+                  v-bind="componentField"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+  
+          <!-- Fecha de Fin del Contrato -->
+          <FormField v-slot="{ componentField }" name="contractEndDate">
+            <FormItem class="w-1/2">
+              <FormControl>
+                <Input
+                  type="date"
+                  placeholder="Fecha de Fin del Contrato"
+                  v-bind="componentField"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+        </div>
+  
+        <h2 class="text-primary text-base font-normal leading-5">Ubicación</h2>
+        <!-- Departamento -->
+        <FormField v-slot="{ componentField }" name="department">
+          <FormItem>
             <FormControl>
               <Select
                 v-bind="componentField"
                 @update:modelValue="
                   (value) => {
-                  form.values.province = value;
-                  handleCityChange(value)
-                }
+                    form.values.department = value;
+                    handleStateChange(value);
+                  }
                 "
-                :disabled="!form.values.department"
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Provincia" />
+                  <SelectValue placeholder="Departamento" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
                     <SelectItem
-                      v-for="city in cities"
-                      :key="city.id"
-                      :value="city.id"
+                      v-for="state in states"
+                      :key="state.id"
+                      :value="state.id"
                     >
-                      {{ city.name }}
+                      {{ state.name }}
                     </SelectItem>
                   </SelectGroup>
                 </SelectContent>
@@ -429,58 +396,94 @@ const handleFilesChange = (files: File[]) => {
             <FormMessage />
           </FormItem>
         </FormField>
-
-        <!-- Distrito -->
-        <FormField v-slot="{ componentField }" name="districtId">
-          <FormItem class="w-1/2">
+  
+        <div class="flex gap-2">
+          <!-- Provincia -->
+          <FormField v-slot="{ componentField }" name="province">
+            <FormItem class="w-1/2">
+              <FormControl>
+                <Select
+                  v-bind="componentField"
+                  @update:modelValue="
+                    (value) => {
+                    form.values.province = value;
+                    handleCityChange(value)
+                  }
+                  "
+                  :disabled="!form.values.department"
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Provincia" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem
+                        v-for="city in cities"
+                        :key="city.id"
+                        :value="city.id"
+                      >
+                        {{ city.name }}
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+  
+          <!-- Distrito -->
+          <FormField v-slot="{ componentField }" name="districtId">
+            <FormItem class="w-1/2">
+              <FormControl>
+                <Select v-bind="componentField" :disabled="!form.values.province">
+                  <SelectTrigger>
+                    <SelectValue placeholder="Distrito" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem
+                        v-for="district in districts"
+                        :key="district.id"
+                        :value="district.id"
+                      >
+                        {{ district.name }}
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+        </div>
+  
+        <!-- Dirección -->
+        <FormField v-slot="{ componentField }" name="addressLine1">
+          <FormItem>
             <FormControl>
-              <Select v-bind="componentField" :disabled="!form.values.province">
-                <SelectTrigger>
-                  <SelectValue placeholder="Distrito" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem
-                      v-for="district in districts"
-                      :key="district.id"
-                      :value="district.id"
-                    >
-                      {{ district.name }}
-                    </SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+              <Input
+                type="text"
+                placeholder="Dirección"
+                v-bind="componentField"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
-      </div>
-
-      <!-- Dirección -->
-      <FormField v-slot="{ componentField }" name="addressLine1">
-        <FormItem>
-          <FormControl>
-            <Input
-              type="text"
-              placeholder="Dirección"
-              v-bind="componentField"
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
+      </section>
 
       <!-- Botón de Submit -->
       <!-- <Button type="submit">Guardar</Button> -->
       <SheetFooter class="mt-auto">
         <Button
           type="submit"
-          :disabled="!form.meta.value.valid"
+          :disabled="form.meta.value.valid"
           :class="
             cn(
-              'w-full',
+              'w-full h-10 text-base bg-[#062339] hover:bg-gray-700',
               !form.meta.value.valid
-                ? 'text-primary bg-bgtheme'
+                ? 'text-white'
                 : 'hover:text-primary hover:bg-bgtheme'
             )
           "
