@@ -24,13 +24,13 @@
     :min-size="6"
     :defaultSize="16"
     :maxSize="16"
-    class="bg-[#20445E] h-screen flex flex-col"
+    class="bg-[#20445E]  flex flex-col"
     @expand="emit('expand')"
     @collapse="emit('collapse')"
   >
       <slot/>
-      <button @click="togglePanel">
+      <!-- <button @click="togglePanel">
         {{ panelRef?.isCollapsed ? 'Expand' : 'Collapse' }}
-      </button>
+      </button> -->
   </SplitterPanel>
 </template>
