@@ -5,14 +5,8 @@
     <Splitter >
       <SplitterNav @collapse="handleCollapse" @expand="handleExpand">
         <Header :collapsed="collapsed" />
-        
       </SplitterNav>
-      <SplitterResizeHandle
-      id="splitter-group-1-resize-handle-1"
-      class="w-2"
-    />
-      <SplitterMain>
-        
+      <SplitterMain>  
         <section class="flex-grow py-4 px-4 bg-bgtheme flex flex-col min-h-[100vh]">
           <div class="flex items-center justify-end space-x-4 relative gap-2 pb-4 px-2">
             <Notification />
