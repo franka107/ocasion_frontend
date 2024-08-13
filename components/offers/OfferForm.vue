@@ -4,12 +4,12 @@ import { useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
 import InputFile from "@/components/common/file/Input.vue";
-import type { IEventLItem } from '@/types/Event';
+import type { OfferItem } from '@/types/Offer';
 import { eventType, goodType, eventTimes, years } from "@/constants/events";
 const BASE_OFFERS_URL = '/offer-management'
 let form: any;
-const {getEvent} = useEvent();
-const props = defineProps<{id: string | undefined, orgRucNumber: string,  onsubmit: (values: any) => void;}>();
+const { getOffer } = useOfferAPI();
+const props = defineProps<{id: string | undefined, eventId: string, rucId: string,  onsubmit: (values: any) => void;}>();
 const { fetchCities, fetchDistricts, fetchStates, states, cities, districts } = useAddress()
 const { brands: brandOptions, models: modelOptions, fetchBrands, fetchModels } = useExtraEndpoints()
 // const yearOptions = Array.from({ length: 65 }, (_, i) => ({ id: 1960 + i, name: (1960 + i).toString() }))
@@ -21,27 +21,59 @@ const formSchema = toTypedSchema(
     attachedFiles: z
       .array(z.any())
       .min(1, "Debe subir al menos un archivo de bien."),
-      brandId: z.string().min(1, "El modelo es requerido."),
-    title: z.number().min(1960 , "El titulo es requerido.").max(200, "Cant. de carácteres máximo 200."),
-    carModel: z.string().min(1, "El modelo es requerido."),
-    year: z.number().min(1960 , "El Año minimo es 1960.").max(2025, "El Año maximo es 2025."),
+    title: z.string().min(1 , "El titulo es requerido.").max(200, "Cant. de carácteres máximo 200."),
+    brandId: z.string().min(1, "El modelo es requerido."),
+    model: z.string().min(1, "El modelo es requerido."),
+    year: z.number().min(1,"El año es requerido"),
+    districtId: z.string().min(1,"El año es requerido"),
     description: z.string().min(1, "La descripcion es requerido."),
     addressLine1: z.string().min(1, "La dirección es requerida."),
-    apprasial: z.string().min(1, "La fecha de fin es requerida."),
+    appraisal: z.number().min(1, "La tasación es requerida."),
   })
 );
-if (props.id) {
-      const { data: organizationData } = await getEvent(props.id);
-        
-      form = useForm({
-        validationSchema: formSchema,
-        initialValues: organizationData.value,
-      });
-} else {
-      await Promise.all([fetchBrands(), fetchStates()]);
-      form = useForm({ validationSchema: formSchema });
+
+interface OfferItemForm extends OfferItem {
+  department?: string;
+  province?: string;
+  districtId?: string;
+  addressLine1?: string;
+  brandId?: string;
+  model?: string;
 }
 
+if (props.id) {
+    // const { data: offerData } = await ;
+    const [{ data }]= await Promise.all([getOffer(props.id),fetchBrands(), fetchStates()]);
+    const offerData: OfferItemForm = { ...data.value };
+    offerData.department = offerData.address?.district?.id.split("+")[0] || "";
+    offerData.province =
+      `${offerData.department}+${offerData.address?.district?.id.split("+")[1]}` ||
+      "";
+    offerData.districtId = offerData.address.district.id;
+    offerData.addressLine1 = offerData.address.addressLine1;
+    offerData.brandId = offerData.carModel.brand.id;
+    offerData.model = offerData.carModel.id;
+    
+    await Promise.all([
+      fetchCities(offerData.department),
+      fetchDistricts(offerData.province),
+      fetchModels(offerData.brandId),
+    ]);
+    form = useForm({
+      validationSchema: formSchema,
+      initialValues: offerData,
+    });
+    
+  } else {
+    await Promise.all([fetchBrands(), fetchStates()]);
+    form = useForm({ validationSchema: formSchema });
+}
+
+
+watch(form.values, (newValues) => {
+  console.log("Form values:", newValues, props.rucId);
+  console.log("Attached Files:", newValues.attachedFiles); // Revisa este log
+});
 
 const handleStateChange = (stateId: string) => {
   cities.value = []; // Limpiar las provincias
@@ -59,20 +91,32 @@ const handleCityChange = (cityId: string) => {
 };
 
 const onSubmit = form.handleSubmit((values: any) => {
-  const { ...restValues } =
-    values;
+  const { addressLine1, districtId, year, model, ...restValues } = values;
 
   const formattedValues = {
     ...restValues,
-    organization: {
-        rucNumber: props.orgRucNumber,
+    event: {
+      id: props.eventId,
     },
+    carModel: {
+      id: model,
+    },
+    year: Number(year),
+    address: {
+      // id: districtId,
+      addressLine1: addressLine1,
+      id: districtId,
+    },
+    organization: {
+      rucNumber: props.rucId,
+    },
+    appraisal: Number(values.appraisal),
   };
   if (props.id) {
     formattedValues.id = props.id;
   }
   console.log(formattedValues);
-  // props.onsubmit(formattedValues);
+  props.onsubmit(formattedValues);
   
 });
 
@@ -95,8 +139,8 @@ const handleFilesChange = (files: File[]) => {
   <div class="flex-grow overflow-y-auto no-scrollbar flex flex-col">
     <!-- <Form> -->
     <form class="flex flex-col gap-4 flex-grow p-1" @submit="onSubmit">
-      <div class="flex gap-2">
-        <FormField v-slot="{ componentField }" name="goodFiles">
+      <div class="flex gap-4 justify-center">
+        <FormField v-slot="{ componentField }" name="annexesFiles">
         <FormItem>
           <FormControl>
             <InputFile
@@ -110,7 +154,7 @@ const handleFilesChange = (files: File[]) => {
           <FormMessage />
         </FormItem>
       </FormField>
-      <FormField v-slot="{ componentField }" name="termsAndConditionsFiles">
+      <FormField v-slot="{ componentField }" name="attachedFiles">
         <FormItem>
           <FormControl>
             <InputFile
@@ -145,7 +189,7 @@ const handleFilesChange = (files: File[]) => {
         <FormItem>
           <FormControl>
             <Select v-bind="componentField" 
-            @update:modelValue="handleBrandChange(componentField.modelValue)">
+            @update:modelValue="(value) => handleBrandChange(value)">
               <SelectTrigger>
                 <SelectValue placeholder="Marca" />
               </SelectTrigger>
@@ -200,7 +244,7 @@ const handleFilesChange = (files: File[]) => {
                   <SelectItem
                     v-for="year in years"
                     :key="year.id"
-                    :value="String(year.id)"
+                    :value="Number(year.id) as any"
                   >
                     {{ year.name }}
                   </SelectItem>
@@ -231,7 +275,7 @@ const handleFilesChange = (files: File[]) => {
           <FormControl>
             <Select
               v-bind="componentField"
-              @update:modelValue="handleStateChange(componentField.modelValue)"
+              @update:modelValue="(value) => handleStateChange(value)"
             >
               <SelectTrigger>
                 <SelectValue placeholder="Departamento" />
@@ -260,7 +304,7 @@ const handleFilesChange = (files: File[]) => {
             <FormControl>
               <Select
                 v-bind="componentField"
-                @update:modelValue="handleCityChange(componentField.modelValue)"
+                @update:modelValue="(value) => handleCityChange(value)"
                 :disabled="!form.values.department"
               >
                 <SelectTrigger>
@@ -324,25 +368,25 @@ const handleFilesChange = (files: File[]) => {
       </FormField>
       <h2 class="text-primary text-base font-normal leading-5">Puesta en valor</h2>
       <div class="flex gap">
-        <FormField v-slot="{ componentField }" name="addressLine1">
+        <FormField v-slot="{ componentField }" name="appraisal">
           <FormItem>
             <FormControl>
               <Input
-                type="text"
-                placeholder="Dirección"
+                type="number"
+                placeholder="Tasación"
                 v-bind="componentField"
               />
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
-        <FormField v-slot="{ componentField }" name="addressLine1">
+        <FormField name="other">
           <FormItem>
             <FormControl>
               <Input
                 type="text"
-                placeholder="Dirección"
-                v-bind="componentField"
+                disabled
+                placeholder="Valor inicial de subasta"
               />
             </FormControl>
             <FormMessage />

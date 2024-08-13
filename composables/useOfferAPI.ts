@@ -1,25 +1,19 @@
-import type { IEventLItem } from "~/types/Event"
+import type { OfferItem } from "~/types/Offer"
 
-const EVENT_BASE_URL = '/event-management'
+const EVENT_BASE_URL = '/offer-management'
 // by convention, composable function names start with "use"
 export function useOfferAPI() {
     // state encapsulated and managed by the composable
     const page = ref(1)
-    const filterOptions = ref('[]')
     const sortOptions = ref('[]')
    
     const onSort = (sortObject: { [key: string]: string }[]) => {
       sortOptions.value = JSON.stringify(sortObject)
     }
-    const onSearch = (item: {[key: string]: string }) => {
-      const filters = [
-        { field: 'title', type: 'like', value: item.title || '' },
-      ]
-      filterOptions.value = JSON.stringify(filters)
-    }
+
     const createOffer = async (values: any) => {
         const { status, error }: any = await useAPI(
-          `${EVENT_BASE_URL}/create-event`,
+          `${EVENT_BASE_URL}/create-offer`,
           {
             method: "POST",
             body: values,
@@ -30,7 +24,7 @@ export function useOfferAPI() {
     
     const editOffer = async (values: any) => {
         const { status, error }: any = await useAPI(
-          `${EVENT_BASE_URL}/update-event`,
+          `${EVENT_BASE_URL}/update-offer`,
           {
             method: "PUT",
             body: values,
@@ -38,5 +32,18 @@ export function useOfferAPI() {
         );
         return { status, error}
     };
-  return { page,  sortOptions, filterOptions, onSearch, onSort, createOffer, editOffer }
+              
+    const getOffer = async (id: number | string) => {
+      const { status, error, data } = await useAPI<OfferItem>(
+        `${EVENT_BASE_URL}/get-offer-detail`,
+        {
+          method: "GET",
+          query: {
+            id,
+          },
+        } as any
+      );
+      return { status, error, data}
+  };
+  return { page,  sortOptions, onSort, createOffer, editOffer, getOffer }
 }

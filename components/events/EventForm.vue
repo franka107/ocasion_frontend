@@ -52,8 +52,9 @@ const onSubmit = form.handleSubmit((values: any) => {
 
   const formattedValues = {
     ...restValues,
+    description: "",
     organization: {
-        rucNumber: props.orgRucNumber,
+      rucNumber: props.orgRucNumber,
     },
   };
   if (props.id) {

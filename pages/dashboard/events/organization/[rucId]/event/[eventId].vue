@@ -34,6 +34,12 @@
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" class="bg-primary text-white">
+                <SheetTrigger class="w-full" @click="() => { offerId = row.id; openSheet('offer-form') }">
+                  <DropdownMenuItem>
+                      Editar
+                      <CustomIcons name="Pen" class="ml-auto" />
+                    </DropdownMenuItem>
+                  </SheetTrigger>
                 <DropdownMenuItem
                   @click=""
                 >
@@ -49,11 +55,13 @@
         </template>
       </CustomTable>
       <SheetContent
+          v-if="currentSheet === 'offer-form'"
           class="flex flex-col h-full"
         >
           <OfferForm
             :id="offerId"
-            :orgRucNumber="route.params.rucId as string"
+            :eventId="String(route.params.eventId)"
+            :rucId="String(route.params.rucId)"
             :onsubmit="offerId !== undefined ? handleEdit : handleCreate"
           />
         </SheetContent>
@@ -70,16 +78,24 @@
 import EventDetails from '~/components/events/EventDetails.vue';
 const BASE_OFFERS_URL = '/offer-management'
 import { offerHeader, offerStatus } from "@/constants/offer";
-import type { OfferItem } from '~/types/Offer';
+import type { OfferListItem } from '~/types/Offer';
 import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue';
 import OfferForm from '@/components/offers/OfferForm.vue';
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const { currentSheet, openSheet, closeSheet } = useSheetStore();
-const { page, sortOptions, filterOptions, onSort, onSearch, createOffer, editOffer } = useOfferAPI()
+const { page, sortOptions, onSort, createOffer, editOffer } = useOfferAPI()
 
 const route = useRoute()
 const { getEvent } = useEvent()
 const offerId = ref(undefined)
+const filterOptions = ref(`[{ "field": "event.id", "type": "equal", "value": "${route.params.eventId}" }]`)
+
+const onSearch = (item: {[key: string]: string }) => {
+  const filters = [
+    { field: 'title', type: 'like', value: item.title || '' },
+  ]
+  filterOptions.value = JSON.stringify(filters)
+}
 
 Promise.all([
   getEvent(route.params.eventId as string),
@@ -87,7 +103,7 @@ Promise.all([
     query: {
       limit: 8,
       page,
-      filterOptions: '[]',
+      filterOptions,
       sortOptions: '[]'
     },
   } as any)
@@ -103,9 +119,10 @@ const { data, refresh } : any = await useAPI(`${BASE_OFFERS_URL}/find-offers`, {
 } as any);
 const { data: eventDetail } = await getEvent(route.params.eventId as string)
 
-const offerData= computed(() => data.value.data.map((item: OfferItem) => ({
-    brandName: item.model.brand.name,
-    modelName: item.model.name,
+
+const offerData= computed(() => data.value.data.map((item: OfferListItem) => ({
+    brandName: item.carModel.brand.name,
+    modelName: item.carModel.name,
     addressCity: item.address.district.city.name,
     ...item
   })))
@@ -119,7 +136,7 @@ const offerData= computed(() => data.value.data.map((item: OfferItem) => ({
         refresh();
         updateConfirmModal({title: 'Oferta creado', message: 'La oferta ha sido creada exitosamente', type: 'success'});
     } else {
-      
+
         const eMsg = error.value.data?.errors?.[0].message || error.value.data.message || 'La oferta no se pudo crear, intentalo más tarde'  
         updateConfirmModal({title: 'Error al crear Oferta', message: eMsg, type: 'error'});
     } 

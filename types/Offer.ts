@@ -1,7 +1,7 @@
-export interface OfferItem {
+export interface OfferListItem {
     id: string
     title: string
-    model: Model
+    carModel: Model
     year: number
     initialValue: number
     description: string
@@ -13,6 +13,23 @@ export interface OfferItem {
     createdAt: string
     updatedAt: string
   }
+
+  export interface OfferItem {
+    id: string
+    title: string
+    carModel: Model
+    year: number
+    initialValue: number
+    description: string
+    address: Address
+    appraisal: number
+    annexesFiles: AnnexesFile[]
+    attachedFiles: AttachedFile[]
+    status: OfferStatus
+    createdAt: string
+    updatedAt: string
+  }
+
   export enum OfferStatus {
     Retired = 'RETIRED', // Retirado
     Confirmed = 'CONFIRMED', // Confirmado

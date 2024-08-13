@@ -25,7 +25,7 @@
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" class="bg-primary text-white w-40">
                 <DropdownMenuItem>
-                  <NuxtLink :to="`/dashboard/events/organization/${row.rucNumber}/event/${row.id}`">Ver Evento</NuxtLink>
+                  <NuxtLink :to="`/dashboard/events/organization/${route.params.rucId}/event/${row.id}`">Ver Evento</NuxtLink>
                   <CustomIcons name="EyeIcon" class="ml-auto" />
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -36,10 +36,12 @@
                   </DropdownMenuItem>
                 </SheetTrigger>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem @click="handleCreate(row.rucNumber)" >
-                  Cancelar
+                <SheetTrigger class="w-full" @click="() => { eventId = row.id; openSheet('cancel-event') }">
+                  <DropdownMenuItem>
+                    Cancelar
                   <CustomIcons name="Close" class="ml-auto" />
                 </DropdownMenuItem>
+                </SheetTrigger>
                 <DropdownMenuSeparator />
               </DropdownMenuContent>
             </DropdownMenu>
@@ -50,13 +52,20 @@
         </template>
       </CustomTable>
       <SheetContent
+        v-if="currentSheet === 'event-form'"
         class="flex flex-col h-full"
       >
         <EventForm
           :id="eventId"
-          :orgRucNumber="route.params.rucId as string"
+          :orgRucNumber="String(route.params.rucId)"
           :onsubmit="eventId !== undefined ? handleEdit : handleCreate"
         />
+      </SheetContent>
+      <SheetContent
+        v-else-if="currentSheet === 'cancel-event'"
+        class="flex flex-col h-full"
+        >
+        <div>Test</div>
       </SheetContent>
     </div>
     <CustomPagination class="mt-5 mb-[19px]" :total="data.count" :limit="data.limit" v-model:page="page" />
@@ -78,15 +87,16 @@ import EventForm from '@/components/events/EventForm.vue';
 const { page, sortOptions, onSort, createEvent, editEvent } = useEvent()
 
 const route = useRoute()
-// const filterOptions = ref(`[{ "field": "organization.rucNumber", "type": "equal", "value": "${route.params.rucId}" }]`)
+const filterOptions = ref(`[{ "field": "organization.rucNumber", "type": "equal", "value": "${route.params.rucId}" }]`)
 const eventId = ref<string | undefined>('EVE-1')
 const { currentSheet, openSheet, closeSheet } = useSheetStore();
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 
-const filterOptions = ref(`[]`)
+// const filterOptions = ref(`[]`)
 const onSearch = (item: {[key: string]: string }) => {
     filterOptions.value = JSON.stringify([
       { field: 'name', type: 'like', value: item.name || '' },
+      { field: "organization.rucNumber", type: "equal", value: route.params.rucId }
     ])
 }
 const BASE_ORG_URL = '/event-management'
