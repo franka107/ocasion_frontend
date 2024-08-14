@@ -9,53 +9,50 @@
         @onSearch="onSearch"
       >
       <template #action-button>
-          <SheetTrigger @click="() => { offerId = undefined; openSheet('offer-form') }">
-            <Button
-              variant="default"
-              >Crear oferta</Button
-            >
-          </SheetTrigger>
-        </template>
-        <template #attachedFiles>
-          <div class="w-10 h-10 flex items-center justify-center rounded-full bg-[#0B38590A]">
-            <CustomIcons name="Clip"  />
-          </div>
-        </template>
-        <template #actions="{ row }">
-          <div class="flex justify-center">
-            <DropdownMenu>
-              <DropdownMenuTrigger as-child>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  class="h-8 data-[state=open]:bg-accent"
-                >
-                  <CustomIcons name="VerticalDots" class="w-6 h-6" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" class="bg-primary text-white">
-                <SheetTrigger class="w-full" @click="() => { offerId = row.id; openSheet('offer-form') }">
-                  <DropdownMenuItem>
-                      Editar
-                      <CustomIcons name="Pen" class="ml-auto" />
-                    </DropdownMenuItem>
-                  </SheetTrigger>
-                <DropdownMenuItem
-                  @click=""
-                >
-                  Debatir
-                  <CustomIcons name="Reload" class="ml-auto" />
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </template>
+        <Button
+          @click="() => { offerId = undefined; openModal = true }"
+          variant="default"
+          >Crear oferta</Button
+        >
+      </template>
+      <template #attachedFiles>
+        <div class="w-10 h-10 flex items-center justify-center rounded-full bg-[#0B38590A]">
+          <CustomIcons name="Clip"  />
+        </div>
+      </template>
+      <template #actions="{ row }">
+        <div class="flex justify-center">
+          <DropdownMenu>
+            <DropdownMenuTrigger as-child>
+              <Button
+                variant="ghost"
+                size="sm"
+                class="h-8 data-[state=open]:bg-accent"
+              >
+                <CustomIcons name="VerticalDots" class="w-6 h-6" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" class="bg-primary text-white">
+              <DropdownMenuItem @click="() => { offerId = row.id; openModal = true }">
+                Editar
+                <CustomIcons name="Pen" class="ml-auto" />
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                @click=""
+              >
+                Debatir
+                <CustomIcons name="Reload" class="ml-auto" />
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </template>
         <template #status="{ row }">
           <CustomChip :text="offerStatus.get(row.status)?.name || ''" :variant="offerStatus.get(row.status)?.color as any" ></CustomChip>
         </template>
       </CustomTable>
       <SheetContent
-          v-if="currentSheet === 'offer-form'"
+          v-model:open="openModal"
           class="flex flex-col h-full"
         >
           <OfferForm
@@ -82,14 +79,13 @@ import type { OfferListItem } from '~/types/Offer';
 import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue';
 import OfferForm from '@/components/offers/OfferForm.vue';
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
-const { currentSheet, openSheet, closeSheet } = useSheetStore();
 const { page, sortOptions, onSort, createOffer, editOffer } = useOfferAPI()
 
 const route = useRoute()
 const { getEvent } = useEvent()
 const offerId = ref(undefined)
 const filterOptions = ref(`[{ "field": "event.id", "type": "equal", "value": "${route.params.eventId}" }]`)
-
+const openModal = ref(false)
 const onSearch = (item: {[key: string]: string }) => {
   const filters = [
     { field: 'title', type: 'like', value: item.title || '' },
@@ -128,15 +124,14 @@ const offerData= computed(() => data.value.data.map((item: OfferListItem) => ({
   })))
 
 
-  const handleCreate = async (values: any) => {
+const handleCreate = async (values: any) => {
   openConfirmModal({title:'Crear Oferta', message: '¿Estás seguro de que deseas crear este Oferta?', callback: async() => {
     const { status, error } : any = await createOffer(values)
     if(status.value === 'success') {
-        closeSheet();
+        openModal.value = false;
         refresh();
         updateConfirmModal({title: 'Oferta creado', message: 'La oferta ha sido creada exitosamente', type: 'success'});
     } else {
-
         const eMsg = error.value.data?.errors?.[0].message || error.value.data.message || 'La oferta no se pudo crear, intentalo más tarde'  
         updateConfirmModal({title: 'Error al crear Oferta', message: eMsg, type: 'error'});
     } 
@@ -147,7 +142,7 @@ const handleEdit = async (values: any) => {
   openConfirmModal({ title: 'Actualizar Oferta', message: '¿Estás seguro de que deseas actualizar este Oferta?', callback: async() => {
     const { status, error } : any = await editOffer(values)
     if(status.value === 'success') {
-        closeSheet();
+        openModal.value = false;
         refresh();
         updateConfirmModal({title: 'Oferta actualizada', message: 'La oferta ha sido actualizado exitosamente', type: 'success'});
     } else {

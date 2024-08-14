@@ -1,0 +1,47 @@
+version: "3"
+
+services:
+  web1:
+    image: registry.dev.deocasion.pe/${IMAGENAME}:${CI_PIPELINE_ID}
+    build: .
+    restart: always
+    networks:
+      - swarm-dev
+    ports:
+      - "${PORTSALIDA}:${PORTDOCKER}"
+    deploy:
+      mode: replicated
+      replicas: 1
+      # placement:
+      #   constraints:
+      #     - node.labels.name == ${NODO}
+      resources:
+        reservations:
+          cpus: "0.1"
+          memory: 200M # Set the memory reservation here
+        limits:
+          cpus: "0.5"
+          memory: 600M # Set the memory limit here
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.${SUBDOMINIO}-http.rule=Host(`${SUBDOMINIO}.${DOMINIO}`)"
+        - "traefik.http.routers.${SUBDOMINIO}.rule=Host(`${SUBDOMINIO}.${DOMINIO}`)"
+        - "traefik.http.routers.${SUBDOMINIO}.entrypoints=websecure"
+        - "traefik.http.routers.${SUBDOMINIO}.tls.certresolver=letsencryptresolver"
+        - "traefik.http.services.${SUBDOMINIO}.loadbalancer.server.port=3000"
+
+        #NOTA LOS NAMES ROUTERS NO DEBEN TENER ., la uiltima Linea web1(nombre del servicio)
+
+    environment:
+      - TZ=America/Lima
+      - NUXT_SESSION_PASSWORD=${NUXT_SESSION_PASSWORD}
+      - NUXT_API_URL=${NUXT_API_URL}
+
+networks:
+  swarm-dev:
+    external: true
+#  swarm-qa:
+#    external: true
+#  swarm-prod:
+#    external: true
+

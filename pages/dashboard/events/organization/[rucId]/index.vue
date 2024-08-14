@@ -4,9 +4,7 @@
         <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto mt-4">
           <CustomTable :data="eventsData" :header="eventListHeaders" @onSort="onSort" @onSearch="onSearch">
         <template #action-button>
-          <SheetTrigger @click="() => { eventId = undefined; openSheet('event-form') }">
-            <Button>Crear evento</Button>
-          </SheetTrigger>
+          <Button @click="() => { eventId = undefined; openEventModal = true }">Crear evento</Button>
         </template> 
         <template #type="{ row }">
           <span class="whitespace-nowrap">{{  eventType.get(row.type) || '' }}</span>
@@ -24,24 +22,22 @@
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" class="bg-primary text-white w-40">
-                <DropdownMenuItem>
-                  <NuxtLink :to="`/dashboard/events/organization/${route.params.rucId}/event/${row.id}`">Ver Evento</NuxtLink>
-                  <CustomIcons name="EyeIcon" class="ml-auto" />
-                </DropdownMenuItem>
+                <NuxtLink :to="`/dashboard/events/organization/${route.params.rucId}/event/${row.id}`">
+                  <DropdownMenuItem>
+                    Ver Evento
+                    <CustomIcons name="EyeIcon" class="ml-auto" />
+                  </DropdownMenuItem>
+                </NuxtLink>
                 <DropdownMenuSeparator />
-                <SheetTrigger class="w-full" @click="() => { eventId = row.id; openSheet('event-form') }">
-                <DropdownMenuItem>
+                <DropdownMenuItem @click="() => { eventId = row.id; openEventModal = true }">
                     Editar
                     <CustomIcons name="Pen" class="ml-auto" />
                   </DropdownMenuItem>
-                </SheetTrigger>
                 <DropdownMenuSeparator />
-                <SheetTrigger class="w-full" @click="() => { eventId = row.id; openSheet('cancel-event') }">
-                  <DropdownMenuItem>
+                  <DropdownMenuItem @click="() => { eventId = row.id; openCancelModal = true }">
                     Cancelar
                   <CustomIcons name="Close" class="ml-auto" />
                 </DropdownMenuItem>
-                </SheetTrigger>
                 <DropdownMenuSeparator />
               </DropdownMenuContent>
             </DropdownMenu>
@@ -52,7 +48,7 @@
         </template>
       </CustomTable>
       <SheetContent
-        v-if="currentSheet === 'event-form'"
+        v-model:open="openEventModal"
         class="flex flex-col h-full"
       >
         <EventForm
@@ -62,7 +58,7 @@
         />
       </SheetContent>
       <SheetContent
-        v-else-if="currentSheet === 'cancel-event'"
+        v-model:open="openCancelModal"
         class="flex flex-col h-full"
         >
         <EventCancel :eventId="String(eventId)" :onsubmit="handleCancel" />
@@ -90,10 +86,10 @@ const { page, sortOptions, onSort, createEvent, editEvent, cancelEvent } = useEv
 const route = useRoute()
 const filterOptions = ref(`[{ "field": "organization.rucNumber", "type": "equal", "value": "${route.params.rucId}" }]`)
 const eventId = ref<string | undefined>('EVE-1')
-const { currentSheet, openSheet, closeSheet } = useSheetStore();
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
+const openEventModal = ref(false)
+const openCancelModal = ref(false)
 
-// const filterOptions = ref(`[]`)
 const onSearch = (item: {[key: string]: string }) => {
     filterOptions.value = JSON.stringify([
       { field: 'name', type: 'like', value: item.name || '' },
@@ -124,7 +120,7 @@ const handleCreate = async (values: any) => {
   openConfirmModal({title:'Crear evento', message: '¿Estás seguro de que deseas crear este evento?', callback: async() => {
     const { status, error } : any = await createEvent(values)
     if(status.value === 'success') {
-        closeSheet();
+        openEventModal.value = false;
         refresh();
         updateConfirmModal({title: 'Evento creado', message: 'El evento ha sido creada exitosamente', type: 'success'});
     } else {
@@ -139,12 +135,12 @@ const handleEdit = async (values: any) => {
   openConfirmModal({ title: 'Actualizar evento', message: '¿Estás seguro de que deseas actualizar este evento?', callback: async() => {
     const { status, error } : any = await editEvent(values)
     if(status.value === 'success') {
-        closeSheet();
-        refresh();
-        updateConfirmModal({title: 'Evento actualizada', message: 'El evento ha sido actualizado exitosamente', type: 'success'});
+      openEventModal.value = false;
+      refresh();
+      updateConfirmModal({title: 'Evento actualizada', message: 'El evento ha sido actualizado exitosamente', type: 'success'});
     } else {
-        const eMsg = error.value.data?.errors?.[0].message || error.value.data.message || 'El evento no se pudo actualizar, intentalo más tarde'  
-        updateConfirmModal({title: 'Error al crear evento', message: eMsg, type: 'error'});
+      const eMsg = error.value.data?.errors?.[0].message || error.value.data.message || 'El evento no se pudo actualizar, intentalo más tarde'  
+      updateConfirmModal({title: 'Error al crear evento', message: eMsg, type: 'error'});
     } 
   }})
 };
@@ -153,7 +149,7 @@ const handleCancel = async (values: any) => {
   openConfirmModal({ title: 'Cancelar evento', message: '¿Estás seguro de que deseas cancelar este evento?', callback: async() => {
     const { status, error } : any = await cancelEvent(values)
     if(status.value === 'success') {
-        closeSheet();
+        openCancelModal.value = false;
         refresh();
         updateConfirmModal({title: 'Evento cancelado', message: 'El evento ha sido cancelar exitosamente', type: 'success'});
     } else {

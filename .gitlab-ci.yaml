@@ -1,0 +1,27 @@
+image: tiangolo/docker-with-compose
+
+include:
+  - project: "miguel.rodriguez/template-ci"
+    file: "install.yml"
+
+stages:
+  - build
+  - build-to-dev
+
+build:
+  stage: build
+  variables:
+    ENVDEPLOY: develop
+    PORTDOCKER: 3000
+    PORTSALIDA: 3000
+    ENV_STAGE: development
+
+build-to-dev:
+  stage: build-to-dev
+  variables:
+    ENVDEPLOY: develop
+    PORTDOCKER: 3000
+    PORTSALIDA: 3000
+    ENV_STAGE: development
+    SUBDOMINIO: web
+    DOMINIO: dev.deocasion.pe

@@ -182,6 +182,7 @@ const handleFilesChange = (files: File[]) => {
             <Input
               type="text"
               placeholder="Título de la oferta"
+              :disabled="props.id"
               v-bind="componentField"
             />
           </FormControl>
@@ -377,6 +378,7 @@ const handleFilesChange = (files: File[]) => {
             <FormControl>
               <Input
                 type="number"
+                :disabled="props.id"
                 placeholder="Tasación"
                 v-bind="componentField"
               />

@@ -143,7 +143,7 @@ const handleFilesChange = (files: File[]) => {
       <FormField v-slot="{ componentField }" name="type">
         <FormItem>
           <FormControl>
-            <Select v-bind="componentField">
+            <Select :disabled="!!props.id" v-bind="componentField">
               <SelectTrigger>
                 <SelectValue placeholder="Tipo de evento" />
               </SelectTrigger>
@@ -166,7 +166,7 @@ const handleFilesChange = (files: File[]) => {
       <FormField v-slot="{ componentField }" name="goodType">
         <FormItem>
           <FormControl>
-            <Select v-bind="componentField">
+            <Select :disabled="!!props.id" v-bind="componentField">
               <SelectTrigger>
                 <SelectValue placeholder="Tipo de bien" />
               </SelectTrigger>

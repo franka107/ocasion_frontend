@@ -186,19 +186,6 @@ const handleFilesChange = (files: File[]) => {
         <h2 class="text-primary text-base font-normal leading-5">
           Datos Básicos
         </h2>
-        <!-- Razón Social -->
-        <FormField v-slot="{ componentField }" name="name">
-          <FormItem>
-            <FormControl>
-              <Input
-                type="text"
-                placeholder="Razón Social"
-                v-bind="componentField"
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
 
         <!-- Número de RUC -->
         <FormField v-slot="{ componentField }" name="rucNumber">
@@ -208,6 +195,21 @@ const handleFilesChange = (files: File[]) => {
                 type="text"
                 placeholder="Número de RUC"
                 v-bind="componentField"
+                :disabled="props.rucNumber"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+        <!-- Razón Social -->
+        <FormField v-slot="{ componentField }" name="name">
+          <FormItem>
+            <FormControl>
+              <Input
+                type="text"
+                placeholder="Razón Social"
+                v-bind="componentField"
+                :disabled="props.rucNumber"
               />
             </FormControl>
             <FormMessage />
