@@ -99,7 +99,27 @@ const icons: Icon[] = [
         svg: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M15.5 6V16.5C15.5 18.71 13.71 20.5 11.5 20.5C9.29 20.5 7.5 18.71 7.5 16.5V6C7.5 4.62 8.62 3.5 10 3.5C11.38 3.5 12.5 4.62 12.5 6V15.5C12.5 16.05 12.05 16.5 11.5 16.5C10.95 16.5 10.5 16.05 10.5 15.5V6H9V15.5C9 16.88 10.12 18 11.5 18C12.88 18 14 16.88 14 15.5V6C14 3.79 12.21 2 10 2C7.79 2 6 3.79 6 6V16.5C6 19.54 8.46 22 11.5 22C14.54 22 17 19.54 17 16.5V6H15.5Z" fill="#052339"/>
         </svg>`
-    }
+    },
+    {
+        name: 'Checkbox',
+        svg: `<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="11" y="11" width="16" height="16" rx="1" stroke="#09314F" stroke-width="2"/>
+            </svg>`
+    },
+    {
+        name: 'Checkbox-Indeterminate',
+        svg: `<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="11" y="11" width="18" height="18" rx="2" fill="#09314F"/>
+                <path d="M15 21V19H25V21H15Z" fill="white"/>
+            </svg>`
+    },
+    {
+        name: 'Checkbox-Checked',
+        svg: `<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="11" y="11" width="18" height="18" rx="2" fill="#09314F"/>
+                <path d="M14 21L18 24L26 16" stroke="#F5F5F4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>`
+    },
 ]
 const currentIcon = computed(() => icons.find(icon => icon.name === props.name)?.svg || "<span></span>")
 </script>
