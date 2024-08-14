@@ -8,6 +8,7 @@ import type { OfferItem } from '@/types/Offer';
 import { Textarea } from '@/components/ui/textarea'
 import { eventType, goodType, eventTimes, years } from "@/constants/events";
 const BASE_OFFERS_URL = '/offer-management'
+import { X } from "lucide-vue-next";
 let form: any;
 const { getOffer } = useOfferAPI();
 const props = defineProps<{id: string | undefined, eventId: string, rucId: string,  onsubmit: (values: any) => void;}>();
@@ -129,20 +130,21 @@ const handleFilesChange = (files: File[]) => {
 </script>
 
 <template>
-  <SheetHeader>
-    <SheetTitle>{{
+    <SheetHeader>
+    <SheetClose class="mr-4 rounded-full p-3 hover:bg-[#f1f5f9]">
+      <X class="w-4 h-4 text-muted-foreground" />
+    </SheetClose>
+    <SheetTitle class="text-xl font-medium text-[#64748B]">{{
       props.id
         ? "Actualizar oferta"
         : "Crear oferta"
     }}</SheetTitle>
   </SheetHeader>
 
-  <div class="border-primary border-t-[1px]"></div>
 
   <div class="flex-grow overflow-y-auto no-scrollbar flex flex-col">
     <!-- <Form> -->
-    <form class="flex flex-col gap-4 flex-grow p-1" @submit="onSubmit">
-      <div class="flex gap-4 justify-center">
+    <form class="flex flex-col gap-4 flex-grow pt-5 pr-5 pl-5" @submit="onSubmit">
         <FormField v-slot="{ componentField }" name="annexesFiles">
         <FormItem>
           <FormControl>
@@ -171,7 +173,6 @@ const handleFilesChange = (files: File[]) => {
           <FormMessage />
         </FormItem>
       </FormField>
-      </div>  
       <h2 class="text-primary text-base font-normal leading-5">
         Producto ofertado
       </h2>

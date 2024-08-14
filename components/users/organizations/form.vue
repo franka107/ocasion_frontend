@@ -5,23 +5,28 @@ import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
 import InputFile from "@/components/common/file/Input.vue";
 import type { Organization } from "~/models/organizations";
+
 import { X } from "lucide-vue-next";
 import { parseDate } from "@internationalized/date";
 const BASE_ORG_URL = "/organization-management";
-let organizationData: Organization | undefined;
 let form: any;
 const props = defineProps<{
   rucNumber: number | undefined;
-  onsubmit: (values: any) => void;
+  onSubmit: (values: any) => void;
 }>();
 
 const formSchema = toTypedSchema(
   z.object({
     name: z.string().min(1, "La razón social es requerida"),
-    rucNumber: z.string()
+    rucNumber: z
+      .string()
       .regex(/^\d+$/, "Este campo debe contener solo dígitos.")
       .length(11, "El número de RUC debe de ser 11 dígitos"),
-    billingEmail: z.string().email("Debe ser un correo electrónico").optional().nullable(),
+    billingEmail: z
+      .string()
+      .email("Debe ser un correo electrónico")
+      .optional()
+      .nullable(),
     economicActivityId: z.string().optional().nullable(),
     addressLine1: z.string().min(1, "La dirección es requerida"),
     department: z.string().min(1, "El departamento es requerido"),
@@ -33,7 +38,10 @@ const formSchema = toTypedSchema(
     contractEndDate: z
       .string()
       .min(0, "La fecha de fin del contrato es requerida"),
-    startPercentage: z.number().min(0, "El porcentaje de inicio es requerido").max(100, "El porcentaje no puede exceder el 100%"),
+    startPercentage: z
+      .number()
+      .min(0, "El porcentaje de inicio es requerido")
+      .max(100, "El porcentaje no puede exceder el 100%"),
     representativeFullName: z
       .string()
       .min(1, "El nombre y apellidos del representante es requerido"),
@@ -51,7 +59,7 @@ const formSchema = toTypedSchema(
       .array(z.any())
       .min(1, "Debe subir al menos un archivo")
       .max(3, "Puede subir un máximo de 3 archivos"),
-  })
+  }),
 );
 interface OrganizationForm extends Organization {
   department?: string;
@@ -84,7 +92,7 @@ if (props.rucNumber) {
       query: {
         rucNumber: props.rucNumber,
       },
-    } as any
+    } as any,
   );
   const orgData: OrganizationForm = { ...organizationData.value };
   orgData.department = orgData.address?.district?.id.split("+")[0] || "";
@@ -129,7 +137,6 @@ watch(form.values, (newValues) => {
 });
 
 const onSubmit = form.handleSubmit((values: OrganizationForm) => {
-  console.log(`QUACK  values ${JSON.stringify(values, null ,2)}`)
   const { economicActivityId, addressLine1, districtId, ...restValues } =
     values;
 
@@ -141,11 +148,10 @@ const onSubmit = form.handleSubmit((values: OrganizationForm) => {
       district: { id: districtId },
     },
   };
-  props.onsubmit(formattedValues);
+  props.onSubmit(formattedValues);
 });
 
 const handleFilesChange = (files: File[]) => {
-  console.log(`QUACKKKKK handleFileChange ${files}`)
   form.values.attachedFiles = files.map((file) => file.name);
 };
 </script>
@@ -501,7 +507,7 @@ const handleFilesChange = (files: File[]) => {
               'w-full h-10 text-base bg-[#062339] hover:bg-gray-700',
               !form.meta.value.valid
                 ? 'text-white'
-                : 'hover:text-primary hover:bg-bgtheme'
+                : 'hover:text-primary hover:bg-bgtheme',
             )
           "
         >

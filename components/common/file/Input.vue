@@ -34,7 +34,7 @@ const emit = defineEmits(["update:modelValue"]);
 
 // const uploadFile = async (file: File): Promise<string> => {
 const uploadFile = async (
-  file: File
+  file: File,
 ): Promise<{ id: string; path: string }> => {
   try {
     const formData = new FormData();
@@ -58,14 +58,13 @@ const handleFileChange = async (event: Event) => {
   const input = event.target as HTMLInputElement;
   if (input.files) {
     const newFiles = Array.from(input.files).slice(0, 3 - files.value.length); // Limitar a 3 archivos
-    const newFileIds: {id: string}[] = [];
+    const newFileIds: { id: string }[] = [];
     // const newFileData: { id: string; path: string }[] = [];
 
     for (const file of newFiles) {
       try {
         // const fileId = await uploadFile(file); // Subir el archivo
         const fileData = await uploadFile(file); // Subir el archivo
-        console.log(`FILE DATAAAA ${JSON.stringify(fileData)}`)
         const fileName = file.name; // Nombre del archivo subido
         files.value.push({ ...fileData, name: fileName }); // Agregar el archivo a la lista con nombre
         props.modelValue.push(fileData); // Agregar el ID del archivo a modelValue
@@ -95,18 +94,16 @@ const triggerFileInput = () => {
 //   console.log(newVal)
 // })
 const getFileNameFromPath = (path: string): string => {
-  return path.split('/').pop() || "Unknown file"; // Obtén el nombre del archivo desde la URL
+  return path.split("/").pop() || "Unknown file"; // Obtén el nombre del archivo desde la URL
 };
 
 // Inicializa los archivos existentes
 onMounted(() => {
-  files.value = props.modelValue.map(fileData => ({
+  files.value = props.modelValue.map((fileData) => ({
     ...fileData,
-    name: getFileNameFromPath(fileData.path)
+    name: getFileNameFromPath(fileData.path),
   }));
 });
-
-
 </script>
 
 <template>
