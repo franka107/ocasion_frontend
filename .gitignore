@@ -20,5 +20,6 @@ logs
 
 # Local env files
 .env
-.env.*
+# Remove temp for client deploy
+#.env.*
 !.env.example

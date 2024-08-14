@@ -1,3 +1,20 @@
+<template>
+    <div class="w-full flex flex-col">
+      <Sheet v-model:open="open">
+        <DataTable
+          createButtonLabel="Crear organización"
+          :data="users"
+          :columns="columns"
+          :filters="[{ field: 'name', placeholder: 'Buscar usuario...' }]"
+          :status="statuses"
+          :noDataComponent="NoResults"
+          @create="handleCreateClick"
+        >
+          <!-- <UserForm :userId="editingUserId" @update:open="open = false" /> -->
+        </DataTable>
+      </Sheet>
+    </div>
+</template>
 <script lang="ts" setup>
 import { ref } from "vue";
 
@@ -130,20 +147,3 @@ const statuses = [
 ];
 </script>
 
-<template>
-    <div class="w-full space-y-4 my-4">
-      <Sheet v-model:open="open">
-        <DataTable
-          createButtonLabel="Crear organización"
-          :data="users"
-          :columns="columns"
-          :filters="[{ field: 'name', placeholder: 'Buscar usuario...' }]"
-          :status="statuses"
-          :noDataComponent="NoResults"
-          @create="handleCreateClick"
-        >
-          <!-- <UserForm :userId="editingUserId" @update:open="open = false" /> -->
-        </DataTable>
-      </Sheet>
-    </div>
-</template>

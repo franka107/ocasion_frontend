@@ -33,7 +33,10 @@
                   </DropdownMenuItem>
                 </NuxtLink>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem @click="handleSuspend(row.rucNumber, row.name)" :disabled="row.status !== 'ACTIVE'">
+                <DropdownMenuItem
+                  @click="handleSuspend(row.rucNumber, row.name)"
+                  :disabled="row.status !== 'ACTIVE'"
+                >
                   Suspender
                   <CustomIcons name="Forbidden" class="ml-auto" />
                 </DropdownMenuItem>
@@ -68,7 +71,9 @@
       >
         <OrganizationForm
           :ruc-number="organizationRucNo"
-          :onsubmit="organizationRucNo !== undefined ? handleEdit : handleCreate"
+          :onSubmit="
+            organizationRucNo !== undefined ? handleEdit : handleCreate
+          "
         />
       </SheetContent>
       <!-- Fomulario -->
@@ -83,21 +88,39 @@
 </template>
 <script setup lang="ts">
 import OrganizationForm from "@/components/users/organizations/form.vue";
-import type { OrganizationItem } from '@/types/Order.ts';
+import CustomTable from "@/components/ui/custom-table/CustomTable.vue";
+import CustomChip from "@/components/ui/custom-chip/CustomChip.vue";
+import CustomIcons from "@/components/ui/custom-icons/CustomIcons.vue";
+import CustomPagination from "@/components/ui/custom-pagination/CustomPagination.vue";
+import type { OrganizationItem } from "@/types/Order.ts";
 import { organizationHeader } from "~/constants/organization";
 
-const { page, filterOptions, sortOptions, onSort, onSearch, suspendOrganization, activateOrganization, createOrganization, editOrganization } = useOrganization()
-const { openConfirmModal, updateConfirmModal } = useConfirmModal()
-const BASE_ORG_URL = '/organization-management'
+const {
+  page,
+  filterOptions,
+  sortOptions,
+  onSort,
+  onSearch,
+  suspendOrganization,
+  activateOrganization,
+  createOrganization,
+  editOrganization,
+} = useOrganization();
+const { openConfirmModal, updateConfirmModal } = useConfirmModal();
+const BASE_ORG_URL = "/organization-management";
+const { data, refresh }: any = await useAPI(
+  `${BASE_ORG_URL}/find-organizations`,
+  {
+    query: {
+      limit: 8,
+      page,
+      filterOptions,
+      sortOptions,
+    },
+  } as any,
+);
+
 const openModal = ref(false)
-const { data, refresh } : any = await useAPI(`${BASE_ORG_URL}/find-organizations`, {
-  query: {
-    limit: 8,
-    page,
-    filterOptions,
-    sortOptions
-  },
-} as any);
 const organizationRucNo = ref<number | undefined>(undefined)
 const orderData= computed(() => data.value.data.map((item: OrganizationItem) => ({
     "date": item.contractStartDate + ' - ' + item.contractEndDate,
@@ -105,29 +128,54 @@ const orderData= computed(() => data.value.data.map((item: OrganizationItem) => 
   })))
 
 const handleSuspend = async (rucNumber: string, name: string) => {
-  openConfirmModal({title:'Suspender organización', message: `¿Estás seguro de suspender a ❝${name}❞?`, callback: async() => {
-    const { status, error } : any = await suspendOrganization(rucNumber)
-    if (status.value === 'success') {
-      updateConfirmModal({title: '¡Suspensión exitosa!', message: 'La organización ha sido suspendida.', type: 'success'});
-      refresh();
-    } else {
-      updateConfirmModal({title: 'Error al suspender', message: 'La organización no se pudo suspender. \nTe recomendamos intentarlo nuevamente.', type: 'error'});
-    }
-  }})
-}
-
-const handleActivate = async (rucNumber: string, name: string) => {
-  openConfirmModal({title:'Activar organización', message: `¿Estás seguro de activar a ❞${name}❞?`, callback: async() => {
-    const { status, error } : any = await activateOrganization(rucNumber)
-    if (status.value === 'success') {
-      updateConfirmModal({title: '¡Activación exitosa!', message: 'La organización ha sido activada.', type: 'success'});
-      refresh();
-    } else {
-      updateConfirmModal({title: 'Error al activar', message: 'La organización no se pudo activar. \nTe recomendamos intentarlo nuevamente.', type: 'error'});
-    }
-  }})
+  openConfirmModal({
+    title: "Suspender organización",
+    message: `¿Estás seguro de suspender a ❝${name}❞?`,
+    callback: async () => {
+      const { status, error }: any = await suspendOrganization(rucNumber);
+      if (status.value === "success") {
+        updateConfirmModal({
+          title: "¡Suspensión exitosa!",
+          message: "La organización ha sido suspendida.",
+          type: "success",
+        });
+        refresh();
+      } else {
+        updateConfirmModal({
+          title: "Error al suspender",
+          message:
+            "La organización no se pudo suspender. \nTe recomendamos intentarlo nuevamente.",
+          type: "error",
+        });
+      }
+    },
+  });
 };
 
+const handleActivate = async (rucNumber: string, name: string) => {
+  openConfirmModal({
+    title: "Activar organización",
+    message: `¿Estás seguro de activar a ❞${name}❞?`,
+    callback: async () => {
+      const { status, error }: any = await activateOrganization(rucNumber);
+      if (status.value === "success") {
+        updateConfirmModal({
+          title: "¡Activación exitosa!",
+          message: "La organización ha sido activada.",
+          type: "success",
+        });
+        refresh();
+      } else {
+        updateConfirmModal({
+          title: "Error al activar",
+          message:
+            "La organización no se pudo activar. \nTe recomendamos intentarlo nuevamente.",
+          type: "error",
+        });
+      }
+    },
+  });
+};
 
 const handleUpdateForm = async (organization: any) => {
   openModal.value = true;
@@ -140,13 +188,24 @@ const handleCreate = async (values: any) => {
     if(status.value === 'success') {
         openModal.value = false;
         refresh();
-        updateConfirmModal({title: 'Organización creada', message: 'La organización ha sido creada exitosamente', type: 'success'});
-    } else {
-        const eMsg = error.value.data?.errors?.[0].message || error.value.data.message || 'La organización no se pudo crear, intentalo más tarde'  
-        updateConfirmModal({title: 'Error al crear organización', message: eMsg, type: 'error'});
-    } 
-  }})
-
+        updateConfirmModal({
+          title: "Organización creada",
+          message: "La organización ha sido creada exitosamente",
+          type: "success",
+        });
+      } else {
+        const eMsg =
+          error.value.data?.errors?.[0].message ||
+          error.value.data.message ||
+          "La organización no se pudo crear, intentalo más tarde";
+        updateConfirmModal({
+          title: "Error al crear organización",
+          message: eMsg,
+          type: "error",
+        });
+      }
+    },
+  });
 };
 
 const handleEdit = async (values: any) => {
@@ -155,11 +214,23 @@ const handleEdit = async (values: any) => {
     if(status.value === 'success') {
         openModal.value = false;
         refresh();
-        updateConfirmModal({title: 'Organización actualizada', message: 'La organización ha sido actualizada exitosamente', type: 'success'});
-    } else {
-        const eMsg = error.value.data?.errors?.[0].message || error.value.data.message || 'La organización no se pudo actualizar, intentalo más tarde'  
-        updateConfirmModal({title: 'Error al crear organización', message: eMsg, type: 'error'});
-    } 
-  }})
+        updateConfirmModal({
+          title: "Organización actualizada",
+          message: "La organización ha sido actualizada exitosamente",
+          type: "success",
+        });
+      } else {
+        const eMsg =
+          error.value.data?.errors?.[0].message ||
+          error.value.data.message ||
+          "La organización no se pudo actualizar, intentalo más tarde";
+        updateConfirmModal({
+          title: "Error al crear organización",
+          message: eMsg,
+          type: "error",
+        });
+      }
+    },
+  });
 };
 </script>

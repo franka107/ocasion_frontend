@@ -37,6 +37,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
 </script>
 
 <template>
+
   <DialogRoot v-model:open="open">
     <DialogPortal>
       <DialogOverlay

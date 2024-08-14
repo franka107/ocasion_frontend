@@ -1,35 +1,21 @@
-import { z } from 'zod';
+import type { DocumentType } from './document-type';
 
 export interface IUser {
   id: string;
-  name: string;
-  dni: string;
-  phone: string;
   email: string;
-  role: string;
-  address: string;
-  department: string;
-  province: string;
-  district: string;
-  status: string;
-  is_deleted: boolean;
-  created_at: string;
-  updated_at: string | null;
-  deleted_at?: string | null;
+  password: string;
+  firstName: string;
+  lastName: string;
+  documentType: DocumentType;
+  documentIdentifier: DocumentType;
+  phoneNumber: string;
+  phoneCountryCode: string;
+  type: string;
+  roles: any[];
+  organizations: any[];
+  createdAt: any[];
+  updatedAt: any[];
 }
 
-export const userSchema = z.object({
-  name: z.string(),
-  dni: z.string(),
-  phone: z.string(),
-  email: z.string(),
-  role: z.string(),
-  address: z.string(),
-  department: z.string(),
-  province: z.string(),
-  district: z.string(),
-  status: z.string(),
-  is_deleted: z.boolean(),
-});
 
-export type User = z.infer<typeof userSchema>;
+
