@@ -1,3 +1,4 @@
 export default defineEventHandler(async (event) => {
-	return { test: "Super test"}
+	    const { apiUrl } = useRuntimeConfig(event).public;
+	return { test: "Super test", apiUrl}
 })
