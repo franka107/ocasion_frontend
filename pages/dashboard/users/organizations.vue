@@ -109,7 +109,7 @@ const {
 const { openConfirmModal, updateConfirmModal } = useConfirmModal();
 const BASE_ORG_URL = "/organization-management";
 const { data, refresh }: any = await useAPI(
-  `${BASE_ORG_URL}/find-organizations`,
+  `${BASE_ORG_URL}/find-organizations-paginated`,
   {
     query: {
       limit: 8,

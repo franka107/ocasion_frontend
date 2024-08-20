@@ -1,6 +1,6 @@
 <template>
     <section>
-        <OrganizationDetails :data="organizationSummary" /> 
+        <!-- <OrganizationDetails :data="organizationSummary" />  -->
         <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto mt-4">
           <CustomTable :data="eventsData" :header="eventListHeaders" @onSort="onSort" @onSearch="onSearch">
         <template #action-button>
