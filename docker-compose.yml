@@ -35,7 +35,7 @@ services:
     environment:
       - TZ=America/Lima
       - NUXT_SESSION_PASSWORD=${NUXT_SESSION_PASSWORD}
-      - NUXT_PUBLIC_API_URL=${NUXT_PUBLIC_API_URL}
+      - NUXT_API_URL=${NUXT_API_URL}
 
 networks:
   swarm-dev:
