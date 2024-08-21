@@ -63,12 +63,12 @@
         />
       </SheetContent>
     </div>
-    <CustomPagination
+    <!-- <CustomPagination
       class="mt-5 mb-[19px]"
       :total="data.count"
       :limit="data.limit"
       v-model:page="page"
-    />
+    /> -->
   </div>
 </template>
 
