@@ -8,7 +8,7 @@
         @onSearch="onSearch"
       >
         <template #action-button>
-          <SheetTrigger @click="() => { roleId = undefined; openSheet('role-form'); }">
+          <SheetTrigger @click="() => { roleId = undefined; openModal = true; }">
             <Button variant="default">Agregar</Button>
           </SheetTrigger>
         </template>
@@ -25,7 +25,7 @@
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" class="bg-primary text-white">
-                <SheetTrigger class="w-full" @click="() => { roleId = row.id; openSheet('role-form') }">
+                <SheetTrigger class="w-full" @click="() => { roleId = row.id;  openModal = true; }">
                   <DropdownMenuItem>
                     Editar
                     <CustomIcons name="Pen" class="ml-auto" />
@@ -54,7 +54,7 @@
         </template>
       </CustomTable>
       <SheetContent
-        v-if="currentSheet === 'role-form'"
+        v-model:open="openModal"
         class="flex flex-col h-full"
       >
         <RolesForm
@@ -78,7 +78,6 @@ import CustomChip from "@/components/ui/custom-chip/CustomChip.vue";
 import CustomIcons from "@/components/ui/custom-icons/CustomIcons.vue";
 import CustomPagination from "@/components/ui/custom-pagination/CustomPagination.vue";
 import { roleHeader } from "~/constants/roles";
-import { useSheetStore } from "@/composables/useSheetStore.js";
 import { useRoles } from "@/composables/useRoles";
 import ConfirmModal from "~/components/ui/confirm-modal/ConfirmModal.vue";
 import RolesForm from "@/components/roles/RolesForm.vue";
@@ -87,11 +86,11 @@ import type { IDataResponse } from "~/types/Common";
 import type { IOrganizationSummary } from "~/types/Roles";
 
 const route = useRoute()
-const { currentSheet, openSheet, closeSheet } = useSheetStore();
 const { page, filterOptions, sortOptions, onSort, onSearch, deleteRole, createRole, editRole } = useRoles();
 const { openConfirmModal, updateConfirmModal } = useConfirmModal();
 const roleId = ref<number | undefined>(undefined);
 const BASE_ROLE_URL = '/role-configuration'
+const openModal = ref(false)
 
 const { data, refresh, error} : any = await useAPI(`${BASE_ROLE_URL}/find-roles`, {
   query: {
@@ -141,7 +140,7 @@ const handleCreate = async (values: any) => {
   openConfirmModal({title: 'Crear rol',message: '¿Estás seguro de que deseas crear este rol?',callback: async () => {
       const { status, error } = await createRole(values);
       if (status === 'success') {
-        closeSheet();
+        openModal.value = false;
         refresh();
         updateConfirmModal({
           title: 'Rol creado',
@@ -164,7 +163,7 @@ const handleEdit = async (values: any) => {
   openConfirmModal({title: 'Actualizar rol',message: '¿Estás seguro de que deseas actualizar este rol?',callback: async () => {
       const { status, error } = await editRole(values);
       if (status === 'success') {
-        closeSheet();
+        openModal.value = false;
         refresh();
         updateConfirmModal({
           title: 'Rol actualizado',
