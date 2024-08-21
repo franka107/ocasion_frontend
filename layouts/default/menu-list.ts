@@ -32,23 +32,23 @@ export function getMenuList(pathname: string): Group[] {
       groupLabel: "",
       menus: [
         {
-          href: "/dashboard",
+          href: "/backoffice",
           label: "Dashboard",
-          active: pathname === "/dashboard",
+          active: pathname === "/backoffice",
           icon: "Dashboard",
           submenus: [],
         },
         {
-          href: "/dashboard/users/organizations",
+          href: "/backoffice/organizations",
           label: "Organizaciones",
-          active: pathname === "/dashboard/users/organizations",
+          active: pathname === "/backoffice/organizations",
           icon: "Organization",
           submenus: [],
         },
         {
           href: "/categories",
           label: "Usuarios",
-          active: pathname.includes("/dashboard/users"),
+          active: pathname.includes("/backoffice/users"),
           icon: "Groups",
           submenus: [
             {
@@ -73,7 +73,7 @@ export function getMenuList(pathname: string): Group[] {
         {
           href: "",
           label: "Eventos",
-          active: pathname.includes("/events"),
+          active: pathname ==="/events",
           icon: "Event",
           submenus: [],
         },

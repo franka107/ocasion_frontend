@@ -6,11 +6,11 @@
   <div class="flex-grow flex flex-col pt-6">
     <div class="flex space-x-4 text-sm font-medium leading-5">
       <NuxtLink
-        to="/dashboard/roles/administrators"
+        to="/backoffice/roles/administrators"
         class="py-2 px-4 rounded-t-lg"
         :class="
           cn('',
-            isActive('/dashboard/roles/administrators')
+            isActive('/backoffice/roles/administrators')
               ? 'bg-white text-primary'
               : 'bg-blue/[0.07] text-primary/50'
           )
@@ -19,11 +19,11 @@
         Administradores
       </NuxtLink>
       <NuxtLink
-        to="/dashboard/roles/organizations"
+        to="/backoffice/roles/organizations"
         class="py-2 px-4 rounded-t-lg"
         :class="
           cn('',
-            isActive('/dashboard/roles/organizations')
+            isActive('/backoffice/roles/organizations')
               ? 'bg-white text-primary'
               : 'bg-blue/[0.07] text-primary/50'
           )
@@ -32,11 +32,11 @@
         Organizaciones
       </NuxtLink>
       <NuxtLink
-        to="/dashboard/roles/participants"
+        to="/backoffice/roles/participants"
         class="py-2 px-4 rounded-t-lg"
         :class="
           cn('',
-            isActive('/dashboard/roles/participants')
+            isActive('/backoffice/roles/participants')
               ? 'bg-white text-primary'
               : 'bg-blue/[0.07] text-primary/50'
           )

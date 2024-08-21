@@ -22,7 +22,7 @@
       <DropdownMenuSeparator /> -->
       <!-- <DropdownMenuGroup>
         <DropdownMenuItem class="hover:cursor-pointer">
-          <RouterLink to="/dashboard" class="flex items-center">
+          <RouterLink to="/backoffice" class="flex items-center">
             <LayoutGrid class="w-4 h-4 mr-3 text-muted-foreground" />
             Dashboard
           </RouterLink>

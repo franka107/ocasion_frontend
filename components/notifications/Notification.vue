@@ -92,7 +92,6 @@ import {
   type NotificationCreatedDomainEvent,
   type NotificationReadedDomainEvent,
 } from "~/types/DomainEvent";
-import { useSound } from "@raffaelesgarro/vue-use-sound";
 import { useWebNotification } from "@vueuse/core";
 
 const {
@@ -107,7 +106,6 @@ const {
 } = await getNotReadedNotifications();
 const limitedNotifications = computed(() => notifications.value.slice(0, 7));
 
-const webSound = useSound("/sounds/notification.mp3");
 const webNotification = useWebNotification({
   title: "Nueva notificación",
   lang: "es",
@@ -128,7 +126,6 @@ const onArchiveButtonPressed = () => {
 };
 
 watch(notificationCreatedListener.data, (value, oldValue) => {
-  webSound.play();
   webNotification.show();
   refresh();
 });

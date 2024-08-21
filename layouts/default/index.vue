@@ -16,7 +16,6 @@
 import { SplitterGroup, SplitterPanel, SplitterResizeHandle } from "radix-vue";
 import ConfirmModal from "~/components/ui/confirm-modal/ConfirmModal.vue";
 import Notification from "@/components/notifications/Notification.vue";
-import Header from "~/components/layouts/Header.vue";
 import ContentLayout from "./ContentLayout.vue";
 import Sidebar from "./Sidebar.vue";
 

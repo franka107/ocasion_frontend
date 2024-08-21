@@ -1,5 +1,13 @@
 <template>
 
+
+	<ContentLayout title="Organizaciones" >
+		    <CustomSimpleCard
+    title="Panel super admin"
+		class="mb-6"
+    sub-title="Gestiona eventos usuarios y reportes"
+    />
+
   <div class="w-full flex flex-col">
     <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
       <CustomTable
@@ -28,7 +36,7 @@
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" class="bg-primary text-white">
-                <NuxtLink :to="`/dashboard/events/organization/${row.rucNumber}`">
+                <NuxtLink :to="`/backoffice/events/organization/${row.rucNumber}`">
                   <DropdownMenuItem>
                     Ver Organización
                   </DropdownMenuItem>
@@ -86,6 +94,7 @@
       v-model:page="page"
     /> 
   </div>
+	</ContentLayout>
 </template>
 <script setup lang="ts">
 import OrganizationForm from "@/components/users/organizations/form.vue";
@@ -96,6 +105,7 @@ import CustomPagination from "@/components/ui/custom-pagination/CustomPagination
 import type { OrganizationItem } from "@/types/Order.ts";
 import { organizationHeader } from "~/constants/organization";
 import ContentLayout from "~/layouts/default/ContentLayout.vue";
+import CustomSimpleCard from "~/components/ui/custom-simple-card/CustomSimpleCard.vue";
 
 const {
   page,

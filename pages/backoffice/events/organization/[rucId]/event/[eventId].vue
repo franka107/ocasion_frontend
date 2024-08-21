@@ -1,4 +1,6 @@
 <template>
+  <ContentLayout title="Eventos">
+
     <section>
     <EventDetails :eventDetail="eventDetail" />
     <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
@@ -70,6 +72,7 @@
       v-model:page="page"
     />
    </section>
+  </ContentLayout>
 </template>
 <script setup lang="ts">
 import EventDetails from '~/components/events/EventDetails.vue';
@@ -78,6 +81,7 @@ import { offerHeader, offerStatus } from "@/constants/offer";
 import type { OfferListItem } from '~/types/Offer';
 import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue';
 import OfferForm from '@/components/offers/OfferForm.vue';
+import ContentLayout from '~/layouts/default/ContentLayout.vue';
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const { page, sortOptions, onSort, createOffer, editOffer } = useOfferAPI()
 

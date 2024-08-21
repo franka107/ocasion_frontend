@@ -1,6 +1,7 @@
 <template>
+  <ContentLayout title="Eventos">
     <section>
-        <!-- <OrganizationDetails :data="organizationSummary" />  -->
+        <OrganizationDetails :data="organizationSummary" /> 
         <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto mt-4">
           <CustomTable :data="eventsData" :header="eventListHeaders" @onSort="onSort" @onSearch="onSearch">
         <template #action-button>
@@ -22,7 +23,7 @@
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" class="bg-primary text-white w-40">
-                <NuxtLink :to="`/dashboard/events/organization/${route.params.rucId}/event/${row.id}`">
+                <NuxtLink :to="`/backoffice/events/organization/${route.params.rucId}/event/${row.id}`">
                   <DropdownMenuItem>
                     Ver Evento
                     <CustomIcons name="EyeIcon" class="ml-auto" />
@@ -67,6 +68,8 @@
     <CustomPagination class="mt-5 mb-[19px]" :total="data.count" :limit="data.limit" v-model:page="page" />
     
   </section>
+
+  </ContentLayout>
 </template>
 <script setup lang="ts">
 import EventCancel from '@/components/events/EventCancel.vue';
@@ -80,6 +83,7 @@ import type { IEventLItem, IOrganizationSummary } from '@/types/Event';
 import type { IDataResponse } from '@/types/Common';
 import dayjs from 'dayjs';
 import EventForm from '@/components/events/EventForm.vue';
+import ContentLayout from '~/layouts/default/ContentLayout.vue';
 
 const { page, sortOptions, onSort, createEvent, editEvent, cancelEvent } = useEvent()
 

@@ -35,7 +35,7 @@ const sidebarOpen = ref(false);
           variant="link"
           asChild
         >
-          <NuxtLink href="/dashboard" class="flex items-center gap-2">
+          <NuxtLink href="/backoffice" class="flex items-center gap-2">
             <img
               :src="alternativeLogo"
               alt="Company Logo"

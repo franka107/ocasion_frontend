@@ -13,7 +13,7 @@
           'transition-transform ease-in-out duration-300 mb-1',
           isSidebarOpen === false ? 'translate-x-1' : 'translate-x-0',
         ]"
-        to="/dashboard"
+        to="/backoffice"
         class="flex  gap-2 pl-3 pt-1 pb-3"
       >
         <div v-if="isSidebarOpen">
