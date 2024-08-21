@@ -11,7 +11,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 
-const { showModal, confirmModalTitle, confirmModalMessage, confirmModalCallback, modalType } = useConfirmModal()
+const { showModal, confirmModalTitle, confirmModalMessage, confirmModalCallback, modalType, cancelModalCallback } = useConfirmModal()
 </script>
 
 <template>
@@ -33,7 +33,7 @@ const { showModal, confirmModalTitle, confirmModalMessage, confirmModalCallback,
         </AlertDialogHeader>
         <AlertDialogFooter>
           <template v-if="modalType === 'confirm'">
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <Button @click="cancelModalCallback ? cancelModalCallback() : (showModal = false)" class="ml-3">Cancelar</Button>
             <Button @click="confirmModalCallback" class="ml-3">Confirmar</Button>
           </template>
           <template v-if="modalType === 'error'">
