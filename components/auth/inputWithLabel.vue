@@ -6,7 +6,7 @@
       :value="modelValue"
       :readonly="readField"
       @input="$emit('update:modelValue', $event.target.value)"
-      class="peer w-full min-w-24 h-[56px] px-3 pr-10 text-gray-900 placeholder-transparent border rounded focus:outline-none 
+      class="peer w-full min-w-24 h-[56px] px-4 pr-10 text-gray-900 placeholder-transparent border rounded focus:outline-none 
         focus:border-primary focus:border-2
         transition-colors duration-300 ease-in-out"
       :placeholder="label"
@@ -14,9 +14,9 @@
     />
     <label 
       :for="id"
-      class="absolute left-3 -top-2.5 bg-white px-1 text-xs text-gray-600 transition-all 
-        peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 
-        peer-focus:-top-2.5 peer-focus:text-xs font-inter peer-focus:text-borderPrimaryDark"
+      class="absolute left-3 -top-1.5 bg-white px-1 text-xs text-gray-600 transition-all 
+        peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-[17px]
+        peer-focus:-top-1.5 peer-focus:text-xs font-inter peer-focus:text-borderPrimaryDark"
         :class="{ 'text-red-500': error }"
     >
       {{ label }}

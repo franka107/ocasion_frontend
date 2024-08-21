@@ -7,20 +7,15 @@ export default defineNuxtConfig({
       apiUrl: process.env.NUXT_API_URL,
     },
   },
-  modules: [
-    "@nuxtjs/tailwindcss",
-    "shadcn-nuxt",
-    "nuxt-auth-utils",
-    [
-      "@nuxtjs/google-fonts",
-      {
-        families: {
-          Inter: true,
-        },
+  modules: ["@nuxtjs/tailwindcss", "shadcn-nuxt", "nuxt-auth-utils", [
+    "@nuxtjs/google-fonts",
+    {
+      families: {
+        Inter: true,
+        Roboto: true
       },
-    ],
-    "@vueuse/nuxt",
-  ],
+    },
+  ], "@vueuse/nuxt"],
   shadcn: {
     /**
      * Prefix for all the imported component

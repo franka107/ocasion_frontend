@@ -5,7 +5,7 @@
         <Button
           variant="ghost"
           size="icon"
-          class="relative bg-gray-100 w-10 h-10 rounded-full"
+          class="relative bg-[#e8edf3] hover:bg-[#d1d7de] w-10 h-10 rounded-full"
         >
           <Badge
             class="absolute -bottom-2 -right-2 flex items-center justify-center h-5 w-5 rounded-full bg-orange-500"

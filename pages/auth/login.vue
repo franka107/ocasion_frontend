@@ -22,17 +22,27 @@
       <div class="mb-6 relative">
         <InputWithLabel 
           id="password"
-          type="password"
+          :type="showPassword ? 'text' : 'password'"
           label="Contraseña"
           v-model="password"
           :error="errors.password"
           :class="{ 'border-red-500': errors.password }"
-        />
+        >
+                  <template #icon-right>
+            <button
+              @click="togglePassword()"
+              type="button"
+              class="absolute right-3 top-1/2 transform -translate-y-1/2 focus:outline-none"
+            >
+              <CustomIcons :name="showPassword ? 'EyeIcon': 'EyeIconClosed'" class="w-10 h-10" />
+            </button>
+          </template>
+      </InputWithLabel>
         <div class="flex justify-end mt-2">
           <a
             @click.prevent="toggleForgotPassword" 
             href="#" 
-            class="font-semibold text-xs text-primary hover:underline w-[161px] h-[20px] rounded-tl-[2px] opacity-100"
+            class="font-semibold text-sm text-primary hover:underline  h-[20px] rounded-tl-[2px] opacity-100"
           >
             ¿Olvidaste tu contraseña?
           </a>

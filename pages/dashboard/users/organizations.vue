@@ -1,4 +1,5 @@
 <template>
+
   <div class="w-full flex flex-col">
     <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
       <CustomTable
@@ -94,6 +95,7 @@ import CustomIcons from "@/components/ui/custom-icons/CustomIcons.vue";
 import CustomPagination from "@/components/ui/custom-pagination/CustomPagination.vue";
 import type { OrganizationItem } from "@/types/Order.ts";
 import { organizationHeader } from "~/constants/organization";
+import ContentLayout from "~/layouts/default/ContentLayout.vue";
 
 const {
   page,
@@ -109,7 +111,7 @@ const {
 const { openConfirmModal, updateConfirmModal } = useConfirmModal();
 const BASE_ORG_URL = "/organization-management";
 const { data, refresh }: any = await useAPI(
-  `${BASE_ORG_URL}/find-organizations`,
+  `${BASE_ORG_URL}/find-organizations-paginated`,
   {
     query: {
       limit: 8,

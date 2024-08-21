@@ -1,6 +1,6 @@
 <template>
   <div class="bg-white rounded-lg shadow-md p-6 w-[572px] transition-all duration-300 ease-in-out " >
-    <h2 :class="['text-[40px] font-roboto font-semibold mb-2', titleClass]">
+    <h2 :class="['text-[40px] font-roboto font-semibold  text-[#20445e]', titleClass]">
       {{ title }}
     </h2>
     <p v-if="subtitle" :class="['text-sm mb-6', subtitleClass]">
@@ -15,10 +15,11 @@
           :class="[
             'w-full',         
             'h-[54px]',       
-            isActive ? 'bg-primary text-white' : 'bg-gray-300 text-gray-400', // Fondo cuando está habilitado o deshabilitado
+            isActive ? 'bg-primary text-white' : 'bg-[#f1f5f9] text-[#95aab9]', // Fondo cuando está habilitado o deshabilitado
             'rounded-btn',   
             'gap-8',          
             'flex',           
+            'font-semibold',
             'items-center',   
             'justify-center',
             'cursor-pointer',

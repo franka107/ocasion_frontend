@@ -30,6 +30,11 @@
             <table class="table w-full">
                 <thead>
                     <tr class="border-b-[1px] border-dotted border-primary font-bold text-sm text-primary">
+                        <th class="h-[54px]" v-if="props.multipleSelect">
+                            <button @click="changeGeneralCheckbox">
+                                <CustomIcons :name="checkboxGeneralIcon" class="w-12 h-12" />
+                            </button>
+                        </th>
                         <th class="h-[54px] px-[16px] " v-for="header in props.header" :class="header.align ==='center'? 'text-center' : header.align ==='right'? 'text-right': 'text-left' " :key="header.key">
                             <div v-if="header.sortable" class="flex flex-row items-center">
                                 <div>{{ header.label }}</div>
@@ -42,13 +47,29 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="item in props.data" :key="item.id" class="h-12 border-b-[1px] border-[#E2E8F0]">
-                        <td v-for="headerItem in props.header" :key="headerItem.key" class="px-[16px] min-w-[140px]" :class="headerItem.align ==='center'? 'text-center' : headerItem.align ==='right'? 'text-right': 'text-left' ">
-                            <slot :name="headerItem.key" :row="item">
-                                {{ item[headerItem.key] }} 
-                            </slot>
-                        </td>
-                    </tr>
+                    <template v-if="props.multipleSelect">
+                        <tr v-for="item in props.data" :key="item.id" class="h-12 border-b-[1px] border-[#E2E8F0]">
+                            <td>
+                                <button @click="onSelectItem(item[props.multipleSelectKey])">
+                                    <CustomIcons :name="getSelectIcon(item[props.multipleSelectKey])" class="w-12 h-12" />
+                                </button>
+                            </td>
+                            <td v-for="headerItem in props.header" :key="headerItem.key" class="px-[16px] min-w-[140px]" :class="headerItem.align ==='center'? 'text-center' : headerItem.align ==='right'? 'text-right': 'text-left' ">
+                                <slot :name="headerItem.key" :row="item">
+                                    {{ item[headerItem.key] }} 
+                                </slot>
+                            </td>
+                        </tr>
+                    </template>
+                    <template v-else>
+                        <tr v-for="item in props.data" :key="item.id" class="h-12 border-b-[1px] border-[#E2E8F0]">
+                            <td v-for="headerItem in props.header" :key="headerItem.key" class="px-[16px] min-w-[140px]" :class="headerItem.align ==='center'? 'text-center' : headerItem.align ==='right'? 'text-right': 'text-left' ">
+                                <slot :name="headerItem.key" :row="item">
+                                    {{ item[headerItem.key] }} 
+                                </slot>
+                            </td>
+                        </tr>
+                    </template>
                 </tbody>
             </table>
         </div>
@@ -79,7 +100,15 @@ export interface HeaderItem {
     align?: 'center' | 'left' | 'right' | undefined
     search?: SearchItem
 }
-const props = defineProps<{ data: DataItem[], header: HeaderItem[], class?: string | object }>()
+interface Props { 
+    data: DataItem[],
+    header: HeaderItem[],
+    multipleSelect: boolean,
+    multipleSelectKey?: string,
+    class?: string | object 
+}
+const props = withDefaults(defineProps<Props>(),{ multipleSelect: false, multipleSelectKey: 'id' })
+
 const emit = defineEmits(["onSort","onSearch"])
 
 const searchComponents = computed(() => props.header.filter(item => item.search))
@@ -88,6 +117,40 @@ watch(()=> searchValues, (value) => {
     emit('onSearch', value)
 }, { deep: true })
 
+const useMultipleSelect = () => {
+    const selectedIdItems   = ref<string[]>([])
+    const generalCheckbox   = ref<'empty' | 'all'>('empty')
+    const checkboxGeneralIcon = ref<'Checkbox-Checked' | 'Checkbox' | 'Checkbox-Indeterminate'>('Checkbox')
+    const changeGeneralCheckbox = () => {
+        selectedIdItems.value = []
+        if (generalCheckbox.value === 'empty') {
+            // selectedIdItems.value = props.data.map(item => item.rucNumber)
+            generalCheckbox.value = 'all'
+            checkboxGeneralIcon.value = 'Checkbox-Checked'
+        } else {
+            generalCheckbox.value = 'empty'
+            checkboxGeneralIcon.value = 'Checkbox'
+        }
+    }
+    const onSelectItem = (id: string) => {
+        const index = selectedIdItems.value.indexOf(id)
+        if (index === -1) {
+            selectedIdItems.value.push(id)
+        } else {
+            selectedIdItems.value.splice(index, 1)
+        }
+        checkboxGeneralIcon.value = 'Checkbox-Indeterminate'
+    }
+    const getSelectIcon = (id: string) => {
+        if(generalCheckbox.value === 'empty') {
+            return selectedIdItems.value.includes(id) ? 'Checkbox-Checked' : 'Checkbox' 
+        } else {
+            return selectedIdItems.value.includes(id) ? 'Checkbox' : 'Checkbox-Checked' 
+        }
+    }
+    return { selectedIdItems, generalCheckbox, checkboxGeneralIcon, changeGeneralCheckbox, onSelectItem, getSelectIcon }
+}
+const { selectedIdItems, generalCheckbox, checkboxGeneralIcon, changeGeneralCheckbox, onSelectItem, getSelectIcon }  = useMultipleSelect()
 
 const sortStates = reactive<{ [key: string]: string | undefined }>({})
 const sortObject = reactive<{ [key: string]: string }[]>([])
@@ -107,5 +170,6 @@ const onSort = (item: HeaderItem) => {
         }
     emit('onSort', sortObject)
 }
+
 </script>
 

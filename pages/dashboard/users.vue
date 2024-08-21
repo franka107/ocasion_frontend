@@ -1,5 +1,6 @@
 <template>
-  <div class="bg-white shadow-md rounded-lg p-6">
+  <ContentLayout title="Organizaciones">
+  <div class="bg-white shadow-sm rounded-lg p-6">
     <h2 class="text-xl font-bold">Panel Super administrador</h2>
     <p class="text-gray-600">Gestiona eventos, usuarios y reportes</p>
   </div>    
@@ -51,9 +52,12 @@
       <NuxtPage />
     </div>
   </div>
+  </ContentLayout>
 </template>
 
 <script setup lang="ts">
+import ContentLayout from '~/layouts/default/ContentLayout.vue';
+
 const route = useRoute();
 
 const isActive = (path: string) => {
