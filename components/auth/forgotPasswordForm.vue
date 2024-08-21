@@ -3,7 +3,7 @@
     title="Recuperar contraseña" 
     subtitle="Para comenzar, ingrese su correo para recuperar su contraseña."
     @submit="handleSubmit"
-    submitText="Iniciar sesión"
+    submitText="Continuar"
     :submitClass="submitButtonClass"
     :isActive="true"  
     titleClass="text-primary"
@@ -17,16 +17,6 @@
         v-model="email"
         :error="error"
       />
-      <div class="flex">
-        <button
-          @click="onSubmit"
-          :class="buttonClass"
-          :disabled="!isActive"
-          class="w-[524px] h-[54px] rounded-[8px] opacity-100"
-        >
-          Continuar
-        </button>
-      </div>
     </div>
   </BaseForm>
 </template>

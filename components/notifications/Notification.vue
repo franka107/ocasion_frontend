@@ -5,7 +5,7 @@
         <Button
           variant="ghost"
           size="icon"
-          class="relative bg-gray-100 w-10 h-10 rounded-full"
+          class="relative bg-[#e8edf3] hover:bg-[#d1d7de] w-10 h-10 rounded-full"
         >
           <Badge
             class="absolute -bottom-2 -right-2 flex items-center justify-center h-5 w-5 rounded-full bg-orange-500"
@@ -16,9 +16,7 @@
             >
               {{ notifications.length }}
             </p>
-            <p v-else>
-              ⦿
-            </p>
+            <p v-else>⦿</p>
           </Badge>
           <img src="@/assets/icon/svg/icon-noti.svg" class="w-5 h-5 m-auto" />
           <span class="sr-only">Notifications</span>
@@ -44,6 +42,7 @@
                 <NotificationItem
                   v-for="(notification, index) in limitedNotifications"
                   :key="index"
+                  @on-remove="refresh"
                   :notification="notification"
                 />
               </template>
@@ -88,16 +87,17 @@ import {
 import NotificationItem from "@/components/notifications/NotificationItem.vue";
 import type { Notification } from "~/types/Notification";
 import { useNotificationAPI } from "~/composables/useNotificationAPI";
-import { domainEvents,  type NotificationCreatedDomainEvent,  type NotificationReadedDomainEvent } from "~/types/DomainEvent";
-import { useSound } from '@raffaelesgarro/vue-use-sound';
+import {
+  domainEvents,
+  type NotificationCreatedDomainEvent,
+  type NotificationReadedDomainEvent,
+} from "~/types/DomainEvent";
 import { useWebNotification } from "@vueuse/core";
-
-
 
 const {
   getNotReadedNotifications,
   listenDomainEvents: listenDomainEvent,
-  removeNotifications
+  removeNotifications,
 } = useNotificationAPI();
 const {
   data: notifications,
@@ -106,30 +106,30 @@ const {
 } = await getNotReadedNotifications();
 const limitedNotifications = computed(() => notifications.value.slice(0, 7));
 
-const webSound = useSound("/sounds/notification.mp3")
 const webNotification = useWebNotification({
   title: "Nueva notificación",
   lang: "es",
   body: "Revisa tu historial de notificaciones",
-  icon: "/favicon.ico"
-})
-const notificationCreatedListener = listenDomainEvent<NotificationCreatedDomainEvent>(domainEvents.notificationCreated)
-const notificationReadedListener = listenDomainEvent<NotificationReadedDomainEvent>(domainEvents.notificationReaded)
-
-
+  icon: "/favicon.ico",
+});
+const notificationCreatedListener =
+  listenDomainEvent<NotificationCreatedDomainEvent>(
+    domainEvents.notificationCreated,
+  );
+const notificationReadedListener =
+  listenDomainEvent<NotificationReadedDomainEvent>(
+    domainEvents.notificationReaded,
+  );
 
 const onArchiveButtonPressed = () => {
-  removeNotifications(limitedNotifications.value.map(e => e.id))
-}
+  removeNotifications(limitedNotifications.value.map((e) => e.id));
+};
 
 watch(notificationCreatedListener.data, (value, oldValue) => {
-  webSound.play()
-  webNotification.show()
-  refresh()
+  webNotification.show();
+  refresh();
 });
 watch(notificationReadedListener.data, (value, oldValue) => {
-  refresh()
+  refresh();
 });
-
-
 </script>
