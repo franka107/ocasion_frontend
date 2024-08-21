@@ -25,7 +25,7 @@
               menuGroup.groupLabel
             "
           >
-            <Tooltip delay-duration="100">
+            <Tooltip :delay-duration="100">
               <TooltipTrigger class="w-full">
                 <div class="w-full flex text-white justify-center items-center">
                   <Ellipsis class="h-5 w-5" />
@@ -44,7 +44,7 @@
           >
             <div v-if="menu.submenus.length === 0">
               <TooltipProvider disable-hoverable-content>
-                <Tooltip delay-duration="100">
+                <Tooltip :delay-duration="100">
                   <TooltipTrigger as-child>
                     <Button
                       :variant="'ghost'"
@@ -102,15 +102,16 @@
             />
           </div>
         </li>
-        <li class="w-full grow flex items-end">
-          <SidebarToggle v-model:is-sidebar-open="isSidebarOpen" />
+        
+        <li class="w-full grow flex items-end" v-if="props.showToggleButton" >
+          <SidebarToggle  v-model:is-sidebar-open="isSidebarOpen" />
         </li>
       </ul>
     </nav>
   </ScrollArea>
 </template>
 
-<script setup>
+<script lang="ts"setup>
 import { ref, computed } from "vue";
 import { useRoute } from "vue-router";
 import { BookmarkMinus, Ellipsis, LogOut } from "lucide-vue-next";
@@ -125,7 +126,10 @@ import SidebarToggle from "./SidebarToggle.vue";
 //   },
 // });
 
-const isSidebarOpen = defineModel("isSidebarOpen", { required: true });
+const isSidebarOpen = defineModel<boolean>("isSidebarOpen", { required: true });
+const props = defineProps < {
+  showToggleButton: boolean
+}>()
 
 const route = useRoute();
 const pathname = computed(() => route.path);

@@ -2,10 +2,11 @@
   <Sidebar v-model:isSidebarOpen="isSidebarOpen"/>
    <main
     :class="[
-      'min-h-[calc(100vh_-_56px)] bg-[#f1f5f9]  transition-[margin-left] ease-in-out duration-300',
+      'min-h-[calc(100vh)] bg-[#f1f5f9]  transition-[margin-left] ease-in-out duration-300',
       isSidebarOpen === false ? 'lg:ml-[90px]' : 'lg:ml-72'
     ]"
   >
+    <ConfirmModal/>
     <slot />
   </main>
   

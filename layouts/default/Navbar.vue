@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import Notification from '~/components/notifications/Notification.vue';
 import SheetMenu from './SheetMenu.vue';
+import UserNav from './UserNav.vue';
 const props = defineProps<{
   title: string
 }>()
@@ -12,8 +14,9 @@ const props = defineProps<{
           <SheetMenu />
           <h1 class="font-bold text-xl text-[#204e6d] ">{{ props.title }}</h1>
         </div>
-        <div class="flex flex-1 items-center space-x-2 justify-end">
-          <h1>Derecha</h1>
+        <div class="flex flex-1 items-center space-x-4 justify-end">
+          <Notification />
+          <UserNav/>
         </div>
       </div>
     </header>

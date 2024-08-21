@@ -28,7 +28,7 @@ const sidebarOpen = ref(false);
         <MenuIcon :size="20" />
       </Button>
     </SheetTrigger>
-    <SheetContent v-model:open="sidebarOpen" class="bg-[#20445e]" side="left">
+    <SheetContent v-model:open="sidebarOpen" class="bg-[#20445e] border-none" side="left">
       <div class="pt-4 pb-4 pl-4">
         <Button
           class="flex justify-center items-center  pb-2 pt-1"
@@ -44,7 +44,7 @@ const sidebarOpen = ref(false);
           </NuxtLink>
         </Button>
       </div>
-      <Menu v-model:is-sidebar-open="isSidebarOpen" />
+      <Menu v-model:is-sidebar-open="isSidebarOpen" :show-toggle-button="false" />
     </SheetContent>
   </Sheet>
 </template>
