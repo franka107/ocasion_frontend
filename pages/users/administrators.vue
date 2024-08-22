@@ -1,149 +1,223 @@
 <template>
-    <div class="w-full flex flex-col">
-      <Sheet v-model:open="open">
-        <DataTable
-          createButtonLabel="Crear organización"
-          :data="users"
-          :columns="columns"
-          :filters="[{ field: 'name', placeholder: 'Buscar usuario...' }]"
-          :status="statuses"
-          :noDataComponent="NoResults"
-          @create="handleCreateClick"
-        >
-          <!-- <UserForm :userId="editingUserId" @update:open="open = false" /> -->
-        </DataTable>
-      </Sheet>
+	<ContentLayout title="Usuarios" >
+		<CustomSimpleCard
+    title="Panel Super administrador"
+		class="mb-6"
+    sub-title="Gestiona eventos usuarios y reportes"
+    />
+
+  <div class="w-full flex flex-col">
+    <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
+      <CustomTable
+        :data="adminsData"
+        :header="administratorsHeader"
+        @onSort="onSort"
+        @onSearch="onSearch"
+      >
+        <template #action-button>
+          <Button
+             @click=""
+             variant="default"
+             class="bg-white text-primary border border-[#052339] "
+          >
+          <CustomIcons name="Download" class="ml-auto" />
+            Exportar
+          </Button>
+          <Button
+            @click="() => { admsUserId = undefined; openModal = true; }"
+            variant="default"
+            >Agregar</Button
+          >
+        </template>
+        <template #actions="{ row }">
+          <div class="flex justify-center">
+            <DropdownMenu>
+              <DropdownMenuTrigger as-child>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  class="h-8 data-[state=open]:bg-accent"
+                >
+                  <CustomIcons name="VerticalDots" class="w-6 h-6" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" class="bg-primary text-white">
+                <DropdownMenuItem
+                  @click="handleSuspend(row.userId, row.name)"
+                  :disabled="row.status !== 'ACTIVE'"
+                >
+                  Suspender
+                  <CustomIcons name="Forbidden" class="ml-auto" />
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  @click="(row.userId, row.name)"
+                  :disabled="row.status === 'ACTIVE'"
+                >
+                  Reenviar Correo 
+                  <CustomIcons name="Reload" class="ml-auto" />
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                  <DropdownMenuItem @click="handleUpdateForm(row)">
+                    Actualizar datos
+                    <CustomIcons name="ArrowLeft" class="ml-auto" />
+                  </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </template>
+        <template #status="{ row }">
+          <CustomChip
+            :text="row.status === 'ACTIVE' ? 'Activo' : 'Suspendido'"
+            :variant="row.status === 'ACTIVE' ? 'default' : 'destructive'"
+          ></CustomChip>
+        </template>
+      </CustomTable>
+      <!-- Fomulario -->
+      <SheetContent
+        class="flex flex-col h-full"
+        v-model:open="openModal"
+      >
+        <AdministratorsForm
+          :user-id="admsUserId"
+          :onSubmit="admsUserId !== undefined ? handleEdit : handleCreate"
+        />
+      </SheetContent>
+      <!-- Fomulario -->
     </div>
+    <CustomPagination
+      class="mt-5 mb-[19px]"
+      :total="data.count"
+      :limit="data.limit"
+      v-model:page="page"
+    /> 
+  </div>
+	</ContentLayout>
 </template>
-<script lang="ts" setup>
-import { ref } from "vue";
+<script setup lang="ts">
+import AdministratorsForm from "~/components/usersidebar/AdministratorsForm.vue";
+import CustomTable from "@/components/ui/custom-table/CustomTable.vue";
+import CustomChip from "@/components/ui/custom-chip/CustomChip.vue";
+import CustomIcons from "@/components/ui/custom-icons/CustomIcons.vue";
+import CustomPagination from "@/components/ui/custom-pagination/CustomPagination.vue";
+import type { IAdminsLItem } from "@/types/Administrators.ts";
+import { administratorsHeader } from "~/constants/administrators";
+import ContentLayout from "~/layouts/default/ContentLayout.vue";
+import CustomSimpleCard from "~/components/ui/custom-simple-card/CustomSimpleCard.vue";
 
-import type { IUser } from "@/models/user";
-import NoResults from "@/components/users/administrators/NoResults.vue";
-import DataTable from "@/components/common/table/DataTable.vue";
-import { columns as userColumns } from "@/components/users/administrators/columns";
-import { CheckCircledIcon, CrossCircledIcon, CubeIcon } from "@radix-icons/vue";
-
-const open = ref(false);
-const editingUserId = ref<string | null>(null);
-  const users = ref<IUser[]>([
-  {
-    id: "1",
-    name: "Juan Pérez",
-    dni: "12345678",
-    phone: "987654321",
-    email: "juan.perez@example.com",
-    role: "Admin",
-    address: "Av. Libertador 123",
-    department: "Lima",
-    province: "Lima",
-    district: "Miraflores",
-    status: "",
-    is_deleted: false,
-    created_at: "",
-    updated_at: null
-  },
-  {
-    id: "2",
-    name: "Ana Gómez",
-    dni: "23456789",
-    phone: "976543210",
-    email: "ana.gomez@example.com",
-    role: "User",
-    address: "Calle Real 456",
-    department: "Arequipa",
-    province: "Arequipa",
-    district: "Cayma",
-    status: "",
-    is_deleted: false,
-    created_at: "",
-    updated_at: null
-  },
-  {
-    id: "3",
-    name: "Carlos Fernández",
-    dni: "34567890",
-    phone: "965432109",
-    email: "carlos.fernandez@example.com",
-    role: "Moderator",
-    address: "Jr. de la Unión 789",
-    department: "Cusco",
-    province: "Cusco",
-    district: "Centro Histórico",
-    status: "",
-    is_deleted: false,
-    created_at: "",
-    updated_at: null
-  },
-  {
-    id: "4",
-    name: "María López",
-    dni: "45678901",
-    phone: "954321098",
-    email: "maria.lopez@example.com",
-    role: "User",
-    address: "Av. Brasil 321",
-    department: "Lima",
-    province: "Lima",
-    district: "San Isidro",
-    status: "",
-    is_deleted: false,
-    created_at: "",
-    updated_at: null
-  }]);
-
-const handleCreateClick = () => {
-  // editingUserId.value = null;
-  users.value = [...users.value, {
-    id: "5",
-    name: "1232112",
-    dni: "45678901",
-    phone: "954321098",
-    email: "maria.lopez@example.com",
-    role: "User",
-    address: "Av. Brasil 321",
-    department: "Lima",
-    province: "Lima",
-    district: "San Isidro",
-    status: "",
-    is_deleted: false,
-    created_at: "",
-    updated_at: null
-  }]
-};
-
-const handleDeleteClick = async (user: IUser) => {
-  console.log(`Eliminar usuario con id: ${user.id}`);
-};
-
-const columns = addActions<IUser>({
-  additionalColumns: userColumns,
-  actions: [
-    {
-      label: 'Editar',
-      icon: "chevron-right",
-      isDisabled: () => false,
-      onClick: (user: { id: string | null; }) => (editingUserId.value = user.id),
-    }
+const route = useRoute()
+const {page, sortOptions, onSort, suspendUser,createUser, editUser} = useAdmins();
+const { openConfirmModal, updateConfirmModal } = useConfirmModal();
+const filterOptions = ref(`[{"field":"type","type":"not","value": "PARTICIPANT"}]`)
+const openModal = ref(false)
+const admsUserId = ref(undefined)
+const BASE_ADM_URL = "/user-management";
+const onSearch = () => {
+  const filters = [
+    { field:"type", type:"not", value:"PARTICIPANT" || ''},
   ]
-});
+  filterOptions.value = JSON.stringify(filters)
+}
 
-const statuses = [
+const { data, refresh }: any = await useAPI(
+  `${BASE_ADM_URL}/find-users-paginated`,
   {
-    value: "ACTIVE",
-    label: "Activo",
-    icon: CheckCircledIcon,
-  },
-  {
-    value: "INACTIVE",
-    label: "Inactivo",
-    icon: CrossCircledIcon,
-  },
-  {
-    value: "SUSPENDED",
-    label: "Suspendido",
-    icon: CubeIcon,
-  },
-];
+    query: {
+      limit: 8,
+      page,
+      filterOptions,
+      sortOptions,
+    },
+  } as any,
+);
+
+const adminsData= computed(() => data.value.data.map((item: IAdminsLItem) => ({
+    fullName: `${item.firstName} ${item.lastName}`,
+    document: `${item.documentType} - ${item.documentIdentifier}`,
+    cellphone: item.phoneNumber,
+    organization: "Organización", 
+    ...item
+  })))
+
+
+  const handleSuspend = async (userId: string, fullName: string) => {
+  openConfirmModal({
+    title: "Suspender usuario",
+    message: `¿Estás seguro de suspender a ❝${fullName}❞?`,
+    callback: async () => {
+      const { status, error }: any = await suspendUser(userId);
+      if (status.value === "success") {
+        updateConfirmModal({
+          title: "¡Suspensión exitosa!",
+          message: "El usuario ha sido suspendido.",
+          type: "success",
+        });
+        refresh();
+      } else {
+        updateConfirmModal({
+          title: "Error al suspender",
+          message: "El usuario no se pudo suspender. \nTe recomendamos intentarlo nuevamente.",
+          type: "error",
+        });
+      }
+    },
+  });
+};
+
+const handleUpdateForm = async (user: any) => {
+  openModal.value = true;
+  admsUserId.value = user.userId;
+};
+
+const handleCreate = async (values: any) => {
+  openConfirmModal({
+    title: 'Crear usuario', message: '¿Estás seguro de que deseas crear este usuario?',
+    callback: async () => {
+      const { status, error } : any = await createUser(values);
+      if (status.value === 'success') {
+        openModal.value = false;
+        refresh();
+        updateConfirmModal({
+          title: "Usuario creado",
+          message: "El usuario ha sido creado exitosamente",
+          type: "success",
+        });
+      } else {
+        const eMsg = error.value.data?.errors?.[0].message || error.value.data.message || "El usuario no se pudo crear, intentalo más tarde";
+        updateConfirmModal({
+          title: "Error al crear usuario",
+          message: eMsg,
+          type: "error",
+        });
+      }
+    },
+  });
+};
+
+const handleEdit = async (values: any) => {
+  openConfirmModal({
+    title: 'Actualizar usuario', message: '¿Estás seguro de que deseas actualizar este usuario?', callback: async () => {
+      const { status, error } : any = await editUser(values);
+      if (status.value === 'success') {
+        openModal.value = false;
+        refresh();
+        updateConfirmModal({
+          title: "Usuario actualizado",
+          message: "El usuario ha sido actualizado exitosamente",
+          type: "success",
+        });
+      } else {
+        const eMsg =
+          error.value.data?.errors?.[0].message ||
+          error.value.data.message ||
+          "El usuario no se pudo actualizar, intentalo más tarde";
+        updateConfirmModal({
+          title: "Error al actualizar usuario",
+          message: eMsg,
+          type: "error",
+        });
+      }
+    },
+  });
+};
 </script>
-

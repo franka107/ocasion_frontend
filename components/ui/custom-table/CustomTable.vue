@@ -99,6 +99,7 @@ export interface HeaderItem {
     sortable?: boolean
     align?: 'center' | 'left' | 'right' | undefined
     search?: SearchItem
+    
 }
 interface Props { 
     data: DataItem[],
