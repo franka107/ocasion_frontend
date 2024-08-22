@@ -1,3 +1,5 @@
 <template>
-    <NuxtPage></NuxtPage>
+    <div>
+        Dashboard
+    </div>
 </template>

@@ -36,7 +36,7 @@
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" class="bg-primary text-white">
-                <NuxtLink :to="`/backoffice/events/organization/${row.rucNumber}`">
+                <NuxtLink :to="`/organizations/${row.rucNumber}`">
                   <DropdownMenuItem>
                     Ver Organización
                   </DropdownMenuItem>

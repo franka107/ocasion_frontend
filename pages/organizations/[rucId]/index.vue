@@ -23,7 +23,7 @@
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" class="bg-primary text-white w-40">
-                <NuxtLink :to="`/backoffice/events/organization/${route.params.rucId}/event/${row.id}`">
+                <NuxtLink :to="`/organizations/${route.params.rucId}/event/${row.id}`">
                   <DropdownMenuItem>
                     Ver Evento
                     <CustomIcons name="EyeIcon" class="ml-auto" />

@@ -1,6 +1,5 @@
 <template>
   <ContentLayout title="Eventos">
-
     <section>
     <EventDetails :eventDetail="eventDetail" />
     <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
