@@ -75,7 +75,7 @@ export function useLoginForm() {
         console.log('Solicitud exitosa, obteniendo sesión del usuario...')
         await fetchUserSession()
         console.log('Sesión del usuario actualizada, redirigiendo al backoffice...')
-        router.push("/backoffice/organizations")
+        router.push("/organizations")
       } catch (error) {
         console.error("Error during login:", error);
         errors.value.api =
