@@ -32,6 +32,7 @@ export const organizationHeader: HeaderItem[] = [{
         items: [
             { text: 'Activo', value: 'ACTIVE' },
             { text: 'Suspendido', value: 'SUSPENDED' },
+            { text: 'Todos', value: " " },
         ],
         elementClass: 'min-w-[400px]',
         position: 3,

@@ -7,7 +7,7 @@
                         <Input v-model="searchValues[item.key]" type="string" :class="item.search.elementClass" :placeholder="item.search.placeholder" class="w-[200px]" />
                     </template>
                     <template  v-else-if="item.search.type === 'select'">
-                        <Select v-model="searchValues[item.key]" :class="item.search.elementClass">
+                        <Select  @update:model-value="event => { searchValues[item.key] = event === ' ' ? undefined : event }" :model-value="searchValues[item.key]" :class="item.search.elementClass">
                             <SelectTrigger class="w-[180px]">
                                 <SelectValue :placeholder="item.search.placeholder" />
                             </SelectTrigger>
@@ -103,7 +103,7 @@ export interface HeaderItem {
 interface Props { 
     data: DataItem[],
     header: HeaderItem[],
-    multipleSelect: boolean,
+    multipleSelect?: boolean,
     multipleSelectKey?: string,
     class?: string | object 
 }
@@ -112,7 +112,7 @@ const props = withDefaults(defineProps<Props>(),{ multipleSelect: false, multipl
 const emit = defineEmits(["onSort","onSearch"])
 
 const searchComponents = computed(() => props.header.filter(item => item.search))
-const searchValues = reactive<{ [key: string]: string }>({})
+const searchValues = reactive<{ [key: string]: string | undefined }>({})
 watch(()=> searchValues, (value) => {
     emit('onSearch', value)
 }, { deep: true })
