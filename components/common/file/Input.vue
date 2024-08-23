@@ -20,6 +20,14 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  limitFiles: {
+    type: Number,
+    default: 3,
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
   hideRemoveIcon: {
     type: Boolean,
     default: false,
@@ -57,7 +65,10 @@ const uploadFile = async (
 const handleFileChange = async (event: Event) => {
   const input = event.target as HTMLInputElement;
   if (input.files) {
-    const newFiles = Array.from(input.files).slice(0, 3 - files.value.length); // Limitar a 3 archivos
+    const newFiles = Array.from(input.files).slice(
+      0,
+      props.limitFiles - files.value.length,
+    ); // Limitar a 3 archivos
     const newFileIds: { id: string }[] = [];
     // const newFileData: { id: string; path: string }[] = [];
 
@@ -109,8 +120,8 @@ onMounted(() => {
 <template>
   <div>
     <div
-      v-if="files.length === 0"
-      class="border-dashed border-2 border-gray-300 rounded-lg p-3 text-center flex flex-col items-center bg-primary/5"
+      v-if="!disabled"
+      class="border-dashed border-2 mb-2 border-gray-300 rounded-lg p-3 text-center flex flex-col items-center bg-primary/5"
     >
       <p class="mb-1 text-primary font-semibold text-sm leading-5">
         {{ title }}
@@ -135,7 +146,7 @@ onMounted(() => {
       </div>
     </div>
 
-    <div v-else class="space-y-2">
+    <div class="space-y-2">
       <div
         v-for="(file, index) in files"
         :key="index"

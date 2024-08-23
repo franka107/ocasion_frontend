@@ -37,7 +37,10 @@ const formSchema = toTypedSchema(
     termsAndConditionsFiles: z
       .array(z.any())
       .min(1, "Debe subir al menos un archivo de tyc."),
-    name: z.string().min(1, "El nombre del evento es requerido."),
+    name: z
+      .string()
+      .min(1, "El nombre del evento es requerido.")
+      .max(200, "El nombre del evento no puede superar los 200 caracteres"),
     description: z.string().min(1, "La descripción es requerida."),
     type: z.string().min(1, "El tipo de evento es requerido."),
     goodType: z.string().min(1, "El tipo de bien es requerido."),
@@ -103,7 +106,8 @@ const handleFilesChange = (files: File[]) => {
           <FormControl>
             <InputFile
               title="Lista de bienes"
-              instructionsText="(xlsx, docx, pdf)"
+              instructionsText="Cargar máximo 10 elementos(xlsx, docx, pdf)"
+              :limit-files="10"
               v-model="form.values.goodFiles"
               @update:value="handleFilesChange"
               v-bind="componentField"
@@ -117,7 +121,8 @@ const handleFilesChange = (files: File[]) => {
           <FormControl>
             <InputFile
               title="Términos y condiciones"
-              instructionsText="(xlsx, docx, pdf)"
+              :limit-files="10"
+              instructionsText="Cargar maximo 10 elementos(xlsx, docx, pdf)"
               v-model="form.values.attachedFiles"
               @update:value="handleFilesChange"
               v-bind="componentField"
@@ -219,6 +224,11 @@ const handleFilesChange = (files: File[]) => {
                 :minValue="
                   form.values.startDate
                     ? parseDate(form.values.startDate)
+                    : undefined
+                "
+                :max-value="
+                  form.values.startDate
+                    ? parseDate(form.values.startDate).add({ days: 7 })
                     : undefined
                 "
                 :value="componentField.modelValue"

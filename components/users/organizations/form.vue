@@ -8,6 +8,7 @@ import type { Organization } from "~/models/organizations";
 
 import { X } from "lucide-vue-next";
 import { parseDate } from "@internationalized/date";
+import CustomComboboxInput from "~/components/ui/custom-combobox-input/CustomComboboxInput.vue";
 const BASE_ORG_URL = "/organization-management";
 let form: any;
 const props = defineProps<{
@@ -15,59 +16,89 @@ const props = defineProps<{
   onSubmit: (values: any) => void;
 }>();
 
-const formSchema = toTypedSchema(
-  z.object({
-    name: z.string().min(1, "La razón social es requerida"),
-    rucNumber: z
-      .string()
-      .regex(/^\d+$/, "Este campo debe contener solo dígitos.")
-      .length(11, "El número de RUC debe de ser 11 dígitos"),
-    billingEmail: z
-      .string()
-      .email("Debe ser un correo electrónico")
-      .optional()
-      .nullable(),
-    economicActivityId: z.string().optional().nullable(),
-    addressLine1: z.string().min(1, "La dirección es requerida"),
-    department: z.string().min(1, "El departamento es requerido"),
-    province: z.string().min(1, "La provincia es requerida"),
-    districtId: z.string().min(1, "El distrito es requerido"),
-    contractStartDate: z
-      .string()
-      .min(1, "La fecha de inicio del contrato es requerida"),
-    contractEndDate: z
-      .string()
-      .min(0, "La fecha de fin del contrato es requerida"),
-    startPercentage: z
-      .number()
-      .min(0, "El porcentaje de inicio es requerido")
-      .max(100, "El porcentaje no puede exceder el 100%"),
-    representativeFullName: z
-      .string()
-      .min(1, "El nombre y apellidos del representante es requerido"),
-    representativeDocumentType: z.enum(["DNI", "CE", "PT"]),
-    representativeDocumentIdentifier: z
-      .string()
-      .regex(/^\d+$/, "El documento debe contener solo dígitos.")
-      .min(1, "El DNI del representante es requerido"),
-    representativePhoneNumber: z
-      .string()
-      .regex(/^\d+$/, "El número de teléfono debe contener solo dígitos.")
-      .optional()
-      .nullable(),
-    attachedFiles: z
-      .array(z.any())
-      .min(1, "Debe subir al menos un archivo")
-      .max(3, "Puede subir un máximo de 3 archivos"),
-  }),
-);
-interface OrganizationForm extends Organization {
-  department?: string;
-  province?: string;
-  districtId?: string;
-  addressLine1?: string;
-  economicActivityId?: string;
-}
+const organizationFormSchema = z.object({
+  name: z.string().min(1, "La razón social es requerida"),
+  rucNumber: z
+    .string()
+    .regex(/^\d+$/, "Este campo debe contener solo dígitos.")
+    .length(11, "El número de RUC debe de ser 11 dígitos"),
+  billingEmail: z
+    .string()
+    .email("Debe ser un correo electrónico")
+    .optional()
+    .nullable(),
+  economicActivityId: z.string().optional().nullable(),
+  addressLine1: z.string().min(1, "La dirección es requerida"),
+  department: z.string().min(1, "El departamento es requerido"),
+  province: z.string().min(1, "La provincia es requerida"),
+  districtId: z.string().min(1, "El distrito es requerido"),
+  contractStartDate: z
+    .string()
+    .min(1, "La fecha de inicio del contrato es requerida"),
+  contractEndDate: z
+    .string()
+    .min(0, "La fecha de fin del contrato es requerida"),
+  startPercentage: z
+    .number()
+    .min(0, "El porcentaje de inicio es requerido")
+    .max(100, "El porcentaje no puede exceder el 100%"),
+  representative: z
+    .object({
+      documentType: z.enum(["DNI", "CE", "PT"]),
+      documentIdentifier: z
+        .string()
+        .regex(/^\d+$/, "El documento debe contener solo dígitos.")
+        .min(1, `El documento del representante es requerido`),
+    })
+    .partial()
+    .superRefine((schema, ctx) => {
+      if (
+        schema.documentType === "DNI" &&
+        schema.documentIdentifier?.length !== 8
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "El dni debe contener 8 digitos",
+          path: ["documentIdentifier"],
+        });
+      }
+      if (
+        schema.documentType !== "DNI" &&
+        schema.documentIdentifier?.length !== 9
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `El ${schema.documentType} debe contener 8 digitos`,
+          path: ["documentIdentifier"],
+        });
+      }
+      return true;
+    }),
+  representativeFullName: z
+    .string()
+    .min(1, "El nombre y apellidos del representante es requerido"),
+  //.length(11, "El número de RUC debe de ser 11 dígitos"),
+  representativePhoneNumber: z
+    .string()
+    .regex(/^\d+$/, "El número de teléfono debe contener solo dígitos.")
+    .optional()
+    .nullable(),
+  attachedFiles: z
+    .array(z.any())
+    .min(1, "Debe subir al menos un archivo")
+    .max(3, "Puede subir un máximo de 3 archivos"),
+});
+
+type OrganizationForm = z.infer<typeof organizationFormSchema>;
+
+const formSchema = toTypedSchema(organizationFormSchema);
+// interface OrganizationForm extends Organization {
+//   department?: string;
+//   province?: string;
+//   districtId?: string;
+//   addressLine1?: string;
+//   economicActivityId?: string;
+// }
 const { fetchCities, fetchDistricts, fetchStates, states, cities, districts } =
   useAddress();
 
@@ -94,7 +125,7 @@ if (props.rucNumber) {
       },
     } as any,
   );
-  const orgData: OrganizationForm = { ...organizationData.value };
+  const orgData: any = { ...organizationData.value, representative: {} };
   orgData.department = orgData.address?.district?.id.split("+")[0] || "";
   orgData.province =
     `${orgData.department}+${orgData.address?.district?.id.split("+")[1]}` ||
@@ -102,6 +133,9 @@ if (props.rucNumber) {
   orgData.districtId = orgData.address.district.id;
   orgData.economicActivityId = orgData.economicActivity?.id;
   orgData.addressLine1 = orgData.address.addressLine1;
+  orgData.representative.documentType = orgData.representativeDocumentType;
+  orgData.representative.documentIdentifier =
+    orgData.representativeDocumentIdentifier;
   await Promise.all([
     fetchCities(orgData.department),
     fetchDistricts(orgData.province),
@@ -143,6 +177,9 @@ const onSubmit = form.handleSubmit((values: OrganizationForm) => {
   const formattedValues = {
     ...restValues,
     economicActivity: economicActivityId ? { id: economicActivityId } : null,
+    representativeDocumentType: restValues.representative.documentType,
+    representativeDocumentIdentifier:
+      restValues.representative.documentIdentifier,
     address: {
       addressLine1: addressLine1,
       district: { id: districtId },
@@ -219,27 +256,47 @@ const handleFilesChange = (files: File[]) => {
         <!-- Actividad Económica -->
         <FormField v-slot="{ componentField }" name="economicActivityId">
           <FormItem>
-            <FormControl>
-              <Select v-bind="componentField">
-                <SelectTrigger>
-                  <SelectValue placeholder="Actividad Económica" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem
-                      v-for="activity in economicActivities"
-                      :key="activity.id"
-                      :value="activity.id"
-                    >
-                      {{ activity.name }}
-                    </SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+            <FormControl class="w-full">
+              <CustomComboboxInput
+                @update:modelValue="componentField.onChange"
+                label="Actividad económica"
+                class="w-full"
+                :options="
+                  economicActivities.map((e) => ({
+                    value: e.id,
+                    label: e.name,
+                  }))
+                "
+                :value="componentField.modelValue"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
+
+        <!-- <FormField v-slot="{ componentField }" name="economicActivityId"> -->
+        <!--   <FormItem> -->
+        <!--     <FormControl> -->
+        <!--       <Select v-bind="componentField"> -->
+        <!--         <SelectTrigger> -->
+        <!--           <SelectValue placeholder="Actividad Económica" /> -->
+        <!--         </SelectTrigger> -->
+        <!--         <SelectContent> -->
+        <!--           <SelectGroup> -->
+        <!--             <SelectItem -->
+        <!--               v-for="activity in economicActivities" -->
+        <!--               :key="activity.id" -->
+        <!--               :value="activity.id" -->
+        <!--             > -->
+        <!--               {{ activity.name }} -->
+        <!--             </SelectItem> -->
+        <!--           </SelectGroup> -->
+        <!--         </SelectContent> -->
+        <!--       </Select> -->
+        <!--     </FormControl> -->
+        <!--     <FormMessage /> -->
+        <!--   </FormItem> -->
+        <!-- </FormField> -->
 
         <h2 class="text-primary text-base font-normal leading-5">
           Representante Legal
@@ -262,7 +319,7 @@ const handleFilesChange = (files: File[]) => {
           <!-- Tipo de Documento -->
           <FormField
             v-slot="{ componentField }"
-            name="representativeDocumentType"
+            name="representative.documentType"
           >
             <FormItem class="w-1/2">
               <FormControl>
@@ -285,7 +342,7 @@ const handleFilesChange = (files: File[]) => {
           <!-- Número de Documento -->
           <FormField
             v-slot="{ componentField }"
-            name="representativeDocumentIdentifier"
+            name="representative.documentIdentifier"
           >
             <FormItem class="w-1/2">
               <FormControl>
