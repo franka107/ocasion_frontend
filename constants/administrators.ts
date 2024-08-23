@@ -12,13 +12,7 @@ export const administratorsHeader: HeaderItem[] = [{
     },{
     key: 'document',
     label: 'Documento',
-    sortable: true,
-    search: {
-        type: 'text',
-        placeholder: 'Fecha creación',
-        elementClass: 'min-w-[400px]',
-        position: 2,
-    }
+    sortable: true
     },{
     key: 'cellphone',
     label: 'Celular',

@@ -112,10 +112,14 @@ const filterOptions = ref(`[{"field":"type","type":"not","value": "PARTICIPANT"}
 const openModal = ref(false)
 const admsUserId = ref(undefined)
 const BASE_ADM_URL = "/user-management";
-const onSearch = () => {
+const onSearch = (item: {[key: string]: string }) => {
   const filters = [
     { field:"type", type:"not", value:"PARTICIPANT" || ''},
+    { field: 'firstName', type: 'like', value: item.fullName || '' },
   ]
+  if(item.status) {
+    filters.push({ field: 'status', type: 'equal', value: item.status })
+  }
   filterOptions.value = JSON.stringify(filters)
 }
 
