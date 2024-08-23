@@ -40,7 +40,7 @@ const emit = defineEmits(['update:modelValue', 'update:open'])
 const open = ref(false)
 const currentValue = ref<undefined | string | Item | string[]>(undefined)
 watch(() => props.modelValue, (val) => {
-    console.log("test", val);
+
     currentValue.value = val
 }, { immediate: true })
 const currentLabel = computed(() => {

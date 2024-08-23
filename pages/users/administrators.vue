@@ -43,7 +43,7 @@
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" class="bg-primary text-white">
                 <DropdownMenuItem
-                  @click="handleSuspend(row.userId, row.name)"
+                  @click="handleSuspend(row.id, row.fullName)"
                   :disabled="row.status !== 'ACTIVE'"
                 >
                   Suspender
@@ -95,7 +95,7 @@
 	</ContentLayout>
 </template>
 <script setup lang="ts">
-import AdministratorsForm from "~/components/usersidebar/AdministratorsForm.vue";
+import AdministratorsForm from "~/components/users/administrators/AdministratorsForm.vue";
 import CustomTable from "@/components/ui/custom-table/CustomTable.vue";
 import CustomChip from "@/components/ui/custom-chip/CustomChip.vue";
 import CustomIcons from "@/components/ui/custom-icons/CustomIcons.vue";
@@ -113,13 +113,13 @@ const openModal = ref(false)
 const admsUserId = ref(undefined)
 const BASE_ADM_URL = "/user-management";
 const onSearch = (item: {[key: string]: string }) => {
+  console.log(item)
   const filters = [
     { field:"type", type:"not", value:"PARTICIPANT" || ''},
     { field: 'firstName', type: 'like', value: item.fullName || '' },
+    { field: 'status', type: 'equal', value: item.status || '' },
+
   ]
-  if(item.status) {
-    filters.push({ field: 'status', type: 'equal', value: item.status })
-  }
   filterOptions.value = JSON.stringify(filters)
 }
 

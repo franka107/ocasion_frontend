@@ -97,7 +97,7 @@
 	</ContentLayout>
 </template>
 <script setup lang="ts">
-import OrganizationForm from "@/components/users/organizations/form.vue";
+import OrganizationForm from "~/components/organizations/OrganizationForm.vue";
 import CustomTable from "@/components/ui/custom-table/CustomTable.vue";
 import CustomChip from "@/components/ui/custom-chip/CustomChip.vue";
 import CustomIcons from "@/components/ui/custom-icons/CustomIcons.vue";
