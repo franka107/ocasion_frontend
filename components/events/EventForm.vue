@@ -5,17 +5,30 @@ import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
 import InputFile from "@/components/common/file/Input.vue";
 import { X } from "lucide-vue-next";
-import type { IEventLItem } from '@/types/Event';
+import type { IEventLItem } from "@/types/Event";
 import { eventType, goodType, eventTimes } from "@/constants/events";
 import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
 import Textarea from "../ui/textarea/Textarea.vue";
-const EVENT_BASE_URL = '/event-management'
+const EVENT_BASE_URL = "/event-management";
 let form: any;
-const {getEvent} = useEvent();
-const props = defineProps<{id: string | undefined, orgRucNumber: string,  onsubmit: (values: any) => void;}>();
-const eventTypesOptions = Array.from(eventType).map(([id,name]) => ({ id, name }));
-const goodTypeOptions = Array.from(goodType).map(([id,name]) => ({ id, name }));
-const eventTimesOptions = Array.from(eventTimes).map(([id,name]) => ({ id: Number(id), name }));
+const { getEvent } = useEvent();
+const props = defineProps<{
+  id: string | undefined;
+  orgRucNumber: string;
+  onsubmit: (values: any) => void;
+}>();
+const eventTypesOptions = Array.from(eventType).map(([id, name]) => ({
+  id,
+  name,
+}));
+const goodTypeOptions = Array.from(goodType).map(([id, name]) => ({
+  id,
+  name,
+}));
+const eventTimesOptions = Array.from(eventTimes).map(([id, name]) => ({
+  id: Number(id),
+  name,
+}));
 const formSchema = toTypedSchema(
   z.object({
     goodFiles: z
@@ -24,26 +37,28 @@ const formSchema = toTypedSchema(
     termsAndConditionsFiles: z
       .array(z.any())
       .min(1, "Debe subir al menos un archivo de tyc."),
-    name: z.string().min(1, "El nombre del evento es requerido."),
+    name: z
+      .string()
+      .min(1, "El nombre del evento es requerido.")
+      .max(200, "El nombre del evento no puede superar los 200 caracteres"),
     description: z.string().min(1, "La descripción es requerida."),
     type: z.string().min(1, "El tipo de evento es requerido."),
     goodType: z.string().min(1, "El tipo de bien es requerido."),
     startDate: z.string().min(1, "La fecha de inicio es requerida."),
     endDate: z.string().min(1, "La fecha de fin es requerida."),
     closingTime: z.number().min(1, "El horario de cierre es requerido."),
-  })
+  }),
 );
 if (props.id) {
-      const { data: organizationData } = await getEvent(props.id);
-        
-      form = useForm({
-        validationSchema: formSchema,
-        initialValues: organizationData.value,
-      });
-} else {
-      form = useForm({ validationSchema: formSchema });
-}
+  const { data: organizationData } = await getEvent(props.id);
 
+  form = useForm({
+    validationSchema: formSchema,
+    initialValues: organizationData.value,
+  });
+} else {
+  form = useForm({ validationSchema: formSchema });
+}
 
 watch(form.values, (newValues) => {
   console.log("Form values:", newValues);
@@ -51,8 +66,7 @@ watch(form.values, (newValues) => {
 });
 
 const onSubmit = form.handleSubmit((values: any) => {
-  const { ...restValues } =
-    values;
+  const { ...restValues } = values;
 
   const formattedValues = {
     ...restValues,
@@ -64,7 +78,6 @@ const onSubmit = form.handleSubmit((values: any) => {
     formattedValues.id = props.id;
   }
   props.onsubmit(formattedValues);
-  
 });
 
 const handleFilesChange = (files: File[]) => {
@@ -78,25 +91,26 @@ const handleFilesChange = (files: File[]) => {
       <X class="w-4 h-4 text-muted-foreground" />
     </SheetClose>
     <SheetTitle class="text-xl font-medium text-[#64748B]">{{
-      props.id
-        ? "Actualizar evento"
-        : "Crear evento"
+      props.id ? "Actualizar evento" : "Crear evento"
     }}</SheetTitle>
   </SheetHeader>
 
-
   <div class="flex-grow overflow-y-auto no-scrollbar flex flex-col">
     <!-- <Form> -->
-    <form class="flex flex-col gap-4 flex-grow pt-5 pr-5 pl-5" @submit="onSubmit">
-        <FormField v-slot="{ componentField }" name="goodFiles">
+    <form
+      class="flex flex-col gap-4 flex-grow pt-5 pr-5 pl-5"
+      @submit="onSubmit"
+    >
+      <FormField v-slot="{ componentField }" name="goodFiles">
         <FormItem>
           <FormControl>
             <InputFile
-                title="Lista de bienes"
-                instructionsText="(xlsx, docx, pdf)"
-                v-model="form.values.goodFiles"
-                @update:value="handleFilesChange"
-                v-bind="componentField"
+              title="Lista de bienes"
+              instructionsText="Cargar máximo 10 elementos(xlsx, docx, pdf)"
+              :limit-files="10"
+              v-model="form.values.goodFiles"
+              @update:value="handleFilesChange"
+              v-bind="componentField"
             />
           </FormControl>
           <FormMessage />
@@ -106,11 +120,12 @@ const handleFilesChange = (files: File[]) => {
         <FormItem>
           <FormControl>
             <InputFile
-                title="Términos y condiciones"
-                instructionsText="(xlsx, docx, pdf)"
-                v-model="form.values.attachedFiles"
-                @update:value="handleFilesChange"
-                v-bind="componentField"
+              title="Términos y condiciones"
+              :limit-files="10"
+              instructionsText="Cargar maximo 10 elementos(xlsx, docx, pdf)"
+              v-model="form.values.attachedFiles"
+              @update:value="handleFilesChange"
+              v-bind="componentField"
             />
           </FormControl>
           <FormMessage />
@@ -190,12 +205,12 @@ const handleFilesChange = (files: File[]) => {
         <FormField v-slot="{ componentField }" name="startDate">
           <FormItem class="w-1/2">
             <FormControl>
-                <DateInput
-                  @update:modelValue="componentField.onChange"
-                  label="Fecha de inicio"
-                  :value="componentField.modelValue"
-                  :minValue="today(getLocalTimeZone()).add({days: 3})"
-                />
+              <DateInput
+                @update:modelValue="componentField.onChange"
+                label="Fecha de inicio"
+                :value="componentField.modelValue"
+                :minValue="today(getLocalTimeZone()).add({ days: 3 })"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -204,16 +219,21 @@ const handleFilesChange = (files: File[]) => {
           <FormItem class="w-1/2">
             <FormControl>
               <DateInput
-                  @update:modelValue="componentField.onChange"
-                  label="Fecha de fin"
-                  :minValue="
-                    form.values.startDate
-                      ? parseDate(form.values.startDate)
-                      : undefined
-                  "
-                  :value="componentField.modelValue"
-                  :disabled="!form.values.startDate"
-                />
+                @update:modelValue="componentField.onChange"
+                label="Fecha de fin"
+                :minValue="
+                  form.values.startDate
+                    ? parseDate(form.values.startDate)
+                    : undefined
+                "
+                :max-value="
+                  form.values.startDate
+                    ? parseDate(form.values.startDate).add({ days: 7 })
+                    : undefined
+                "
+                :value="componentField.modelValue"
+                :disabled="!form.values.startDate"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -242,23 +262,22 @@ const handleFilesChange = (files: File[]) => {
           <FormMessage />
         </FormItem>
       </FormField>
-      
+
       <SheetFooter class="mt-auto">
-          <Button
-            type="submit"
-            :disabled="!form.meta.value.valid"
-            :class="
-            
-                          cn(
+        <Button
+          type="submit"
+          :disabled="!form.meta.value.valid"
+          :class="
+            cn(
               'w-full h-10 text-base bg-[#062339] hover:bg-gray-700',
               !form.meta.value.valid
                 ? 'text-white'
-                : 'hover:text-primary hover:bg-bgtheme'
+                : 'hover:text-primary hover:bg-bgtheme',
             )
-            "
-          >
-            {{ props.id ? "Actualizar evento" : "Crear evento" }}
-          </Button>
+          "
+        >
+          {{ props.id ? "Actualizar evento" : "Crear evento" }}
+        </Button>
       </SheetFooter>
     </form>
     <!-- </Form> -->

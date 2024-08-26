@@ -4,16 +4,27 @@ import { useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
 import InputFile from "@/components/common/file/Input.vue";
-import type { OfferItem } from '@/types/Offer';
-import { Textarea } from '@/components/ui/textarea'
+import type { OfferItem } from "@/types/Offer";
+import { Textarea } from "@/components/ui/textarea";
 import { eventType, goodType, eventTimes, years } from "@/constants/events";
-const BASE_OFFERS_URL = '/offer-management'
+const BASE_OFFERS_URL = "/offer-management";
 import { X } from "lucide-vue-next";
 let form: any;
 const { getOffer } = useOfferAPI();
-const props = defineProps<{id: string | undefined, eventId: string, rucId: string,  onsubmit: (values: any) => void;}>();
-const { fetchCities, fetchDistricts, fetchStates, states, cities, districts } = useAddress()
-const { brands: brandOptions, models: modelOptions, fetchBrands, fetchModels } = useExtraEndpoints()
+const props = defineProps<{
+  id: string | undefined;
+  eventId: string;
+  rucId: string;
+  onsubmit: (values: any) => void;
+}>();
+const { fetchCities, fetchDistricts, fetchStates, states, cities, districts } =
+  useAddress();
+const {
+  brands: brandOptions,
+  models: modelOptions,
+  fetchBrands,
+  fetchModels,
+} = useExtraEndpoints();
 // const yearOptions = Array.from({ length: 65 }, (_, i) => ({ id: 1960 + i, name: (1960 + i).toString() }))
 const formSchema = toTypedSchema(
   z.object({
@@ -23,15 +34,18 @@ const formSchema = toTypedSchema(
     attachedFiles: z
       .array(z.any())
       .min(1, "Debe subir al menos un archivo de bien."),
-    title: z.string().min(1 , "El titulo es requerido.").max(200, "Cant. de carácteres máximo 200."),
+    title: z
+      .string()
+      .min(1, "El titulo es requerido.")
+      .max(200, "Cant. de carácteres máximo 200."),
     brandId: z.string().min(1, "El modelo es requerido."),
     model: z.string().min(1, "El modelo es requerido."),
-    year: z.number().min(1,"El año es requerido"),
-    districtId: z.string().min(1,"El año es requerido"),
+    year: z.number().min(1, "El año es requerido"),
+    districtId: z.string().min(1, "El año es requerido"),
     description: z.string().min(1, "La descripcion es requerido."),
     addressLine1: z.string().min(1, "La dirección es requerida."),
     appraisal: z.number().min(1, "La tasación es requerida."),
-  })
+  }),
 );
 
 interface OfferItemForm extends OfferItem {
@@ -44,33 +58,35 @@ interface OfferItemForm extends OfferItem {
 }
 
 if (props.id) {
-    // const { data: offerData } = await ;
-    const [{ data }]= await Promise.all([getOffer(props.id),fetchBrands(), fetchStates()]);
-    const offerData: OfferItemForm = { ...data.value };
-    offerData.department = offerData.address?.district?.id.split("+")[0] || "";
-    offerData.province =
-      `${offerData.department}+${offerData.address?.district?.id.split("+")[1]}` ||
-      "";
-    offerData.districtId = offerData.address.district.id;
-    offerData.addressLine1 = offerData.address.addressLine1;
-    offerData.brandId = offerData.carModel.brand.id;
-    offerData.model = offerData.carModel.id;
-    
-    await Promise.all([
-      fetchCities(offerData.department),
-      fetchDistricts(offerData.province),
-      fetchModels(offerData.brandId),
-    ]);
-    form = useForm({
-      validationSchema: formSchema,
-      initialValues: offerData,
-    });
-    
-  } else {
-    await Promise.all([fetchBrands(), fetchStates()]);
-    form = useForm({ validationSchema: formSchema });
-}
+  // const { data: offerData } = await ;
+  const [{ data }] = await Promise.all([
+    getOffer(props.id),
+    fetchBrands(),
+    fetchStates(),
+  ]);
+  const offerData: OfferItemForm = { ...data.value };
+  offerData.department = offerData.address?.district?.id.split("+")[0] || "";
+  offerData.province =
+    `${offerData.department}+${offerData.address?.district?.id.split("+")[1]}` ||
+    "";
+  offerData.districtId = offerData.address.district.id;
+  offerData.addressLine1 = offerData.address.addressLine1;
+  offerData.brandId = offerData.carModel.brand.id;
+  offerData.model = offerData.carModel.id;
 
+  await Promise.all([
+    fetchCities(offerData.department),
+    fetchDistricts(offerData.province),
+    fetchModels(offerData.brandId),
+  ]);
+  form = useForm({
+    validationSchema: formSchema,
+    initialValues: offerData,
+  });
+} else {
+  await Promise.all([fetchBrands(), fetchStates()]);
+  form = useForm({ validationSchema: formSchema });
+}
 
 watch(form.values, (newValues) => {
   console.log("Form values:", newValues, props.rucId);
@@ -109,7 +125,7 @@ const onSubmit = form.handleSubmit((values: any) => {
       addressLine1: addressLine1,
       district: {
         id: districtId,
-      }
+      },
     },
     organization: {
       rucNumber: props.rucId,
@@ -121,7 +137,6 @@ const onSubmit = form.handleSubmit((values: any) => {
   }
   console.log(formattedValues);
   props.onsubmit(formattedValues);
-  
 });
 
 const handleFilesChange = (files: File[]) => {
@@ -130,30 +145,31 @@ const handleFilesChange = (files: File[]) => {
 </script>
 
 <template>
-    <SheetHeader>
+  <SheetHeader>
     <SheetClose class="mr-4 rounded-full p-3 hover:bg-[#f1f5f9]">
       <X class="w-4 h-4 text-muted-foreground" />
     </SheetClose>
     <SheetTitle class="text-xl font-medium text-[#64748B]">{{
-      props.id
-        ? "Actualizar oferta"
-        : "Crear oferta"
+      props.id ? "Actualizar oferta" : "Crear oferta"
     }}</SheetTitle>
   </SheetHeader>
 
-
   <div class="flex-grow overflow-y-auto no-scrollbar flex flex-col">
     <!-- <Form> -->
-    <form class="flex flex-col gap-4 flex-grow pt-5 pr-5 pl-5" @submit="onSubmit">
-        <FormField v-slot="{ componentField }" name="annexesFiles">
+    <form
+      class="flex flex-col gap-4 flex-grow pt-5 pr-5 pl-5"
+      @submit="onSubmit"
+    >
+      <FormField v-slot="{ componentField }" name="annexesFiles">
         <FormItem>
           <FormControl>
             <InputFile
-                title="Anexos"
-                instructionsText="(xlsx, docx, pdf)"
-                v-model="form.values.goodFiles"
-                @update:value="handleFilesChange"
-                v-bind="componentField"
+              title="Anexos"
+              instructionsText="Cargar máximo 10 elementos (xlsx, docx, pdf)"
+              :limit-files="10"
+              v-model="form.values.goodFiles"
+              @update:value="handleFilesChange"
+              v-bind="componentField"
             />
           </FormControl>
           <FormMessage />
@@ -163,11 +179,12 @@ const handleFilesChange = (files: File[]) => {
         <FormItem>
           <FormControl>
             <InputFile
-                title="Fotos y videos"
-                instructionsText="(Mp4, jpg, png)"
-                v-model="form.values.attachedFiles"
-                @update:value="handleFilesChange"
-                v-bind="componentField"
+              title="Fotos y videos"
+              instructionsText="Cargar máximo 12 elementos(mp4, jpg, png)"
+              :limit-files="12"
+              v-model="form.values.attachedFiles"
+              @update:value="handleFilesChange"
+              v-bind="componentField"
             />
           </FormControl>
           <FormMessage />
@@ -191,89 +208,91 @@ const handleFilesChange = (files: File[]) => {
       </FormField>
       <div class="grid grid-cols-[1fr,_1fr,_0.75fr] gap-x-1">
         <FormField v-slot="{ componentField }" name="brandId">
-        <FormItem>
-          <FormControl>
-            <Select v-bind="componentField" 
-            @update:modelValue="(value) => handleBrandChange(value)">
-              <SelectTrigger>
-                <SelectValue placeholder="Marca" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem
-                    v-for="brand in brandOptions"
-                    :key="brand.id"
-                    :value="brand.id"
-                  >
-                    {{ brand.name }}
-                  </SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-      <FormField v-slot="{ componentField }" name="model">
-        <FormItem>
-          <FormControl>
-            <Select v-bind="componentField" :disabled="!form.values.brandId">
-              <SelectTrigger>
-                <SelectValue placeholder="Modelo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem
-                    v-for="model in modelOptions"
-                    :key="model.id"
-                    :value="model.id"
-                  >
-                    {{ model.name }}
-                  </SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-      <FormField v-slot="{ componentField }" name="year">
-        <FormItem>
-          <FormControl>
-            <Select v-bind="componentField">
-              <SelectTrigger>
-                <SelectValue placeholder="Año" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem
-                    v-for="year in years"
-                    :key="year.id"
-                    :value="Number(year.id) as any"
-                  >
-                    {{ year.name }}
-                  </SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-      </div>
-        <FormField v-slot="{ componentField }" name="description">
           <FormItem>
             <FormControl>
-              <Textarea
-                type="text"
-                placeholder="Descripcion del bien"
+              <Select
                 v-bind="componentField"
-              />
+                @update:modelValue="(value) => handleBrandChange(value)"
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Marca" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem
+                      v-for="brand in brandOptions"
+                      :key="brand.id"
+                      :value="brand.id"
+                    >
+                      {{ brand.name }}
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
-        <h2 class="text-primary text-base font-normal leading-5">Ubicación</h2>
+        <FormField v-slot="{ componentField }" name="model">
+          <FormItem>
+            <FormControl>
+              <Select v-bind="componentField" :disabled="!form.values.brandId">
+                <SelectTrigger>
+                  <SelectValue placeholder="Modelo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem
+                      v-for="model in modelOptions"
+                      :key="model.id"
+                      :value="model.id"
+                    >
+                      {{ model.name }}
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+        <FormField v-slot="{ componentField }" name="year">
+          <FormItem>
+            <FormControl>
+              <Select v-bind="componentField">
+                <SelectTrigger>
+                  <SelectValue placeholder="Año" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem
+                      v-for="year in years"
+                      :key="year.id"
+                      :value="Number(year.id) as any"
+                    >
+                      {{ year.name }}
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+      </div>
+      <FormField v-slot="{ componentField }" name="description">
+        <FormItem>
+          <FormControl>
+            <Textarea
+              type="text"
+              placeholder="Descripcion del bien"
+              v-bind="componentField"
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+      <h2 class="text-primary text-base font-normal leading-5">Ubicación</h2>
       <!-- Departamento -->
       <FormField v-slot="{ componentField }" name="department">
         <FormItem>
@@ -371,7 +390,9 @@ const handleFilesChange = (files: File[]) => {
           <FormMessage />
         </FormItem>
       </FormField>
-      <h2 class="text-primary text-base font-normal leading-5">Puesta en valor</h2>
+      <h2 class="text-primary text-base font-normal leading-5">
+        Puesta en valor
+      </h2>
       <div class="flex gap">
         <FormField v-slot="{ componentField }" name="appraisal">
           <FormItem>
@@ -402,20 +423,20 @@ const handleFilesChange = (files: File[]) => {
       <!-- Botón de Submit -->
       <!-- <Button type="submit">Guardar</Button> -->
       <SheetFooter class="mt-auto">
-          <Button
-            type="submit"
-            :disabled="!form.meta.value.valid"
-            :class="
-              cn(
-                'w-full',
-                !form.meta.value.valid
-                  ? 'text-primary bg-bgtheme'
-                  : 'hover:text-primary hover:bg-bgtheme'
-              )
-            "
-          >
-            {{ props.id ? "Actualizar evento" : "Crear evento" }}
-          </Button>
+        <Button
+          type="submit"
+          :disabled="!form.meta.value.valid"
+          :class="
+            cn(
+              'w-full',
+              !form.meta.value.valid
+                ? 'text-primary bg-bgtheme'
+                : 'hover:text-primary hover:bg-bgtheme',
+            )
+          "
+        >
+          {{ props.id ? "Actualizar oferta" : "Crear oferta" }}
+        </Button>
       </SheetFooter>
     </form>
     <!-- </Form> -->

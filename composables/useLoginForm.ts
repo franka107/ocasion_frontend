@@ -8,6 +8,7 @@ export function useLoginForm() {
   const showPassword = ref(false);
   const showForgotPassword = ref(false);
   const isDialogOpen = ref(false);
+  const isMaxAttemptsDialogOpen = ref(false);
   const router = useRouter();
   const errors = ref({
     email: "",
@@ -70,12 +71,17 @@ export function useLoginForm() {
           if (errorBack.code === "AUTH.INCORRECT_PASSWORD") {
             errors.value.password = errorBack.message;
           }
+          if (errorBack.code === "AUTH.MAX_ATTEMPTS_LIMIT_EXCEED") {
+            isMaxAttemptsDialogOpen.value = true;
+          }
         }
 
-        console.log('Solicitud exitosa, obteniendo sesión del usuario...')
-        await fetchUserSession()
-        console.log('Sesión del usuario actualizada, redirigiendo al backoffice...')
-        router.push("/organizations")
+        console.log("Solicitud exitosa, obteniendo sesión del usuario...");
+        await fetchUserSession();
+        console.log(
+          "Sesión del usuario actualizada, redirigiendo al backoffice...",
+        );
+        router.push("/organizations");
       } catch (error) {
         console.error("Error during login:", error);
         errors.value.api =
@@ -96,6 +102,10 @@ export function useLoginForm() {
     isDialogOpen.value = false;
   };
 
+  const closeMaxAttemptsDialog = () => {
+    isMaxAttemptsDialogOpen.value = false;
+  };
+
   const goToUpdatePassword = () => {
     console.log("Redirigiendo a la vista de actualización de contraseña");
     router.push("/auth/updatePassword");
@@ -109,9 +119,11 @@ export function useLoginForm() {
     isDialogOpen,
     errors,
     validate,
+    closeMaxAttemptsDialog,
     handleSubmit,
     togglePassword,
     toggleForgotPassword,
+    isMaxAttemptsDialogOpen,
     closeDialog,
     goToUpdatePassword,
   };

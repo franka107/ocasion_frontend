@@ -12,11 +12,11 @@
           :disabled="props.disabled"
         >
           <CalendarIcon class="mr-2 h-4 w-4" />
-          {{ dateValue
-            ? dateFormatter.format(
-                dateValue.toDate(getLocalTimeZone())
-              )
-            : props.label }}
+          {{
+            dateValue
+              ? dateFormatter.format(dateValue.toDate(getLocalTimeZone()))
+              : props.label
+          }}
         </Button>
       </PopoverTrigger>
       <PopoverContent class="w-auto p-0">
@@ -34,8 +34,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, defineProps, defineEmits } from 'vue'
-import { useVModel } from '@vueuse/core'
+import { ref, computed, defineProps, defineEmits } from "vue";
+import { useVModel } from "@vueuse/core";
 import {
   CalendarDate,
   DateFormatter,
@@ -48,36 +48,35 @@ import CalendarIcon from "@radix-icons/vue/CalendarIcon";
 const dateFormatter = new DateFormatter("es", {
   year: "2-digit",
   month: "2-digit",
-  day: "2-digit"
+  day: "2-digit",
 });
 
-
 const props = defineProps<{
-  label: string
-  class?: string
-  maxValue?: DateValue
-  minValue?: DateValue
-  value: string | undefined
-  disabled?: boolean
-}>()
+  label: string;
+  class?: string;
+  maxValue?: DateValue;
+  minValue?: DateValue;
+  value: string | undefined;
+  disabled?: boolean;
+}>();
 
 const emits = defineEmits<{
-  (e: 'update:modelValue', payload: string | undefined): void
-}>()
+  (e: "update:modelValue", payload: string | undefined): void;
+}>();
 
-const modelValue = useVModel(props, 'value', emits, {
+const modelValue = useVModel(props, "value", emits, {
   passive: true,
   defaultValue: props.value,
-})
+});
 
 const dateValue = computed({
   get: () => (modelValue.value ? parseDate(modelValue.value) : undefined),
   set: (val) => {
-    modelValue.value = val ? val.toString() : undefined
+    modelValue.value = val ? val.toString() : undefined;
   },
-})
+});
 
 const onUpdateValue = (newValue: DateValue | undefined) => {
-  emits('update:modelValue', newValue ? newValue.toString() : undefined)
-}
+  emits("update:modelValue", newValue ? newValue.toString() : undefined);
+};
 </script>
