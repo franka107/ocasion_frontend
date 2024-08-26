@@ -42,9 +42,7 @@
                   align="start"
                   class="bg-primary text-white"
                 >
-                  <NuxtLink
-                    :to="`/backoffice/events/organization/${row.rucNumber}`"
-                  >
+                  <NuxtLink :to="`/organizations/${row.rucNumber}`">
                     <DropdownMenuItem> Ver Organización </DropdownMenuItem>
                   </NuxtLink>
                   <DropdownMenuSeparator />
@@ -55,6 +53,7 @@
                     Suspender
                     <CustomIcons name="Forbidden" class="ml-auto" />
                   </DropdownMenuItem>
+
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     @click="handleActivate(row.rucNumber, row.name)"
@@ -105,7 +104,7 @@
   </ContentLayout>
 </template>
 <script setup lang="ts">
-import OrganizationForm from "@/components/users/organizations/form.vue";
+import OrganizationForm from "~/components/organizations/OrganizationForm.vue";
 import CustomTable from "@/components/ui/custom-table/CustomTable.vue";
 import CustomChip from "@/components/ui/custom-chip/CustomChip.vue";
 import CustomIcons from "@/components/ui/custom-icons/CustomIcons.vue";

@@ -2,6 +2,22 @@
   <div class="my-2">
     <Popover>
       <PopoverTrigger as-child>
+        <!-- <Button -->
+        <!--   variant="outline" -->
+        <!--   :class="[ -->
+        <!--     'w-full justify-start text-left font-normal', -->
+        <!--     !modelValue && 'text-muted-foreground', -->
+        <!--     props.class, -->
+        <!--   ]" -->
+        <!--   :disabled="props.disabled" -->
+        <!-- > -->
+        <!--   <CalendarIcon class="mr-2 h-4 w-4" /> -->
+        <!--   {{ -->
+        <!--     dateValue -->
+        <!--       ? dateFormatter.format(dateValue.toDate(getLocalTimeZone())) -->
+        <!--       : props.label -->
+        <!--   }} -->
+        <!-- </Button> -->
         <Button
           variant="outline"
           role="combobox"

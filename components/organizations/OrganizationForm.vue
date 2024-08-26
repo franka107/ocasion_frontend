@@ -323,18 +323,15 @@ const handleFilesChange = (files: File[]) => {
           >
             <FormItem class="w-1/2">
               <FormControl>
-                <Select v-bind="componentField">
-                  <SelectTrigger class="px-2">
-                    <SelectValue placeholder="Tipo de Documento" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectItem value="DNI">DNI</SelectItem>
-                      <SelectItem value="CE">CE</SelectItem>
-                      <SelectItem value="PT">PT</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                <CustomSelect
+                  v-bind="componentField"
+                  :items="[
+                    { id: 'DNI', name: 'DNI' },
+                    { id: 'CE', name: 'CE' },
+                    { id: 'PT', name: 'PT' },
+                  ]"
+                  placeholder="Tipo de Documento"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -447,30 +444,18 @@ const handleFilesChange = (files: File[]) => {
         <FormField v-slot="{ componentField }" name="department">
           <FormItem>
             <FormControl>
-              <Select
+              <CustomSelect
                 v-bind="componentField"
                 @update:modelValue="
                   (value) => {
-                    form.values.department = value;
                     handleStateChange(value);
+                    form.setFieldValue('province', undefined);
+                    form.setFieldValue('districtId', undefined);
                   }
                 "
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Departamento" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem
-                      v-for="state in states"
-                      :key="state.id"
-                      :value="state.id"
-                    >
-                      {{ state.name }}
-                    </SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+                :items="states"
+                placeholder="Departamento"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -481,31 +466,18 @@ const handleFilesChange = (files: File[]) => {
           <FormField v-slot="{ componentField }" name="province">
             <FormItem class="w-1/2">
               <FormControl>
-                <Select
+                <CustomSelect
                   v-bind="componentField"
                   @update:modelValue="
                     (value) => {
-                      form.values.province = value;
+                      form.setFieldValue('districtId', undefined);
                       handleCityChange(value);
                     }
                   "
                   :disabled="!form.values.department"
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Provincia" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectItem
-                        v-for="city in cities"
-                        :key="city.id"
-                        :value="city.id"
-                      >
-                        {{ city.name }}
-                      </SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                  :items="cities"
+                  placeholder="Provincia"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -515,25 +487,12 @@ const handleFilesChange = (files: File[]) => {
           <FormField v-slot="{ componentField }" name="districtId">
             <FormItem class="w-1/2">
               <FormControl>
-                <Select
+                <CustomSelect
                   v-bind="componentField"
                   :disabled="!form.values.province"
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Distrito" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectItem
-                        v-for="district in districts"
-                        :key="district.id"
-                        :value="district.id"
-                      >
-                        {{ district.name }}
-                      </SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                  :items="districts"
+                  placeholder="Distrito"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

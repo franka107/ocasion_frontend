@@ -46,6 +46,7 @@
               <TooltipProvider disable-hoverable-content>
                 <Tooltip :delay-duration="100">
                   <TooltipTrigger as-child>
+                    <NuxtLink :to="menu.href">
                     <Button
                       :variant="'ghost'"
                       :class="
@@ -55,7 +56,6 @@
                         )
                       "
                     >
-                      <NuxtLink :to="menu.href">
                         <div class="flex flew-row">
                           <span :class="isSidebarOpen === false ? '' : 'mr-4'">
                             <CustomIcons
@@ -79,8 +79,8 @@
                             {{ menu.label }}
                           </p>
                         </div>
-                      </NuxtLink>
-                    </Button>
+                      </Button>
+                    </NuxtLink>
                   </TooltipTrigger>
                   <TooltipContent
                     v-if="isSidebarOpen === false"

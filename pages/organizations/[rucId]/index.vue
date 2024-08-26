@@ -43,8 +43,8 @@
                 >
                   <DropdownMenuItem :disabled="row.status === 'CANCELLED'">
                     <NuxtLink
-                      :to="`/backoffice/events/organization/${route.params.rucId}/event/${row.id}`"
                       class="flex justify-between w-full"
+                      :to="`/organizations/${route.params.rucId}/event/${row.id}`"
                     >
                       Ver Evento
                       <CustomIcons name="EyeIcon" class="ml-auto" />
@@ -266,4 +266,3 @@ const handleCancel = async (values: any) => {
   });
 };
 </script>
-

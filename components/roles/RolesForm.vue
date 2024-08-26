@@ -4,28 +4,37 @@ import { useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
 
-const props = defineProps<{ id: number | undefined, onsubmit: (values: any) => void }>();
-const functionalities = [
-  { id: 'funcion01', label: 'Función 01' },
-  { id: 'funcion02', label: 'Función 02' },
-  { id: 'funcion03', label: 'Función 03' },
-  { id: 'funcion04', label: 'Función 04' },
-  { id: 'funcion05', label: 'Función 05' },
-  { id: 'funcion06', label: 'Función 06' },
-  { id: 'funcion07', label: 'Función 07' },
-  { id: 'funcion08', label: 'Función 08' },
-  { id: 'funcion09', label: 'Función 09' },
-  { id: 'funcion10', label: 'Función 10' }
-]
+import { X } from "lucide-vue-next";
+import CustomComboboxMultipleInput from "../ui/custom-combobox-multiple-input/CustomComboboxMultipleInput.vue";
+const allGrants = ref<Array<{ id: string; name: string }>>([]);
+const fetchGrants = async () => {
+  try {
+    const { data } = await useAPI("/role-configuration/find-grants", {
+      default: () => [],
+    });
+    allGrants.value = data.value;
+  } catch (error) {
+    console.error("Error al cargar grants:", error);
+  }
+};
+await fetchGrants();
+
+const props = defineProps<{
+  id: number | undefined;
+  onsubmit: (values: any) => void;
+}>();
+
 const formSchema = toTypedSchema(
   z.object({
     name: z.string().min(1, "El nombre del rol es requerido."),
     description: z.string().min(1, "La descripción es requerida."),
-    status: z.enum(["activo", "desactivo"], {
+    status: z.enum(["ACTIVE", "INACTIVE"], {
       required_error: "El estado es requerido.",
     }),
-    functionalities: z.array(z.string()).min(1, "Debe seleccionar al menos una funcionalidad."),
-  })
+    grants: z
+      .array(z.string())
+      .min(1, "Debe seleccionar al menos una funcionalidad."),
+  }),
 );
 
 const form = useForm({
@@ -33,9 +42,13 @@ const form = useForm({
   initialValues: {
     name: "",
     description: "",
-    status: "activo",
-    functionalities: []
+    status: "ACTIVE",
+    grants: [],
   },
+});
+watch(form.values, (newValues) => {
+  console.log("Form values:", newValues);
+  console.log(form.errors.value);
 });
 
 const onSubmit = form.handleSubmit((values) => {
@@ -45,81 +58,155 @@ const onSubmit = form.handleSubmit((values) => {
   };
   props.onsubmit(formattedValues);
 });
+
+if (props.id) {
+  const { data } = await useAPI<any>(`role-configuration/get-role-detail`, {
+    method: "GET",
+    query: {
+      id: props.id,
+    },
+  } as any);
+  console.log(data.value);
+  form.setValues(data.value);
+}
 </script>
 
 <template>
   <SheetHeader>
-    <SheetTitle>{{ props.id ? "Editar rol" : "Crear rol" }}</SheetTitle>
+    <SheetClose class="mr-4 rounded-full p-3 hover:bg-[#f1f5f9]">
+      <X class="w-4 h-4 text-muted-foreground" />
+    </SheetClose>
+    <SheetTitle class="text-xl font-medium text-[#64748B]">{{
+      props.id ? "Actualizar rol" : "Registrar rol"
+    }}</SheetTitle>
   </SheetHeader>
 
-  <div class="border-primary border-t-[1px]"></div>
+  <div class="flex-grow overflow-y-auto no-scrollbar flex flex-col">
+    <form class="h-full" @submit="onSubmit">
+      <section class="flex flex-col gap-4 flex-grow p-5 h-full">
+        <!-- Fields -->
+        <FormField v-slot="{ componentField }" name="name">
+          <FormItem>
+            <FormControl>
+              <Input type="text" placeholder="Nombre" v-bind="componentField" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
 
-  <div class="flex-grow overflow-y-auto no-scrollbar flex flex-col p-1">
-    <form class="flex flex-col gap-4 flex-grow" @submit="onSubmit">
-      <!-- Fields -->
-      <FormField v-slot="{ componentField }" name="name">
-        <FormItem>
-          <FormControl>
-            <Input
-              type="text"
-              placeholder="Nombre"
-              v-bind="componentField"
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-      
-      <FormField v-slot="{ componentField }" name="description">
-        <FormItem>
-          <FormControl>
-            <Input class="h-[85px] "
-              type="text"
-              placeholder="Descripción"
-              v-bind="componentField"
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-      
-      <FormField v-slot="{ componentField }" name="status">
-        <FormItem>
-          <FormControl>
-            <Select v-bind="componentField">
-              <SelectTrigger>
-                <SelectValue placeholder="Estado" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem value="activo">Activo</SelectItem>
-                  <SelectItem value="desactivo">Desactivo</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-      
-      <h2>Funcionalidades</h2>
-      <Input type="text" placeholder="Buscar" />
-      
-      <div v-for="func in functionalities" :key="func.id" class="flex items-center space-x-2">
-        <Checkbox :id="func.id" :value="func.id" v-model="form.values.functionalities"/>
-        <label
-          :for="func.id"
-          class="text-[16px] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-        >
-          {{ func.label }}
-        </label>
-      </div>
+        <FormField v-slot="{ componentField }" name="description">
+          <FormItem>
+            <FormControl>
+              <Input
+                class="h-[85px]"
+                type="text"
+                placeholder="Descripción"
+                v-bind="componentField"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
+        <FormField v-slot="{ componentField }" name="status">
+          <FormItem>
+            <FormControl>
+              <Select v-bind="componentField">
+                <SelectTrigger>
+                  <SelectValue placeholder="Estado" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="ACTIVE">Activo</SelectItem>
+                    <SelectItem value="INACTIVE">Desactivo</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
+        <h2>Funcionalidades</h2>
+
+        <FormField name="grants">
+          <FormItem>
+            <FormField
+              v-for="item in allGrants"
+              v-slot="{ value, handleChange }"
+              :key="item.id"
+              type="checkbox"
+              :value="item.id"
+              :unchecked-value="false"
+              name="grants"
+            >
+              <FormItem class="flex flex-row items-start space-x-3 space-y-0">
+                <FormControl>
+                  <Checkbox
+                    :checked="(value || []).includes(item.id)"
+                    @update:checked="handleChange"
+                  />
+                </FormControl>
+                <FormLabel class="font-normal">
+                  {{ item.name }}
+                </FormLabel>
+              </FormItem>
+            </FormField>
+          </FormItem>
+        </FormField>
+
+        <!-- <FormField v-slot="{ componentField }" name="grants"> -->
+        <!--   <FormItem> -->
+        <!--     <FormControl class="w-full"> -->
+        <!--       <CustomComboboxMultipleInput -->
+        <!--         @update:modelValue="componentField.onChange" -->
+        <!--         label="Funcionalidades" -->
+        <!--         class="w-full" -->
+        <!--         :options=" -->
+        <!--           grants.map((e) => ({ -->
+        <!--             value: e.id, -->
+        <!--             label: e.name, -->
+        <!--           })) -->
+        <!--         " -->
+        <!--         :value="componentField.modelValue" -->
+        <!--       /> -->
+        <!--     </FormControl> -->
+        <!--     <FormMessage /> -->
+        <!--   </FormItem> -->
+        <!-- </FormField> -->
+        <!-- <Input type="text" placeholder="Buscar" /> -->
+
+        <!-- <div -->
+        <!--   v-for="func in grants" -->
+        <!--   :key="func.id" -->
+        <!--   class="flex items-center space-x-2" -->
+        <!-- > -->
+        <!--   <Checkbox -->
+        <!--     :id="func.id" -->
+        <!--     :value="func.id" -->
+        <!--     @update:checked="handleChange" -->
+        <!--   /> -->
+        <!--   <label -->
+        <!--     :for="func.id" -->
+        <!--     class="text-[16px] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" -->
+        <!--   > -->
+        <!--     {{ func.name }} -->
+        <!--   </label> -->
+        <!-- </div> -->
+      </section>
 
       <SheetFooter class="mt-auto">
         <Button
           type="submit"
           :disabled="!form.meta.value.valid"
-          :class="cn('w-full', !form.meta.value.valid ? 'text-primary bg-bgtheme' : 'hover:text-primary hover:bg-bgtheme')"
+          :class="
+            cn(
+              'w-full h-10 text-base bg-[#062339] hover:bg-gray-700',
+              !form.meta.value.valid
+                ? 'text-white'
+                : 'hover:text-primary hover:bg-bgtheme',
+            )
+          "
         >
           {{ props.id ? "Actualizar rol" : "Crear rol" }}
         </Button>
