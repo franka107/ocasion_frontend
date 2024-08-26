@@ -53,7 +53,7 @@ export function useAdmins() {
         const { status, error }: any = await useAPI(
           `${BASE_ADM_URL}/update-user`,
           {
-            method: "PUT",
+            method: "POST",
             body: values,
           } as any
         );

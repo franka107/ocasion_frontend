@@ -1,12 +1,10 @@
 import type { HeaderItem } from '@/components/ui/custom-table/CustomTable.vue';
 
 export const userType = new Map<string, string>([
-    ['SUPER_ADMIN', "Super Adminitrador"],
     ['PLATFORM_ADMIN', "Administrador de plataforma"],
     ['PLATFORM_USER', "Usuario plataforma"],
     ['ORGANIZATION_ADMIN', "Adminitrador de organizacion"],
     ['ORGANIZATION_USER', "Usuario de organizacion"],
-    ['PARTICIPANT', "Participante"],
 ]);
 
 export const administratorsHeader: HeaderItem[] = [{
