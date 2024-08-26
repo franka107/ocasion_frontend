@@ -16,7 +16,7 @@
       >
         <template #action-button>
           <Button
-             @click=""
+             @click="handleExport"
              variant="default"
              class="bg-white text-primary border border-[#052339] "
           >
@@ -28,6 +28,9 @@
             variant="default"
             >Agregar</Button
           >
+        </template>
+        <template #type="{ row }">
+          <span class="whitespace-nowrap">{{  userType.get(row.type) || '' }}</span>
         </template>
         <template #actions="{ row }">
           <div class="flex justify-center">
@@ -51,8 +54,7 @@
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  @click="(row.userId, row.name)"
-                  :disabled="row.status === 'ACTIVE'"
+                  @click="handleResetPassword(row.id)"
                 >
                   Reenviar Correo 
                   <CustomIcons name="Reload" class="ml-auto" />
@@ -79,7 +81,7 @@
         v-model:open="openModal"
       >
         <AdministratorsForm
-          :user-id="admsUserId"
+          :id="admsUserId"
           :onSubmit="admsUserId !== undefined ? handleEdit : handleCreate"
         />
       </SheetContent>
@@ -100,17 +102,18 @@ import CustomTable from "@/components/ui/custom-table/CustomTable.vue";
 import CustomChip from "@/components/ui/custom-chip/CustomChip.vue";
 import CustomIcons from "@/components/ui/custom-icons/CustomIcons.vue";
 import CustomPagination from "@/components/ui/custom-pagination/CustomPagination.vue";
+import { userType } from '~/constants/administrators';
 import type { IAdminsLItem } from "@/types/Administrators.ts";
 import { administratorsHeader } from "~/constants/administrators";
 import ContentLayout from "~/layouts/default/ContentLayout.vue";
 import CustomSimpleCard from "~/components/ui/custom-simple-card/CustomSimpleCard.vue";
 
 const route = useRoute()
-const {page, sortOptions, onSort, suspendUser,createUser, editUser} = useAdmins();
+const {page, sortOptions, onSort, suspendUser,createUser, editUser, resetUser, getExportUser} = useAdmins();
 const { openConfirmModal, updateConfirmModal } = useConfirmModal();
 const filterOptions = ref(`[{"field":"type","type":"not","value": "PARTICIPANT"}]`)
 const openModal = ref(false)
-const admsUserId = ref(undefined)
+const admsUserId = ref<number | undefined>(undefined)
 const BASE_ADM_URL = "/user-management";
 const onSearch = (item: {[key: string]: string }) => {
   console.log(item)
@@ -139,17 +142,17 @@ const adminsData= computed(() => data.value.data.map((item: IAdminsLItem) => ({
     fullName: `${item.firstName} ${item.lastName}`,
     document: `${item.documentType} - ${item.documentIdentifier}`,
     cellphone: item.phoneNumber,
-    organization: "Organización", 
+    organization: item.organizations.map(org => org.name).join(', '),
     ...item
   })))
 
 
-  const handleSuspend = async (userId: string, fullName: string) => {
+  const handleSuspend = async (id: string, fullName: string) => {
   openConfirmModal({
     title: "Suspender usuario",
     message: `¿Estás seguro de suspender a ❝${fullName}❞?`,
     callback: async () => {
-      const { status, error }: any = await suspendUser(userId);
+      const { status, error }: any = await suspendUser(id);
       if (status.value === "success") {
         updateConfirmModal({
           title: "¡Suspensión exitosa!",
@@ -170,12 +173,12 @@ const adminsData= computed(() => data.value.data.map((item: IAdminsLItem) => ({
 
 const handleUpdateForm = async (user: any) => {
   openModal.value = true;
-  admsUserId.value = user.userId;
+  admsUserId.value = user.id;
 };
 
 const handleCreate = async (values: any) => {
-  openConfirmModal({
-    title: 'Crear usuario', message: '¿Estás seguro de que deseas crear este usuario?',
+  console.log("handleCreate ejecutado", values); 
+  openConfirmModal({title: 'Crear usuario', message: '¿Estás seguro de que deseas crear este usuario?',
     callback: async () => {
       const { status, error } : any = await createUser(values);
       if (status.value === 'success') {
@@ -199,6 +202,7 @@ const handleCreate = async (values: any) => {
 };
 
 const handleEdit = async (values: any) => {
+  console.log("handleEdit ejecutado", values);
   openConfirmModal({
     title: 'Actualizar usuario', message: '¿Estás seguro de que deseas actualizar este usuario?', callback: async () => {
       const { status, error } : any = await editUser(values);
@@ -217,6 +221,65 @@ const handleEdit = async (values: any) => {
           "El usuario no se pudo actualizar, intentalo más tarde";
         updateConfirmModal({
           title: "Error al actualizar usuario",
+          message: eMsg,
+          type: "error",
+        });
+      }
+    },
+  });
+};
+
+const handleResetPassword = async (values: any) => {
+  openConfirmModal({
+    title: 'Restablecer contraseña de usuario', message: '¿Estás seguro de que deseas restablecer contraseña de usuario?', callback: async () => {
+      const { status, error } : any = await resetUser(values);
+      if (status.value === 'success') {
+        openModal.value = false;
+        refresh();
+        updateConfirmModal({
+          title: "Contraseña de usuario restablecida",
+          message: "El usuario ha restablecido la contraseña exitosamente",
+          type: "success",
+        });
+      } else {
+        const eMsg =
+          error.value.data?.errors?.[0].message ||
+          error.value.data.message ||
+          "El usuario no se pudo restablecer la contraseña de usuario, intentalo más tarde";
+        updateConfirmModal({
+          title: "Error al restablecer contraseña de usuario",
+          message: eMsg,
+          type: "error",
+        });
+      }
+    },
+  });
+};
+
+const handleExport = async () => {
+  openConfirmModal({
+    title: "Exportar usuarios",
+    message: "¿Estás seguro de que deseas exportar los usuarios?",
+    callback: async () => {
+      const { status, error, file }: any = await getExportUser();
+      if (status.value === "success") {
+        const url = window.URL.createObjectURL(new Blob([file]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "usuarios_exportados.xlsx");
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        
+        updateConfirmModal({
+          title: "Exportación exitosa",
+          message: "Los usuarios han sido exportados exitosamente.",
+          type: "success",
+        });
+      } else {
+        const eMsg = error.value?.data?.message || "Error al exportar usuarios. Inténtalo de nuevo más tarde.";
+        updateConfirmModal({
+          title: "Error al exportar usuarios",
           message: eMsg,
           type: "error",
         });
