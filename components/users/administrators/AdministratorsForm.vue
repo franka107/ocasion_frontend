@@ -4,18 +4,27 @@ import { useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
 import type { IAdminsLItem } from '@/types/Administrators';
+import { userType } from '~/constants/administrators';
+
 import { X } from "lucide-vue-next";
 import CustomSelect from "~/components/ui/custom-select/CustomSelect.vue";
+import type { Organization } from '@/types/Administrators';
+import AdministratorsForm from '~/components/users/administrators/AdministratorsForm.vue';
 
 const BASE_ADM_URL = "/user-management";
+const BASE_ORG_URL = "/organization-management";
+const BASE_ROLE_URL = '/role-configuration';
+let form: any;
+const {getUser} = useAdmins();
 const props = defineProps<{
-  userId: number | undefined;
+  id: number | undefined;
   onSubmit: (values: any) => void;
 }>();
-
+const userTypesOptions = Array.from(userType).map(([id,name]) => ({ id, name }));
 const formSchema = toTypedSchema(
   z.object({
-    fullName: z.string().min(2, "El nombre y apellidos es requerido").max(100),
+    firstName: z.string().min(1, "El nombre es requerido"),
+    lastName: z.string().min(1, "El apellido es requerido"),
     documentType: z.string().min(1, "Tipo de documento es requerido"),
     documentIdentifier: z.string()
       .regex(/^\d+$/, "Este campo debe contener solo dígitos.")
@@ -27,42 +36,91 @@ const formSchema = toTypedSchema(
       .optional()
       .nullable(),
     type: z.string().min(1, "Tipo de usuario es requerido"),
-    organization: z.string().min(1, "La organización es requerida"),
-    userRole: z.array(z.string()).min(1, "El rol de usuario es requerido"),
+    organizations: z.array(z.string()).min(1, "La organización es requerida"),
+    roles: z.array(z.string()).min(1, "El rol de usuario es requerido"), 
   }),
 );
-interface AdminsForm extends IAdminsLItem {
-  addressLine1?: string;
+interface AdministratorsForm extends Omit<IAdminsLItem,"organizations"> {
+  organizations?:string[];
+  roles?: string[];
 }
 
-const test = ref<any>([]);
-const form = useForm({
-  validationSchema: formSchema,
-  initialValues: {
-    fullName: '',
-    documentType: '',
-    documentIdentifier: '',
-    phoneNumber: '',
-    email: '',
-    type: '',
-    organization: '',
-    userRole: [],
-  }
-});
-const userTypes = ref<Array<{ id: string; name: string }>>([]);
+if (props.id) {
+      const { data: userData } = await getUser(props.id);
+      const organizationsFormatted = userData.value.organizations.map((item )=> item.rucNumber)
+      const userDataFormatted :  AdministratorsForm = { ...userData.value, organizations: organizationsFormatted }    
+ 
+      form = useForm({
+        validationSchema: formSchema,
+        initialValues: userDataFormatted,
+      });
+} else {
+      form = useForm({ validationSchema: formSchema });
+}
 
-const fetchUserTypes = async () => {
+
+const organizations = ref<Array<Organization>>([]);
+const roles = ref<Array<{ id: string; name: string }>>([]);
+
+const fetchOrganizations = async () => {
   try {
-    const { data } = await useAPI("/user-management", { default: () => [] });
-    const typesSet = new Set(data.value.map((user: any) => user.type));
-    userTypes.value = Array.from(typesSet).map(type => ({
-      id: type, 
-      name: type 
+    const { data } = await useAPI(`${BASE_ORG_URL}/find-organizations`, {
+      default: () => [],
+    });
+    organizations.value = data.value.map((org: any) => ({
+      rucNumber: org.rucNumber,
+      name: org.name
     }));
   } catch (error) {
-    console.error("Error al cargar los tipos de usuario:", error);
+    console.error("Error al cargar organizaciones:", error);
   }
 };
+
+const fetchRoles = async () => {
+  try {
+    const { data } = await useAPI(`${BASE_ROLE_URL}/find-roles`, {
+      default: () => [],
+    });
+    roles.value = data.value; 
+  } catch (error) {
+    console.error("Error al cargar roles:", error);
+  }
+};
+if (props.id) {
+  await Promise.all([
+    fetchOrganizations(),
+    fetchRoles()
+  ]);
+} else {
+  await Promise.all([fetchOrganizations(), fetchRoles()]);
+}
+
+const formattedOrganizations = computed(() => {
+  return organizations.value.map(org => ({
+    id: org.rucNumber,
+    name: org.name
+  }));
+});
+
+const onSubmit = form.handleSubmit((values: any) => {
+  const { organizations, roles, ...restValues } = values;
+
+  const formattedValues = {
+    ...restValues,
+    organizations: organizations.map((orgRucNumber: string) => ({
+      rucNumber: orgRucNumber,
+    })),
+    roles: roles.map((roleId: string) => ({
+      id: roleId,
+    })),
+  };
+
+  if (props.id) {
+    formattedValues.id = props.id;
+  }
+
+  props.onSubmit(formattedValues);
+});
 
 </script>
 
@@ -72,28 +130,43 @@ const fetchUserTypes = async () => {
       <X class="w-4 h-4 text-muted-foreground" />
     </SheetClose>
     <SheetTitle class="text-xl font-medium text-[#64748B]">{{
-      props.userId
+      props.id
         ? "Actualizar datos de usuario"
         : "Crear usuario"
     }}</SheetTitle>
   </SheetHeader>
   <div class="flex-grow overflow-y-auto no-scrollbar flex flex-col">
     <!-- <Form> -->
-    <!-- <form @submit="onSubmit"> -->
       <form class="flex flex-col gap-4 flex-grow p-5" @submit="onSubmit">
-        <!-- Nombre Completo -->
-        <FormField v-slot="{ componentField }" name="fullName">
-          <FormItem>
+       
+        <div class="flex gap-2">
+        <!-- Nombre  -->
+        <FormField v-slot="{ componentField }" name="firstName">
+          <FormItem class="w-1/2">
             <FormControl>
               <Input
                 type="text"
-                placeholder="Nombre y apellidos"
+                placeholder="Nombres"
                 v-bind="componentField"
               />
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
+        <!-- Apellido-->
+        <FormField v-slot="{ componentField }" name="lastName">
+          <FormItem class="w-1/2">
+            <FormControl>
+              <Input
+                type="text"
+                placeholder="Apellidos"
+                v-bind="componentField"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+        </div>
 
         <div class="flex gap-2">
         <!-- Tipo de Documento -->
@@ -169,60 +242,42 @@ const fetchUserTypes = async () => {
         <FormField v-slot="{ componentField }" name="type">
           <FormItem>
             <FormControl>
-              <Select
+              <CustomSelect
                 v-bind="componentField"
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Tipo de Usuario" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectGroup>
-                      <SelectItem value="type">SUPER_ADMIN</SelectItem>
-                      <SelectItem value="type">ORGANIZATION_ADMIN</SelectItem>
-                      <SelectItem value="type">PLATFORM_USER</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-              </Select>
+                :items="userTypesOptions"
+                placeholder="Tipo de Usuario" />
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
-        <!-- Organización -->
-        <FormField v-slot="{ componentField }" name="organization">
-          <FormItem>
-            <FormControl>
-              <Select v-bind="componentField">
-                <SelectTrigger>
-                  <SelectValue placeholder="Organización" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                      <SelectItem value="Organización">Organización</SelectItem>
-                    </SelectGroup>
-                </SelectContent>
-              </Select>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-      <!-- Rol Usuario -->
-      <FormField v-slot="{ componentField }" name="userRole">
+        <!-- Organización -->        
+        <FormField v-slot="{ componentField }" name="organizations">
           <FormItem>
             <FormControl>
               <CustomSelect
                 v-bind="componentField"
                 multiple
-                :items="[{ id: 'rol', name: 'Rol Usuario'}, { id: 'rol2', name: 'Rol Usuaro2'}, { id: 'ro3l', name: 'Rol Usuario3'}]"
+                :items="formattedOrganizations"
+                placeholder="Organización" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+      <!-- Rol Usuario -->
+      <FormField v-slot="{ componentField }" name="roles">
+          <FormItem>
+            <FormControl>
+              <CustomSelect
+                v-bind="componentField"
+                multiple
+                :items="roles"
                 placeholder="Rol Usuario" 
               />
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
-      </form>
-
-      <!-- Botón de Submit -->
-      <!-- <Button type="submit">Guardar</Button> -->
+        <!-- Botón de Submit -->
       <SheetFooter class="mt-auto">
         <Button
           type="submit"
@@ -236,10 +291,10 @@ const fetchUserTypes = async () => {
             )
           "
         >
-          {{ props.userId ? "Actualizar datos" : "Registrar" }}
+          {{ props.id ? "Actualizar datos" : "Crear usuario" }}
         </Button>
       </SheetFooter>
-    <!-- </form> -->
-    <!-- </Form> -->
+      </form>
+      
   </div>
 </template>
