@@ -117,7 +117,6 @@ const openModal = ref(false)
 const admsUserId = ref<number | undefined>(undefined)
 const BASE_ADM_URL = "/user-management";
 const onSearch = (item: {[key: string]: string }) => {
-  console.log(item)
   const filters = [
     { field:"type", type:"not", value:"PARTICIPANT" || ''},
     { field: 'firstName', type: 'like', value: item.fullName || '' }
