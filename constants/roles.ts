@@ -1,15 +1,31 @@
-import type { HeaderItem } from "@/components/ui/custom-table/CustomTable.vue";
+import type { HeaderItem, SearchItem } from "@/components/ui/custom-table/CustomTable.vue";
 
+export const eventSearch: SearchItem[] = [
+  {
+      key: 'name',
+      type: 'text',
+      placeholder: 'Buscar rol',
+      elementClass: 'min-w-[400px]',
+      position: 2,
+  },
+  {
+    key: "status",
+    type: "select",
+    placeholder: "Filtrar por estado",
+    items: [
+      { text: "Activo", value: "ACTIVE" },
+      { text: "Inactivo", value: "INACTIVE" },
+      { text: "Todos", value: " " },
+    ],
+    elementClass: "min-w-[400px]",
+    position: 3,
+  },
+]
 export const roleHeader: HeaderItem[] = [
   {
     key: "name",
     label: "Nombre",
-    sortable: true,
-    search: {
-      type: "text",
-      placeholder: "Buscar rol",
-      position: 1,
-    },
+    sortable: true
   },
   {
     key: "usersCount",
@@ -35,17 +51,6 @@ export const roleHeader: HeaderItem[] = [
     key: "status",
     label: "Estado",
     sortable: true,
-    search: {
-      type: "select",
-      placeholder: "Filtrar por estado",
-      items: [
-        { text: "Activo", value: "ACTIVE" },
-        { text: "Inactivo", value: "INACTIVE" },
-        { text: "Todos", value: " " },
-      ],
-      elementClass: "min-w-[400px]",
-      position: 3,
-    },
   },
   {
     key: "actions",

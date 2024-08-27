@@ -11,6 +11,7 @@
       <CustomTable
         :data="adminsData"
         :header="administratorsHeader"
+        :search="administratorsSearch"
         @onSort="onSort"
         @onSearch="onSearch"
       >
@@ -104,7 +105,7 @@ import CustomIcons from "@/components/ui/custom-icons/CustomIcons.vue";
 import CustomPagination from "@/components/ui/custom-pagination/CustomPagination.vue";
 import { userType } from '~/constants/administrators';
 import type { IAdminsLItem } from "@/types/Administrators.ts";
-import { administratorsHeader } from "~/constants/administrators";
+import { administratorsHeader, administratorsSearch } from "~/constants/administrators";
 import ContentLayout from "~/layouts/default/ContentLayout.vue";
 import CustomSimpleCard from "~/components/ui/custom-simple-card/CustomSimpleCard.vue";
 
@@ -119,8 +120,9 @@ const onSearch = (item: {[key: string]: string }) => {
   console.log(item)
   const filters = [
     { field:"type", type:"not", value:"PARTICIPANT" || ''},
-    { field: 'firstName', type: 'like', value: item.fullName || '' },
+    { field: 'fullName', type: 'like', value: item.fullName || '' },
     { field: 'status', type: 'equal', value: item.status || '' },
+    { field: 'createdAt', type: 'equal', value: item.createdAt || '' },
 
   ]
   filterOptions.value = JSON.stringify(filters)

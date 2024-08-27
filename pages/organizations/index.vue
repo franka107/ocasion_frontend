@@ -11,6 +11,7 @@
         <CustomTable
           :data="orderData"
           :header="organizationHeader"
+          :search="organizationSearch"
           @onSort="onSort"
           @onSearch="onSearch"
         >
@@ -110,7 +111,7 @@ import CustomChip from "@/components/ui/custom-chip/CustomChip.vue";
 import CustomIcons from "@/components/ui/custom-icons/CustomIcons.vue";
 import CustomPagination from "@/components/ui/custom-pagination/CustomPagination.vue";
 import type { OrganizationItem } from "@/types/Order.ts";
-import { organizationHeader } from "~/constants/organization";
+import { organizationHeader, organizationSearch } from "~/constants/organization";
 import ContentLayout from "~/layouts/default/ContentLayout.vue";
 import CustomSimpleCard from "~/components/ui/custom-simple-card/CustomSimpleCard.vue";
 

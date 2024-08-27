@@ -1,5 +1,5 @@
 <template>
-  <div class="my-2">
+  <div>
     <Popover>
       <PopoverTrigger as-child>
         <Button

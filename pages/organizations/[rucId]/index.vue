@@ -6,6 +6,7 @@
         <CustomTable
           :data="eventsData"
           :header="eventListHeaders"
+          :search="eventSearch"
           @onSort="onSort"
           @onSearch="onSearch"
         >
@@ -125,7 +126,7 @@ import CustomTable from "@/components/ui/custom-table/CustomTable.vue";
 import CustomChip from "@/components/ui/custom-chip/CustomChip.vue";
 import CustomIcons from "@/components/ui/custom-icons/CustomIcons.vue";
 import CustomPagination from "@/components/ui/custom-pagination/CustomPagination.vue";
-import { eventListHeaders, eventStatus, eventType } from "~/constants/events";
+import { eventListHeaders, eventStatus, eventType, eventSearch } from "~/constants/events";
 import type { IEventLItem, IOrganizationSummary } from "@/types/Event";
 import type { IDataResponse } from "@/types/Common";
 import dayjs from "dayjs";
