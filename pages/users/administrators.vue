@@ -120,11 +120,10 @@ const onSearch = (item: {[key: string]: string }) => {
   console.log(item)
   const filters = [
     { field:"type", type:"not", value:"PARTICIPANT" || ''},
-    { field: 'fullName', type: 'like', value: item.fullName || '' },
-    { field: 'status', type: 'equal', value: item.status || '' },
-    { field: 'createdAt', type: 'equal', value: item.createdAt || '' },
-
+    { field: 'firstName', type: 'like', value: item.fullName || '' }
   ]
+  item.status && filters.push({ field: 'status', type: 'equal', value: item.status || '' })
+  item.createdAt && filters.push({ field: 'createdAt', type: 'equal', value: item.createdAt || '' })
   filterOptions.value = JSON.stringify(filters)
 }
 
@@ -263,25 +262,25 @@ const handleExport = async () => {
     title: "Exportar usuarios",
     message: "¿Estás seguro de que deseas exportar los usuarios?",
     callback: async () => {
-      const { status, error, file }: any = await getExportUser();
-      if (status.value === "success") {
-        const url = window.URL.createObjectURL(new Blob([file]));
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", "usuarios_exportados.xlsx");
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        
-        updateConfirmModal({
-          title: "Exportación exitosa",
-          message: "Los usuarios han sido exportados exitosamente.",
-          type: "success",
-        });
-      } else {
-        const eMsg = error.value?.data?.message || "Error al exportar usuarios. Inténtalo de nuevo más tarde.";
-        updateConfirmModal({
-          title: "Error al exportar usuarios",
+const { status, error, file }: any = await getExportUser(filterOptions.value);
+if (status.value === "success") {
+  const url = window.URL.createObjectURL(new Blob([file]));
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute("download", "usuarios_exportados.xlsx");
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  
+  updateConfirmModal({
+    title: "Exportación exitosa",
+    message: "Los usuarios han sido exportados exitosamente.",
+    type: "success",
+  });
+} else {
+  const eMsg = error.value?.data?.message || "Error al exportar usuarios. Inténtalo de nuevo más tarde.";
+  updateConfirmModal({
+    title: "Error al exportar usuarios",
           message: eMsg,
           type: "error",
         });

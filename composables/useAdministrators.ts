@@ -85,10 +85,13 @@ export function useAdmins() {
       );
       return { status, error, data}
     };
-    const getExportUser = async () => {
+    const getExportUser = async (filterOptions: string) => {
       const { status, error, data }: any = await useAPI(
         `${BASE_ADM_URL}/export-users`,
         {
+          query: {
+            filterOptions: filterOptions,
+          },
           method: "GET",
           responseType: "blob", 
         } as any
