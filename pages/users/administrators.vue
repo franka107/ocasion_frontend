@@ -119,7 +119,7 @@ const BASE_ADM_URL = "/user-management";
 const onSearch = (item: {[key: string]: string }) => {
   const filters = [
     { field:"type", type:"not", value:"PARTICIPANT" || ''},
-    { field: 'firstName', type: 'like', value: item.fullName || '' }
+    { field: 'fullName', type: 'like', value: item.fullName || '' }
   ]
   item.status && filters.push({ field: 'status', type: 'equal', value: item.status || '' })
   item.createdAt && filters.push({ field: 'createdAt', type: 'equal', value: item.createdAt || '' })
