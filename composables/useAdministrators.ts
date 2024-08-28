@@ -1,8 +1,6 @@
 import type { IAdminsLItem } from "~/types/Administrators"
 const BASE_ADM_URL = '/user-management'
-interface AdministratorsForm extends IAdminsLItem {
-  roles?: string[];
-}
+
 
 export function useAdmins() {
 
@@ -74,7 +72,7 @@ export function useAdmins() {
     };
 
     const getUser = async (id: number | string) => {
-      const { status, error, data } = await useAPI<AdministratorsForm>(
+      const { status, error, data } = await useAPI<IAdminsLItem>(
         `${BASE_ADM_URL}/get-user-detail`,
         {
           method: "GET",

@@ -36,11 +36,11 @@ const formSchema = toTypedSchema(
       .optional()
       .nullable(),
     type: z.string().min(1, "Tipo de usuario es requerido"),
-    organizations: z.array(z.string()).min(1, "La organización es requerida"),
+    organizations: z.union([z.array(z.string()).min(1, "La organización es requerida"), z.string().min(1, "La organización es requerida")]),
     roles: z.array(z.string()).min(1, "El rol de usuario es requerido"), 
   }),
 );
-interface AdministratorsForm extends Omit<IAdminsLItem,"organizations"> {
+interface AdministratorsForm extends Omit<IAdminsLItem,"organizations" | "roles"> {
   organizations?:string[];
   roles?: string[];
 }
@@ -48,7 +48,8 @@ interface AdministratorsForm extends Omit<IAdminsLItem,"organizations"> {
 if (props.id) {
       const { data: userData } = await getUser(props.id);
       const organizationsFormatted = userData.value.organizations.map((item )=> item.rucNumber)
-      const userDataFormatted :  AdministratorsForm = { ...userData.value, organizations: organizationsFormatted }    
+      const rolesFormatted = userData.value.roles?.map((item )=> item.id)
+      const userDataFormatted :  AdministratorsForm = { ...userData.value, organizations: organizationsFormatted, roles: rolesFormatted };    
  
       form = useForm({
         validationSchema: formSchema,
@@ -57,7 +58,7 @@ if (props.id) {
 } else {
       form = useForm({ validationSchema: formSchema });
 }
-
+const isOrgSimpleSelect = computed(() => ["ORGANIZATION_ADMIN", "ORGANIZATION_USER"].includes(form.values.type));
 
 const organizations = ref<Array<Organization>>([]);
 const roles = ref<Array<{ id: string; name: string }>>([]);
@@ -104,10 +105,10 @@ const formattedOrganizations = computed(() => {
 
 const onSubmit = form.handleSubmit((values: any) => {
   const { organizations, roles, ...restValues } = values;
-
+  const organizationFormatted =  Array.isArray(organizations) ? organizations : [organizations];
   const formattedValues = {
     ...restValues,
-    organizations: organizations.map((orgRucNumber: string) => ({
+    organizations: organizationFormatted.map((orgRucNumber: string) => ({
       rucNumber: orgRucNumber,
     })),
     roles: roles.map((roleId: string) => ({
@@ -244,6 +245,7 @@ const onSubmit = form.handleSubmit((values: any) => {
             <FormControl>
               <CustomSelect
                 v-bind="componentField"
+                @update:model-value="form.setFieldValue('organizations', isOrgSimpleSelect ? '': []);"
                 :items="userTypesOptions"
                 placeholder="Tipo de Usuario" />
             </FormControl>
@@ -256,7 +258,7 @@ const onSubmit = form.handleSubmit((values: any) => {
             <FormControl>
               <CustomSelect
                 v-bind="componentField"
-                multiple
+                :multiple="!isOrgSimpleSelect"
                 :items="formattedOrganizations"
                 placeholder="Organización" />
             </FormControl>
