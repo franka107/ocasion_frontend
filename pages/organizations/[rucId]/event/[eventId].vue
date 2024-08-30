@@ -4,6 +4,7 @@
       <EventDetails :eventDetail="eventDetail" />
       <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
         <CustomTable
+           v-if="!showBids"
           :data="offerData"
           :header="offerHeader"
           :search="offerSearch"
@@ -12,6 +13,7 @@
         >
           <template #action-button>
             <Button
+              v-if="eventDetail?.status !== 'CREATED'"
               @click="
                 () => {
                   offerId = undefined;
@@ -19,8 +21,14 @@
                 }
               "
               variant="default"
-              >Crear oferta</Button
-            >
+              >Crear oferta
+            </Button>
+            <Button
+              v-else
+              @click="handleViewBids"
+              variant="default"
+              >Ver pujas
+            </Button>
           </template>
           <template #attachedFiles>
             <div
@@ -71,6 +79,74 @@
             ></CustomChip>
           </template>
         </CustomTable>
+        <div>
+        <CustomTable
+          v-if="showBids"
+          :data="bidData"
+          :header="pujasHeader"
+          :search="pujasSearch"
+          @onSort="onSort"
+          @onSearch="onSearch"
+        >
+        <template #action-button>
+          <Button
+             @click=""
+             variant="default"
+             class="bg-white text-primary border border-primary hover:bg-accent"
+          > Rechazar puja
+          </Button>
+          <Button
+            @click=""
+            class="bg-white text-primary border border-primary hover:bg-accent"
+            >Aceptar puja
+            </Button>
+            <Button
+            @click=""
+            variant="default"
+            >Contraofertar
+            </Button>
+        </template>
+        <template #actions="{ row }">
+          <div class="flex justify-center">
+            <DropdownMenu>
+              <DropdownMenuTrigger as-child>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  class="h-8 data-[state=open]:bg-accent"
+                >
+                  <CustomIcons name="VerticalDots" class="w-6 h-6" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" class="bg-primary text-white">
+                <DropdownMenuItem
+                  @click="() => {bindsId = undefined;openModal = true;} "
+                >
+                  Historial de puja 
+                  <CustomIcons name="Reload" class="ml-auto" />
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </template>
+        <template #status="{ row }">
+            <CustomChip
+              :text="BidStatus.get(row.status) || ''"
+            ></CustomChip>
+        </template>
+        </CustomTable>  
+        <!-- Fomulario -->
+        <SheetContent
+          class="flex flex-col h-full"
+          v-model:open="openModal"
+        >
+          <BindsForm
+            :id="bindsId"
+            :onSubmit="bindsId !== undefined ? handleEdit : handleCreate"
+          />
+        </SheetContent>
+      <!-- Fomulario -->
+      </div>  
         <SheetContent
           v-model:open="openModal"
           class="flex flex-col h-full"
@@ -98,18 +174,28 @@
 import EventDetails from "~/components/events/EventDetails.vue";
 const BASE_OFFERS_URL = "/offer-management";
 import { offerHeader, offerStatus, offerSearch } from "@/constants/offer";
+import { pujasHeader, pujasSearch, BidStatus} from "@/constants/pujas";
 import type { OfferListItem } from "~/types/Offer";
+import type { OfferWithBidDto } from "~/types/Pujas";
 import CustomIcons from "~/components/ui/custom-icons/CustomIcons.vue";
 import OfferForm from "@/components/offers/OfferForm.vue";
+import HistoryForm from "@/components/history/HistoryForm.vue";
 import ContentLayout from "~/layouts/default/ContentLayout.vue";
 const { openConfirmModal, updateConfirmModal } = useConfirmModal();
 const { page, sortOptions, onSort, createOffer, editOffer } = useOfferAPI();
 
 const route = useRoute();
 const { getEvent } = useEvent();
+// const { getBind } = useEvent();
 const offerId = ref(undefined);
+const showBids = ref(false); 
+const bindsId = ref<number | undefined>(undefined)
+const bidData = ref([]); 
 const filterOptions = ref(
   `[{ "field": "event.id", "type": "equal", "value": "${route.params.eventId}" }]`,
+);
+const filterOptions2 = ref(
+  `[{ "field": "id", "type": "like", "value": "${route.params.eventId}" }]`,
 );
 const openModal = ref(false);
 const onSearch = (item: { [key: string]: string }) => {
@@ -147,6 +233,36 @@ const offerData = computed(() =>
     ...item,
   })),
 );
+
+const pujasData = computed(() => data.value.data.map((item: OfferWithBidDto) => ({
+    code: "1",
+    date: "DD/MM/AAAA 12:20",
+    amount:"10000",
+    ...item,
+  })),
+);
+
+// Datos de puja 
+const refreshBids = async () => {
+  const { data: bidData }: any = await useAPI(`${BASE_OFFERS_URL}/find-offers-with-bid-paginated`, {
+    query: {
+      limit: 8,
+      page,
+      filterOptions2,
+      sortOptions,
+    },
+  } as any);
+// bidData.value = bidData.data;
+console.log("Data1", bidData.value); 
+};
+await refreshBids();
+
+//Funcion cambia vista de pujas
+const handleViewBids = async () => {
+  await refreshBids();
+  showBids.value = true; 
+  console.log("Bids view enabled", showBids.value);
+};
 
 const handleCreate = async (values: any) => {
   openConfirmModal({
