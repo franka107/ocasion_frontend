@@ -85,23 +85,28 @@
           :data="pujasData"
           :header="pujasHeader"
           :search="pujasSearch"
+          multipleSelect
           @onSort="onSort"
           @onSearch="onSearch"
+          @on-multiple-select="($event)=> { selectedMultipleData = $event; }"
         >
         <template #action-button>
           <Button
              @click=""
              variant="default"
+             :disabled="disableMultipleSelect"
              class="bg-white text-primary border border-primary hover:bg-accent"
           > Rechazar puja
           </Button>
           <Button
             @click=""
+            :disabled="disableMultipleSelect"
             class="bg-white text-primary border border-primary hover:bg-accent"
             >Aceptar puja
             </Button>
             <Button
             @click=""
+            :disabled="disableMultipleSelect"
             variant="default"
             >Contraofertar
             </Button>
@@ -200,33 +205,24 @@ const filterOptions2 = ref(
 );
 const openModal = ref(false);
 const openModalOffer = ref(false); 
+const selectedMultipleData = ref({ type: 'empty', ids: [] });
+const disableMultipleSelect = computed(()=> selectedMultipleData.value.type === 'empty' && selectedMultipleData.value.ids.length === 0);
 const onSearch = (item: { [key: string]: string }) => {
   const filters = [{ field: "title", type: "like", value: item.title || "" }];
   filterOptions.value = JSON.stringify(filters);
 };
 
-Promise.all([
+const  [{ data: eventDetail }, { data, refresh }]: any = await Promise.all([
   getEvent(route.params.eventId as string),
   useAPI(`${BASE_OFFERS_URL}/find-offers`, {
     query: {
       limit: 8,
       page,
       filterOptions,
-      sortOptions: "[]",
+      sortOptions,
     },
   } as any),
 ]);
-// [] = await Promise.all
-const { data, refresh }: any = await useAPI(`${BASE_OFFERS_URL}/find-offers`, {
-  query: {
-    limit: 8,
-    page,
-    filterOptions,
-    sortOptions,
-  },
-} as any);
-const { data: eventDetail } = await getEvent(route.params.eventId as string);
-
 const offerData = computed(() =>
   data.value.data.map((item: OfferListItem) => ({
     brandName: item.carModel.brand.name,
