@@ -1,10 +1,10 @@
 import type { HeaderItem, SearchItem } from "@/components/ui/custom-table/CustomTable.vue";
 
-export const BidStatus = new Map<string, string>([
-    ['BASE', "Base"],
-    ['GIVEN_UP', "Desistida"],
-    ['WINNER', "Ganadora"],
-    ['DISCARDED', "Descartada"],
+export const BidStatus = new Map<string, { name: string; color: string }>([
+    ["BASE", { name: "Base", color: "purple" }],
+    ["GIVEN_UP", { name: "Desistida", color: "blue" }],
+    ["WINNER", { name: "Ganadora", color: "green" }],
+    ["DISCARDED", { name: "Decartada", color: "gray" }],
 ]);
 
 export const pujasSearch: SearchItem[] = [
