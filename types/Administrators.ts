@@ -11,6 +11,7 @@ export interface IAdminsLItem {
     createdAt: string
     updatedAt: string
     organizations: Organization[]
+    roles?: Roles[]
   }
   
   export interface Organization {
@@ -18,6 +19,10 @@ export interface IAdminsLItem {
     name: string
   }
 
+  export interface Roles {
+    id: string
+    name: string
+  }
   export enum UserType {
     SuperAdmin = 'SUPER_ADMIN', //Super Adminitrador
     PlatformAdmin = 'PLATFORM_ADMIN', // Administrador de plataforma

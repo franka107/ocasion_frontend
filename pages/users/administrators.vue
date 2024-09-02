@@ -11,15 +11,14 @@
         <CustomTable
           :data="adminsData"
           :header="administratorsHeader"
+          :search="administratorsSearch"
           @onSort="onSort"
           @onSearch="onSearch"
         >
           <template #action-button>
             <Button
+              @click="handleExport"
               variant="default"
-              href="http://localhost:4000/api/v1/user-management/export-users"
-              target="_blank"
-              as="a"
               class="bg-white text-primary border border-[#052339]"
             >
               <CustomIcons name="Download" class="ml-auto" />
@@ -111,7 +110,10 @@ import CustomIcons from "@/components/ui/custom-icons/CustomIcons.vue";
 import CustomPagination from "@/components/ui/custom-pagination/CustomPagination.vue";
 import { userType } from "~/constants/administrators";
 import type { IAdminsLItem } from "@/types/Administrators.ts";
-import { administratorsHeader } from "~/constants/administrators";
+import {
+  administratorsHeader,
+  administratorsSearch,
+} from "~/constants/administrators";
 import ContentLayout from "~/layouts/default/ContentLayout.vue";
 import CustomSimpleCard from "~/components/ui/custom-simple-card/CustomSimpleCard.vue";
 
@@ -134,12 +136,18 @@ const openModal = ref(false);
 const admsUserId = ref<number | undefined>(undefined);
 const BASE_ADM_URL = "/user-management";
 const onSearch = (item: { [key: string]: string }) => {
-  console.log(item);
   const filters = [
     { field: "type", type: "not", value: "PARTICIPANT" || "" },
-    { field: "firstName", type: "like", value: item.fullName || "" },
-    { field: "status", type: "equal", value: item.status || "" },
+    { field: "fullName", type: "like", value: item.fullName || "" },
   ];
+  item.status &&
+    filters.push({ field: "status", type: "equal", value: item.status || "" });
+  item.createdAt &&
+    filters.push({
+      field: "createdAt",
+      type: "equal",
+      value: item.createdAt || "",
+    });
   filterOptions.value = JSON.stringify(filters);
 };
 
@@ -289,12 +297,14 @@ const handleExport = async () => {
     title: "Exportar usuarios",
     message: "¿Estás seguro de que deseas exportar los usuarios?",
     callback: async () => {
-      const { status, error, file }: any = await getExportUser();
+      const { status, error, file }: any = await getExportUser(
+        filterOptions.value,
+      );
       if (status.value === "success") {
         const url = window.URL.createObjectURL(new Blob([file]));
         const link = document.createElement("a");
         link.href = url;
-        link.setAttribute("download", "usuarios_exportados.csv");
+        link.setAttribute("download", "usuarios_exportados.xlsx");
         document.body.appendChild(link);
         link.click();
         link.remove();

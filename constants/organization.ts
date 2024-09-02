@@ -1,32 +1,18 @@
-import type { HeaderItem } from '@/components/ui/custom-table/CustomTable.vue';
-
-export const organizationHeader: HeaderItem[] = [{
-    key: 'rucNumber',
-    label: 'RUC',
-    sortable: true,
-    search: {
+import type { HeaderItem, SearchItem } from '@/components/ui/custom-table/CustomTable.vue';
+export const organizationSearch: SearchItem[] = [
+    {
+        key: 'rucNumber',
         type: 'text',
         placeholder: 'Buscar RUC',
         position: 1,
-    }
-    }, {
-    key: 'name',
-    label: 'Razón social',
-    sortable: true,
-    search: {
+    },{
+        key: 'name',
         type: 'text',
         placeholder: 'Buscar nombre de organización',
         elementClass: 'min-w-[400px]',
         position: 2,
-    }
-    }, {
-    key: 'date',
-    label: 'Fecha de inicio y fecha de fin del contrato',
     },{
-    key: 'status',
-    label: 'Estado',
-    sortable: true,
-    search: {
+        key: 'status',
         type: 'select',
         placeholder: 'Filtrar por estado',
         items: [
@@ -37,6 +23,22 @@ export const organizationHeader: HeaderItem[] = [{
         elementClass: 'min-w-[400px]',
         position: 3,
     }
+]
+export const organizationHeader: HeaderItem[] = [{
+    key: 'rucNumber',
+    label: 'RUC',
+    sortable: true,
+    }, {
+    key: 'name',
+    label: 'Razón social',
+    sortable: true,
+    }, {
+    key: 'date',
+    label: 'Fecha de inicio y fecha de fin del contrato',
+    },{
+    key: 'status',
+    label: 'Estado',
+    sortable: true,
     },{
     key: 'representativeFullName',
     label: 'Usuario',

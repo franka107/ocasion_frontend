@@ -1,4 +1,4 @@
-import type { HeaderItem } from "@/components/ui/custom-table/CustomTable.vue";
+import type { HeaderItem, SearchItem } from "@/components/ui/custom-table/CustomTable.vue";
 
 export const eventType = new Map<string, string>([
   ["HAND_OVER", "Puesta en mano"],
@@ -35,6 +35,15 @@ export const goodType = new Map<string, string>([
   ["SCRAP_MATERIAL", "Chatarra, materiales y residuos"],
   ["INDUSTRIAL_MACHINERY_AND_EQUIPMENT", "Industrial, maquinaria y equipo"],
 ]);
+
+export const eventSearch: SearchItem[] = [
+  {
+      key: 'name',
+      type: 'text',
+      placeholder: 'Buscar eventos',
+      position: 1,
+  }
+]
 export const eventListHeaders: HeaderItem[] = [
   {
     key: "id",
@@ -45,10 +54,6 @@ export const eventListHeaders: HeaderItem[] = [
     key: "name",
     label: "Evento",
     sortable: true,
-    search: {
-      type: "text",
-      placeholder: "Buscar eventos",
-    },
   },
   {
     key: "type",

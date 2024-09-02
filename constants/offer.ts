@@ -1,4 +1,4 @@
-import type { HeaderItem } from '@/components/ui/custom-table/CustomTable.vue';
+import type { HeaderItem, SearchItem } from '@/components/ui/custom-table/CustomTable.vue';
 
 export const offerStatus = new Map<string, { name: string, color: string}>([
     ['RETIRED', { name: 'Retirado', color: 'red'}],
@@ -8,7 +8,15 @@ export const offerStatus = new Map<string, { name: string, color: string}>([
     ['CANCELLED', { name: 'Cancelado', color: 'brown'}],
     ['REJECTED', { name: 'Rechazado', color: 'red'}],
 ]);
-
+export const offerSearch: SearchItem[] = [
+    {
+        key: 'title',
+        type: 'text',
+        placeholder: 'Buscar oferta',
+        elementClass: 'min-w-[400px]',
+        position: 2,
+    }
+]
 export const offerHeader: HeaderItem[] = [{
         key: 'id',
         label: 'N°',
@@ -17,12 +25,6 @@ export const offerHeader: HeaderItem[] = [{
         key: 'title',
         label: 'Bien',
         sortable: true,
-        search: {
-            type: 'text',
-            placeholder: 'Buscar oferta',
-            elementClass: 'min-w-[400px]',
-            position: 2,
-        }
     }, {
         key: 'brandName',
         sortable: true,

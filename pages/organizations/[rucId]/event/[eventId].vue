@@ -6,6 +6,7 @@
         <CustomTable
           :data="offerData"
           :header="offerHeader"
+          :search="offerSearch"
           @onSort="onSort"
           @onSearch="onSearch"
         >
@@ -96,7 +97,7 @@
 <script setup lang="ts">
 import EventDetails from "~/components/events/EventDetails.vue";
 const BASE_OFFERS_URL = "/offer-management";
-import { offerHeader, offerStatus } from "@/constants/offer";
+import { offerHeader, offerStatus, offerSearch } from "@/constants/offer";
 import type { OfferListItem } from "~/types/Offer";
 import CustomIcons from "~/components/ui/custom-icons/CustomIcons.vue";
 import OfferForm from "@/components/offers/OfferForm.vue";

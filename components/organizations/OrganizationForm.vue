@@ -410,6 +410,7 @@ const handleFilesChange = (files: File[]) => {
             <FormItem class="w-1/2">
               <FormControl>
                 <DateInput
+                  class="my-2"
                   @update:modelValue="componentField.onChange"
                   label="Fecha de inicio"
                   :value="componentField.modelValue"
@@ -424,6 +425,7 @@ const handleFilesChange = (files: File[]) => {
             <FormItem class="w-1/2">
               <FormControl>
                 <DateInput
+                  class="my-2"
                   @update:modelValue="componentField.onChange"
                   label="Fecha de fin"
                   :minValue="

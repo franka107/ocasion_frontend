@@ -1,24 +1,32 @@
 <template>
     <div class="w-full">
         <div class="w-full flex flex-row py-6 gap-x-4 justify-end">
-            <template v-for="(item, i) in searchComponents" :index="i">
-                <template v-if="item.search">
-                    <template v-if="item.search.type === 'text'">
-                        <Input v-model="searchValues[item.key]" type="string" :class="item.search.elementClass" :placeholder="item.search.placeholder" class="w-[200px]" />
+            <template v-for="(item, i) in search" :index="i">
+                <template v-if="item">
+                    <template v-if="item.type === 'text'">
+                        <Input v-model="searchValues[item.key]" type="string" :class="item.elementClass" :placeholder="item.placeholder" class="w-[200px]" />
                     </template>
-                    <template  v-else-if="item.search.type === 'select'">
-                        <Select  @update:model-value="event => { searchValues[item.key] = event === ' ' ? undefined : event }" :model-value="searchValues[item.key]" :class="item.search.elementClass">
+                    <template  v-else-if="item.type === 'select'">
+                        <Select  @update:model-value="event => { searchValues[item.key] = event === ' ' ? undefined : event }" :model-value="searchValues[item.key]" :class="item.elementClass">
                             <SelectTrigger class="w-[180px]">
-                                <SelectValue :placeholder="item.search.placeholder" />
+                                <SelectValue :placeholder="item.placeholder" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectGroup>
-                                    <SelectItem v-for="selectItem in item.search.items" :value="selectItem.value">
+                                    <SelectItem v-for="selectItem in item.items" :value="selectItem.value">
                                         {{ selectItem.text }}
                                     </SelectItem>
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
+                    </template>
+                    <template  v-else-if="item.type === 'date'">
+                        <DateInput
+                            @update:modelValue="event => { searchValues[item.key] = event === ' ' ? undefined : event }" :model-value="searchValues[item.key]" :class="item.elementClass"
+                            label="Fecha de creación"
+                            format="DD/MM/YYYY"
+                            :value="searchValues[item.key]"
+                        />
                     </template>
                 </template>
             </template>
@@ -91,6 +99,7 @@ export interface SearchItem {
     placeholder?: string
     position?: number
     items?: SearchSelectItem[]
+    key: string
     elementClass?: string
 }
 export interface HeaderItem {
@@ -104,6 +113,7 @@ export interface HeaderItem {
 interface Props { 
     data: DataItem[],
     header: HeaderItem[],
+    search?: SearchItem[],
     multipleSelect?: boolean,
     multipleSelectKey?: string,
     class?: string | object 
@@ -112,7 +122,6 @@ const props = withDefaults(defineProps<Props>(),{ multipleSelect: false, multipl
 
 const emit = defineEmits(["onSort","onSearch"])
 
-const searchComponents = computed(() => props.header.filter(item => item.search))
 const searchValues = reactive<{ [key: string]: string | undefined }>({})
 watch(()=> searchValues, (value) => {
     emit('onSearch', value)
