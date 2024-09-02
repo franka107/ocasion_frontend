@@ -82,7 +82,7 @@
         <div>
         <CustomTable
           v-if="showBids"
-          :data="bidData"
+          :data="pujasData"
           :header="pujasHeader"
           :search="pujasSearch"
           @onSort="onSort"
@@ -122,8 +122,10 @@
                 <DropdownMenuItem
                   @click="() => {bindsId = undefined;openModal = true;} "
                 >
-                  Historial de puja 
-                  <CustomIcons name="Reload" class="ml-auto" />
+                <div class="flex items-center space-x-2">
+                  <span>Historial de puja</span>
+                  <CustomIcons name="Clock-Timer" class="ml-auto" />
+                </div>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -131,24 +133,24 @@
         </template>
         <template #status="{ row }">
             <CustomChip
-              :text="BidStatus.get(row.status) || ''"
+              :text="BidStatus.get(row.status)?.name  || ''"
+              :variant="BidStatus.get(row.status)?.color as any"
             ></CustomChip>
         </template>
         </CustomTable>  
         <!-- Fomulario -->
         <SheetContent
-          class="flex flex-col h-full"
           v-model:open="openModal"
+          @pointer-down-outside="(e) => e.preventDefault()"
+          @interact-outside="(e) => e.preventDefault()"
+          class="flex flex-col h-full"
         >
-          <BindsForm
-            :id="bindsId"
-            :onSubmit="bindsId !== undefined ? handleEdit : handleCreate"
-          />
+          <HistoryForm :bindsId="bindsId" />
         </SheetContent>
       <!-- Fomulario -->
       </div>  
         <SheetContent
-          v-model:open="openModal"
+          v-model:open="openModalOffer"
           class="flex flex-col h-full"
           @pointer-down-outside="(e) => e.preventDefault()"
           @interact-outside="(e) => e.preventDefault()"
@@ -159,7 +161,7 @@
             :rucId="String(route.params.rucId)"
             :onsubmit="offerId !== undefined ? handleEdit : handleCreate"
           />
-        </SheetContent>
+        </SheetContent>´
       </div>
       <CustomPagination
         class="mt-5 mb-[19px]"
@@ -186,7 +188,6 @@ const { page, sortOptions, onSort, createOffer, editOffer } = useOfferAPI();
 
 const route = useRoute();
 const { getEvent } = useEvent();
-// const { getBind } = useEvent();
 const offerId = ref(undefined);
 const showBids = ref(false); 
 const bindsId = ref<number | undefined>(undefined)
@@ -198,6 +199,7 @@ const filterOptions2 = ref(
   `[{ "field": "id", "type": "like", "value": "${route.params.eventId}" }]`,
 );
 const openModal = ref(false);
+const openModalOffer = ref(false); 
 const onSearch = (item: { [key: string]: string }) => {
   const filters = [{ field: "title", type: "like", value: item.title || "" }];
   filterOptions.value = JSON.stringify(filters);
@@ -234,28 +236,31 @@ const offerData = computed(() =>
   })),
 );
 
-const pujasData = computed(() => data.value.data.map((item: OfferWithBidDto) => ({
-    code: "1",
-    date: "DD/MM/AAAA 12:20",
-    amount:"10000",
+const pujasData = computed(() => bidData.value.map((item: OfferWithBidDto, index: number) => ({
+    code: String(index + 1),
+    date: item.bid.createdAt,
+    amount: `$${item.bid.amount}`,
+    status: item.bid.status,
     ...item,
   })),
 );
 
 // Datos de puja 
 const refreshBids = async () => {
-  const { data: bidData }: any = await useAPI(`${BASE_OFFERS_URL}/find-offers-with-bid-paginated`, {
+  const { data: result }: any = await useAPI(`${BASE_OFFERS_URL}/find-offers-with-bid-paginated`, {
     query: {
-      limit: 8,
+      limit: 10,
       page,
       filterOptions2,
       sortOptions,
     },
   } as any);
-// bidData.value = bidData.data;
-console.log("Data1", bidData.value); 
+
+  bidData.value = result.value.data || [];
+  console.log("Data de pujas actualizada", bidData.value); 
 };
-await refreshBids();
+
+
 
 //Funcion cambia vista de pujas
 const handleViewBids = async () => {
