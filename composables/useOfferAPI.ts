@@ -45,5 +45,15 @@ export function useOfferAPI() {
       );
       return { status, error, data}
   };
-  return { page,  sortOptions, onSort, createOffer, editOffer, getOffer }
+    const discussOffer = async (values: any) => {
+      const { status, error }: any = await useAPI(
+        `${EVENT_BASE_URL}/discuss-offer"`,
+        {
+          method: "POST",
+          body: values,
+        } as any
+      );
+      return {status, error}
+  }
+  return { page,  sortOptions, onSort, createOffer, editOffer, getOffer, discussOffer}
 }

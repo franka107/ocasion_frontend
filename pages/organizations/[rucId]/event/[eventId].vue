@@ -17,7 +17,7 @@
               @click="
                 () => {
                   offerId = undefined;
-                  openModal = true;
+                  openModalOffer = true;
                 }
               "
               variant="default"
@@ -57,7 +57,7 @@
                     @click="
                       () => {
                         offerId = row.id;
-                        openModal = true;
+                        openModalOffer = true;
                       }
                     "
                   >
@@ -66,7 +66,7 @@
                   </DropdownMenuItem>
                   <DropdownMenuItem @click="">
                     Debatir
-                    <CustomIcons name="Reload" class="ml-auto" />
+                    <CustomIcons name="Mallet" class="ml-auto" />
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -272,7 +272,7 @@ const handleCreate = async (values: any) => {
     callback: async () => {
       const { status, error }: any = await createOffer(values);
       if (status.value === "success") {
-        openModal.value = false;
+        openModalOffer.value = false;
         refresh();
         updateConfirmModal({
           title: "Oferta creada",
@@ -301,7 +301,7 @@ const handleEdit = async (values: any) => {
     callback: async () => {
       const { status, error }: any = await editOffer(values);
       if (status.value === "success") {
-        openModal.value = false;
+        openModalOffer.value = false;
         refresh();
         updateConfirmModal({
           title: "Oferta actualizada",
