@@ -78,6 +78,12 @@
                     <CustomIcons name="Close" class="ml-auto" />
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem                   
+                    @click="() => {bindsId = undefined;openModal = true;} "
+                  >
+                    Historial tasaciones
+                    <CustomIcons name="Clock-Timer" class="ml-auto" />
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -109,6 +115,14 @@
         >
           <EventCancel :eventId="String(eventId)" :onsubmit="handleCancel" />
         </SheetContent>
+        <SheetContent
+          v-model:open="openModal"
+          @pointer-down-outside="(e) => e.preventDefault()"
+          @interact-outside="(e) => e.preventDefault()"
+          class="flex flex-col h-full"
+        >
+          <HistoryForm :bindsId="bindsId" />
+        </SheetContent>
       </div>
       <CustomPagination
         class="mt-5 mb-[19px]"
@@ -133,7 +147,8 @@ import dayjs from "dayjs";
 import EventForm from "@/components/events/EventForm.vue";
 import ContentLayout from "~/layouts/default/ContentLayout.vue";
 import { DateFormatter, parseAbsolute } from "@internationalized/date";
-
+const bindsId = ref<number | undefined>(undefined);
+const openModal = ref(false);
 const { page, sortOptions, onSort, createEvent, editEvent, cancelEvent } =
   useEvent();
 
