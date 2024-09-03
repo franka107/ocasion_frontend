@@ -95,8 +95,6 @@
   
   
   <script setup lang="ts">
-
-  import EventDetails from "~/components/events/EventDetails.vue";
   import { offerHeader, offerStatus, offerSearch } from "@/constants/offer";
   const { openConfirmModal, updateConfirmModal } = useConfirmModal();
   const { page, sortOptions, onSort, createOffer, editOffer } = useOfferAPI();  
