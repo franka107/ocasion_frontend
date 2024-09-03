@@ -54,5 +54,18 @@ export function useEvent() {
       );
       return {status, error}
     }
-  return { page,  sortOptions, onSort, createEvent, editEvent, getEvent, cancelEvent }
+    const publishEvent = async (eventId: string) => {
+      const { status, error }: any = await useAPI(
+        `${EVENT_BASE_URL}/publish-event`,
+        {
+          method: "POST",
+          body: JSON.stringify({ eventId }), 
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        } as any
+      );
+      return {status, error}
+     }
+  return { page,  sortOptions, onSort, createEvent, editEvent, getEvent, cancelEvent, publishEvent }
 }

@@ -4,7 +4,7 @@
       <EventDetails :eventDetail="eventDetail">
         <template #default>
           <Button
-            v-if="eventDetail?.status !== 'PUBLISHED'"
+            v-if="isEventNotPublished"
             @click="handlePublishEvent"
             variant="default"
             class="bg-white text-primary border border-primary hover:bg-accent"
@@ -19,12 +19,30 @@
           :data="offerData"
           :header="offerHeader"
           :search="offerSearch"
+          multipleSelect
           @onSort="onSort"
           @onSearch="onSearch"
+          @on-multiple-select="($event)=> { selectedMultipleData = $event; }"
         >
           <template #action-button>
             <Button
-              v-if="eventDetail?.status !== FINISHED_STATUS"
+              v-if="isOfferActionsVisible"
+              @click="handleConfirmOffers(selectedMultipleData.ids)"
+              class="bg-white text-primary border border-primary hover:bg-accent"
+              variant="default"
+              :disabled="disableMultipleSelect"
+            >Confirmar oferta
+            </Button>
+            <Button
+               v-if="isOfferActionsVisible" 
+              @click="handleRetireOffers(selectedMultipleData.ids)"
+              class="bg-white text-primary border border-primary hover:bg-accent"
+              variant="default"
+              :disabled="disableMultipleSelect"
+              >Retirar oferta
+            </Button>
+            <Button
+              v-if="isOfferActionsVisible"
               @click="
                 () => {
                   offerId = undefined;
@@ -205,7 +223,6 @@
 </template>
 <script setup lang="ts">
 import EventDetails from "~/components/events/EventDetails.vue";
-const BASE_OFFERS_URL = "/offer-management";
 import { offerHeader, offerStatus, offerSearch } from "@/constants/offer";
 import { pujasHeader, pujasSearch, BidStatus} from "@/constants/pujas";
 import type { OfferListItem, IDebateForm } from "~/types/Offer";
@@ -216,8 +233,9 @@ import DebateModal from "@/components/offers/DebateModal.vue";
 import HistoryForm from "@/components/history/HistoryForm.vue";
 import ContentLayout from "~/layouts/default/ContentLayout.vue";
 const { openConfirmModal, updateConfirmModal } = useConfirmModal();
-const { page, sortOptions, onSort, createOffer, editOffer, publishEvent } = useOfferAPI();
-
+const { page, sortOptions, onSort, createOffer, editOffer, confirmOffers, retireOffers } = useOfferAPI();
+const OFFER_BASE_URL = "/offer-management";
+const { publishEvent } = useEvent()
 const route = useRoute();
 const { getEvent } = useEvent();
 const offerId = ref(undefined);
@@ -225,6 +243,8 @@ const showBids = ref(false);
 const bindsId = ref<number | undefined>(undefined)
 const bidData = ref([]); 
 const FINISHED_STATUS = "FINISHED";
+const isOfferActionsVisible = computed(() => eventDetail.value?.status !== FINISHED_STATUS);
+const isEventNotPublished = computed(() => eventDetail.value?.status !== 'PUBLISHED');
 const filterOptions = ref(
   `[{ "field": "event.id", "type": "equal", "value": "${route.params.eventId}" }]`,
 );
@@ -244,7 +264,7 @@ const onSearch = (item: { [key: string]: string }) => {
 
 const  [{ data: eventDetail, refresh: refreshEventDetail }, { data, refresh }]: any = await Promise.all([
   getEvent(route.params.eventId as string),
-  useAPI(`${BASE_OFFERS_URL}/find-offers`, {
+  useAPI(`${OFFER_BASE_URL}/find-offers`, {
     query: {
       limit: 8,
       page,
@@ -273,7 +293,7 @@ const pujasData = computed(() => bidData.value.map((item: OfferWithBidDto, index
 
 // Datos de puja 
 const refreshBids = async () => {
-  const { data: result }: any = await useAPI(`${BASE_OFFERS_URL}/find-offers-with-bid-paginated`, {
+  const { data: result }: any = await useAPI(`${OFFER_BASE_URL}/find-offers-with-bid-paginated`, {
     query: {
       limit: 10,
       page,
@@ -350,6 +370,7 @@ const handleEdit = async (values: any) => {
     },
   });
 };
+
 const handlePublishEvent = async () => {
   openConfirmModal({
     title: "Publicar Evento",
@@ -371,6 +392,69 @@ const handlePublishEvent = async () => {
         updateConfirmModal({
           title: "Error al Publicar Evento",
           message: "No se pudo publicar el evento. Por favor, intente nuevamente.",
+          type: "error",
+        });
+      }
+    },
+  });
+};
+
+const handleConfirmOffers = async (values: any) => {
+  openConfirmModal({
+    title: "Confirmar Ofertas",
+    message: `¿Está seguro de aprobar las ❝${route.params.ids}❞ oferta(s) seleccionada(s)?`,
+    callback: async () => {
+      try {
+        const { status } = await confirmOffers({
+          type: 'confirm',
+          ids: selectedMultipleData.value.ids
+        });
+        if (status.value === "success") {
+          refreshEventDetail();
+          updateConfirmModal({
+            title: "Oferta(s) confirmada(s)",
+            message: "Las oferta(s) ha sido confirmada(s) exitosamente",
+            type: "success",
+          });
+        } else {
+          throw new Error("Error al confirmar estas oferta(s)");
+        }
+      } catch (error) {
+        updateConfirmModal({
+          title: "Error al confirmar Oferta(s)",
+          message: "No se pudo confirmar oferta(s). Por favor, intente nuevamente.",
+          type: "error",
+        });
+      }
+    },
+  });
+};
+
+const handleRetireOffers = async (values: any) => {
+  openConfirmModal({
+    title: "Retirar Ofertas",
+    message: `¿Está seguro de retirar las ❝${route.params.ids}❞ oferta(s) seleccionada(s)?`,
+    callback: async () => {
+      try {
+        // const { status } = await retireOffers(values);
+        const { status } = await retireOffers({
+          type: 'retire',
+          ids: selectedMultipleData.value.ids
+        });
+        if (status.value === "success") {
+          refreshEventDetail();
+          updateConfirmModal({
+            title: "Oferta(s) retirada(s)",
+            message: "Las oferta(s) ha sido retirada(s) exitosamente",
+            type: "success",
+          });
+        } else {
+          throw new Error("Error al retirar estas oferta(s)");
+        }
+      } catch (error) {
+        updateConfirmModal({
+          title: "Error al retirar Oferta(s)",
+          message: "No se pudo retirar oferta(s). Por favor, intente nuevamente.",
           type: "error",
         });
       }
