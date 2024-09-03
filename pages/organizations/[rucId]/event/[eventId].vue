@@ -5,9 +5,8 @@
         <template #default>
           <Button
             v-if="eventDetail?.status !== 'PUBLISHED'"
-            :disabled="!allOffersApproved"
             @click="handlePublishEvent"
-            variant="primary"
+            variant="default"
             class="bg-white text-primary border border-primary hover:bg-accent"
           >
             Publicar Evento
@@ -242,7 +241,7 @@ const onSearch = (item: { [key: string]: string }) => {
   filterOptions.value = JSON.stringify(filters);
 };
 
-const  [{ data: eventDetail }, { data, refresh }]: any = await Promise.all([
+const  [{ data: eventDetail, refresh: refreshEventDetail }, { data, refresh }]: any = await Promise.all([
   getEvent(route.params.eventId as string),
   useAPI(`${BASE_OFFERS_URL}/find-offers`, {
     query: {
@@ -292,10 +291,6 @@ const handleViewBids = async () => {
   showBids.value = true; 
   console.log("Bids view enabled", showBids.value);
 };
-//Verificación si todas las ofertas tienen el estado 'APPROVED'
-const allOffersApproved = computed(() =>
-  offerData.value.every(offer => offer.status === 'APPROVED')
-);
 
 const handleCreate = async (values: any) => {
   openConfirmModal({
@@ -362,7 +357,7 @@ const handlePublishEvent = async () => {
       try {
         const { status } = await publishEvent(route.params.eventId as string);
         if (status.value === "success") {
-          refresh();
+          refreshEventDetail();
           updateConfirmModal({
             title: "Evento Publicado",
             message: "El evento ha sido publicado exitosamente",
