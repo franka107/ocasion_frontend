@@ -24,7 +24,7 @@
         >
           <template #action-button>
             <Button
-              v-if="eventDetail?.status !== 'CREATED'"
+              v-if="eventDetail?.status !== FINISHED_STATUS"
               @click="
                 () => {
                   offerId = undefined;
@@ -224,6 +224,7 @@ const offerId = ref(undefined);
 const showBids = ref(false); 
 const bindsId = ref<number | undefined>(undefined)
 const bidData = ref([]); 
+const FINISHED_STATUS = "FINISHED";
 const filterOptions = ref(
   `[{ "field": "event.id", "type": "equal", "value": "${route.params.eventId}" }]`,
 );
