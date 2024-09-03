@@ -22,7 +22,7 @@
           variant="outline"
           role="combobox"
           :class="[
-            'w-full justify-between text-left font-normal',
+            'w-full justify-between text-left font-normal border-[#0B3859]',
             !modelValue && 'text-muted-foreground',
             props.class,
           ]"

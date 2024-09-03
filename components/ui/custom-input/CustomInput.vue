@@ -12,10 +12,12 @@ const props = withDefaults(defineProps<{
   class?: HTMLAttributes['class']
   type?: string
   readonly?: boolean
+  disabled?: boolean
 }>(),{
   size: 'base',
   type: 'text',
   readonly: false,
+  disabled: false,
 })
 
 const emits = defineEmits<{
@@ -40,6 +42,6 @@ watch([modelValue, isFocus], () => {
 <template>
   <div class="relative flex items-center">
     <label :for="label" :class="cn(labelVariant({ size }), active ? `text-[#64748B] text-xs ${size === 'base' ? 'translate-y-[-20px]' : 'translate-y-[-24px]'}`: 'text-[#94A3B8]')">{{ label }}</label>
-    <input v-model="modelValue" :name="label" @focus="isFocus = true" @blur="isFocus = false" :type="type" :readonly="readonly" :class="cn(inputVariant({ size }), props.class)">
+    <input v-model="modelValue" :name="label" @focus="isFocus = true" @blur="isFocus = false" :type="type" :readonly="readonly" :disabled="disabled" :class="cn(inputVariant({ size }), props.class)">
   </div>
 </template>
