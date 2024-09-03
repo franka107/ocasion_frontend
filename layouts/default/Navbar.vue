@@ -8,7 +8,7 @@ const props = defineProps<{
 </script>
 
 <template>
-	 <header class="sticky top-0  w-full bg-[#f1f5f9]   backdrop-blur supports-[backdrop-filter]:bg-[#f1f5f9] ">
+	 <header class="sticky top-0  w-full bg-[#f1f5f9] z-10   backdrop-blur supports-[backdrop-filter]:bg-[#f1f5f9] ">
       <div class="mx-4 sm:mx-8 flex flex-row h-20  justify-between items-center">
         <div class="flex flex-row items-center space-x-4 lg:space-x-0">
           <SheetMenu />

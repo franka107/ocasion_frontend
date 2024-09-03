@@ -47,8 +47,8 @@ export function useOfferAPI() {
       );
       return { status, error, data}
   };
-    const discussOffer = async (values: any) => {
-      const { status, error }: any = await useAPI (
+    const discussOffer = async (values: { offerId: string, counterProposalAmount: number}) => {
+      const { status, error }: any = await useAPI(
         `${EVENT_BASE_URL}/discuss-offer`,
         {
           method: "POST",

@@ -76,7 +76,14 @@
                     Editar
                     <CustomIcons name="Pen" class="ml-auto" />
                   </DropdownMenuItem>
-                  <DropdownMenuItem @click="">
+                  <DropdownMenuItem @click="() => {
+                    openModalDebate = true;
+                    selectedDebateInfo = {
+                      name: eventDetail.name,
+                      appraisal: row.appraisal,
+                      id: row.id,
+                    }
+                  }">
                     Debatir
                     <CustomIcons name="Mallet" class="ml-auto" />
                   </DropdownMenuItem>
@@ -166,7 +173,7 @@
         </SheetContent>
       <!-- Fomulario -->
       </div>  
-        <SheetContent
+      <SheetContent
           v-model:open="openModalOffer"
           class="flex flex-col h-full"
           @pointer-down-outside="(e) => e.preventDefault()"
@@ -179,6 +186,14 @@
             :onsubmit="offerId !== undefined ? handleEdit : handleCreate"
           />
         </SheetContent>´
+        <DebateModal
+          v-model="openModalDebate"
+         :id="selectedDebateInfo.id"
+         :name="selectedDebateInfo.name"
+         :appraisal="selectedDebateInfo.appraisal"
+         :refreshTable="refresh"
+        ></DebateModal>
+        
       </div>
       <CustomPagination
         class="mt-5 mb-[19px]"
@@ -194,10 +209,11 @@ import EventDetails from "~/components/events/EventDetails.vue";
 const BASE_OFFERS_URL = "/offer-management";
 import { offerHeader, offerStatus, offerSearch } from "@/constants/offer";
 import { pujasHeader, pujasSearch, BidStatus} from "@/constants/pujas";
-import type { OfferListItem } from "~/types/Offer";
+import type { OfferListItem, IDebateForm } from "~/types/Offer";
 import type { OfferWithBidDto } from "~/types/Pujas";
 import CustomIcons from "~/components/ui/custom-icons/CustomIcons.vue";
 import OfferForm from "@/components/offers/OfferForm.vue";
+import DebateModal from "@/components/offers/DebateModal.vue";
 import HistoryForm from "@/components/history/HistoryForm.vue";
 import ContentLayout from "~/layouts/default/ContentLayout.vue";
 const { openConfirmModal, updateConfirmModal } = useConfirmModal();
@@ -217,6 +233,8 @@ const filterOptions2 = ref(
 );
 const openModal = ref(false);
 const openModalOffer = ref(false); 
+const openModalDebate = ref(false); 
+const selectedDebateInfo = ref<IDebateForm>({ name: "", appraisal: 0, id: "" }); 
 const selectedMultipleData = ref({ type: 'empty', ids: [] });
 const disableMultipleSelect = computed(()=> selectedMultipleData.value.type === 'empty' && selectedMultipleData.value.ids.length === 0);
 const onSearch = (item: { [key: string]: string }) => {
