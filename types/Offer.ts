@@ -83,3 +83,9 @@ export interface OfferListItem {
     path: string
   }
   
+  export interface IDebateForm {
+    id: string
+    name: string
+    appraisal: number
+  }
+  

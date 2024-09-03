@@ -10,7 +10,7 @@
       >
         <template #action-button>
           <Button
-            v-if="eventDetail?.status !== 'CREATED'"
+            v-if="eventDetail?.status !== CREATED_STATUS"
             @click="
                 () => {
                   offerId = undefined;
@@ -95,8 +95,6 @@
   
   
   <script setup lang="ts">
-
-  import EventDetails from "~/components/events/EventDetails.vue";
   import { offerHeader, offerStatus, offerSearch } from "@/constants/offer";
   const { openConfirmModal, updateConfirmModal } = useConfirmModal();
   const { page, sortOptions, onSort, createOffer, editOffer } = useOfferAPI();  
@@ -107,6 +105,7 @@
   const offerData = ref([]);
   const openModal = ref(false);
   const BASE_OFFERS_URL = "/offer-management";
+  const CREATED_STATUS = "CREATED";
   
   const filterOptions = ref(
   `[{ "field": "event.id", "type": "equal", "value": "${route.params.eventId}" }]`,

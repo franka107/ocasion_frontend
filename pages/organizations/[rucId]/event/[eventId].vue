@@ -1,7 +1,18 @@
 <template>
   <ContentLayout title="Eventos">
     <section>
-      <EventDetails :eventDetail="eventDetail" />
+      <EventDetails :eventDetail="eventDetail">
+        <template #default>
+          <Button
+            v-if="eventDetail?.status !== 'PUBLISHED'"
+            @click="handlePublishEvent"
+            variant="default"
+            class="bg-white text-primary border border-primary hover:bg-accent"
+          >
+            Publicar Evento
+          </Button>
+        </template>
+      </EventDetails>
       <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
         <CustomTable
            v-if="!showBids"
@@ -13,11 +24,11 @@
         >
           <template #action-button>
             <Button
-              v-if="eventDetail?.status !== 'CREATED'"
+              v-if="eventDetail?.status !== FINISHED_STATUS"
               @click="
                 () => {
                   offerId = undefined;
-                  openModal = true;
+                  openModalOffer = true;
                 }
               "
               variant="default"
@@ -57,16 +68,23 @@
                     @click="
                       () => {
                         offerId = row.id;
-                        openModal = true;
+                        openModalOffer = true;
                       }
                     "
                   >
                     Editar
                     <CustomIcons name="Pen" class="ml-auto" />
                   </DropdownMenuItem>
-                  <DropdownMenuItem @click="">
+                  <DropdownMenuItem @click="() => {
+                    openModalDebate = true;
+                    selectedDebateInfo = {
+                      name: eventDetail.name,
+                      appraisal: row.appraisal,
+                      id: row.id,
+                    }
+                  }">
                     Debatir
-                    <CustomIcons name="Reload" class="ml-auto" />
+                    <CustomIcons name="Mallet" class="ml-auto" />
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -85,23 +103,28 @@
           :data="pujasData"
           :header="pujasHeader"
           :search="pujasSearch"
+          multipleSelect
           @onSort="onSort"
           @onSearch="onSearch"
+          @on-multiple-select="($event)=> { selectedMultipleData = $event; }"
         >
         <template #action-button>
           <Button
              @click=""
              variant="default"
+             :disabled="disableMultipleSelect"
              class="bg-white text-primary border border-primary hover:bg-accent"
           > Rechazar puja
           </Button>
           <Button
             @click=""
+            :disabled="disableMultipleSelect"
             class="bg-white text-primary border border-primary hover:bg-accent"
             >Aceptar puja
             </Button>
             <Button
             @click=""
+            :disabled="disableMultipleSelect"
             variant="default"
             >Contraofertar
             </Button>
@@ -149,7 +172,7 @@
         </SheetContent>
       <!-- Fomulario -->
       </div>  
-        <SheetContent
+      <SheetContent
           v-model:open="openModalOffer"
           class="flex flex-col h-full"
           @pointer-down-outside="(e) => e.preventDefault()"
@@ -162,6 +185,14 @@
             :onsubmit="offerId !== undefined ? handleEdit : handleCreate"
           />
         </SheetContent>´
+        <DebateModal
+          v-model="openModalDebate"
+         :id="selectedDebateInfo.id"
+         :name="selectedDebateInfo.name"
+         :appraisal="selectedDebateInfo.appraisal"
+         :refreshTable="refresh"
+        ></DebateModal>
+        
       </div>
       <CustomPagination
         class="mt-5 mb-[19px]"
@@ -177,14 +208,15 @@ import EventDetails from "~/components/events/EventDetails.vue";
 const BASE_OFFERS_URL = "/offer-management";
 import { offerHeader, offerStatus, offerSearch } from "@/constants/offer";
 import { pujasHeader, pujasSearch, BidStatus} from "@/constants/pujas";
-import type { OfferListItem } from "~/types/Offer";
+import type { OfferListItem, IDebateForm } from "~/types/Offer";
 import type { OfferWithBidDto } from "~/types/Pujas";
 import CustomIcons from "~/components/ui/custom-icons/CustomIcons.vue";
 import OfferForm from "@/components/offers/OfferForm.vue";
+import DebateModal from "@/components/offers/DebateModal.vue";
 import HistoryForm from "@/components/history/HistoryForm.vue";
 import ContentLayout from "~/layouts/default/ContentLayout.vue";
 const { openConfirmModal, updateConfirmModal } = useConfirmModal();
-const { page, sortOptions, onSort, createOffer, editOffer } = useOfferAPI();
+const { page, sortOptions, onSort, createOffer, editOffer, publishEvent } = useOfferAPI();
 
 const route = useRoute();
 const { getEvent } = useEvent();
@@ -192,6 +224,7 @@ const offerId = ref(undefined);
 const showBids = ref(false); 
 const bindsId = ref<number | undefined>(undefined)
 const bidData = ref([]); 
+const FINISHED_STATUS = "FINISHED";
 const filterOptions = ref(
   `[{ "field": "event.id", "type": "equal", "value": "${route.params.eventId}" }]`,
 );
@@ -200,33 +233,26 @@ const filterOptions2 = ref(
 );
 const openModal = ref(false);
 const openModalOffer = ref(false); 
+const openModalDebate = ref(false); 
+const selectedDebateInfo = ref<IDebateForm>({ name: "", appraisal: 0, id: "" }); 
+const selectedMultipleData = ref({ type: 'empty', ids: [] });
+const disableMultipleSelect = computed(()=> selectedMultipleData.value.type === 'empty' && selectedMultipleData.value.ids.length === 0);
 const onSearch = (item: { [key: string]: string }) => {
   const filters = [{ field: "title", type: "like", value: item.title || "" }];
   filterOptions.value = JSON.stringify(filters);
 };
 
-Promise.all([
+const  [{ data: eventDetail, refresh: refreshEventDetail }, { data, refresh }]: any = await Promise.all([
   getEvent(route.params.eventId as string),
   useAPI(`${BASE_OFFERS_URL}/find-offers`, {
     query: {
       limit: 8,
       page,
       filterOptions,
-      sortOptions: "[]",
+      sortOptions,
     },
   } as any),
 ]);
-// [] = await Promise.all
-const { data, refresh }: any = await useAPI(`${BASE_OFFERS_URL}/find-offers`, {
-  query: {
-    limit: 8,
-    page,
-    filterOptions,
-    sortOptions,
-  },
-} as any);
-const { data: eventDetail } = await getEvent(route.params.eventId as string);
-
 const offerData = computed(() =>
   data.value.data.map((item: OfferListItem) => ({
     brandName: item.carModel.brand.name,
@@ -260,8 +286,6 @@ const refreshBids = async () => {
   console.log("Data de pujas actualizada", bidData.value); 
 };
 
-
-
 //Funcion cambia vista de pujas
 const handleViewBids = async () => {
   await refreshBids();
@@ -276,7 +300,7 @@ const handleCreate = async (values: any) => {
     callback: async () => {
       const { status, error }: any = await createOffer(values);
       if (status.value === "success") {
-        openModal.value = false;
+        openModalOffer.value = false;
         refresh();
         updateConfirmModal({
           title: "Oferta creada",
@@ -305,7 +329,7 @@ const handleEdit = async (values: any) => {
     callback: async () => {
       const { status, error }: any = await editOffer(values);
       if (status.value === "success") {
-        openModal.value = false;
+        openModalOffer.value = false;
         refresh();
         updateConfirmModal({
           title: "Oferta actualizada",
@@ -326,5 +350,33 @@ const handleEdit = async (values: any) => {
     },
   });
 };
+const handlePublishEvent = async () => {
+  openConfirmModal({
+    title: "Publicar Evento",
+    message: `¿Estás seguro de que deseas publicar el evento ❝${route.params.eventId}❞?`,
+    callback: async () => {
+      try {
+        const { status } = await publishEvent(route.params.eventId as string);
+        if (status.value === "success") {
+          refreshEventDetail();
+          updateConfirmModal({
+            title: "Evento Publicado",
+            message: "El evento ha sido publicado exitosamente",
+            type: "success",
+          });
+        } else {
+          throw new Error("Error al publicar el evento");
+        }
+      } catch (error) {
+        updateConfirmModal({
+          title: "Error al Publicar Evento",
+          message: "No se pudo publicar el evento. Por favor, intente nuevamente.",
+          type: "error",
+        });
+      }
+    },
+  });
+};
+
 </script>
 

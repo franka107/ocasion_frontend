@@ -42,6 +42,14 @@ export const eventSearch: SearchItem[] = [
       type: 'text',
       placeholder: 'Buscar eventos',
       position: 1,
+  },
+  {
+    key: 'status',
+    type: 'select',
+    placeholder: 'Filtrar por estado',
+    items: [...Array.from(eventStatus).map(([key, value]) => ({ text: value.name, value: key })), { text: 'Todos', value: " " }],
+    elementClass: 'min-w-[400px]',
+    position: 3,
   }
 ]
 export const eventListHeaders: HeaderItem[] = [

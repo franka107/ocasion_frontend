@@ -228,9 +228,9 @@ const handleFilesChange = (files: File[]) => {
         <FormField v-slot="{ componentField }" name="rucNumber">
           <FormItem>
             <FormControl>
-              <Input
+              <CustomInput
                 type="text"
-                placeholder="Número de RUC"
+                label="Número de RUC"
                 v-bind="componentField"
                 :disabled="props.rucNumber"
               />
@@ -242,9 +242,9 @@ const handleFilesChange = (files: File[]) => {
         <FormField v-slot="{ componentField }" name="name">
           <FormItem>
             <FormControl>
-              <Input
+              <CustomInput
                 type="text"
-                placeholder="Razón Social"
+                label="Razón Social"
                 v-bind="componentField"
                 :disabled="props.rucNumber"
               />
@@ -305,9 +305,9 @@ const handleFilesChange = (files: File[]) => {
         <FormField v-slot="{ componentField }" name="representativeFullName">
           <FormItem>
             <FormControl>
-              <Input
+              <CustomInput
                 type="text"
-                placeholder="Nombre Completo"
+                label="Nombre Completo"
                 v-bind="componentField"
               />
             </FormControl>
@@ -343,9 +343,9 @@ const handleFilesChange = (files: File[]) => {
           >
             <FormItem class="w-1/2">
               <FormControl>
-                <Input
+                <CustomInput
                   type="text"
-                  placeholder="Número de Documento"
+                  label="Número de Documento"
                   v-bind="componentField"
                 />
               </FormControl>
@@ -358,9 +358,9 @@ const handleFilesChange = (files: File[]) => {
         <FormField v-slot="{ componentField }" name="representativePhoneNumber">
           <FormItem>
             <FormControl>
-              <Input
+              <CustomInput
                 type="text"
-                placeholder="Número de contacto"
+                label="Número de contacto"
                 v-bind="componentField"
               />
             </FormControl>
@@ -372,9 +372,9 @@ const handleFilesChange = (files: File[]) => {
         <FormField v-slot="{ componentField }" name="billingEmail">
           <FormItem>
             <FormControl>
-              <Input
+              <CustomInput
                 type="email"
-                placeholder="Correo de facturación"
+                label="Correo de facturación"
                 v-bind="componentField"
               />
             </FormControl>
@@ -389,11 +389,11 @@ const handleFilesChange = (files: File[]) => {
         <FormField v-slot="{ componentField }" name="startPercentage">
           <FormItem>
             <FormControl>
-              <Input
+              <CustomInput
                 type="number"
                 step="0.01"
                 min="0"
-                placeholder="Porcentaje de Inicio"
+                label="Porcentaje de Inicio"
                 v-bind="componentField"
               />
             </FormControl>
@@ -505,9 +505,9 @@ const handleFilesChange = (files: File[]) => {
         <FormField v-slot="{ componentField }" name="addressLine1">
           <FormItem>
             <FormControl>
-              <Input
+              <CustomInput
                 type="text"
-                placeholder="Dirección"
+                label="Dirección"
                 v-bind="componentField"
               />
             </FormControl>

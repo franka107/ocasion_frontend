@@ -32,7 +32,7 @@ export function useEvent() {
     };
           
     const getEvent = async (id: number | string) => {
-      const { status, error, data } = await useAPI<IEventLItem>(
+      const { status, error, data, refresh } = await useAPI<IEventLItem>(
         `${EVENT_BASE_URL}/get-event-detail`,
         {
           method: "GET",
@@ -41,7 +41,7 @@ export function useEvent() {
           },
         } as any
       );
-      return { status, error, data}
+      return { status, error, data, refresh}
     };
     
     const cancelEvent = async (values: any) => {

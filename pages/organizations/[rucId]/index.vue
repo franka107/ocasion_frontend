@@ -164,6 +164,7 @@ const openCancelModal = ref(false);
 const onSearch = (item: { [key: string]: string }) => {
   filterOptions.value = JSON.stringify([
     { field: "name", type: "like", value: item.name || "" },
+    { field: "status", type: "equal", value: item.status || "" },
     {
       field: "organization.rucNumber",
       type: "equal",

@@ -1,6 +1,8 @@
 import type { OfferItem } from "~/types/Offer"
+import { useAPI } from "./useAPI"
 
 const EVENT_BASE_URL = '/offer-management'
+const EVENT_PUBLISH_URL = '/event-management'
 // by convention, composable function names start with "use"
 export function useOfferAPI() {
     // state encapsulated and managed by the composable
@@ -45,5 +47,30 @@ export function useOfferAPI() {
       );
       return { status, error, data}
   };
-  return { page,  sortOptions, onSort, createOffer, editOffer, getOffer }
+    const discussOffer = async (values: { offerId: string, counterProposalAmount: number}) => {
+      const { status, error }: any = await useAPI(
+        `${EVENT_BASE_URL}/discuss-offer`,
+        {
+          method: "POST",
+          body: values,
+        } as any
+      );
+      return {status, error}
+  }
+  
+  const publishEvent = async (eventId: string) => {
+    const { status, error }: any = await useAPI(
+      `${EVENT_PUBLISH_URL}/publish-event`,
+      {
+        method: "POST",
+        body: JSON.stringify({ eventId }), 
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      } as any
+    );
+    return {status, error}
+   }
+
+  return { page,  sortOptions, onSort, createOffer, editOffer, getOffer, discussOffer, publishEvent }
 }

@@ -30,9 +30,6 @@ export const pujasSearch: SearchItem[] = [
 ]
 export const pujasHeader: HeaderItem[] = [
 {
-    key: 'checkbox',
-    label: '-',
-},{
     key: 'code',
     label: 'Código',
     sortable: true,

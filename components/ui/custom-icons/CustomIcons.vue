@@ -199,6 +199,12 @@ const icons: Icon[] = [
           <circle cx="5" cy="5" r="4.25" fill="white" stroke="#225B82" stroke-width="1.5"/>
           </svg>`,
   },
+  {
+    name: "Mallet",
+    svg: `<svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0.398438 20H12.3984V22H0.398438V20ZM4.63844 7.07L7.46844 4.24L21.6084 18.38L18.7784 21.21L4.63844 7.07ZM11.7184 0L17.3784 5.66L14.5484 8.49L8.88844 2.83L11.7184 0ZM3.22844 8.48L8.88844 14.14L6.05844 16.97L0.398438 11.31L3.22844 8.48Z" fill="white"/>
+          </svg>`,
+  },
 ];
 const currentIcon = computed(
   () => icons.find((icon) => icon.name === props.name)?.svg || "<span></span>"

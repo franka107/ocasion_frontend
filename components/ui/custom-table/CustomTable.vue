@@ -120,7 +120,7 @@ interface Props {
 }
 const props = withDefaults(defineProps<Props>(),{ multipleSelect: false, multipleSelectKey: 'id' })
 
-const emit = defineEmits(["onSort","onSearch"])
+const emit = defineEmits(["onSort","onSearch", "onMultipleSelect"])
 
 const searchValues = reactive<{ [key: string]: string | undefined }>({})
 watch(()=> searchValues, (value) => {
@@ -141,6 +141,7 @@ const useMultipleSelect = () => {
             generalCheckbox.value = 'empty'
             checkboxGeneralIcon.value = 'Checkbox'
         }
+        emit('onMultipleSelect', { type: generalCheckbox.value, ids: selectedIdItems.value })
     }
     const onSelectItem = (id: string) => {
         const index = selectedIdItems.value.indexOf(id)
@@ -150,6 +151,7 @@ const useMultipleSelect = () => {
             selectedIdItems.value.splice(index, 1)
         }
         checkboxGeneralIcon.value = 'Checkbox-Indeterminate'
+        emit('onMultipleSelect', { type: generalCheckbox.value, ids: selectedIdItems.value })
     }
     const getSelectIcon = (id: string) => {
         if(generalCheckbox.value === 'empty') {
@@ -160,7 +162,7 @@ const useMultipleSelect = () => {
     }
     return { selectedIdItems, generalCheckbox, checkboxGeneralIcon, changeGeneralCheckbox, onSelectItem, getSelectIcon }
 }
-const { selectedIdItems, generalCheckbox, checkboxGeneralIcon, changeGeneralCheckbox, onSelectItem, getSelectIcon }  = useMultipleSelect()
+const { checkboxGeneralIcon, changeGeneralCheckbox, onSelectItem, getSelectIcon }  = useMultipleSelect()
 
 const sortStates = reactive<{ [key: string]: string | undefined }>({})
 const sortObject = reactive<{ [key: string]: string }[]>([])

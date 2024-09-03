@@ -5,12 +5,13 @@
         <Button
           variant="outline"
           :class="[
-            'w-full justify-start text-left font-normal',
-            !modelValue && 'text-muted-foreground',
+            'w-full justify-start text-left font-normal relative border-[#0B3859]',
+            !modelValue && 'text-[#94A3B8]',
             props.class,
           ]"
           :disabled="props.disabled"
         >
+        <span v-if="dateValue" class="absolute text-[#64748B] bg-white text-xs top-[-8px] left-2 px-1">{{ props.label }}</span>
           <CalendarIcon class="mr-2 h-4 w-4" />
           {{
             dateValue

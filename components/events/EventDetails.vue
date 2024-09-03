@@ -15,6 +15,9 @@
         Evento - {{ params.eventId }}
       </h1>
     </div>
+    <div class="ml-auto">
+      <slot></slot>
+    </div>
   </div>
   <div class="py-4 px-10 rounded-xl items-center bg-white w-full">
     <div class="grid grid-cols-[2fr_1fr] gap-6">

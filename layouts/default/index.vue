@@ -6,8 +6,8 @@
       isSidebarOpen === false ? 'lg:ml-[90px]' : 'lg:ml-72'
     ]"
   >
-    <ConfirmModal/>
     <slot />
+    <ConfirmModal/>
   </main>
   
 </template>
