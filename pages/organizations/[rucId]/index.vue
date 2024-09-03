@@ -78,12 +78,6 @@
                     <CustomIcons name="Close" class="ml-auto" />
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem                   
-                    @click="() => {bindsId = undefined;openModal = true;} "
-                  >
-                    Historial tasaciones
-                    <CustomIcons name="Clock-Timer" class="ml-auto" />
-                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -115,14 +109,6 @@
         >
           <EventCancel :eventId="String(eventId)" :onsubmit="handleCancel" />
         </SheetContent>
-        <SheetContent
-          v-model:open="openModal"
-          @pointer-down-outside="(e) => e.preventDefault()"
-          @interact-outside="(e) => e.preventDefault()"
-          class="flex flex-col h-full"
-        >
-          <HistoryForm :bindsId="bindsId" />
-        </SheetContent>
       </div>
       <CustomPagination
         class="mt-5 mb-[19px]"
@@ -140,7 +126,12 @@ import CustomTable from "@/components/ui/custom-table/CustomTable.vue";
 import CustomChip from "@/components/ui/custom-chip/CustomChip.vue";
 import CustomIcons from "@/components/ui/custom-icons/CustomIcons.vue";
 import CustomPagination from "@/components/ui/custom-pagination/CustomPagination.vue";
-import { eventListHeaders, eventStatus, eventType, eventSearch } from "~/constants/events";
+import {
+  eventListHeaders,
+  eventStatus,
+  eventType,
+  eventSearch,
+} from "~/constants/events";
 import type { IEventLItem, IOrganizationSummary } from "@/types/Event";
 import type { IDataResponse } from "@/types/Common";
 import dayjs from "dayjs";

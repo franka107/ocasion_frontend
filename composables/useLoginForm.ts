@@ -9,6 +9,7 @@ export function useLoginForm() {
   const showForgotPassword = ref(false);
   const isDialogOpen = ref(false);
   const isMaxAttemptsDialogOpen = ref(false);
+  const isSuspendedDialogOpen = ref(false);
   const router = useRouter();
   const errors = ref({
     email: "",
@@ -74,6 +75,9 @@ export function useLoginForm() {
           if (errorBack.code === "AUTH.MAX_ATTEMPTS_LIMIT_EXCEED") {
             isMaxAttemptsDialogOpen.value = true;
           }
+          if (errorBack.code === "AUTH.USER_IS_SUSPENDED") {
+            isSuspendedDialogOpen.value = true;
+          }
         }
 
         console.log("Solicitud exitosa, obteniendo sesión del usuario...");
@@ -105,6 +109,9 @@ export function useLoginForm() {
   const closeMaxAttemptsDialog = () => {
     isMaxAttemptsDialogOpen.value = false;
   };
+  const closeSuspendedDialog = () => {
+    isSuspendedDialogOpen.value = false;
+  };
 
   const goToUpdatePassword = () => {
     console.log("Redirigiendo a la vista de actualización de contraseña");
@@ -124,7 +131,9 @@ export function useLoginForm() {
     togglePassword,
     toggleForgotPassword,
     isMaxAttemptsDialogOpen,
+    isSuspendedDialogOpen,
     closeDialog,
     goToUpdatePassword,
+    closeSuspendedDialog,
   };
 }

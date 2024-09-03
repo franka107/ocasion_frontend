@@ -64,7 +64,7 @@
                     <CustomIcons name="Forbidden" class="ml-auto" />
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem @click="handleResetPassword(row.id)">
+                  <DropdownMenuItem @click="handleResetPassword(row.email)">
                     Reenviar Correo
                     <CustomIcons name="Reload" class="ml-auto" />
                   </DropdownMenuItem>
@@ -124,6 +124,7 @@ const {
   onSort,
   suspendUser,
   createUser,
+  restoreUserPassword,
   editUser,
   resetUser,
   getExportUser,
@@ -263,12 +264,13 @@ const handleEdit = async (values: any) => {
   });
 };
 
-const handleResetPassword = async (values: any) => {
+const handleResetPassword = async (email: string) => {
   openConfirmModal({
     title: "Restablecer contraseña de usuario",
     message: "¿Estás seguro de que deseas restablecer contraseña de usuario?",
     callback: async () => {
-      const { status, error }: any = await resetUser(values);
+      console.log("");
+      const { status, error }: any = await restoreUserPassword(email);
       if (status.value === "success") {
         openModal.value = false;
         refresh();

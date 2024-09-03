@@ -54,6 +54,17 @@
     </BaseForm>
     <ForgotPasswordForm v-else @back="toggleForgotPassword" />
     <Dialog
+      v-model:open="isSuspendedDialogOpen"
+      :iconSrc="messageIconSrc"
+      iconAlt="Icono de alerta"
+      title="Cuenta suspendida"
+      description="Tu cuenta se encuentra suspendida, por favor contacta al administrador para mayor informacion"
+      buttonText="Aceptar"
+      iconBgColor="bg-[#f53e3e]"
+      @close="closeSuspendedDialog"
+      @action="closeSuspendedDialog"
+    />
+    <Dialog
       v-model:open="isMaxAttemptsDialogOpen"
       :iconSrc="messageIconSrc"
       iconAlt="Icono de alerta"
@@ -94,6 +105,8 @@ const {
   password,
   showPassword,
   closeMaxAttemptsDialog,
+  closeSuspendedDialog,
+  isSuspendedDialogOpen,
   showForgotPassword,
   isDialogOpen,
   isMaxAttemptsDialogOpen,

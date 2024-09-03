@@ -70,6 +70,19 @@ export function useAdmins() {
     return { status, error };
   };
 
+  const restoreUserPassword = async (email: string) => {
+    const { status, error }: any = await useAPI(
+      `auth-management/restore-user-password`,
+      {
+        method: "POST",
+        body: {
+          email: email,
+        },
+      } as any,
+    );
+    return { status, error };
+  };
+
   const getUser = async (id: number | string) => {
     const { status, error, data } = await useAPI<IAdminsLItem>(
       `${BASE_ADM_URL}/get-user-detail`,
@@ -117,6 +130,7 @@ export function useAdmins() {
     editUser,
     suspendUser,
     resetUser,
+    restoreUserPassword,
     getUser,
     getExportUser,
   };
