@@ -131,6 +131,13 @@ const useMultipleSelect = () => {
     const selectedIdItems   = ref<string[]>([])
     const generalCheckbox   = ref<'empty' | 'all'>('empty')
     const checkboxGeneralIcon = ref<'Checkbox-Checked' | 'Checkbox' | 'Checkbox-Indeterminate'>('Checkbox')
+
+    const resetMultipleSelect = () => {
+        generalCheckbox.value = 'empty'
+        selectedIdItems.value = []
+        checkboxGeneralIcon.value = 'Checkbox'
+    }
+
     const changeGeneralCheckbox = () => {
         selectedIdItems.value = []
         if (generalCheckbox.value === 'empty') {
@@ -141,8 +148,9 @@ const useMultipleSelect = () => {
             generalCheckbox.value = 'empty'
             checkboxGeneralIcon.value = 'Checkbox'
         }
-        emit('onMultipleSelect', { type: generalCheckbox.value, ids: selectedIdItems.value })
+        emit('onMultipleSelect', { type: generalCheckbox.value, ids: selectedIdItems.value, resetMultipleSelect })
     }
+
     const onSelectItem = (id: string) => {
         const index = selectedIdItems.value.indexOf(id)
         if (index === -1) {
@@ -151,7 +159,7 @@ const useMultipleSelect = () => {
             selectedIdItems.value.splice(index, 1)
         }
         checkboxGeneralIcon.value = 'Checkbox-Indeterminate'
-        emit('onMultipleSelect', { type: generalCheckbox.value, ids: selectedIdItems.value })
+        emit('onMultipleSelect', { type: generalCheckbox.value, ids: selectedIdItems.value, resetMultipleSelect })
     }
     const getSelectIcon = (id: string) => {
         if(generalCheckbox.value === 'empty') {
