@@ -1,7 +1,19 @@
 <template>
   <ContentLayout title="Eventos">
     <section>
-      <EventDetails :eventDetail="eventDetail" />
+      <EventDetails :eventDetail="eventDetail">
+        <template #default>
+          <Button
+            v-if="eventDetail?.status !== 'PUBLISHED'"
+            :disabled="!allOffersApproved"
+            @click="handlePublishEvent"
+            variant="primary"
+            class="bg-white text-primary border border-primary hover:bg-accent"
+          >
+            Publicar Evento
+          </Button>
+        </template>
+      </EventDetails>
       <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
         <CustomTable
            v-if="!showBids"
@@ -189,7 +201,7 @@ import OfferForm from "@/components/offers/OfferForm.vue";
 import HistoryForm from "@/components/history/HistoryForm.vue";
 import ContentLayout from "~/layouts/default/ContentLayout.vue";
 const { openConfirmModal, updateConfirmModal } = useConfirmModal();
-const { page, sortOptions, onSort, createOffer, editOffer } = useOfferAPI();
+const { page, sortOptions, onSort, createOffer, editOffer, publishEvent } = useOfferAPI();
 
 const route = useRoute();
 const { getEvent } = useEvent();
@@ -256,14 +268,16 @@ const refreshBids = async () => {
   console.log("Data de pujas actualizada", bidData.value); 
 };
 
-
-
 //Funcion cambia vista de pujas
 const handleViewBids = async () => {
   await refreshBids();
   showBids.value = true; 
   console.log("Bids view enabled", showBids.value);
 };
+//Verificación si todas las ofertas tienen el estado 'APPROVED'
+const allOffersApproved = computed(() =>
+  offerData.value.every(offer => offer.status === 'APPROVED')
+);
 
 const handleCreate = async (values: any) => {
   openConfirmModal({
@@ -322,5 +336,33 @@ const handleEdit = async (values: any) => {
     },
   });
 };
+const handlePublishEvent = async () => {
+  openConfirmModal({
+    title: "Publicar Evento",
+    message: `¿Estás seguro de que deseas publicar el evento ❝${route.params.eventId}❞?`,
+    callback: async () => {
+      try {
+        const { status } = await publishEvent(route.params.eventId as string);
+        if (status.value === "success") {
+          refresh();
+          updateConfirmModal({
+            title: "Evento Publicado",
+            message: "El evento ha sido publicado exitosamente",
+            type: "success",
+          });
+        } else {
+          throw new Error("Error al publicar el evento");
+        }
+      } catch (error) {
+        updateConfirmModal({
+          title: "Error al Publicar Evento",
+          message: "No se pudo publicar el evento. Por favor, intente nuevamente.",
+          type: "error",
+        });
+      }
+    },
+  });
+};
+
 </script>
 
