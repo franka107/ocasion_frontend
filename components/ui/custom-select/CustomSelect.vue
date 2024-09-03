@@ -1,7 +1,8 @@
 <template>
     <SelectRoot v-model:open="open">
-        <SelectTrigger>
-            <span>
+        <SelectTrigger class="border-[#0B3859] relative">
+            <label v-if="!!currentLabel" class="absolute text-[#64748B] bg-white text-xs top-[-8px] left-2 px-1">{{ props.placeholder }}</label>
+            <span :class="currentLabel ? 'text-[#020617]' :'text-[#94A3B8]'">
                 {{ currentLabel || props.placeholder }} 
             </span>
         </SelectTrigger>
@@ -44,7 +45,7 @@ watch(() => props.modelValue, (val) => {
     currentValue.value = val
 }, { immediate: true })
 const currentLabel = computed(() => {
-    if (!currentValue.value) return props.placeholder
+    if (!currentValue.value) return ''
     if (typeof currentValue.value === 'string') {
         return props.items.find((item) => item.id === currentValue.value)?.name || props.placeholder
     }
