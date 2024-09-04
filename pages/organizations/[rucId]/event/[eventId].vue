@@ -108,7 +108,7 @@
                   <DropdownMenuItem
                     @click="
                       () => {
-                        bindsId = row.id;
+                        bidsId = row.id;
                         openAppraisalHistoryModal = true;
                         appraisalHistoryModal = { offerId: row.id };
                       }
@@ -144,24 +144,21 @@
             ></CustomChip>
           </template>
         </CustomTable>
+        <section>
         <div>
           <CustomTable
             v-if="showBids"
-            :data="pujasData"
-            :header="pujasHeader"
-            :search="pujasSearch"
+            :data="bidsData"
+            :header="bidsHeader"
+            :search="bidsSearch"
             multipleSelect
             @onSort="onSort"
             @onSearch="onSearch"
-            @on-multiple-select="
-              ($event) => {
-                selectedMultipleData = $event;
-              }
-            "
+            @on-multiple-select="({ ids, type, resetMultipleSelect: onResetMultipleSelect })=> { selectedMultipleData = { ids, type }; resetMultipleSelect = onResetMultipleSelect }"
           >
             <template #action-button>
               <Button
-                @click=""
+                @click="handleRejectBid(selectedMultipleData)"
                 variant="default"
                 :disabled="disableMultipleSelect"
                 class="bg-white text-primary border border-primary hover:bg-accent"
@@ -169,7 +166,7 @@
                 Rechazar puja
               </Button>
               <Button
-                @click=""
+                @click="handleAddBid(selectedMultipleData)"
                 :disabled="disableMultipleSelect"
                 class="bg-white text-primary border border-primary hover:bg-accent"
                 >Aceptar puja
@@ -200,7 +197,7 @@
                     <DropdownMenuItem
                       @click="
                         () => {
-                          bindsId = undefined;
+                          bidsId = undefined;
                           openModal = true;
                         }
                       "
@@ -229,12 +226,20 @@
             class="flex flex-col h-full"
           >
             <HistoryForm
-              :bindsId="bindsId"
+              :bidsId="bidsId"
               :offer-id="appraisalHistoryModal.offerId"
             />
           </SheetContent>
-          <!-- Fomulario -->
         </div>
+        <div v-if="showBids">
+        <CustomPagination
+          class="mt-5 mb-[19px]"
+          :total="data.count"
+          :limit="data.limit"
+          v-model:page="page"
+        />
+        </div>
+        </section>
         <SheetContent
           v-model:open="openModalOffer"
           class="flex flex-col h-full"
@@ -276,14 +281,14 @@
 <script setup lang="ts">
 import EventDetails from "~/components/events/EventDetails.vue";
 import { offerHeader, offerStatus, offerSearch } from "@/constants/offer";
-import { pujasHeader, pujasSearch, BidStatus } from "@/constants/pujas";
+import { bidsHeader, bidsSearch, BidStatus } from "@/constants/bids";
 import type {
   OfferListItem,
   IDebateForm,
   IChangeAppraisalForm,
   IAmountHistoryModal,
 } from "~/types/Offer";
-import type { OfferWithBidDto } from "~/types/Pujas";
+import type { OfferWithBidDto } from "~/types/Bids";
 import CustomIcons from "~/components/ui/custom-icons/CustomIcons.vue";
 import OfferForm from "@/components/offers/OfferForm.vue";
 import DebateModal from "@/components/offers/DebateModal.vue";
@@ -294,15 +299,17 @@ const { openConfirmModal, updateConfirmModal } = useConfirmModal();
 const { page, sortOptions, onSort, createOffer, editOffer, confirmOffers, retireOffers } = useOfferAPI();
 const OFFER_BASE_URL = "/offer-management";
 const { publishEvent } = useEvent()
+const { rejectOfferBids,acceptOfferBids  } = useBidAPI()
 const route = useRoute();
 const { getEvent } = useEvent();
 const offerId = ref(undefined);
 const showBids = ref(false);
-const bindsId = ref<number | undefined>(undefined);
+const bidsId = ref<number | undefined>(undefined);
 const bidData = ref([]);
 const FINISHED_STATUS = "FINISHED";
+const PUBLISHED_STATUS = "PUBLISHED";
 const isOfferActionsVisible = computed(() => eventDetail.value?.status !== FINISHED_STATUS);
-const isEventNotPublished = computed(() => eventDetail.value?.status !== 'PUBLISHED');
+const isEventNotPublished = computed(() => eventDetail.value?.status !== PUBLISHED_STATUS);
 const filterOptions = ref(
   `[{ "field": "event.id", "type": "equal", "value": "${route.params.eventId}" }]`,
 );
@@ -350,10 +357,16 @@ const offerData = computed(() =>
   })),
 );
 
-const pujasData = computed(() =>
+const bidsData = computed(() =>
   bidData.value.map((item: OfferWithBidDto, index: number) => ({
     code: String(index + 1),
-    date: item.bid.createdAt,
+    date: new Date(item.bid.createdAt).toLocaleString("es-ES", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
     amount: `$${item.bid.amount}`,
     status: item.bid.status,
     ...item,
@@ -364,7 +377,7 @@ const pujasData = computed(() =>
 const refreshBids = async () => {
   const { data: result }: any = await useAPI(`${OFFER_BASE_URL}/find-offers-with-bid-paginated`, {
     query: {
-      limit: 10,
+      limit: 8,
       page,
       filterOptions2,
       sortOptions,
@@ -472,7 +485,7 @@ const handlePublishEvent = async () => {
 const handleConfirmOffers = async (values: { type: string, ids: string[]}) => {
   openConfirmModal({
     title: "Confirmar Ofertas",
-    message: `¿Está seguro de aprobar las oferta(s) seleccionada(s)?`,
+    message: `¿Está seguro de aprobar la(s) oferta(s) seleccionada(s)?`,
     callback: async () => {
       try {
         const { type, ids } = values
@@ -482,11 +495,11 @@ const handleConfirmOffers = async (values: { type: string, ids: string[]}) => {
           resetMultipleSelect.value?.()
           updateConfirmModal({
             title: "Oferta(s) confirmada(s)",
-            message: "Las oferta(s) ha sido confirmada(s) exitosamente",
+            message: "La(s) oferta(s) ha sido confirmada(s) exitosamente",
             type: "success",
           });
         } else {
-          throw new Error("Error al confirmar estas oferta(s)");
+          throw new Error("Error al confirmar esta(s) oferta(s)");
         }
       } catch (error) {
         console.log("error", error);
@@ -503,7 +516,7 @@ const handleConfirmOffers = async (values: { type: string, ids: string[]}) => {
 const handleRetireOffers = async (values: { type: string, ids: string[]}) => {
   openConfirmModal({
     title: "Retirar Ofertas",
-    message: `¿Está seguro de retirar las oferta(s) seleccionada(s)?`,
+    message: `¿Está seguro de retirar la(s) oferta(s) seleccionada(s)?`,
     callback: async () => {
       try {
         const { status } = await retireOffers(values);
@@ -513,11 +526,11 @@ const handleRetireOffers = async (values: { type: string, ids: string[]}) => {
           resetMultipleSelect.value?.()
           updateConfirmModal({
             title: "Oferta(s) retirada(s)",
-            message: "Las oferta(s) ha sido retirada(s) exitosamente",
+            message: "La(s) oferta(s) ha sido retirada(s) exitosamente",
             type: "success",
           });
         } else {
-          throw new Error("Error al retirar estas oferta(s)");
+          throw new Error("Error al retirar esta(s) oferta(s)");
         }
       } catch (error) {
         updateConfirmModal({
@@ -530,4 +543,63 @@ const handleRetireOffers = async (values: { type: string, ids: string[]}) => {
   });
 };
 
+const handleRejectBid = async (values: { type: string, ids: string[]}) => {
+  openConfirmModal({
+    title: "Rechazar puja",
+    message: `¿Está seguro de rechazar la(s) puja(s) seleccionada(s)?`,
+    callback: async () => {
+      try {
+        const { status } = await rejectOfferBids(values);
+       
+        if (status.value === "success") {
+          refreshBids();
+          resetMultipleSelect.value?.()
+          updateConfirmModal({
+            title: "Puja(s) rechazada(s)",
+            message: "La(s) puja(s) ha sido rechazada(s) exitosamente",
+            type: "success",
+          });
+        } else {
+          throw new Error("Error al rechazar esta(s) puja(s)");
+        }
+      } catch (error) {
+        updateConfirmModal({
+          title: "Error al rechazar puja(s)",
+          message: "No se pudo rechazar puja(s). Por favor, intente nuevamente.",
+          type: "error",
+        });
+      }
+    },
+  });
+};
+
+const handleAddBid = async (values: { type: string, ids: string[]}) => {
+  openConfirmModal({
+    title: "Aceptar puja",
+    message: `¿Está seguro de aceptar la(s) puja(s) seleccionada(s)?`,
+    callback: async () => {
+      try {
+        const { status } = await acceptOfferBids(values);
+       
+        if (status.value === "success") {
+          refreshBids();
+          resetMultipleSelect.value?.()
+          updateConfirmModal({
+            title: "Puja(s) aceptada(s)",
+            message: "La(s) puja(s) ha sido aceptada(s) exitosamente",
+            type: "success",
+          });
+        } else {
+          throw new Error("Error al aceptar esta(s) puja(s)");
+        }
+      } catch (error) {
+        updateConfirmModal({
+          title: "Error al aceptar puja(s)",
+          message: "No se pudo aceptar puja(s). Por favor, intente nuevamente.",
+          type: "error",
+        });
+      }
+    },
+  });
+};
 </script>

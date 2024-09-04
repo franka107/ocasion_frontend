@@ -67,11 +67,11 @@ const handleSubmit = async (values: any) => {
   <AlertDialog :open="modelValue" @update:open="event => emit('update:modelValue', event)" class="z-[30]">
     <AlertDialogContent class="z-[98]">
       <form
-        class="flex flex-col gap-4 flex-grow pt-5 pr-5 pl-5"
+        class="flex flex-col gap-10 flex-grow"
         @submit="onSubmit"
       >
-        <AlertDialogHeader>
-          <AlertDialogTitle class="text-center">Debate de precios</AlertDialogTitle>
+        <AlertDialogHeader class="border-b border-primary">
+          <AlertDialogTitle class="text-xl tracking-[-0.5px] text-primary text-start mb-[18px] font-[600] ">Debate de precios</AlertDialogTitle>
         </AlertDialogHeader>
         <div class="grid grid-cols-2 gap-3">
           <Input
@@ -79,12 +79,14 @@ const handleSubmit = async (values: any) => {
             :disabled="true"
             placeholder="Nombre del evento"
             :model-value="props.name"
+            class="h-14 w-full"
           />
           <Input
             type="number"
             :disabled="true"
             placeholder="Tasación"
             :model-value="props.appraisal"
+            class="h-14 w-full"
           />             
           <FormField v-slot="{ componentField }" name="counterProposalAmount">
             <FormItem>
@@ -93,6 +95,7 @@ const handleSubmit = async (values: any) => {
                   type="number"
                   placeholder="Tasación"
                   v-bind="componentField"
+                  class="h-14 w-full"
                 />
               </FormControl>
               <FormMessage />
@@ -101,8 +104,8 @@ const handleSubmit = async (values: any) => {
         </div>
 
         <AlertDialogFooter>
-          <Button @click="()=>{ emit('update:modelValue', false)}" type="button" class="ml-3">Cancelar</Button>
-          <Button type="submit" class="ml-3" :disabled="!form.meta.value.valid">Confirmar</Button>
+          <Button @click="()=>{ emit('update:modelValue', false)}" type="button" size="xl" class="text-[16px] font-[600] bg-white text-primary border border-primary hover:bg-accent mt-[16px]">Cancelar</Button>
+          <Button type="submit" class="text-[16px] font-[600] mt-[16px]" size="xl" :disabled="!form.meta.value.valid">Confirmar</Button>
         </AlertDialogFooter>
       </form>
     </AlertDialogContent>

@@ -2,9 +2,9 @@
 <template>
     <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
       <CustomTable
-        :data="pujasData"
-        :header="pujasHeader"
-        :search="pujasSearch"
+        :data="bidsData"
+        :header="bidsHeader"
+        :search="bidsSearch"
         @onSort="onSort"
         @onSearch="onSearch"
       >
@@ -22,7 +22,7 @@
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" class="bg-primary text-white">
-                <DropdownMenuItem @click="() => {bindsId = undefined;openModal = true;} ">
+                <DropdownMenuItem @click="() => {bidsId = undefined;openModal = true;} ">
                   Historial de puja 
                   <CustomIcons name="Reload" class="ml-auto" />
                 </DropdownMenuItem>
@@ -37,8 +37,8 @@
       <!-- Formulario de Pujas -->
       <!-- <SheetContent class="flex flex-col h-full" v-model:open="openModal">
         <BindsForm
-          :id="bindsId"
-          :onSubmit="bindsId !== undefined ? handleViewBidHistory "
+          :id="bidsId"
+          :onSubmit="bidsId !== undefined ? handleViewBidHistory "
         />
       </SheetContent>
         <CustomPagination
@@ -56,11 +56,11 @@
   import CustomTable from '../ui/custom-table/CustomTable.vue';
   import Button from '../ui/button/Button.vue';
   import CustomIcons from '@/components/ui/custom-icons/CustomIcons.vue';
-  import { pujasHeader, pujasSearch, BidStatus } from '@/constants/pujas';
-  import type { OfferWithBidDto } from '~/types/Pujas';
+  import { bidsHeader, bidsSearch, BidStatus } from '@/constants/bids';
+  import type { OfferWithBidDto } from '~/types/Bids';
   const BASE_OFFERS_URL = "/offer-management";
   const route = useRoute();
-  const bindsId = ref<number | undefined>(undefined);
+  const bidsId = ref<number | undefined>(undefined);
   const showBids = ref(false); 
   const openModal = ref(false);
   const { page, sortOptions, onSort} = useOfferAPI();
@@ -72,7 +72,7 @@
     const filters = [{ field: "tile", type: "like", value: item.title || "" }];
     filterOptions.value = JSON.stringify(filters);
   };
-  const pujasData = computed(() => bidData.value.map((item: OfferWithBidDto) => ({
+  const bidsData = computed(() => bidData.value.map((item: OfferWithBidDto) => ({
     code: "1",
     date: "DD/MM/AAAA 12:20",
     amount:"10000",

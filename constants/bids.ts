@@ -7,7 +7,7 @@ export const BidStatus = new Map<string, { name: string; color: string }>([
     ["DISCARDED", { name: "Decartada", color: "gray" }],
 ]);
 
-export const pujasSearch: SearchItem[] = [
+export const bidsSearch: SearchItem[] = [
     {
         key: 'title',
         type: 'text',
@@ -19,16 +19,12 @@ export const pujasSearch: SearchItem[] = [
         key: 'status',
         type: 'select',
         placeholder: 'Filtrar estados',
-        items: [
-            { text: 'Activo', value: 'ACTIVE' },
-            { text: 'Suspendido', value: 'SUSPENDED' },
-            { text: 'Todos', value: " " },
-        ],
+        items: [...Array.from(BidStatus).map(([key, value]) => ({ text: value.name, value: key })), { text: 'Todos', value: " " }],
         elementClass: 'min-w-[400px]',
         position: 2,
     }
 ]
-export const pujasHeader: HeaderItem[] = [
+export const bidsHeader: HeaderItem[] = [
 {
     key: 'code',
     label: 'Código',
