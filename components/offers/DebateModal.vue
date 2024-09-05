@@ -74,29 +74,32 @@ const handleSubmit = async (values: any) => {
           <AlertDialogTitle class="text-xl tracking-[-0.5px] text-primary text-start mb-[18px] font-[600] ">Debate de precios</AlertDialogTitle>
         </AlertDialogHeader>
         <div class="grid grid-cols-2 gap-3">
-          <Input
-            type="string"
-            :disabled="true"
-            placeholder="Nombre del evento"
-            :model-value="props.name"
-            class="h-14 w-full"
-          />
-          <Input
-            type="number"
-            :disabled="true"
-            placeholder="Tasación"
-            :model-value="props.appraisal"
-            class="h-14 w-full"
-          />             
+          <CustomInput
+                class="h-14 w-full"
+                type="string"
+                label="Nombre del evento"
+                :model-value="props.name"
+                :disabled="true"
+                labelOffset
+              />
+          <CustomInput
+                class="h-14 w-full"
+                type="number"
+                label="Tasación"
+                :model-value="props.appraisal"
+                :disabled="true"
+                labelOffset
+              />
           <FormField v-slot="{ componentField }" name="counterProposalAmount">
             <FormItem>
               <FormControl>
-                <Input
-                  type="number"
-                  placeholder="Tasación"
-                  v-bind="componentField"
-                  class="h-14 w-full"
-                />
+                <CustomInput
+                class="h-14 w-full"
+                type="number"
+                label="Tasación"
+                v-bind="componentField"
+                labelOffset            
+              />
               </FormControl>
               <FormMessage />
             </FormItem>

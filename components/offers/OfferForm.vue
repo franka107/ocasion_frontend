@@ -196,12 +196,12 @@ const handleFilesChange = (files: File[]) => {
       <FormField v-slot="{ componentField }" name="title">
         <FormItem>
           <FormControl>
-            <Input
-              type="text"
-              placeholder="Título de la oferta"
-              :disabled="props.id"
-              v-bind="componentField"
-            />
+            <CustomInput
+                type="text"
+                label="Título de la oferta"
+                v-bind="componentField"
+                :disabled="props.id"
+              />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -210,25 +210,12 @@ const handleFilesChange = (files: File[]) => {
         <FormField v-slot="{ componentField }" name="brandId">
           <FormItem>
             <FormControl>
-              <Select
+              <CustomSelect
                 v-bind="componentField"
-                @update:modelValue="(value) => handleBrandChange(value)"
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Marca" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem
-                      v-for="brand in brandOptions"
-                      :key="brand.id"
-                      :value="brand.id"
-                    >
-                      {{ brand.name }}
-                    </SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+                @update:modelValue="(value) => handleBrandChange(value)"       
+                :items="brandOptions"
+                placeholder="Marca"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -236,22 +223,12 @@ const handleFilesChange = (files: File[]) => {
         <FormField v-slot="{ componentField }" name="model">
           <FormItem>
             <FormControl>
-              <Select v-bind="componentField" :disabled="!form.values.brandId">
-                <SelectTrigger>
-                  <SelectValue placeholder="Modelo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem
-                      v-for="model in modelOptions"
-                      :key="model.id"
-                      :value="model.id"
-                    >
-                      {{ model.name }}
-                    </SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+              <CustomSelect
+                v-bind="componentField"
+                :disabled="!form.values.brandId"
+                :items="modelOptions"
+                placeholder="Modelo"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -297,25 +274,12 @@ const handleFilesChange = (files: File[]) => {
       <FormField v-slot="{ componentField }" name="department">
         <FormItem>
           <FormControl>
-            <Select
-              v-bind="componentField"
-              @update:modelValue="(value) => handleStateChange(value)"
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Departamento" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem
-                    v-for="state in states"
-                    :key="state.id"
-                    :value="state.id"
-                  >
-                    {{ state.name }}
-                  </SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+            <CustomSelect
+                v-bind="componentField"
+                @update:modelValue="(value) => handleStateChange(value)"
+                :items="states"
+                placeholder="Departamento"
+              />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -326,26 +290,13 @@ const handleFilesChange = (files: File[]) => {
         <FormField v-slot="{ componentField }" name="province">
           <FormItem class="w-1/2">
             <FormControl>
-              <Select
+              <CustomSelect
                 v-bind="componentField"
                 @update:modelValue="(value) => handleCityChange(value)"
                 :disabled="!form.values.department"
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Provincia" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem
-                      v-for="city in cities"
-                      :key="city.id"
-                      :value="city.id"
-                    >
-                      {{ city.name }}
-                    </SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+                :items="cities"
+                placeholder="Provincia"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -355,22 +306,12 @@ const handleFilesChange = (files: File[]) => {
         <FormField v-slot="{ componentField }" name="districtId">
           <FormItem class="w-1/2">
             <FormControl>
-              <Select v-bind="componentField" :disabled="!form.values.province">
-                <SelectTrigger>
-                  <SelectValue placeholder="Distrito" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem
-                      v-for="district in districts"
-                      :key="district.id"
-                      :value="district.id"
-                    >
-                      {{ district.name }}
-                    </SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+              <CustomSelect
+                v-bind="componentField"
+                :disabled="!form.values.province"
+                :items="districts"
+                placeholder="Distrito"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -381,11 +322,11 @@ const handleFilesChange = (files: File[]) => {
       <FormField v-slot="{ componentField }" name="addressLine1">
         <FormItem>
           <FormControl>
-            <Input
-              type="text"
-              placeholder="Dirección"
-              v-bind="componentField"
-            />
+            <CustomInput
+                type="text"
+                label="Dirección"
+                v-bind="componentField"
+              />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -393,14 +334,14 @@ const handleFilesChange = (files: File[]) => {
       <h2 class="text-primary text-base font-normal leading-5">
         Puesta en valor
       </h2>
-      <div class="flex gap">
+      <div class="flex gap-2">
         <FormField v-slot="{ componentField }" name="appraisal">
-          <FormItem>
+          <FormItem >
             <FormControl>
-              <Input
+              <CustomInput
                 type="number"
                 :disabled="props.id"
-                placeholder="Tasación"
+                label="Tasación"
                 v-bind="componentField"
               />
             </FormControl>
@@ -410,10 +351,10 @@ const handleFilesChange = (files: File[]) => {
         <FormField name="other">
           <FormItem>
             <FormControl>
-              <Input
+              <CustomInput
                 type="text"
+                label="Valor inicial de subasta"
                 disabled
-                placeholder="Valor inicial de subasta"
               />
             </FormControl>
             <FormMessage />

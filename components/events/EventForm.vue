@@ -134,11 +134,11 @@ const handleFilesChange = (files: File[]) => {
       <FormField v-slot="{ componentField }" name="name">
         <FormItem>
           <FormControl>
-            <Input
-              type="text"
-              placeholder="Nombre del evento"
-              v-bind="componentField"
-            />
+            <CustomInput
+                type="text"
+                label="Nombre del evento"
+                v-bind="componentField"
+              />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -157,23 +157,13 @@ const handleFilesChange = (files: File[]) => {
       </FormField>
       <FormField v-slot="{ componentField }" name="type">
         <FormItem>
-          <FormControl>
-            <Select :disabled="!!props.id" v-bind="componentField">
-              <SelectTrigger>
-                <SelectValue placeholder="Tipo de evento" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem
-                    v-for="activity in eventTypesOptions"
-                    :key="activity.id"
-                    :value="activity.id"
-                  >
-                    {{ activity.name }}
-                  </SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+          <FormControl>  
+            <CustomSelect
+                v-bind="componentField"
+                :disabled="!!props.id"
+                :items="eventTypesOptions"
+                placeholder="Tipo de evento"
+              />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -181,22 +171,12 @@ const handleFilesChange = (files: File[]) => {
       <FormField v-slot="{ componentField }" name="goodType">
         <FormItem>
           <FormControl>
-            <Select :disabled="!!props.id" v-bind="componentField">
-              <SelectTrigger>
-                <SelectValue placeholder="Tipo de bien" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem
-                    v-for="activity in goodTypeOptions"
-                    :key="activity.id"
-                    :value="activity.id"
-                  >
-                    {{ activity.name }}
-                  </SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+            <CustomSelect
+                v-bind="componentField"
+                :disabled="!!props.id"
+                :items="goodTypeOptions"
+                placeholder="Tipo de bien"
+              />
           </FormControl>
           <FormMessage />
         </FormItem>

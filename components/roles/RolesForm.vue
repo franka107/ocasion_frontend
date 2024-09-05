@@ -88,20 +88,26 @@ if (props.id) {
         <FormField v-slot="{ componentField }" name="name">
           <FormItem>
             <FormControl>
-              <Input type="text" placeholder="Nombre" v-bind="componentField" />
+              <CustomInput
+                type="text"
+                label="Nombre"
+                v-bind="componentField"
+                :disabled="props.id"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
-
         <FormField v-slot="{ componentField }" name="description">
           <FormItem>
             <FormControl>
-              <Input
+              <CustomInput
                 class="h-[85px]"
                 type="text"
-                placeholder="Descripción"
+                label="Descripción"
                 v-bind="componentField"
+                :removeAlignCenter="true"
+                :addMarginTop="true"
               />
             </FormControl>
             <FormMessage />
@@ -111,17 +117,14 @@ if (props.id) {
         <FormField v-slot="{ componentField }" name="status">
           <FormItem>
             <FormControl>
-              <Select v-bind="componentField">
-                <SelectTrigger>
-                  <SelectValue placeholder="Estado" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem value="ACTIVE">Activo</SelectItem>
-                    <SelectItem value="INACTIVE">Desactivo</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+              <CustomSelect
+                  v-bind="componentField"
+                  :items="[
+                    { id: 'ACTIVE', name: 'Activo' },
+                    { id: 'INACTIVE', name: 'Desactivo' },
+                  ]"
+                  placeholder="Estado"
+                />
             </FormControl>
             <FormMessage />
           </FormItem>

@@ -74,35 +74,41 @@ const handleSubmit = async (values: any) => {
   >
     <AlertDialogContent class="z-[98]">
       <form
-        class="flex flex-col gap-4 flex-grow pt-5 pr-5 pl-5"
+        class="flex flex-col gap-5 flex-grow"
         @submit="onSubmit"
       >
-        <AlertDialogHeader>
-          <AlertDialogTitle class="text-center"
-            >Cambio de tasacion</AlertDialogTitle
+        <AlertDialogHeader class="border-b border-primary">
+          <AlertDialogTitle class="text-xl tracking-[-0.5px] text-primary text-start mb-[18px] font-[600] "
+            >Cambio de tasación</AlertDialogTitle
           >
         </AlertDialogHeader>
-        <Input
-          type="string"
-          :disabled="true"
-          placeholder="Nombre del evento"
-          :model-value="props.offerTitle"
-        />
+        <CustomInput
+                class="h-14 w-full"
+                type="string"
+                label="Nombre del evento"
+                :model-value="props.offerTitle"
+                :disabled="true"
+                labelOffset
+              />
         <div class="grid grid-cols-2 gap-3">
-          <Input
-            type="number"
-            :disabled="true"
-            placeholder="Tasación actual"
-            :model-value="props.oldAppraisal"
-          />
+          <CustomInput
+                class="h-14 w-full"
+                type="number"
+                label="Tasación actual"
+                :model-value="props.oldAppraisal"
+                :disabled="true"
+                labelOffset
+              />
           <FormField v-slot="{ componentField }" name="newAppraisal">
             <FormItem>
               <FormControl>
-                <Input
-                  type="number"
-                  placeholder="Nuevo valor de tasacion"
-                  v-bind="componentField"
-                />
+                <CustomInput
+                class="h-14 w-full"
+                type="number"
+                label="Nuevo valor de tasacion"
+                v-bind="componentField"
+                labelOffset
+              />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -117,10 +123,11 @@ const handleSubmit = async (values: any) => {
               }
             "
             type="button"
-            class="ml-3"
+            size="xl" 
+            class="text-[16px] font-[600] bg-white text-primary border border-primary hover:bg-accent mt-[16px]"
             >Cancelar</Button
           >
-          <Button type="submit" class="ml-3" :disabled="!form.meta.value.valid"
+          <Button type="submit" class="text-[16px] font-[600] mt-[16px]" size="xl" :disabled="!form.meta.value.valid"
             >Confirmar</Button
           >
         </AlertDialogFooter>
