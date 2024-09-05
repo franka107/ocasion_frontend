@@ -145,11 +145,11 @@ const onSubmit = form.handleSubmit((values: any) => {
         <FormField v-slot="{ componentField }" name="firstName">
           <FormItem class="w-1/2">
             <FormControl>
-              <Input
-                type="text"
-                placeholder="Nombres"
-                v-bind="componentField"
-              />
+              <CustomInput
+                  type="text"
+                  label="Nombres"
+                  v-bind="componentField"
+                />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -158,11 +158,11 @@ const onSubmit = form.handleSubmit((values: any) => {
         <FormField v-slot="{ componentField }" name="lastName">
           <FormItem class="w-1/2">
             <FormControl>
-              <Input
-                type="text"
-                placeholder="Apellidos"
-                v-bind="componentField"
-              />
+              <CustomInput
+                  type="text"
+                  label="Apellidos"
+                  v-bind="componentField"
+                />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -177,18 +177,15 @@ const onSubmit = form.handleSubmit((values: any) => {
           >
             <FormItem class="w-1/2">
               <FormControl>
-                <Select v-bind="componentField">
-                  <SelectTrigger class="px-2">
-                    <SelectValue placeholder="Tipo de Documento" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectItem value="DNI">DNI</SelectItem>
-                      <SelectItem value="CE">CE</SelectItem>
-                      <SelectItem value="PT">PT</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                <CustomSelect
+                  v-bind="componentField"
+                  :items="[
+                    { id: 'DNI', name: 'DNI' },
+                    { id: 'CE', name: 'CE' },
+                    { id: 'PT', name: 'PT' },
+                  ]"
+                  placeholder="Tipo de Documento"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -200,11 +197,11 @@ const onSubmit = form.handleSubmit((values: any) => {
           >
             <FormItem class="w-1/2">
               <FormControl>
-                <Input
-                  type="text"
-                  placeholder="N° documento"
-                  v-bind="componentField"
-                />
+                <CustomInput
+                type="text"
+                label="N° documento"
+                v-bind="componentField"
+              />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -215,9 +212,9 @@ const onSubmit = form.handleSubmit((values: any) => {
         <FormField v-slot="{ componentField }" name="phoneNumber">
           <FormItem>
             <FormControl>
-              <Input
+              <CustomInput
                 type="text"
-                placeholder="Número de celular"
+                label="Número de celular"
                 v-bind="componentField"
               />
             </FormControl>
@@ -229,9 +226,9 @@ const onSubmit = form.handleSubmit((values: any) => {
         <FormField v-slot="{ componentField }" name="email">
           <FormItem>
             <FormControl>
-              <Input
+              <CustomInput
                 type="email"
-                placeholder="Correo"
+                label="Correo"
                 v-bind="componentField"
               />
             </FormControl>

@@ -27,7 +27,7 @@
 import { SelectRoot } from 'radix-vue'
 import { Check } from 'lucide-vue-next'
 interface Item {
-    id: string
+    id: string 
     name: string
 }
 interface Props {
