@@ -101,14 +101,11 @@ if (props.id) {
         <FormField v-slot="{ componentField }" name="description">
           <FormItem>
             <FormControl>
-              <CustomInput
-                class="h-[85px]"
-                type="text"
-                label="Descripción"
-                v-bind="componentField"
-                :removeAlignCenter="true"
-                :addMarginTop="true"
-              />
+              <Textarea
+              type="text"
+              label="Descripción"
+              v-bind="componentField"
+            />
             </FormControl>
             <FormMessage />
           </FormItem>
