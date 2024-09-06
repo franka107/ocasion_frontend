@@ -148,7 +148,7 @@ const handleFilesChange = (files: File[]) => {
           <FormControl>
             <Textarea
               type="text"
-              placeholder="Descripción"
+              label="Descripción"
               v-bind="componentField"
             />
           </FormControl>
