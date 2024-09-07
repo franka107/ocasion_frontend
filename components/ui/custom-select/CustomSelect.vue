@@ -1,7 +1,7 @@
 <template>
     <SelectRoot v-model:open="open">
         <SelectTrigger class="border-[#0B3859] relative">
-            <label v-if="!!currentLabel" class="absolute text-[#64748B] bg-white text-xs top-[-8px] left-2 px-1">{{ props.placeholder }}</label>
+            <label v-if="!!currentLabel" class="absolute text-[#64748B] bg-white text-xs top-[-8px] left-2 px-1 max-w-[calc(100%_-_12px)] whitespace-nowrap overflow-hidden text-ellipsis">{{ props.placeholder }}</label>
             <span :class="currentLabel ? 'text-[#020617]' :'text-[#94A3B8]'">
                 {{ currentLabel || props.placeholder }} 
             </span>
@@ -26,8 +26,8 @@
 <script setup lang="ts">
 import { SelectRoot } from 'radix-vue'
 import { Check } from 'lucide-vue-next'
-interface Item {
-    id: string 
+export interface Item {
+    id: string | number
     name: string
 }
 interface Props {
@@ -39,14 +39,14 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), { items: () => [], placeholder: '', multiple: false })
 const emit = defineEmits(['update:modelValue', 'update:open'])
 const open = ref(false)
-const currentValue = ref<undefined | string | Item | string[]>(undefined)
+const currentValue = ref<undefined | string | number | Item | (string| number)[]>(undefined)
 watch(() => props.modelValue, (val) => {
 
     currentValue.value = val
 }, { immediate: true })
 const currentLabel = computed(() => {
-    if (!currentValue.value) return ''
-    if (typeof currentValue.value === 'string') {
+    if (currentValue.value === undefined) return ''
+    if (['string', 'number'].includes(typeof currentValue.value)) {
         return props.items.find((item) => item.id === currentValue.value)?.name || props.placeholder
     }
     if (Array.isArray(currentValue.value)) {
@@ -54,7 +54,7 @@ const currentLabel = computed(() => {
     }
     // return currentValue.value.name
 })
-const handleSelect = (value: string) => {
+const handleSelect = (value: string | number) => {
     if (!props.multiple) {
         if (currentValue.value !== value) {
             currentValue.value = value;
@@ -63,7 +63,7 @@ const handleSelect = (value: string) => {
         open.value = false 
     } else {
         if (currentValue.value === undefined) {
-            currentValue.value = [value]
+            currentValue.value = [value] 
         } else if(Array.isArray(currentValue.value)) {
             const index = currentValue.value.findIndex((item) => item === value)
             if (index !== -1) {

@@ -9,6 +9,7 @@ import type { IEventLItem } from "@/types/Event";
 import { eventType, goodType, eventTimes } from "@/constants/events";
 import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
 import Textarea from "../ui/textarea/Textarea.vue";
+import type { Item } from "../ui/custom-select/CustomSelect.vue";
 const EVENT_BASE_URL = "/event-management";
 let form: any;
 const { getEvent } = useEvent();
@@ -25,7 +26,7 @@ const goodTypeOptions = Array.from(goodType).map(([id, name]) => ({
   id,
   name,
 }));
-const eventTimesOptions = Array.from(eventTimes).map(([id, name]) => ({
+const eventTimesOptions: Item[] = Array.from(eventTimes).map(([id, name]) => ({
   id: Number(id),
   name,
 }));
@@ -221,28 +222,13 @@ const handleFilesChange = (files: File[]) => {
           </FormItem>
         </FormField>
       </div>
+    
       <FormField v-slot="{ componentField }" name="closingTime">
-        <FormItem>
-          <FormControl>
-            <Select v-bind="componentField">
-              <SelectTrigger>
-                <SelectValue placeholder="Horario de cierre" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem
-                    v-for="time in eventTimesOptions"
-                    :key="time.id"
-                    :value="time.id as any"
-                  >
-                    {{ time.name }}
-                  </SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </FormControl>
-          <FormMessage />
-        </FormItem>
+        <CustomSelect
+          v-bind="componentField"
+          :items="eventTimesOptions"
+          placeholder="Horario de cierre"
+        />
       </FormField>
 
       <SheetFooter class="mt-auto">

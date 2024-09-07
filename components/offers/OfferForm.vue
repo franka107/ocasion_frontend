@@ -200,7 +200,7 @@ const handleFilesChange = (files: File[]) => {
                 type="text"
                 label="Título de la oferta"
                 v-bind="componentField"
-                :disabled="props.id"
+                :disabled="!!(props.id)"
               />
           </FormControl>
           <FormMessage />
@@ -234,27 +234,11 @@ const handleFilesChange = (files: File[]) => {
           </FormItem>
         </FormField>
         <FormField v-slot="{ componentField }" name="year">
-          <FormItem>
-            <FormControl>
-              <Select v-bind="componentField">
-                <SelectTrigger>
-                  <SelectValue placeholder="Año" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem
-                      v-for="year in years"
-                      :key="year.id"
-                      :value="Number(year.id) as any"
-                    >
-                      {{ year.name }}
-                    </SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
+          <CustomSelect
+            v-bind="componentField"
+            :items="years"
+            placeholder="Horario de cierre"
+          />
         </FormField>
       </div>
       <FormField v-slot="{ componentField }" name="description">
@@ -340,7 +324,7 @@ const handleFilesChange = (files: File[]) => {
             <FormControl>
               <CustomInput
                 type="number"
-                :disabled="props.id"
+                :disabled="!!(props.id)"
                 label="Tasación"
                 v-bind="componentField"
               />
