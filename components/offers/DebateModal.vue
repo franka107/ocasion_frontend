@@ -65,15 +65,15 @@ const handleSubmit = async (values: any) => {
 
 <template>
   <AlertDialog :open="modelValue" @update:open="event => emit('update:modelValue', event)" class="z-[30]">
-    <AlertDialogContent class="z-[98]">
+    <AlertDialogContent class="z-[98] max-w-[600px] px-0">
       <form
         class="flex flex-col gap-10 flex-grow"
         @submit="onSubmit"
       >
-        <AlertDialogHeader class="border-b border-primary">
-          <AlertDialogTitle class="text-xl tracking-[-0.5px] text-primary text-start mb-[18px] font-[600] ">Debate de precios</AlertDialogTitle>
+        <AlertDialogHeader class="border-b border-primary ">
+          <AlertDialogTitle class="text-xl tracking-[-0.5px] text-primary text-start mb-[18px] font-[600 px-6">Debate de precios</AlertDialogTitle>
         </AlertDialogHeader>
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-2 gap-3 px-6">
           <CustomInput
                 class="h-14 w-full"
                 type="string"
@@ -106,7 +106,7 @@ const handleSubmit = async (values: any) => {
           </FormField>
         </div>
 
-        <AlertDialogFooter>
+        <AlertDialogFooter class="px-6">
           <Button @click="()=>{ emit('update:modelValue', false)}" type="button" size="xl" class="text-[16px] font-[600] bg-white text-primary border border-primary hover:bg-accent mt-[16px]">Cancelar</Button>
           <Button type="submit" class="text-[16px] font-[600] mt-[16px]" size="xl" :disabled="!form.meta.value.valid">Confirmar</Button>
         </AlertDialogFooter>
