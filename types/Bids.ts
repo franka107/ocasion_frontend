@@ -5,11 +5,11 @@ export interface OfferWithBidDto {
     bid:{
         createdAt: string // Iso Format
         amount: number;
-        status: BidStatus[]
+        status: bidStatus[]
     };
 };
     
-export enum BidStatus {
+export enum bidStatus {
     Base = 'BASE', // Base
     GivenUp = 'GIVEN_UP', // Desistida
     Winner = 'WINNER', // Ganadora
