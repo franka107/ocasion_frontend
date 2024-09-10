@@ -119,11 +119,12 @@ const bidData = ref([]);
 const selectedMultipleData = ref<{ type: string, ids: string[]}>({ type: 'empty', ids: [] });
 const resetMultipleSelect = ref<Function | undefined>(undefined);
 const disableMultipleSelect = computed(()=> selectedMultipleData.value.type === 'empty' && selectedMultipleData.value.ids.length === 0);
-const filterOptions = ref(`[{ "field": "id", "type": "like", "value": "0" }]`);
+const filterOptions = ref(`[{ "field": "event.id", "type": "equal", "value": "${route.params.eventId}" }]`);
 const onSearch = (item: { [key: string]: string }) => {
   filterOptions.value = JSON.stringify([
     { field: "title", type: "like", value: item.title || "" },
-    { field: "status", type: "equal", value: item.status || "" }
+    { field: "status", type: "equal", value: item.status || "" },
+    { field: "event.id", type: "equal", value: route.params.eventId }
   ]);
   
 };

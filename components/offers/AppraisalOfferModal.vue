@@ -72,17 +72,18 @@ const handleSubmit = async (values: any) => {
     @update:open="(event) => emit('update:modelValue', event)"
     class="z-[30]"
   >
-    <AlertDialogContent class="z-[98]">
+    <AlertDialogContent class="z-[98] max-w-[600px] px-0">
       <form
-        class="flex flex-col gap-5 flex-grow"
+        class="flex flex-col gap-10 flex-grow"
         @submit="onSubmit"
       >
         <AlertDialogHeader class="border-b border-primary">
-          <AlertDialogTitle class="text-xl tracking-[-0.5px] text-primary text-start mb-[18px] font-[600] "
+          <AlertDialogTitle class="text-xl tracking-[-0.5px] text-primary text-start mb-[18px] font-[600] px-6"
             >Cambio de tasación</AlertDialogTitle
           >
         </AlertDialogHeader>
-        <CustomInput
+        <div class="px-6">
+          <CustomInput
                 class="h-14 w-full"
                 type="string"
                 label="Nombre del evento"
@@ -90,7 +91,8 @@ const handleSubmit = async (values: any) => {
                 :disabled="true"
                 labelOffset
               />
-        <div class="grid grid-cols-2 gap-3">
+        </div>
+        <div class="grid grid-cols-2 gap-3 px-6">
           <CustomInput
                 class="h-14 w-full"
                 type="number"

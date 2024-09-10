@@ -92,7 +92,7 @@ if (props.id) {
                 type="text"
                 label="Nombre"
                 v-bind="componentField"
-                :disabled="props.id"
+                :disabled="!!(props.id)"
               />
             </FormControl>
             <FormMessage />

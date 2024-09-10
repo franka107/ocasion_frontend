@@ -214,9 +214,6 @@ const isOfferActionsVisible = computed(() => eventDetail.value?.status !== FINIS
 const filterOptions = ref(
   `[{ "field": "event.id", "type": "equal", "value": "${route.params.eventId}" }]`,
 );
-const filterOptions2 = ref(
-  `[{ "field": "id", "type": "like", "value": "${route.params.eventId}" }]`,
-);
 const openModal = ref(false);
 const openModifyAppraisal = ref(false);
 const openAppraisalHistoryModal = ref(false);
@@ -227,16 +224,18 @@ const changeAppraisalForm = ref<IChangeAppraisalForm>({
   oldAppraisal: 0,
   newAppraisal: 0,
 });
-
 const openModalOffer = ref(false); 
 const openModalDebate = ref(false); 
 const selectedDebateInfo = ref<IDebateForm>({ name: "", appraisal: 0, id: "" }); 
 const selectedMultipleData = ref<{ type: string, ids: string[]}>({ type: 'empty', ids: [] });
 const resetMultipleSelect = ref<Function | undefined>(undefined);
 const disableMultipleSelect = computed(()=> selectedMultipleData.value.type === 'empty' && selectedMultipleData.value.ids.length === 0);
+
 const onSearch = (item: { [key: string]: string }) => {
-  const filters = [{ field: "title", type: "like", value: item.title || "" }];
-  filterOptions.value = JSON.stringify(filters);
+  filterOptions.value = JSON.stringify([
+   { field: "title", type: "like", value: item.title || "" },
+   { field: "event.id", type: "equal", value: route.params.eventId },
+   ]);
 };
 
 const  [{ data: eventDetail, refresh: refreshEventDetail }, { data, refresh: refreshOfferTable }]: any = await Promise.all([
@@ -278,12 +277,6 @@ const bidsData = computed(() =>
 // Datos de puja
 const refreshBids = async () => {
   const { data: result }: any = await useAPI(`${OFFER_BASE_URL}/find-offers-with-bid-paginated`, {
-    query: {
-      limit: 8,
-      page,
-      filterOptions : filterOptions2,
-      sortOptions,
-    },
   } as any);
   bidData.value = result.value.data || [];
 };

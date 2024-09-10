@@ -1,7 +1,14 @@
 <template>
-  <div class="py-4 px-10 rounded-xl bg-white w-full">
-    <h1 class="mb-3 text-2xl font-bold text-primary">Gestión de eventos</h1>
-    <p class="text-[18px] text-[#68686C]">Crea y gestiona tus eventos</p>
+  <div class="flex items-center py-4 px-10 rounded-xl bg-white w-full">
+    <div class="h 10 w 10">
+      <Button variant="ghost" @click="router.back">
+        <CustomIcons name="BackArrow" class="w-6 h-6 text-primary" />
+      </Button>
+    </div>
+    <div class="ml-7">
+      <h1 class="mb-3 text-2xl font-bold text-primary">Gestión de eventos</h1>
+      <p class="text-[18px] text-[#68686C]">Crea y gestiona tus eventos</p>
+    </div>
   </div>
   <div class="mt-4 grid lg:grid-cols-[212px,_1fr,_1fr] sm:grid-cols-1 gap-x-4">
     <div class="bg-white rounded-xl p-6 lg:max-w-[212px] mt-3 lg:mt-0">
@@ -64,7 +71,7 @@
 </template>
 <script setup lang="ts">
 import type { IOrganizationSummary } from "@/types/Event";
-
+const router = useRouter();
 defineProps<{ data: IOrganizationSummary }>();
 </script>
 
