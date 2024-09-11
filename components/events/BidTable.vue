@@ -53,8 +53,9 @@
                     <DropdownMenuItem
                       @click="
                         () => {
-                          bidsId = undefined;
-                          openModal = true;
+                          bidsId = row.id;
+                          openAppraisalHistoryModal = true;
+                          appraisalHistoryModal = { offerId: row.id };
                         }
                       "
                     >
@@ -83,6 +84,8 @@
             <HistoryForm
               :bidsId="bidsId"
               :offer-id="appraisalHistoryModal.offerId"
+              :endpoint="findBidHistories"
+              title="Historial de pujas"
             />
           </SheetContent>
       
@@ -109,7 +112,7 @@ import type {IAmountHistoryModal} from "~/types/Offer";
 
 const { openConfirmModal, updateConfirmModal } = useConfirmModal();
 const { rejectOfferBids,acceptOfferBids, page, sortOptions, onSort  } = useBidAPI()
-
+const findBidHistories = "/audit/find-bid-histories";
 const OFFER_BASE_URL = "/offer-management";
 const openModal = ref(false);
 const openAppraisalHistoryModal = ref(false);

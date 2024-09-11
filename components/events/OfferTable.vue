@@ -101,8 +101,10 @@
                       }
                     "
                   >
-                    Historial tasaciones
+                  <div class="flex items-center space-x-2">
+                    <span>Historial tasaciones</span>
                     <CustomIcons name="Clock-Timer" class="ml-auto" />
+                  </div>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     @click="
@@ -140,6 +142,8 @@
             <HistoryForm
               :bidsId="bidsId"
               :offer-id="appraisalHistoryModal.offerId"
+              :endpoint="auditBidHistories"
+              title="Historial de tasaciones"
             />
           </SheetContent>
         <SheetContent
@@ -180,7 +184,7 @@
     </div>
   </section>
   <section v-else>
-          <BidTable />
+          <BidTable/>
   </section>
 </template>
 
@@ -197,6 +201,8 @@ import OfferForm from "@/components/offers/OfferForm.vue";
 import DebateModal from "@/components/offers/DebateModal.vue";
 import BidTable from '@/components/events/BidTable.vue';
 import AppraisalOfferModal from "~/components/offers/AppraisalOfferModal.vue";
+
+const auditBidHistories = "/audit/find-audit-histories";
 const { openConfirmModal, updateConfirmModal } = useConfirmModal();
 const { page, sortOptions, onSort, createOffer, editOffer, confirmOffers, retireOffers } = useOfferAPI();
 const OFFER_BASE_URL = "/offer-management";
@@ -210,7 +216,6 @@ const isOfferActionsVisible = computed(() => eventDetail.value?.status !== FINIS
 const filterOptions = ref(
   `[{ "field": "event.id", "type": "equal", "value": "${route.params.eventId}" }]`,
 );
-const openModal = ref(false);
 const openModifyAppraisal = ref(false);
 const openAppraisalHistoryModal = ref(false);
 const appraisalHistoryModal = ref<IAmountHistoryModal>({ offerId: "" });
@@ -226,7 +231,6 @@ const selectedDebateInfo = ref<IDebateForm>({ name: "", appraisal: 0, id: "" });
 const selectedMultipleData = ref<{ type: string, ids: string[]}>({ type: 'empty', ids: [] });
 const resetMultipleSelect = ref<Function | undefined>(undefined);
 const disableMultipleSelect = computed(()=> selectedMultipleData.value.type === 'empty' && selectedMultipleData.value.ids.length === 0);
-
 const onSearch = (item: { [key: string]: string }) => {
   filterOptions.value = JSON.stringify([
    { field: "title", type: "like", value: item.title || "" },
@@ -253,8 +257,6 @@ const offerData = computed(() =>
     ...item,
   })),
 );
-
-
 //Funcion cambia vista de pujas
 const handleViewBids = async () => {
   showBids.value = true;

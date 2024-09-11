@@ -117,7 +117,7 @@ const handleSubmit = async (values: any) => {
           </FormField>
         </div>
 
-        <AlertDialogFooter>
+        <AlertDialogFooter class="px-6">
           <Button
             @click="
               () => {

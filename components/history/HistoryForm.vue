@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { X } from "lucide-vue-next";
-const props = defineProps<{ offerId: string }>();
+const props = defineProps<{ 
+  offerId: string;
+  endpoint: string; 
+  title: string;
+}>();
 const dateHistory = ref<
   Array<{
     id: string;
@@ -14,7 +18,7 @@ const dateHistory = ref<
 
 const fetchBidHistory = async (offerId: string) => {
   try {
-    const { data } = await useAPI("/audit/find-audit-histories", {
+    const { data } = await useAPI(props.endpoint, {
       default: () => [],
       query: {
         filterOptions: JSON.stringify([
@@ -49,7 +53,7 @@ await fetchBidHistory(props.offerId);
       <X class="w-4 h-4 text-muted-foreground" />
     </SheetClose>
     <SheetTitle class="text-xl font-medium text-[#64748B]"
-      >Historial de tasaciones
+      >{{ title }}
     </SheetTitle>
   </SheetHeader>
   <div class="flex-grow overflow-y-auto no-scrollbar flex flex-col">
