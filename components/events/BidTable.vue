@@ -88,6 +88,7 @@
       
     </div>
     <CustomPagination
+          v-if="data"
           class="mt-5 mb-[19px]"
           :total="data.count"
           :limit="data.limit"
@@ -115,7 +116,6 @@ const openAppraisalHistoryModal = ref(false);
 const appraisalHistoryModal = ref<IAmountHistoryModal>({ offerId: "" });
 const bidsId = ref<number | undefined>(undefined);
 const route = useRoute();
-const bidData = ref([]);
 const selectedMultipleData = ref<{ type: string, ids: string[]}>({ type: 'empty', ids: [] });
 const resetMultipleSelect = ref<Function | undefined>(undefined);
 const disableMultipleSelect = computed(()=> selectedMultipleData.value.type === 'empty' && selectedMultipleData.value.ids.length === 0);
@@ -141,7 +141,7 @@ const { data, refresh }: any = await useAPI(
 );
 
 const bidsData = computed(() =>
-  data.value.data.map((item: OfferWithBidDto, index: number) => ({
+  data.value?.data.map((item: OfferWithBidDto, index: number) => ({
     code: "-",
     date: new Date(item.bid.createdAt).toLocaleString("es-ES", {
         day: "2-digit",
@@ -153,7 +153,7 @@ const bidsData = computed(() =>
     amount: `$${item.bid.amount}`,
     status: item.bid.status,
     ...item,
-  })),
+  })) || [], 
 );
 
 const handleRejectBid = async (values: { type: string, ids: string[]}) => {

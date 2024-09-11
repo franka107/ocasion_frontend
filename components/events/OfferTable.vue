@@ -179,21 +179,19 @@
       />
     </div>
   </section>
-  <section v-if="showBids">
-          <BidTable :bidsData="bidsData" :search="bidsSearch" @onSort="onSort" @onSearch="onSearch" />
+  <section v-else>
+          <BidTable />
   </section>
 </template>
 
 <script setup lang="ts">
 import { offerHeader, offerStatus, offerSearch } from "@/constants/offer";
-import { bidsSearch } from "@/constants/bids";
 import type {
   OfferListItem,
   IDebateForm,
   IChangeAppraisalForm,
   IAmountHistoryModal,
 } from "~/types/Offer";
-import type { OfferWithBidDto } from "~/types/Bids";
 import CustomIcons from "~/components/ui/custom-icons/CustomIcons.vue";
 import OfferForm from "@/components/offers/OfferForm.vue";
 import DebateModal from "@/components/offers/DebateModal.vue";
@@ -207,9 +205,7 @@ const { getEvent } = useEvent();
 const offerId = ref(undefined);
 const showBids = ref(false);
 const bidsId = ref<number | undefined>(undefined);
-const bidData = ref([]);
 const FINISHED_STATUS = "FINISHED";
-const PUBLISHED_STATUS = "PUBLISHED";
 const isOfferActionsVisible = computed(() => eventDetail.value?.status !== FINISHED_STATUS);
 const filterOptions = ref(
   `[{ "field": "event.id", "type": "equal", "value": "${route.params.eventId}" }]`,
@@ -258,32 +254,9 @@ const offerData = computed(() =>
   })),
 );
 
-const bidsData = computed(() =>
-  bidData.value.map((item: OfferWithBidDto, index: number) => ({
-    code: String(index + 1),
-    date: new Date(item.bid.createdAt).toLocaleString("es-ES", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    amount: `$${item.bid.amount}`,
-    status: item.bid.status,
-    ...item,
-  })),
-);
-
-// Datos de puja
-const refreshBids = async () => {
-  const { data: result }: any = await useAPI(`${OFFER_BASE_URL}/find-offers-with-bid-paginated`, {
-  } as any);
-  bidData.value = result.value.data || [];
-};
 
 //Funcion cambia vista de pujas
 const handleViewBids = async () => {
-  await refreshBids();
   showBids.value = true;
   console.log("Bids view enabled", showBids.value);
 };
