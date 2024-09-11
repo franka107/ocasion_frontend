@@ -1,10 +1,10 @@
 import type { HeaderItem, SearchItem } from "@/components/ui/custom-table/CustomTable.vue";
 
-export const BidStatus = new Map<string, { name: string; color: string }>([
+export const bidStatus = new Map<string, { name: string; color: string }>([
     ["BASE", { name: "Base", color: "purple" }],
     ["GIVEN_UP", { name: "Desistida", color: "blue" }],
     ["WINNER", { name: "Ganadora", color: "green" }],
-    ["DISCARDED", { name: "Decartada", color: "gray" }],
+    ["DISCARDED", { name: "Descartada", color: "gray" }],
 ]);
 
 export const bidsSearch: SearchItem[] = [
@@ -19,7 +19,7 @@ export const bidsSearch: SearchItem[] = [
         key: 'status',
         type: 'select',
         placeholder: 'Filtrar estados',
-        items: [...Array.from(BidStatus).map(([key, value]) => ({ text: value.name, value: key })), { text: 'Todos', value: " " }],
+        items: [...Array.from(bidStatus).map(([key, value]) => ({ text: value.name, value: key })), { text: 'Todos', value: " " }],
         elementClass: 'min-w-[400px]',
         position: 2,
     }

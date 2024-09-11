@@ -232,7 +232,7 @@ const handleFilesChange = (files: File[]) => {
                 type="text"
                 label="Número de RUC"
                 v-bind="componentField"
-                :disabled="props.rucNumber"
+                :disabled="!!(props.rucNumber)"
               />
             </FormControl>
             <FormMessage />
@@ -246,7 +246,7 @@ const handleFilesChange = (files: File[]) => {
                 type="text"
                 label="Razón Social"
                 v-bind="componentField"
-                :disabled="props.rucNumber"
+                :disabled="!!(props.rucNumber)"
               />
             </FormControl>
             <FormMessage />

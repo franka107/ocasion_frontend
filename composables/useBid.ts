@@ -4,6 +4,11 @@ const BID_BASE_URL = "/bid-management";
 
 export function useBidAPI() {
 
+    const page = ref(1);
+    const sortOptions = ref("[]");
+    const onSort = (sortObject: { [key: string]: string }[]) => {
+      sortOptions.value = JSON.stringify(sortObject);
+    };
     const rejectOfferBids = async (values: { type: string; ids: string[] }) => {
         const { status, error }: any = await useAPI(
           `${BID_BASE_URL}/reject-offer-bids`,
@@ -26,6 +31,6 @@ export function useBidAPI() {
         return {status, error}
     }
 
-    return{ rejectOfferBids, acceptOfferBids }
+    return{ rejectOfferBids, acceptOfferBids, page, sortOptions, onSort}
 
 }

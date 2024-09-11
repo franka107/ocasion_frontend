@@ -71,7 +71,7 @@ const handleSubmit = async (values: any) => {
         @submit="onSubmit"
       >
         <AlertDialogHeader class="border-b border-primary ">
-          <AlertDialogTitle class="text-xl tracking-[-0.5px] text-primary text-start mb-[18px] font-[600 px-6">Debate de precios</AlertDialogTitle>
+          <AlertDialogTitle class="text-xl tracking-[-0.5px] text-primary text-start mb-[18px] font-[600] px-6">Debate de precios</AlertDialogTitle>
         </AlertDialogHeader>
         <div class="grid grid-cols-2 gap-3 px-6">
           <CustomInput

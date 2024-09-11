@@ -1,108 +1,221 @@
-<!-- src/components/events/BidTable.vue -->
+
 <template>
-    <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
+  <section>
+    <div class="w-full flex flex-col">
+     <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto mt-6">
       <CustomTable
-        :data="bidsData"
-        :header="bidsHeader"
-        :search="bidsSearch"
-        @onSort="onSort"
-        @onSearch="onSearch"
-      >
-        <template #action-button>
-          <Button @click="" variant="default" class="bg-white text-primary border border-primary hover:bg-accent">Rechazar puja</Button>
-          <Button @click="" class="bg-white text-primary border border-primary hover:bg-accent">Aceptar puja</Button>
-          <Button @click="" variant="default">Contraofertar</Button>
-        </template>
-        <template #actions="{ row }">
-          <div class="flex justify-center">
-            <DropdownMenu>
-              <DropdownMenuTrigger as-child>
-                <Button variant="ghost" size="sm" class="h-8 data-[state=open]:bg-accent">
-                  <CustomIcons name="VerticalDots" class="w-6 h-6" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" class="bg-primary text-white">
-                <DropdownMenuItem @click="() => {bidsId = undefined;openModal = true;} ">
-                  Historial de puja 
-                  <CustomIcons name="Reload" class="ml-auto" />
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </template>
-        <template #status="{ row }">
-          <CustomChip :text="BidStatus.get(row.status) || ''"></CustomChip>
-        </template>
-      </CustomTable>
-      <!-- Formulario de Pujas -->
-      <!-- <SheetContent class="flex flex-col h-full" v-model:open="openModal">
-        <BindsForm
-          :id="bidsId"
-          :onSubmit="bidsId !== undefined ? handleViewBidHistory "
-        />
-      </SheetContent>
-        <CustomPagination
-        class="mt-5 mb-[19px]"
-        :total="data.count"
-        :limit="data.limit"
-        v-model:page="page"
-        />  -->
+            :data="bidsData"
+            :header="bidsHeader"
+            :search="bidsSearch"
+            multipleSelect
+            @onSort="onSort"
+            @onSearch="onSearch"
+            @on-multiple-select="({ ids, type, resetMultipleSelect: onResetMultipleSelect })=> { selectedMultipleData = { ids, type }; resetMultipleSelect = onResetMultipleSelect }"
+          >
+            <template #action-button>
+              <Button
+                @click="handleRejectBid(selectedMultipleData)"
+                variant="default"
+                :disabled="disableMultipleSelect"
+                class="bg-white text-primary border border-primary hover:bg-accent"
+              >
+                Rechazar puja
+              </Button>
+              <Button
+                @click="handleAddBid(selectedMultipleData)"
+                :disabled="disableMultipleSelect"
+                class="bg-white text-primary border border-primary hover:bg-accent"
+                >Aceptar puja
+              </Button>
+              <Button
+                @click=""
+                :disabled="disableMultipleSelect"
+                variant="default"
+                >Contraofertar
+              </Button>
+            </template>
+            <template #actions="{ row }">
+              <div class="flex justify-center">
+                <DropdownMenu>
+                  <DropdownMenuTrigger as-child>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      class="h-8 data-[state=open]:bg-accent"
+                    >
+                      <CustomIcons name="VerticalDots" class="w-6 h-6" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="start"
+                    class="bg-primary text-white"
+                  >
+                    <DropdownMenuItem
+                      @click="
+                        () => {
+                          bidsId = row.id;
+                          openAppraisalHistoryModal = true;
+                          appraisalHistoryModal = { offerId: row.id };
+                        }
+                      "
+                    >
+                      <div class="flex items-center space-x-2">
+                        <span>Historial de puja</span>
+                        <CustomIcons name="Clock-Timer" class="ml-auto" />
+                      </div>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </template>
+            <template #status="{ row }">
+              <CustomChip
+                :text="bidStatus.get(row.status)?.name || ''"
+                :variant="bidStatus.get(row.status)?.color as any"
+              ></CustomChip>
+            </template>
+          </CustomTable>
+          <SheetContent
+            v-model:open="openAppraisalHistoryModal"
+            @pointer-down-outside="(e) => e.preventDefault()"
+            @interact-outside="(e) => e.preventDefault()"
+            class="flex flex-col h-full"
+          >
+            <HistoryForm
+              :bidsId="bidsId"
+              :offer-id="appraisalHistoryModal.offerId"
+              :endpoint="findBidHistories"
+              title="Historial de pujas"
+            />
+          </SheetContent>
+      
+    </div>
+    <CustomPagination
+          v-if="data"
+          class="mt-5 mb-[19px]"
+          :total="data.count"
+          :limit="data.limit"
+          v-model:page="page"
+          @page-change="refresh"
+    /> 
   </div>
-    
+</section>
   </template>
   
   <script setup lang="ts">
-  import { ref, computed } from 'vue';
-  import CustomTable from '../ui/custom-table/CustomTable.vue';
-  import Button from '../ui/button/Button.vue';
-  import CustomIcons from '@/components/ui/custom-icons/CustomIcons.vue';
-  import { bidsHeader, bidsSearch, BidStatus } from '@/constants/bids';
-  import type { OfferWithBidDto } from '~/types/Bids';
-  const BASE_OFFERS_URL = "/offer-management";
-  const route = useRoute();
-  const bidsId = ref<number | undefined>(undefined);
-  const showBids = ref(false); 
-  const openModal = ref(false);
-  const { page, sortOptions, onSort} = useOfferAPI();
-  const bidData = ref([]); 
-  const filterOptions = ref(
-    `[{ "field": "id", "type": "like", "value": "${route.params.eventId}" }]`,
-    );
-  const onSearch = (item: { [key: string]: string }) => {
-    const filters = [{ field: "tile", type: "like", value: item.title || "" }];
-    filterOptions.value = JSON.stringify(filters);
-  };
-  const bidsData = computed(() => bidData.value.map((item: OfferWithBidDto) => ({
-    code: "1",
-    date: "DD/MM/AAAA 12:20",
-    amount:"10000",
-    ...item,
-   })),
-  );
-  // Datos de puja 
-  const refreshBids = async () => {
-    const { data: bidData }: any = await useAPI(`${BASE_OFFERS_URL}/find-offers-with-bid-paginated`, {
-        query: {
-        limit: 10,
-        page,
-        filterOptions,
-        sortOptions,
-        },
-    } as any);
-    // bidData.value = bidData.data;
-    console.log("Data1", bidData.value); 
-  };
+import { ref, computed } from 'vue';
+import CustomIcons from '@/components/ui/custom-icons/CustomIcons.vue';
+import CustomPagination from "@/components/ui/custom-pagination/CustomPagination.vue";
+import { bidsHeader, bidsSearch, bidStatus } from '@/constants/bids';
+import type { OfferWithBidDto } from '~/types/Bids';
+import type {IAmountHistoryModal} from "~/types/Offer";
 
-  //Funcion cambia vista de pujas
-  const handleViewBids = async () => {
-    await refreshBids();
-    showBids.value = true; 
-    console.log("Bids view enabled", showBids.value);
-  };
+const { openConfirmModal, updateConfirmModal } = useConfirmModal();
+const { rejectOfferBids,acceptOfferBids, page, sortOptions, onSort  } = useBidAPI()
+const findBidHistories = "/audit/find-bid-histories";
+const OFFER_BASE_URL = "/offer-management";
+const openModal = ref(false);
+const openAppraisalHistoryModal = ref(false);
+const appraisalHistoryModal = ref<IAmountHistoryModal>({ offerId: "" });
+const bidsId = ref<number | undefined>(undefined);
+const route = useRoute();
+const selectedMultipleData = ref<{ type: string, ids: string[]}>({ type: 'empty', ids: [] });
+const resetMultipleSelect = ref<Function | undefined>(undefined);
+const disableMultipleSelect = computed(()=> selectedMultipleData.value.type === 'empty' && selectedMultipleData.value.ids.length === 0);
+const filterOptions = ref(`[{ "field": "event.id", "type": "equal", "value": "${route.params.eventId}" }]`);
+const onSearch = (item: { [key: string]: string }) => {
+  filterOptions.value = JSON.stringify([
+    { field: "title", type: "like", value: item.title || "" },
+    { field: "status", type: "equal", value: item.status || "" },
+    { field: "event.id", type: "equal", value: route.params.eventId }
+  ]);
   
-//   const handleViewBidHistory = () => {
-//     // Lógica para ver el historial de pujas
-//   };
-  
-  </script>
+};
+const { data, refresh }: any = await useAPI(
+  `${OFFER_BASE_URL}/find-offers-with-bid-paginated`,
+  {
+    query: {
+      limit: 10,
+      page,
+      filterOptions,
+      sortOptions,
+    },
+  } as any,
+);
+
+const bidsData = computed(() =>
+  data.value?.data.map((item: OfferWithBidDto, index: number) => ({
+    code: "-",
+    date: new Date(item.bid.createdAt).toLocaleString("es-ES", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    amount: `$${item.bid.amount}`,
+    status: item.bid.status,
+    ...item,
+  })) || [], 
+);
+
+const handleRejectBid = async (values: { type: string, ids: string[]}) => {
+  openConfirmModal({
+    title: "Rechazar puja",
+    message: `¿Está seguro de rechazar la(s) puja(s) seleccionada(s)?`,
+    callback: async () => {
+      try {
+        const { status } = await rejectOfferBids(values);
+       
+        if (status.value === "success") {
+          refresh();
+          resetMultipleSelect.value?.()
+          updateConfirmModal({
+            title: "Puja(s) rechazada(s)",
+            message: "La(s) puja(s) ha sido rechazada(s) exitosamente",
+            type: "success",
+          });
+        } else {
+          throw new Error("Error al rechazar esta(s) puja(s)");
+        }
+      } catch (error) {
+        updateConfirmModal({
+          title: "Error al rechazar puja(s)",
+          message: "No se pudo rechazar puja(s). Por favor, intente nuevamente.",
+          type: "error",
+        });
+      }
+    },
+  });
+};
+const handleAddBid = async (values: { type: string, ids: string[]}) => {
+  openConfirmModal({
+    title: "Aceptar puja",
+    message: `¿Está seguro de aceptar la(s) puja(s) seleccionada(s)?`,
+    callback: async () => {
+      try {
+        const { status } = await acceptOfferBids(values);
+       
+        if (status.value === "success") {
+          refresh();
+          resetMultipleSelect.value?.()
+          updateConfirmModal({
+            title: "Puja(s) aceptada(s)",
+            message: "La(s) puja(s) ha sido aceptada(s) exitosamente",
+            type: "success",
+          });
+        } else {
+          throw new Error("Error al aceptar esta(s) puja(s)");
+        }
+      } catch (error) {
+        updateConfirmModal({
+          title: "Error al aceptar puja(s)",
+          message: "No se pudo aceptar puja(s). Por favor, intente nuevamente.",
+          type: "error",
+        });
+      }
+    },
+  });
+};
+</script>
   
