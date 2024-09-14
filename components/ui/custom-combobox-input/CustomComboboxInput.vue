@@ -2,22 +2,6 @@
   <div class="my-2">
     <Popover>
       <PopoverTrigger as-child>
-        <!-- <Button -->
-        <!--   variant="outline" -->
-        <!--   :class="[ -->
-        <!--     'w-full justify-start text-left font-normal', -->
-        <!--     !modelValue && 'text-muted-foreground', -->
-        <!--     props.class, -->
-        <!--   ]" -->
-        <!--   :disabled="props.disabled" -->
-        <!-- > -->
-        <!--   <CalendarIcon class="mr-2 h-4 w-4" /> -->
-        <!--   {{ -->
-        <!--     dateValue -->
-        <!--       ? dateFormatter.format(dateValue.toDate(getLocalTimeZone())) -->
-        <!--       : props.label -->
-        <!--   }} -->
-        <!-- </Button> -->
         <Button
           variant="outline"
           role="combobox"
@@ -36,14 +20,6 @@
         </Button>
       </PopoverTrigger>
       <PopoverContent class="w-auto p-0">
-        <!-- <Calendar -->
-        <!--   :minValue="props.minValue" -->
-        <!--   :maxValue="props.maxValue" -->
-        <!--   @update:modelValue="onUpdateValue" -->
-        <!--   v-model="dateValue" -->
-        <!--   initial-focus -->
-        <!--   :disabled="props.disabled" -->
-        <!-- /> -->
         <Command>
           <CommandInput :placeholder="props.label" />
           <CommandEmpty>No hay coincidencias.</CommandEmpty>

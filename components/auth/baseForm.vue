@@ -1,6 +1,13 @@
 <template>
-  <div class="bg-white rounded-lg shadow-md p-6 w-[572px] transition-all duration-300 ease-in-out " >
-    <h2 :class="['text-[40px] font-roboto font-semibold  text-[#20445e]', titleClass]">
+  <div
+    class="bg-white rounded-lg shadow-md p-6 w-[572px] transition-all duration-300 ease-in-out"
+  >
+    <h2
+      :class="[
+        'text-[40px] font-roboto font-semibold  text-[#20445e]',
+        titleClass,
+      ]"
+    >
       {{ title }}
     </h2>
     <p v-if="subtitle" :class="['text-sm mb-6', subtitleClass]">
@@ -10,21 +17,28 @@
       <div>
         <slot></slot>
       </div>
-      <div :class="['mt-4 transition-all duration-300 ease-in-out', showPasswordRequirements ? 'mb-16' : 'mb-4']">
-        <button 
+      <div
+        :class="[
+          'mt-4 transition-all duration-300 ease-in-out',
+          showPasswordRequirements ? 'mb-16' : 'mb-4',
+        ]"
+      >
+        <button
           :class="[
-            'w-full',         
-            'h-[54px]',       
-            isActive ? 'bg-primary text-white' : 'bg-[#f1f5f9] text-[#95aab9]', // Fondo cuando está habilitado o deshabilitado
-            'rounded-btn',   
-            'gap-8',          
-            'flex',           
+            'w-full',
+            'h-[54px]',
+            isActive && !isLoading
+              ? 'bg-primary text-white'
+              : 'bg-[#f1f5f9] text-[#95aab9]', // Fondo cuando está habilitado o deshabilitado
+            'rounded-btn',
+            'gap-8',
+            'flex',
             'font-semibold',
-            'items-center',   
+            'items-center',
             'justify-center',
             'cursor-pointer',
-          ]" 
-          :disabled="!isActive"
+          ]"
+          :disabled="!isActive && !isLoading"
           type="submit"
         >
           {{ submitText }}
@@ -35,7 +49,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed } from "vue";
 
 const props = defineProps({
   title: String,
@@ -45,6 +59,7 @@ const props = defineProps({
   titleClass: String,
   subtitleClass: String,
   showPasswordRequirements: Boolean,
-  isActive: Boolean // Recibe isActive como prop
-})
+  isActive: Boolean,
+  isLoading: Boolean,
+});
 </script>

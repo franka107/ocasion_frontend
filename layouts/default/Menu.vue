@@ -47,15 +47,15 @@
                 <Tooltip :delay-duration="100">
                   <TooltipTrigger as-child>
                     <NuxtLink :to="menu.href">
-                    <Button
-                      :variant="'ghost'"
-                      :class="
-                        cn(
-                          `w-full justify-start h-10 mb-1 hover:bg-[#36576e] hover:text-white`,
-                          `${menu.active && 'bg-[#36576e]'} text-white `
-                        )
-                      "
-                    >
+                      <Button
+                        :variant="'ghost'"
+                        :class="
+                          cn(
+                            `w-full justify-start h-10 mb-1 hover:bg-[#36576e] hover:text-white`,
+                            `${menu.active && 'bg-[#36576e]'} text-white `,
+                          )
+                        "
+                      >
                         <div class="flex flew-row">
                           <span :class="isSidebarOpen === false ? '' : 'mr-4'">
                             <CustomIcons
@@ -102,20 +102,23 @@
             />
           </div>
         </li>
-        
-        <li class="w-full grow flex items-end" v-if="props.showToggleButton" >
-          <SidebarToggle  v-model:is-sidebar-open="isSidebarOpen" />
+
+        <li class="w-full grow flex items-end" v-if="props.showToggleButton">
+          <SidebarToggle v-model:is-sidebar-open="isSidebarOpen" />
         </li>
       </ul>
     </nav>
   </ScrollArea>
 </template>
 
-<script lang="ts"setup>
+<script lang="ts" setup>
 import { ref, computed } from "vue";
 import { useRoute } from "vue-router";
 import { BookmarkMinus, Ellipsis, LogOut } from "lucide-vue-next";
 import ScrollArea from "~/components/ui/scroll-area/ScrollArea.vue";
+
+const { getMyGrants } = useAuthManagement();
+
 import { getMenuList } from "./menu-list";
 import CollapseMenuButton from "./CollapseMenuButton.vue";
 import SidebarToggle from "./SidebarToggle.vue";
@@ -125,15 +128,19 @@ import SidebarToggle from "./SidebarToggle.vue";
 // 		required: true
 //   },
 // });
+//
+const myGrants = await getMyGrants();
 
 const isSidebarOpen = defineModel<boolean>("isSidebarOpen", { required: true });
-const props = defineProps < {
-  showToggleButton: boolean
-}>()
+const props = defineProps<{
+  showToggleButton: boolean;
+}>();
 
 const route = useRoute();
 const pathname = computed(() => route.path);
-const menuList = computed(() => getMenuList(pathname.value));
+const menuList = computed(() =>
+  getMenuList(pathname.value, myGrants.data.value ?? []),
+);
 
 function handleSignOut() {
   // Lógica para cerrar sesión

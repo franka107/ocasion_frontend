@@ -7,6 +7,7 @@
       submit-text="Ingresar"
       :submitClass="submitButtonClass"
       :isActive="isActive"
+      :isLoading="isLoading"
       @submit="handleSubmit"
     >
       <div class="mb-6 relative">
@@ -76,6 +77,17 @@
       @action="closeMaxAttemptsDialog"
     />
     <Dialog
+      v-model:open="isIncorrectCredentialsOpen"
+      :iconSrc="messageIconSrc"
+      iconAlt="Icono de alerta"
+      title="Credenciales  incorrectas"
+      description="El correo electrónico o la contraseña son incorrectos. Por favor, vuelva a intentarlo."
+      buttonText="Aceptar"
+      iconBgColor="bg-[#f53e3e]"
+      @close="closeIncorrectCredentialsDialog"
+      @action="closeIncorrectCredentialsDialog"
+    />
+    <Dialog
       v-model:open="isDialogOpen"
       :iconSrc="messageIconSrc"
       iconAlt="Icono de alerta"
@@ -116,6 +128,9 @@ const {
   toggleForgotPassword,
   closeDialog,
   goToUpdatePassword,
+  isIncorrectCredentialsOpen,
+  isLoading,
+  closeIncorrectCredentialsDialog,
 } = useLoginForm();
 
 // Computa si el campo de correo electrónico tiene texto

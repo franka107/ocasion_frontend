@@ -68,7 +68,7 @@ const organizationFormSchema = z.object({
       ) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `El ${schema.documentType} debe contener 8 digitos`,
+          message: `El ${schema.documentType} debe contener 9 digitos`,
           path: ["documentIdentifier"],
         });
       }
@@ -76,10 +76,11 @@ const organizationFormSchema = z.object({
     }),
   representativeFullName: z
     .string()
-    .min(1, "El nombre y apellidos del representante es requerido"),
-  //.length(11, "El número de RUC debe de ser 11 dígitos"),
+    .min(1, "El nombre y apellidos del representante es requerido")
+    .max(200, "No puede superar los 200 caracteres"),
   representativePhoneNumber: z
     .string()
+    .max(10, "No puede superar los 10 digitos")
     .regex(/^\d+$/, "El número de teléfono debe contener solo dígitos.")
     .optional()
     .nullable(),
@@ -232,7 +233,7 @@ const handleFilesChange = (files: File[]) => {
                 type="text"
                 label="Número de RUC"
                 v-bind="componentField"
-                :disabled="!!(props.rucNumber)"
+                :disabled="!!props.rucNumber"
               />
             </FormControl>
             <FormMessage />
@@ -246,7 +247,7 @@ const handleFilesChange = (files: File[]) => {
                 type="text"
                 label="Razón Social"
                 v-bind="componentField"
-                :disabled="!!(props.rucNumber)"
+                :disabled="!!props.rucNumber"
               />
             </FormControl>
             <FormMessage />
@@ -260,7 +261,7 @@ const handleFilesChange = (files: File[]) => {
               <CustomComboboxInput
                 @update:modelValue="componentField.onChange"
                 label="Actividad económica"
-                class="w-full"
+                class="w-full truncate"
                 :options="
                   economicActivities.map((e) => ({
                     value: e.id,
@@ -395,7 +396,11 @@ const handleFilesChange = (files: File[]) => {
                 min="0"
                 label="Porcentaje de Inicio"
                 v-bind="componentField"
-              />
+              >
+                <template #iconRight>
+                  <span class="mr-2"> % </span>
+                </template>
+              </CustomInput>
             </FormControl>
             <FormMessage />
           </FormItem>

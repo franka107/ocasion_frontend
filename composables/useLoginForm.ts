@@ -8,7 +8,9 @@ export function useLoginForm() {
   const showPassword = ref(false);
   const showForgotPassword = ref(false);
   const isDialogOpen = ref(false);
+  const isLoading = ref(false);
   const isMaxAttemptsDialogOpen = ref(false);
+  const isIncorrectCredentialsOpen = ref(false);
   const isSuspendedDialogOpen = ref(false);
   const router = useRouter();
   const errors = ref({
@@ -48,6 +50,7 @@ export function useLoginForm() {
   const handleSubmit = async () => {
     if (validate()) {
       try {
+        isLoading.value = true;
         console.log("Iniciando solicitud a la API...");
         const response = await fetch("/api/auth/login", {
           method: "POST",
@@ -64,13 +67,10 @@ export function useLoginForm() {
         if (!response.ok) {
           const errorBody = await response.json();
           const errorBack = errorBody.data.errors[0];
-          console.log(`Capturando ${JSON.stringify(errorBack)}`);
           errors.value.api = errorBack.message;
-          if (errorBack.code === "AUTH.INCORRECT_EMAIL") {
-            errors.value.email = errorBack.message;
-          }
-          if (errorBack.code === "AUTH.INCORRECT_PASSWORD") {
-            errors.value.password = errorBack.message;
+
+          if (errorBack.code === "AUTH.INVALID_CREDENTIALS") {
+            isIncorrectCredentialsOpen.value = true;
           }
           if (errorBack.code === "AUTH.MAX_ATTEMPTS_LIMIT_EXCEED") {
             isMaxAttemptsDialogOpen.value = true;
@@ -90,6 +90,8 @@ export function useLoginForm() {
         console.error("Error during login:", error);
         errors.value.api =
           "Hubo un error durante el inicio de sesión. Por favor, intente de nuevo.";
+      } finally {
+        isLoading.value = false;
       }
     }
   };
@@ -108,6 +110,9 @@ export function useLoginForm() {
 
   const closeMaxAttemptsDialog = () => {
     isMaxAttemptsDialogOpen.value = false;
+  };
+  const closeIncorrectCredentialsDialog = () => {
+    isIncorrectCredentialsOpen.value = false;
   };
   const closeSuspendedDialog = () => {
     isSuspendedDialogOpen.value = false;
@@ -132,8 +137,11 @@ export function useLoginForm() {
     toggleForgotPassword,
     isMaxAttemptsDialogOpen,
     isSuspendedDialogOpen,
+    isIncorrectCredentialsOpen,
+    isLoading,
     closeDialog,
     goToUpdatePassword,
     closeSuspendedDialog,
+    closeIncorrectCredentialsDialog,
   };
 }
