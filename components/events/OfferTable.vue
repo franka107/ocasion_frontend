@@ -1,15 +1,20 @@
 <template>
-  <section v-if="!showBids" >
-  <div class="w-full flex flex-col">
-    <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto mt-6">
-      <CustomTable
+  <section v-if="!showBids">
+    <div class="w-full flex flex-col">
+      <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto mt-6">
+        <CustomTable
           :data="offerData"
           :header="offerHeader"
           :search="offerSearch"
           multipleSelect
           @onSort="onSort"
           @onSearch="onSearch"
-          @on-multiple-select="({ ids, type, resetMultipleSelect: onResetMultipleSelect })=> { selectedMultipleData = { ids, type }; resetMultipleSelect = onResetMultipleSelect }"
+          @on-multiple-select="
+            ({ ids, type, resetMultipleSelect: onResetMultipleSelect }) => {
+              selectedMultipleData = { ids, type };
+              resetMultipleSelect = onResetMultipleSelect;
+            }
+          "
         >
           <template #action-button>
             <Button
@@ -18,27 +23,34 @@
               class="bg-white text-primary border border-primary hover:bg-accent"
               variant="default"
               :disabled="disableMultipleSelect"
-            >Confirmar oferta
+              >Confirmar oferta
             </Button>
             <Button
-               v-if="isOfferActionsVisible" 
+              v-if="isOfferActionsVisible"
               @click="handleRetireOffers(selectedMultipleData)"
               class="bg-white text-primary border border-primary hover:bg-accent"
               variant="default"
               :disabled="disableMultipleSelect"
               >Retirar oferta
             </Button>
-            <Button
-              v-if="isOfferActionsVisible"
-              @click="
-                () => {
-                  offerId = undefined;
-                  openModalOffer = true;
-                }
+            <div
+              v-if="
+                myGrants.data.value.includes(GrantId.PlatformOfferCanCreate)
               "
-              variant="default"
-              >Crear oferta
-            </Button>
+            >
+              <Button
+                v-if="isOfferActionsVisible"
+                @click="
+                  () => {
+                    offerId = undefined;
+                    openModalOffer = true;
+                  }
+                "
+                variant="default"
+                >Crear oferta
+              </Button>
+            </div>
+
             <Button v-else @click="handleViewBids" variant="default"
               >Ver pujas
             </Button>
@@ -66,17 +78,27 @@
                   align="start"
                   class="bg-primary text-white"
                 >
-                  <DropdownMenuItem
-                    @click="
-                      () => {
-                        offerId = row.id;
-                        openModalOffer = true;
-                      }
+                  <div
+                    v-if="
+                      myGrants.data.value.includes(
+                        GrantId.PlatformOfferCanUpdate,
+                      )
                     "
                   >
-                    Editar
-                    <CustomIcons name="Pen" class="ml-auto" />
-                  </DropdownMenuItem>
+                    <DropdownMenuItem
+                      :disabled="row.status === OfferStatus.Confirmed"
+                      @click="
+                        () => {
+                          offerId = row.id;
+                          openModalOffer = true;
+                        }
+                      "
+                    >
+                      Editar
+                      <CustomIcons name="Pen" class="ml-auto" />
+                    </DropdownMenuItem>
+                  </div>
+
                   <DropdownMenuItem
                     @click="
                       () => {
@@ -101,10 +123,10 @@
                       }
                     "
                   >
-                  <div class="flex items-center space-x-2">
-                    <span>Historial tasaciones</span>
-                    <CustomIcons name="Clock-Timer" class="ml-auto" />
-                  </div>
+                    <div class="flex items-center space-x-2">
+                      <span>Historial tasaciones</span>
+                      <CustomIcons name="Clock-Timer" class="ml-auto" />
+                    </div>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     @click="
@@ -134,18 +156,18 @@
           </template>
         </CustomTable>
         <SheetContent
-            v-model:open="openAppraisalHistoryModal"
-            @pointer-down-outside="(e) => e.preventDefault()"
-            @interact-outside="(e) => e.preventDefault()"
-            class="flex flex-col h-full"
-          >
-            <HistoryForm
-              :bidsId="bidsId"
-              :offer-id="appraisalHistoryModal.offerId"
-              :endpoint="auditBidHistories"
-              title="Historial de tasaciones"
-            />
-          </SheetContent>
+          v-model:open="openAppraisalHistoryModal"
+          @pointer-down-outside="(e) => e.preventDefault()"
+          @interact-outside="(e) => e.preventDefault()"
+          class="flex flex-col h-full"
+        >
+          <HistoryForm
+            :bidsId="bidsId"
+            :offer-id="appraisalHistoryModal.offerId"
+            :endpoint="auditBidHistories"
+            title="Historial de tasaciones"
+          />
+        </SheetContent>
         <SheetContent
           v-model:open="openModalOffer"
           class="flex flex-col h-full"
@@ -155,16 +177,16 @@
           <OfferForm
             :id="offerId"
             :eventId="String(route.params.eventId)"
-            :rucId="String(route.params.rucId)"
+            :organizationId="String(route.params.organizationId)"
             :onsubmit="offerId !== undefined ? handleEdit : handleCreate"
           />
         </SheetContent>
         <DebateModal
           v-model="openModalDebate"
-         :id="selectedDebateInfo.id"
-         :name="selectedDebateInfo.name"
-         :appraisal="selectedDebateInfo.appraisal"
-         :refreshTable="refreshOfferTable"
+          :id="selectedDebateInfo.id"
+          :name="selectedDebateInfo.name"
+          :appraisal="selectedDebateInfo.appraisal"
+          :refreshTable="refreshOfferTable"
         ></DebateModal>
         <AppraisalOfferModal
           v-model="openModifyAppraisal"
@@ -174,8 +196,8 @@
           :old-appraisal="changeAppraisalForm.oldAppraisal"
           :refreshTable="refreshOfferTable"
         ></AppraisalOfferModal>
-     </div>
-     <CustomPagination 
+      </div>
+      <CustomPagination
         class="mt-5 mb-[19px]"
         :total="data.count"
         :limit="data.limit"
@@ -184,35 +206,49 @@
     </div>
   </section>
   <section v-else>
-          <BidTable/>
+    <BidTable />
   </section>
 </template>
 
 <script setup lang="ts">
 import { offerHeader, offerStatus, offerSearch } from "@/constants/offer";
-import type {
-  OfferListItem,
-  IDebateForm,
-  IChangeAppraisalForm,
-  IAmountHistoryModal,
+import {
+  type OfferListItem,
+  type IDebateForm,
+  type IChangeAppraisalForm,
+  type IAmountHistoryModal,
+  OfferStatus,
 } from "~/types/Offer";
 import CustomIcons from "~/components/ui/custom-icons/CustomIcons.vue";
 import OfferForm from "@/components/offers/OfferForm.vue";
 import DebateModal from "@/components/offers/DebateModal.vue";
-import BidTable from '@/components/events/BidTable.vue';
+import BidTable from "@/components/events/BidTable.vue";
 import AppraisalOfferModal from "~/components/offers/AppraisalOfferModal.vue";
+import { GrantId } from "~/types/Grant";
+import { EventStatus } from "~/types/Event";
 
+const { getMyGrants } = useAuthManagement();
+const myGrants = await getMyGrants();
 const auditBidHistories = "/audit/find-audit-histories";
 const { openConfirmModal, updateConfirmModal } = useConfirmModal();
-const { page, sortOptions, onSort, createOffer, editOffer, confirmOffers, retireOffers } = useOfferAPI();
+const {
+  page,
+  sortOptions,
+  onSort,
+  createOffer,
+  editOffer,
+  confirmOffers,
+  retireOffers,
+} = useOfferAPI();
 const OFFER_BASE_URL = "/offer-management";
 const route = useRoute();
 const { getEvent } = useEvent();
 const offerId = ref(undefined);
 const showBids = ref(false);
 const bidsId = ref<number | undefined>(undefined);
-const FINISHED_STATUS = "FINISHED";
-const isOfferActionsVisible = computed(() => eventDetail.value?.status !== FINISHED_STATUS);
+const isOfferActionsVisible = computed(
+  () => eventDetail.value?.status !== EventStatus.Published,
+);
 const filterOptions = ref(
   `[{ "field": "event.id", "type": "equal", "value": "${route.params.eventId}" }]`,
 );
@@ -225,20 +261,30 @@ const changeAppraisalForm = ref<IChangeAppraisalForm>({
   oldAppraisal: 0,
   newAppraisal: 0,
 });
-const openModalOffer = ref(false); 
-const openModalDebate = ref(false); 
-const selectedDebateInfo = ref<IDebateForm>({ name: "", appraisal: 0, id: "" }); 
-const selectedMultipleData = ref<{ type: string, ids: string[]}>({ type: 'empty', ids: [] });
+const openModalOffer = ref(false);
+const openModalDebate = ref(false);
+const selectedDebateInfo = ref<IDebateForm>({ name: "", appraisal: 0, id: "" });
+const selectedMultipleData = ref<{ type: string; ids: string[] }>({
+  type: "empty",
+  ids: [],
+});
 const resetMultipleSelect = ref<Function | undefined>(undefined);
-const disableMultipleSelect = computed(()=> selectedMultipleData.value.type === 'empty' && selectedMultipleData.value.ids.length === 0);
+const disableMultipleSelect = computed(
+  () =>
+    selectedMultipleData.value.type === "empty" &&
+    selectedMultipleData.value.ids.length === 0,
+);
 const onSearch = (item: { [key: string]: string }) => {
   filterOptions.value = JSON.stringify([
-   { field: "title", type: "like", value: item.title || "" },
-   { field: "event.id", type: "equal", value: route.params.eventId },
-   ]);
+    { field: "title", type: "like", value: item.title || "" },
+    { field: "event.id", type: "equal", value: route.params.eventId },
+  ]);
 };
 
-const  [{ data: eventDetail, refresh: refreshEventDetail }, { data, refresh: refreshOfferTable }]: any = await Promise.all([
+const [
+  { data: eventDetail, refresh: refreshEventDetail },
+  { data, refresh: refreshOfferTable },
+]: any = await Promise.all([
   getEvent(route.params.eventId as string),
   useAPI(`${OFFER_BASE_URL}/find-offers`, {
     query: {
@@ -321,17 +367,17 @@ const handleEdit = async (values: any) => {
   });
 };
 
-const handleConfirmOffers = async (values: { type: string, ids: string[]}) => {
+const handleConfirmOffers = async (values: { type: string; ids: string[] }) => {
   openConfirmModal({
     title: "Confirmar Ofertas",
     message: `¿Está seguro de aprobar la(s) oferta(s) seleccionada(s)?`,
     callback: async () => {
       try {
-        const { type, ids } = values
+        const { type, ids } = values;
         const { status } = await confirmOffers({ type, ids });
         if (status.value === "success") {
           refreshOfferTable();
-          resetMultipleSelect.value?.()
+          resetMultipleSelect.value?.();
           updateConfirmModal({
             title: "Oferta(s) confirmada(s)",
             message: "La(s) oferta(s) ha sido confirmada(s) exitosamente",
@@ -344,7 +390,8 @@ const handleConfirmOffers = async (values: { type: string, ids: string[]}) => {
         console.log("error", error);
         updateConfirmModal({
           title: "Error al confirmar Oferta(s)",
-          message: "No se pudo confirmar oferta(s). Por favor, intente nuevamente.",
+          message:
+            "No se pudo confirmar oferta(s). Por favor, intente nuevamente.",
           type: "error",
         });
       }
@@ -352,17 +399,17 @@ const handleConfirmOffers = async (values: { type: string, ids: string[]}) => {
   });
 };
 
-const handleRetireOffers = async (values: { type: string, ids: string[]}) => {
+const handleRetireOffers = async (values: { type: string; ids: string[] }) => {
   openConfirmModal({
     title: "Retirar Ofertas",
     message: `¿Está seguro de retirar la(s) oferta(s) seleccionada(s)?`,
     callback: async () => {
       try {
         const { status } = await retireOffers(values);
-       
+
         if (status.value === "success") {
           refreshOfferTable();
-          resetMultipleSelect.value?.()
+          resetMultipleSelect.value?.();
           updateConfirmModal({
             title: "Oferta(s) retirada(s)",
             message: "La(s) oferta(s) ha sido retirada(s) exitosamente",
@@ -374,7 +421,8 @@ const handleRetireOffers = async (values: { type: string, ids: string[]}) => {
       } catch (error) {
         updateConfirmModal({
           title: "Error al retirar Oferta(s)",
-          message: "No se pudo retirar oferta(s). Por favor, intente nuevamente.",
+          message:
+            "No se pudo retirar oferta(s). Por favor, intente nuevamente.",
           type: "error",
         });
       }

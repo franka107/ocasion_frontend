@@ -1,119 +1,135 @@
 <script setup lang="ts">
-import { ref, watch, defineProps } from "vue";
+import { ref, watch, defineProps, computed } from "vue";
 import { useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
-import type { IAdminsLItem } from '@/types/Administrators';
-import { userType } from '~/constants/administrators';
+import type { IAdminsLItem } from "@/types/Administrators";
+import { userType } from "~/constants/administrators";
 
-import { X } from "lucide-vue-next";
 import CustomSelect from "~/components/ui/custom-select/CustomSelect.vue";
-import type { Organization } from '@/types/Administrators';
-import AdministratorsForm from '~/components/users/administrators/AdministratorsForm.vue';
+import type { Organization } from "@/types/Administrators";
 
 const BASE_ADM_URL = "/user-management";
 const BASE_ORG_URL = "/organization-management";
-const BASE_ROLE_URL = '/role-configuration';
-let form: any;
-const {getUser} = useAdmins();
+const BASE_ROLE_URL = "/role-configuration";
+
 const props = defineProps<{
   id: number | undefined;
   onSubmit: (values: any) => void;
 }>();
-const userTypesOptions = Array.from(userType).map(([id,name]) => ({ id, name }));
+
+const { getUser } = useAdmins();
+const userTypesOptions = Array.from(userType).map(([id, name]) => ({
+  id,
+  name,
+}));
+
+// Form schema
 const formSchema = toTypedSchema(
   z.object({
     firstName: z.string().min(1, "El nombre es requerido"),
     lastName: z.string().min(1, "El apellido es requerido"),
     documentType: z.string().min(1, "Tipo de documento es requerido"),
-    documentIdentifier: z.string()
+    documentIdentifier: z
+      .string()
       .regex(/^\d+$/, "Este campo debe contener solo dígitos.")
       .length(9, "El número de documento debe de ser 9 dígitos"),
     phoneNumber: z.string().min(1, "El número de celular es requerido"),
-      email: z
+    email: z
       .string()
       .email("El correo electrónico no es válido")
       .optional()
       .nullable(),
     type: z.string().min(1, "Tipo de usuario es requerido"),
-    organizations: z.union([z.array(z.string()).min(1, "La organización es requerida"), z.string().min(1, "La organización es requerida")]),
-    roles: z.array(z.string()).min(1, "El rol de usuario es requerido"), 
+    organizations: z.union([
+      z.array(z.string()).min(1, "La organización es requerida"),
+      z.string().min(1, "La organización es requerida"),
+    ]),
+    roles: z.array(z.string()).min(1, "El rol de usuario es requerido"),
   }),
 );
-interface AdministratorsForm extends Omit<IAdminsLItem,"organizations" | "roles"> {
-  organizations?:string[];
+
+interface AdministratorsForm
+  extends Omit<IAdminsLItem, "organizations" | "roles"> {
+  organizations?: string[];
   roles?: string[];
 }
-
-if (props.id) {
-      const { data: userData } = await getUser(props.id);
-      const organizationsFormatted = userData.value.organizations.map((item )=> item.rucNumber)
-      const rolesFormatted = userData.value.roles?.map((item )=> item.id)
-      const userDataFormatted :  AdministratorsForm = { ...userData.value, organizations: organizationsFormatted, roles: rolesFormatted };    
- 
-      form = useForm({
-        validationSchema: formSchema,
-        initialValues: userDataFormatted,
-      });
-} else {
-      form = useForm({ validationSchema: formSchema });
-}
-const isOrgSimpleSelect = computed(() => ["ORGANIZATION_ADMIN", "ORGANIZATION_USER"].includes(form.values.type));
 
 const organizations = ref<Array<Organization>>([]);
 const roles = ref<Array<{ id: string; name: string }>>([]);
 
-const fetchOrganizations = async () => {
+// Function to fetch organizations and roles
+const fetchData = async (
+  url: string,
+  target: typeof organizations | typeof roles,
+) => {
   try {
-    const { data } = await useAPI(`${BASE_ORG_URL}/find-organizations`, {
-      default: () => [],
-    });
-    organizations.value = data.value.map((org: any) => ({
-      rucNumber: org.rucNumber,
-      name: org.name
-    }));
+    const { data } = await useAPI(url, { default: () => [] });
+    target.value = data.value;
   } catch (error) {
-    console.error("Error al cargar organizaciones:", error);
+    console.error(`Error al cargar datos de ${url}:`, error);
   }
 };
 
-const fetchRoles = async () => {
-  try {
-    const { data } = await useAPI(`${BASE_ROLE_URL}/find-roles`, {
-      default: () => [],
-    });
-    roles.value = data.value; 
-  } catch (error) {
-    console.error("Error al cargar roles:", error);
-  }
-};
-if (props.id) {
-  await Promise.all([
-    fetchOrganizations(),
-    fetchRoles()
-  ]);
-} else {
-  await Promise.all([fetchOrganizations(), fetchRoles()]);
-}
+// Fetch organizations and roles
+await Promise.all([
+  fetchData(`${BASE_ORG_URL}/find-organizations`, organizations),
+  fetchData(`${BASE_ROLE_URL}/find-roles`, roles),
+]);
+
+const form = useForm({
+  validationSchema: formSchema,
+  initialValues: props.id
+    ? await getUser(props.id).then(({ data: userData }) => {
+        const organizationsFormatted = userData.value.organizations.map(
+          (item: any) => item.id,
+        );
+        const rolesFormatted = userData.value.roles?.map(
+          (item: any) => item.id,
+        );
+        return {
+          ...userData.value,
+          organizations: organizationsFormatted,
+          roles: rolesFormatted,
+        };
+      })
+    : undefined,
+});
+
+// Computed property to determine if the organizations should be single-select
+const isOrgSimpleSelect = computed(() =>
+  ["ORGANIZATION_ADMIN", "ORGANIZATION_USER"].includes(form.values.type),
+);
 
 const formattedOrganizations = computed(() => {
-  return organizations.value.map(org => ({
-    id: org.rucNumber,
-    name: org.name
+  return organizations.value.map((org) => ({
+    id: org.id,
+    name: org.name,
   }));
 });
 
+// Watcher to auto-select the role when the user type changes
+watch(
+  () => form.values.type,
+  (newType) => {
+    if (newType) {
+      const matchingRole = roles.value.find((role) => role.id === newType);
+      if (matchingRole) {
+        form.setFieldValue("roles", [matchingRole.id]); // Set the role automatically
+      }
+    }
+  },
+);
+
+// Submit handler
 const onSubmit = form.handleSubmit((values: any) => {
   const { organizations, roles, ...restValues } = values;
-  const organizationFormatted =  Array.isArray(organizations) ? organizations : [organizations];
   const formattedValues = {
     ...restValues,
-    organizations: organizationFormatted.map((orgRucNumber: string) => ({
-      rucNumber: orgRucNumber,
-    })),
-    roles: roles.map((roleId: string) => ({
-      id: roleId,
-    })),
+    organizations: Array.isArray(organizations)
+      ? organizations.map((orgId: string) => ({ id: orgId }))
+      : [{ id: organizations }],
+    roles: roles.map((roleId: string) => ({ id: roleId })),
   };
 
   if (props.id) {
@@ -122,7 +138,6 @@ const onSubmit = form.handleSubmit((values: any) => {
 
   props.onSubmit(formattedValues);
 });
-
 </script>
 
 <template>
@@ -131,25 +146,22 @@ const onSubmit = form.handleSubmit((values: any) => {
       <X class="w-4 h-4 text-muted-foreground" />
     </SheetClose>
     <SheetTitle class="text-xl font-medium text-[#64748B]">{{
-      props.id
-        ? "Actualizar datos de usuario"
-        : "Crear usuario"
+      props.id ? "Actualizar datos de usuario" : "Crear usuario"
     }}</SheetTitle>
   </SheetHeader>
   <div class="flex-grow overflow-y-auto no-scrollbar flex flex-col">
     <!-- <Form> -->
-      <form class="flex flex-col gap-4 flex-grow p-5" @submit="onSubmit">
-       
-        <div class="flex gap-2">
+    <form class="flex flex-col gap-4 flex-grow p-5" @submit="onSubmit">
+      <div class="flex gap-2">
         <!-- Nombre  -->
         <FormField v-slot="{ componentField }" name="firstName">
           <FormItem class="w-1/2">
             <FormControl>
               <CustomInput
-                  type="text"
-                  label="Nombres"
-                  v-bind="componentField"
-                />
+                type="text"
+                label="Nombres"
+                v-bind="componentField"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -159,124 +171,118 @@ const onSubmit = form.handleSubmit((values: any) => {
           <FormItem class="w-1/2">
             <FormControl>
               <CustomInput
-                  type="text"
-                  label="Apellidos"
-                  v-bind="componentField"
-                />
+                type="text"
+                label="Apellidos"
+                v-bind="componentField"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
-        </div>
+      </div>
 
-        <div class="flex gap-2">
+      <div class="flex gap-2">
         <!-- Tipo de Documento -->
-          <FormField
-            v-slot="{ componentField }"
-            name="documentType"
-          >
-            <FormItem class="w-1/2">
-              <FormControl>
-                <CustomSelect
-                  v-bind="componentField"
-                  :items="[
-                    { id: 'DNI', name: 'DNI' },
-                    { id: 'CE', name: 'CE' },
-                    { id: 'PT', name: 'PT' },
-                  ]"
-                  placeholder="Tipo de Documento"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-          <!-- Número de Documento -->
-          <FormField
-            v-slot="{ componentField }"
-            name="documentIdentifier"
-          >
-            <FormItem class="w-1/2">
-              <FormControl>
-                <CustomInput
+        <FormField v-slot="{ componentField }" name="documentType">
+          <FormItem class="w-1/2">
+            <FormControl>
+              <CustomSelect
+                v-bind="componentField"
+                :items="[
+                  { id: 'DNI', name: 'DNI' },
+                  { id: 'CE', name: 'CE' },
+                  { id: 'PT', name: 'PT' },
+                ]"
+                placeholder="Tipo de Documento"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+        <!-- Número de Documento -->
+        <FormField v-slot="{ componentField }" name="documentIdentifier">
+          <FormItem class="w-1/2">
+            <FormControl>
+              <CustomInput
                 type="text"
                 label="N° documento"
                 v-bind="componentField"
               />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-        </div>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+      </div>
 
-        <!-- Teléfono -->
-        <FormField v-slot="{ componentField }" name="phoneNumber">
-          <FormItem>
-            <FormControl>
-              <CustomInput
-                type="text"
-                label="Número de celular"
-                v-bind="componentField"
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
+      <!-- Teléfono -->
+      <FormField v-slot="{ componentField }" name="phoneNumber">
+        <FormItem>
+          <FormControl>
+            <CustomInput
+              type="text"
+              label="Número de celular"
+              v-bind="componentField"
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
 
-        <!-- Correo de Facturación -->
-        <FormField v-slot="{ componentField }" name="email">
-          <FormItem>
-            <FormControl>
-              <CustomInput
-                type="email"
-                label="Correo"
-                v-bind="componentField"
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
+      <!-- Correo de Facturación -->
+      <FormField v-slot="{ componentField }" name="email">
+        <FormItem>
+          <FormControl>
+            <CustomInput type="email" label="Correo" v-bind="componentField" />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
 
-        <!-- Tipo de Usuario -->
-        <FormField v-slot="{ componentField }" name="type">
-          <FormItem>
-            <FormControl>
-              <CustomSelect
-                v-bind="componentField"
-                @update:model-value="form.setFieldValue('organizations', isOrgSimpleSelect ? '': []);"
-                :items="userTypesOptions"
-                placeholder="Tipo de Usuario" />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-        <!-- Organización -->        
-        <FormField v-slot="{ componentField }" name="organizations">
-          <FormItem>
-            <FormControl>
-              <CustomSelect
-                v-bind="componentField"
-                :multiple="!isOrgSimpleSelect"
-                :items="formattedOrganizations"
-                placeholder="Organización" />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
+      <!-- Tipo de Usuario -->
+      <FormField v-slot="{ componentField }" name="type">
+        <FormItem>
+          <FormControl>
+            <CustomSelect
+              v-bind="componentField"
+              @update:model-value="
+                form.setFieldValue('organizations', isOrgSimpleSelect ? '' : [])
+              "
+              :items="userTypesOptions"
+              placeholder="Tipo de Usuario"
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+      <!-- Organización -->
+      <FormField v-slot="{ componentField }" name="organizations">
+        <FormItem>
+          <FormControl>
+            <CustomSelect
+              v-bind="componentField"
+              :multiple="!isOrgSimpleSelect"
+              :items="formattedOrganizations"
+              placeholder="Organización"
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
       <!-- Rol Usuario -->
       <FormField v-slot="{ componentField }" name="roles">
-          <FormItem>
-            <FormControl>
-              <CustomSelect
-                v-bind="componentField"
-                multiple
-                :items="roles"
-                placeholder="Rol Usuario" 
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-        <!-- Botón de Submit -->
+        <FormItem>
+          <FormControl>
+            <CustomSelect
+              v-bind="componentField"
+              multiple
+              :items="roles"
+              placeholder="Rol Usuario"
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      </FormField>
+      <!-- Botón de Submit -->
       <SheetFooter class="mt-auto">
         <Button
           type="submit"
@@ -293,7 +299,6 @@ const onSubmit = form.handleSubmit((values: any) => {
           {{ props.id ? "Actualizar datos" : "Crear usuario" }}
         </Button>
       </SheetFooter>
-      </form>
-      
+    </form>
   </div>
 </template>

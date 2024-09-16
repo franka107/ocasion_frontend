@@ -18,7 +18,7 @@ export const attachedFileSchema = z.object({
 });
 
 export const organizationSchema = z.object({
-  rucNumber: z.string(),
+  id: z.string(),
   name: z.string(),
   economicActivity: economicActivitySchema.nullable(),
   representativeFullName: z.string(),

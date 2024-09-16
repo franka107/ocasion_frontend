@@ -14,30 +14,35 @@
         </template>
       </EventDetails>
       <div>
-        <OfferTable/>
+        <OfferTable />
       </div>
     </section>
   </ContentLayout>
 </template>
 <script setup lang="ts">
 import EventDetails from "~/components/events/EventDetails.vue";
-import OfferTable from '@/components/events/OfferTable.vue';
+import OfferTable from "@/components/events/OfferTable.vue";
 import ContentLayout from "~/layouts/default/ContentLayout.vue";
 const { openConfirmModal, updateConfirmModal } = useConfirmModal();
-const { publishEvent } = useEvent()
+const { publishEvent } = useEvent();
 const route = useRoute();
 const { getEvent } = useEvent();
 const PUBLISHED_STATUS = "PUBLISHED";
-const isEventNotPublished = computed(() => eventDetail.value?.status !== PUBLISHED_STATUS);
-const { data: eventDetail, refresh: refreshEventDetail } = await getEvent(route.params.eventId as string);
+const isEventNotPublished = computed(
+  () => eventDetail.value?.status !== PUBLISHED_STATUS,
+);
+const props = defineProps<{ eventId: string }>();
+const { data: eventDetail, refresh: refreshEventDetail } = await getEvent(
+  props.eventId as string,
+);
 
 const handlePublishEvent = async () => {
   openConfirmModal({
     title: "Publicar Evento",
-    message: `¿Estás seguro de que deseas publicar el evento ❝${route.params.eventId}❞?`,
+    message: `¿Estás seguro de que deseas publicar el evento ❝${props.eventId}❞?`,
     callback: async () => {
       try {
-        const { status } = await publishEvent(route.params.eventId as string);
+        const { status, error } = await publishEvent(props.eventId as string);
         if (status.value === "success") {
           refreshEventDetail();
           updateConfirmModal({
@@ -46,18 +51,19 @@ const handlePublishEvent = async () => {
             type: "success",
           });
         } else {
-          throw new Error("Error al publicar el evento");
+          console.log("erro publi", error);
+          const eMsg =
+            error.value.data?.errors?.[0].message ||
+            error.value.data.message ||
+            "No se pudo publicar el evento. Por favor, intente nuevamente.";
+          updateConfirmModal({
+            title: "Error al Publicar Evento",
+            message: eMsg,
+            type: "error",
+          });
         }
-      } catch (error) {
-        updateConfirmModal({
-          title: "Error al Publicar Evento",
-          message:
-            "No se pudo publicar el evento. Por favor, intente nuevamente.",
-          type: "error",
-        });
-      }
+      } catch (error) {}
     },
   });
 };
-
 </script>

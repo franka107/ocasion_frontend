@@ -43,12 +43,12 @@
                   align="start"
                   class="bg-primary text-white"
                 >
-                  <NuxtLink :to="`/organizations/${row.rucNumber}`">
+                  <NuxtLink :to="`/organizations/${row.id}`">
                     <DropdownMenuItem> Ver Organización </DropdownMenuItem>
                   </NuxtLink>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
-                    @click="handleSuspend(row.rucNumber, row.name)"
+                    @click="handleSuspend(row.id, row.name)"
                     :disabled="row.status !== 'ACTIVE'"
                   >
                     Suspender
@@ -57,7 +57,7 @@
 
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
-                    @click="handleActivate(row.rucNumber, row.name)"
+                    @click="handleActivate(row.id, row.name)"
                     :disabled="row.status === 'ACTIVE'"
                   >
                     Activar
@@ -149,12 +149,12 @@ const orderData = computed(() =>
   })),
 );
 
-const handleSuspend = async (rucNumber: string, name: string) => {
+const handleSuspend = async (id: string, name: string) => {
   openConfirmModal({
     title: "Suspender organización",
     message: `¿Estás seguro de suspender a ❝${name}❞?`,
     callback: async () => {
-      const { status, error }: any = await suspendOrganization(rucNumber);
+      const { status, error }: any = await suspendOrganization(id);
       if (status.value === "success") {
         updateConfirmModal({
           title: "¡Suspensión exitosa!",
@@ -174,12 +174,12 @@ const handleSuspend = async (rucNumber: string, name: string) => {
   });
 };
 
-const handleActivate = async (rucNumber: string, name: string) => {
+const handleActivate = async (id: string, name: string) => {
   openConfirmModal({
     title: "Activar organización",
     message: `¿Estás seguro de activar a ❞${name}❞?`,
     callback: async () => {
-      const { status, error }: any = await activateOrganization(rucNumber);
+      const { status, error }: any = await activateOrganization(id);
       if (status.value === "success") {
         updateConfirmModal({
           title: "¡Activación exitosa!",
@@ -201,7 +201,7 @@ const handleActivate = async (rucNumber: string, name: string) => {
 
 const handleUpdateForm = async (organization: any) => {
   openModal.value = true;
-  organizationRucNo.value = organization.rucNumber;
+  organizationRucNo.value = organization.id;
 };
 
 const handleCreate = async (values: any) => {

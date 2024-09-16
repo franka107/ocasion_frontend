@@ -62,6 +62,7 @@
           :key="index"
           :variant="'ghost'"
           class="w-full justify-start h-10 mb-1 hover:bg-[#36576e]"
+          as-child
         >
           <NuxtLink :to="submenu.href" class="flex items-center">
             <span class="ml-6">

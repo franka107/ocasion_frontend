@@ -1,4 +1,7 @@
-import type { HeaderItem, SearchItem } from "@/components/ui/custom-table/CustomTable.vue";
+import type {
+  HeaderItem,
+  SearchItem,
+} from "@/components/ui/custom-table/CustomTable.vue";
 
 export const eventType = new Map<string, string>([
   ["HAND_OVER", "Puesta en mano"],
@@ -6,10 +9,12 @@ export const eventType = new Map<string, string>([
 ]);
 export const eventStatus = new Map<string, { name: string; color: string }>([
   ["PUBLISHED", { name: "Publicado", color: "blue" }],
+  ["COMPLETED", { name: "Completado", color: "blue" }],
   ["CANCELLED", { name: "Cancelado", color: "red" }],
   ["CREATED", { name: "Creado", color: "purple" }],
   ["FINISHED", { name: "Finalizado", color: "brown" }],
   ["IN_DEBATE", { name: "En debate", color: "orange" }],
+  ["IN_PROGRESS", { name: "En progreso", color: "orange" }],
   ["READY_TO_PUBLISH", { name: "Listo para publicar", color: "green" }],
 ]);
 export const eventTimes = new Map<string, string>([
@@ -38,20 +43,26 @@ export const goodType = new Map<string, string>([
 
 export const eventSearch: SearchItem[] = [
   {
-      key: 'name',
-      type: 'text',
-      placeholder: 'Buscar eventos',
-      position: 1,
+    key: "name",
+    type: "text",
+    placeholder: "Buscar eventos",
+    position: 1,
   },
   {
-    key: 'status',
-    type: 'select',
-    placeholder: 'Filtrar por estado',
-    items: [...Array.from(eventStatus).map(([key, value]) => ({ text: value.name, value: key })), { text: 'Todos', value: " " }],
-    elementClass: 'min-w-[400px]',
+    key: "status",
+    type: "select",
+    placeholder: "Filtrar por estado",
+    items: [
+      ...Array.from(eventStatus).map(([key, value]) => ({
+        text: value.name,
+        value: key,
+      })),
+      { text: "Todos", value: " " },
+    ],
+    elementClass: "min-w-[400px]",
     position: 3,
-  }
-]
+  },
+];
 export const eventListHeaders: HeaderItem[] = [
   {
     key: "id",
@@ -362,4 +373,3 @@ export const years = [
     name: "2024",
   },
 ];
-

@@ -54,7 +54,7 @@
       <h2 class="text-xl font-semibold text-primary">Meta</h2>
       <div class="flex mt-8 mx-2 justify-around">
         <div>
-          <div class="text-[#64748B] text-sm">Ticket promedio</div>
+          <div class="text-[#64748B] text-sm">Meta esperada</div>
           <div class="text-primary text-4xl">
             <sup>S/</sup>{{ formatCurrency(data.goal.goalAmount) }}
           </div>
@@ -74,4 +74,3 @@ import type { IOrganizationSummary } from "@/types/Event";
 const router = useRouter();
 defineProps<{ data: IOrganizationSummary }>();
 </script>
-

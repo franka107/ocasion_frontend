@@ -16,7 +16,7 @@ export interface IEventLItem {
   }
   
   interface Organization {
-    rucNumber: string
+    id: string
     name: string
   }
   

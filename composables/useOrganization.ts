@@ -12,7 +12,7 @@ export function useOrganization() {
     
   const onSearch = (item: {[key: string]: string }) => {
       const filters = [
-        { field: 'rucNumber', type: 'like', value: item.rucNumber || '' },
+        { field: 'id', type: 'like', value: item.id || '' },
         { field: 'name', type: 'like', value: item.name || '' },
       ]
       if(item.status) {
@@ -21,25 +21,25 @@ export function useOrganization() {
       filterOptions.value = JSON.stringify(filters)
   }
     
-  const suspendOrganization = async (rucNumber: string) => {
+  const suspendOrganization = async (id: string) => {
     const { status, error }: any = await useAPI(
       `${BASE_ORG_URL}/suspend-organization`,
       {
         method: "POST",
         body: {
-          rucNumber, 
+          id, 
         }
       } as any);
       return {status, error}
   }
 
-  const activateOrganization = async (rucNumber: string) => {
+  const activateOrganization = async (id: string) => {
     const { status, error }: any = await useAPI(
       `${BASE_ORG_URL}/activate-organization`,
       {
         method: "POST",
         body: {
-          rucNumber,
+          id,
         },
       } as any);
       return {status, error}

@@ -12,13 +12,13 @@ import CustomComboboxInput from "~/components/ui/custom-combobox-input/CustomCom
 const BASE_ORG_URL = "/organization-management";
 let form: any;
 const props = defineProps<{
-  rucNumber: number | undefined;
+  id: number | undefined;
   onSubmit: (values: any) => void;
 }>();
 
 const organizationFormSchema = z.object({
   name: z.string().min(1, "La razón social es requerida"),
-  rucNumber: z
+  id: z
     .string()
     .regex(/^\d+$/, "Este campo debe contener solo dígitos.")
     .length(11, "El número de RUC debe de ser 11 dígitos"),
@@ -116,21 +116,20 @@ const fetchEconomicActivities = async () => {
   }
 };
 
-if (props.rucNumber) {
+if (props.id) {
   const { data: organizationData } = await useAPI<Organization>(
     `${BASE_ORG_URL}/get-organization-detail`,
     {
       method: "GET",
       query: {
-        rucNumber: props.rucNumber,
+        id: props.id,
       },
     } as any,
   );
   const orgData: any = { ...organizationData.value, representative: {} };
-  orgData.department = orgData.address?.district?.id.split("+")[0] || "";
-  orgData.province =
-    `${orgData.department}+${orgData.address?.district?.id.split("+")[1]}` ||
-    "";
+
+  orgData.department = orgData.address.district.city.state.id;
+  orgData.province = orgData.address.district.city.id;
   orgData.districtId = orgData.address.district.id;
   orgData.economicActivityId = orgData.economicActivity?.id;
   orgData.addressLine1 = orgData.address.addressLine1;
@@ -200,9 +199,7 @@ const handleFilesChange = (files: File[]) => {
       <X class="w-4 h-4 text-muted-foreground" />
     </SheetClose>
     <SheetTitle class="text-xl font-medium text-[#64748B]">{{
-      props.rucNumber
-        ? "Actualizar datos de organización"
-        : "Registrar organización"
+      props.id ? "Actualizar datos de organización" : "Registrar organización"
     }}</SheetTitle>
   </SheetHeader>
   <div class="flex-grow overflow-y-auto no-scrollbar flex flex-col">
@@ -226,14 +223,14 @@ const handleFilesChange = (files: File[]) => {
         </h2>
 
         <!-- Número de RUC -->
-        <FormField v-slot="{ componentField }" name="rucNumber">
+        <FormField v-slot="{ componentField }" name="id">
           <FormItem>
             <FormControl>
               <CustomInput
                 type="text"
                 label="Número de RUC"
                 v-bind="componentField"
-                :disabled="!!props.rucNumber"
+                :disabled="!!props.id"
               />
             </FormControl>
             <FormMessage />
@@ -247,7 +244,7 @@ const handleFilesChange = (files: File[]) => {
                 type="text"
                 label="Razón Social"
                 v-bind="componentField"
-                :disabled="!!props.rucNumber"
+                :disabled="!!props.id"
               />
             </FormControl>
             <FormMessage />
@@ -536,7 +533,7 @@ const handleFilesChange = (files: File[]) => {
             )
           "
         >
-          {{ props.rucNumber ? "Actualizar datos" : "Registrar" }}
+          {{ props.id ? "Actualizar datos" : "Registrar" }}
         </Button>
       </SheetFooter>
     </form>

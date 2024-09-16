@@ -15,7 +15,7 @@ let form: any;
 const { getEvent } = useEvent();
 const props = defineProps<{
   id: string | undefined;
-  orgRucNumber: string;
+  orgid: string;
   onsubmit: (values: any) => void;
 }>();
 const eventTypesOptions = Array.from(eventType).map(([id, name]) => ({
@@ -72,7 +72,7 @@ const onSubmit = form.handleSubmit((values: any) => {
   const formattedValues = {
     ...restValues,
     organization: {
-      rucNumber: props.orgRucNumber,
+      id: props.orgid,
     },
   };
   if (props.id) {
@@ -136,10 +136,10 @@ const handleFilesChange = (files: File[]) => {
         <FormItem>
           <FormControl>
             <CustomInput
-                type="text"
-                label="Nombre del evento"
-                v-bind="componentField"
-              />
+              type="text"
+              label="Nombre del evento"
+              v-bind="componentField"
+            />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -147,24 +147,20 @@ const handleFilesChange = (files: File[]) => {
       <FormField v-slot="{ componentField }" name="description">
         <FormItem>
           <FormControl>
-            <Textarea
-              type="text"
-              label="Descripción"
-              v-bind="componentField"
-            />
+            <Textarea type="text" label="Descripción" v-bind="componentField" />
           </FormControl>
           <FormMessage />
         </FormItem>
       </FormField>
       <FormField v-slot="{ componentField }" name="type">
         <FormItem>
-          <FormControl>  
+          <FormControl>
             <CustomSelect
-                v-bind="componentField"
-                :disabled="!!props.id"
-                :items="eventTypesOptions"
-                placeholder="Tipo de evento"
-              />
+              v-bind="componentField"
+              :disabled="!!props.id"
+              :items="eventTypesOptions"
+              placeholder="Tipo de evento"
+            />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -173,11 +169,11 @@ const handleFilesChange = (files: File[]) => {
         <FormItem>
           <FormControl>
             <CustomSelect
-                v-bind="componentField"
-                :disabled="!!props.id"
-                :items="goodTypeOptions"
-                placeholder="Tipo de bien"
-              />
+              v-bind="componentField"
+              :disabled="!!props.id"
+              :items="goodTypeOptions"
+              placeholder="Tipo de bien"
+            />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -191,7 +187,7 @@ const handleFilesChange = (files: File[]) => {
                 @update:modelValue="componentField.onChange"
                 label="Fecha de inicio"
                 :value="componentField.modelValue"
-                :minValue="today(getLocalTimeZone()).add({ days: 3 })"
+                :minValue="today(getLocalTimeZone())"
               />
             </FormControl>
             <FormMessage />
@@ -209,11 +205,6 @@ const handleFilesChange = (files: File[]) => {
                     ? parseDate(form.values.startDate)
                     : undefined
                 "
-                :max-value="
-                  form.values.startDate
-                    ? parseDate(form.values.startDate).add({ days: 7 })
-                    : undefined
-                "
                 :value="componentField.modelValue"
                 :disabled="!form.values.startDate"
               />
@@ -222,7 +213,7 @@ const handleFilesChange = (files: File[]) => {
           </FormItem>
         </FormField>
       </div>
-    
+
       <FormField v-slot="{ componentField }" name="closingTime">
         <CustomSelect
           v-bind="componentField"

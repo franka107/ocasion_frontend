@@ -7,15 +7,32 @@ export default defineNuxtConfig({
       apiUrl: process.env.NUXT_API_URL,
     },
   },
-  modules: ["@nuxtjs/tailwindcss", "shadcn-nuxt", "nuxt-auth-utils", [
-    "@nuxtjs/google-fonts",
-    {
-      families: {
-        Inter: true,
-        Roboto: true
-      },
+  sound: {
+    sounds: {
+      scan: true,
     },
-  ], "@vueuse/nuxt"],
+  },
+  vite: {
+    optimizeDeps: {
+      include: ["howler"],
+    },
+  },
+  modules: [
+    "@nuxtjs/tailwindcss",
+    "shadcn-nuxt",
+    "nuxt-auth-utils",
+    "@vueuse/sound/nuxt",
+    [
+      "@nuxtjs/google-fonts",
+      {
+        families: {
+          Inter: true,
+          Roboto: true,
+        },
+      },
+    ],
+    "@vueuse/nuxt",
+  ],
   shadcn: {
     /**
      * Prefix for all the imported component
@@ -41,5 +58,5 @@ export default defineNuxtConfig({
       ],
     },
   },
-  
 });
+

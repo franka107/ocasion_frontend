@@ -1,7 +1,6 @@
 <template>
   <ContentLayout title="Eventos">
     <section>
-      <OrganizationDetails :data="organizationSummary" />
       <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto mt-4">
         <CustomTable
           :data="eventsData"
@@ -10,17 +9,6 @@
           @onSort="onSort"
           @onSearch="onSearch"
         >
-          <template #action-button>
-            <Button
-              @click="
-                () => {
-                  eventId = undefined;
-                  openEventModal = true;
-                }
-              "
-              >Crear evento</Button
-            >
-          </template>
           <template #type="{ row }">
             <span class="whitespace-nowrap">{{
               eventType.get(row.type) || ""
@@ -45,7 +33,7 @@
                   <DropdownMenuItem :disabled="row.status === 'CANCELLED'">
                     <NuxtLink
                       class="flex justify-between w-full"
-                      :to="`/organizations/${route.params.rucId}/event/${row.id}`"
+                      :to="`/organizations/${route.params.organizationId}/events/${row.id}`"
                     >
                       Ver Evento
                       <CustomIcons name="EyeIcon" class="ml-auto" />
@@ -97,7 +85,7 @@
         >
           <EventForm
             :id="eventId"
-            :orgRucNumber="String(route.params.rucId)"
+            :orgid="String(route.params.organizationId)"
             :onsubmit="eventId !== undefined ? handleEdit : handleCreate"
           />
         </SheetContent>
@@ -121,7 +109,6 @@
 </template>
 <script setup lang="ts">
 import EventCancel from "@/components/events/EventCancel.vue";
-import OrganizationDetails from "@/components/organizations/OrganizationDetails.vue";
 import CustomTable from "@/components/ui/custom-table/CustomTable.vue";
 import CustomChip from "@/components/ui/custom-chip/CustomChip.vue";
 import CustomIcons from "@/components/ui/custom-icons/CustomIcons.vue";
@@ -144,9 +131,7 @@ const { page, sortOptions, onSort, createEvent, editEvent, cancelEvent } =
   useEvent();
 
 const route = useRoute();
-const filterOptions = ref(
-  `[{ "field": "organization.rucNumber", "type": "equal", "value": "${route.params.rucId}" }]`,
-);
+const filterOptions = ref(`[]`);
 const eventId = ref<string | undefined>("EVE-1");
 const { openConfirmModal, updateConfirmModal } = useConfirmModal();
 const openEventModal = ref(false);
@@ -157,14 +142,14 @@ const onSearch = (item: { [key: string]: string }) => {
     { field: "name", type: "like", value: item.name || "" },
     { field: "status", type: "equal", value: item.status || "" },
     {
-      field: "organization.rucNumber",
+      field: "organization.id",
       type: "equal",
-      value: route.params.rucId,
+      value: route.params.organizationId,
     },
   ]);
 };
 const BASE_ORG_URL = "/event-management";
-const [eventListData, organizationSummaryData] = await Promise.all([
+const [eventListData] = await Promise.all([
   useAPI<IDataResponse<IEventLItem[]>>(`${BASE_ORG_URL}/find-events`, {
     query: {
       limit: 6,
@@ -173,12 +158,8 @@ const [eventListData, organizationSummaryData] = await Promise.all([
       sortOptions,
     },
   } as any),
-  useAPI<IOrganizationSummary>(`${BASE_ORG_URL}/get-events-summary`, {
-    query: { organizationRucNumber: route.params.rucId },
-  } as any),
 ]);
 const { data, refresh } = eventListData;
-const organizationSummary = organizationSummaryData.data.value;
 //fix typing
 const eventsData = computed(() =>
   data.value.data.map((item: any) => ({

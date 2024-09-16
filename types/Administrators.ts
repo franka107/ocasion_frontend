@@ -15,7 +15,7 @@ export interface IAdminsLItem {
   }
   
   export interface Organization {
-    rucNumber: string
+    id: string
     name: string
   }
 

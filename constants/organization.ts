@@ -1,7 +1,7 @@
 import type { HeaderItem, SearchItem } from '@/components/ui/custom-table/CustomTable.vue';
 export const organizationSearch: SearchItem[] = [
     {
-        key: 'rucNumber',
+        key: 'id',
         type: 'text',
         placeholder: 'Buscar RUC',
         position: 1,
@@ -25,7 +25,7 @@ export const organizationSearch: SearchItem[] = [
     }
 ]
 export const organizationHeader: HeaderItem[] = [{
-    key: 'rucNumber',
+    key: 'id',
     label: 'RUC',
     sortable: true,
     }, {

@@ -16,8 +16,10 @@ export function useNotificationAPI() {
 
   const listenDomainEvents = <T>(event: string) => {
     const { apiUrl } = useRuntimeConfig().public;
+    const { user } = useUserSession();
+
     const eventSource = useEventSource(
-      `${apiUrl}${NOTIFICATION_BASE_URL}/listen-domain-events`,
+      `${apiUrl}${NOTIFICATION_BASE_URL}/listen-domain-events?token=${user.value?.token}`,
       [event],
       { autoReconnect: true },
     );

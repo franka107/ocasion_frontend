@@ -83,13 +83,17 @@ type Group = {
 //   ];
 // }
 
-export function getMenuList(pathname: string, grants: GrantId[]): Group[] {
+export function getMenuList(
+  pathname: string,
+  grants: GrantId[],
+  organizationId?: string,
+): Group[] {
   console.log(grants);
   const menuList = [
-    ...(grants.includes(GrantId.ManagePlatformDashboard)
+    ...(grants.includes(GrantId.PlatformKpisManagement)
       ? [
           {
-            href: "/dashboard",
+            href: "/dashboard/platform/graphics",
             label: "Dashboard",
             active: pathname === "/dashboard",
             icon: "Dashboard",
@@ -97,10 +101,10 @@ export function getMenuList(pathname: string, grants: GrantId[]): Group[] {
           },
         ]
       : []),
-    ...(grants.includes(GrantId.ManagePlatformOrganizations)
+    ...(grants.includes(GrantId.PlatformOrganizationsManagement)
       ? [
           {
-            href: "/organizations",
+            href: "/dashboard/platform/organizations",
             label: "Organizaciones",
             active: pathname.includes("/organizations"),
             icon: "Organization",
@@ -108,27 +112,27 @@ export function getMenuList(pathname: string, grants: GrantId[]): Group[] {
           },
         ]
       : []),
-    ...(grants.includes(GrantId.ManagePlatformUsers)
+    ...(grants.includes(GrantId.PlatformUsersManagement)
       ? [
           {
-            href: "/users",
+            href: "/dashboard/platform/users",
             label: "Usuarios",
             active: pathname.includes("/users"),
             icon: "Groups",
             submenus: [
-              ...(grants.includes(GrantId.ViewPlatformAdministrators)
+              ...(grants.includes(GrantId.PlatformUsersCanViewAdministrators)
                 ? [
                     {
-                      href: "/users/administrators",
+                      href: "/dashboard/platform/users/administrators",
                       label: "Administradores",
                       active: pathname === "/users/administrators",
                     },
                   ]
                 : []),
-              ...(grants.includes(GrantId.ViewPlatformParticipants)
+              ...(grants.includes(GrantId.PlarformUsersCanViewParticipants)
                 ? [
                     {
-                      href: "/users/participants",
+                      href: "/dashboard/platform/users/participants",
                       label: "Participantes",
                       active: pathname === "/users/participants",
                     },
@@ -139,10 +143,10 @@ export function getMenuList(pathname: string, grants: GrantId[]): Group[] {
         ]
       : []),
 
-    ...(grants.includes(GrantId.ManagePlatformRoles)
+    ...(grants.includes(GrantId.PlatformRolesManagement)
       ? [
           {
-            href: "/roles",
+            href: "/dashboard/platform/roles",
             label: "Roles",
             active: pathname.includes("/roles"),
             icon: "WorkOutline",
@@ -151,13 +155,58 @@ export function getMenuList(pathname: string, grants: GrantId[]): Group[] {
         ]
       : []),
 
-    ...(grants.includes(GrantId.ManagePlatformEvents)
+    ...(grants.includes(GrantId.PlatformEventsManagement)
       ? [
           {
-            href: "",
+            href: "/dashboard/platform/events",
             label: "Eventos",
             active: pathname === "/events",
             icon: "Event",
+            submenus: [],
+          },
+        ]
+      : []),
+
+    ...(grants.includes(GrantId.OrganizationKpisManagement)
+      ? [
+          {
+            href: `/dashboard/organization/${organizationId}/graphics`,
+            label: "Dashboard",
+            active: pathname === "/graphics",
+            icon: "Dashboard",
+            submenus: [],
+          },
+        ]
+      : []),
+    ...(grants.includes(GrantId.OrganizationEventsManagement)
+      ? [
+          {
+            href: `/dashboard/organization/${organizationId}/events`,
+            label: "Eventos",
+            active: pathname === "/events",
+            icon: "Event",
+            submenus: [],
+          },
+        ]
+      : []),
+    ...(grants.includes(GrantId.OrganizationUsersManagement)
+      ? [
+          {
+            href: `/dashboard/organization/${organizationId}/users`,
+            label: "Usuarios",
+            active: pathname === "/events",
+            icon: "Groups",
+            submenus: [],
+          },
+        ]
+      : []),
+    ...(grants.includes(GrantId.OrganizationRolesManagement)
+      ? [
+          {
+            href: `/dashboard/organization/${organizationId}/roles`,
+            label: "Roles",
+            active: pathname === "/roles",
+            icon: "WorkOutline",
             submenus: [],
           },
         ]
@@ -229,78 +278,3 @@ export function getMenuList(pathname: string, grants: GrantId[]): Group[] {
 //     },
 //   ];
 // }
-
-const grantMenuMapping: { [key in GrantId]?: Menu[] } = {
-  [GrantId.ManagePlatformDashboard]: [
-    {
-      href: "/dashboard",
-      label: "Dashboard",
-      active: false,
-      icon: "Dashboard",
-      submenus: [],
-    },
-  ],
-  [GrantId.ManagePlatformOrganizations]: [
-    {
-      href: "/organizations",
-      label: "Organizaciones",
-      active: false,
-      icon: "Organization",
-      submenus: [],
-    },
-  ],
-  [GrantId.ManagePlatformUsers]: [
-    {
-      href: "/users",
-      label: "Usuarios",
-      active: false,
-      icon: "Groups",
-      submenus: [],
-    },
-  ],
-  [GrantId.ViewPlatformAdministrators]: [
-    {
-      href: "/users/administrators",
-      label: "Administradores",
-      active: false,
-      icon: "AdminPanelSettings",
-      submenus: [],
-    },
-  ],
-  [GrantId.ViewPlatformParticipants]: [
-    {
-      href: "/users/participants",
-      label: "Participantes",
-      active: false,
-      icon: "Person",
-      submenus: [],
-    },
-  ],
-  [GrantId.ManagePlatformRoles]: [
-    {
-      href: "/roles",
-      label: "Roles",
-      active: false,
-      icon: "WorkOutline",
-      submenus: [],
-    },
-  ],
-  [GrantId.ManagePlatformEvents]: [
-    {
-      href: "/events",
-      label: "Eventos",
-      active: false,
-      icon: "Event",
-      submenus: [],
-    },
-  ],
-  [GrantId.ManageOrganizationEvents]: [
-    {
-      href: "/organization/events",
-      label: "Eventos de Organización",
-      active: false,
-      icon: "Event",
-      submenus: [],
-    },
-  ],
-};

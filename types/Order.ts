@@ -1,7 +1,7 @@
 export interface OrganizationItem {
     createdAt: string
     updatedAt: string
-    rucNumber: string
+    id: string
     name: string
     economicActivityId: any
     representativeFullName: string

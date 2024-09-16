@@ -141,7 +141,7 @@ const useMultipleSelect = () => {
     const changeGeneralCheckbox = () => {
         selectedIdItems.value = []
         if (generalCheckbox.value === 'empty') {
-            // selectedIdItems.value = props.data.map(item => item.rucNumber)
+            // selectedIdItems.value = props.data.map(item => item.id)
             generalCheckbox.value = 'all'
             checkboxGeneralIcon.value = 'Checkbox-Checked'
         } else {

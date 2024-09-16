@@ -10,7 +10,7 @@ export function useAuthManagement() {
         method: "GET",
       } as any,
     );
-    return { status, error, data, refresh };
+    return { status, error, data: data || [], refresh };
   };
 
   return { getMyGrants };

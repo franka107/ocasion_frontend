@@ -139,7 +139,11 @@ const props = defineProps<{
 const route = useRoute();
 const pathname = computed(() => route.path);
 const menuList = computed(() =>
-  getMenuList(pathname.value, myGrants.data.value ?? []),
+  getMenuList(
+    pathname.value,
+    myGrants.data.value ?? [],
+    route.params.organizationId as string,
+  ),
 );
 
 function handleSignOut() {

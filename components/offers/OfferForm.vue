@@ -9,22 +9,23 @@ import { Textarea } from "@/components/ui/textarea";
 import { eventType, goodType, eventTimes, years } from "@/constants/events";
 const BASE_OFFERS_URL = "/offer-management";
 import { X } from "lucide-vue-next";
+import type { Organization } from "~/types/Administrators";
+import Input from "../ui/input/Input.vue";
 let form: any;
 const { getOffer } = useOfferAPI();
 const props = defineProps<{
   id: string | undefined;
   eventId: string;
-  rucId: string;
   onsubmit: (values: any) => void;
 }>();
-const { fetchCities, fetchDistricts, fetchStates, states, cities, districts } =
-  useAddress();
+
 const {
   brands: brandOptions,
   models: modelOptions,
   fetchBrands,
   fetchModels,
 } = useExtraEndpoints();
+const initialAuctionAmount = ref("0");
 // const yearOptions = Array.from({ length: 65 }, (_, i) => ({ id: 1960 + i, name: (1960 + i).toString() }))
 const formSchema = toTypedSchema(
   z.object({
@@ -41,12 +42,19 @@ const formSchema = toTypedSchema(
     brandId: z.string().min(1, "El modelo es requerido."),
     model: z.string().min(1, "El modelo es requerido."),
     year: z.number().min(1, "El año es requerido"),
+    department: z.string().min(1, "El departamento es requerido"),
+    province: z.string().min(1, "La provincia es requerida"),
     districtId: z.string().min(1, "El año es requerido"),
-    description: z.string().min(1, "La descripcion es requerido."),
+    description: z
+      .string()
+      .min(1, "La descripcion es requerido.")
+      .max(1000, "Cant. de carácteres máximo 1000."),
     addressLine1: z.string().min(1, "La dirección es requerida."),
     appraisal: z.number().min(1, "La tasación es requerida."),
   }),
 );
+const { fetchCities, fetchDistricts, fetchStates, states, cities, districts } =
+  useAddress();
 
 interface OfferItemForm extends OfferItem {
   department?: string;
@@ -57,27 +65,43 @@ interface OfferItemForm extends OfferItem {
   model?: string;
 }
 
+const BASE_ORG_URL = "/organization-management";
+
+const { data: organizationData } = await useAPI<any>(
+  `${BASE_ORG_URL}/get-organization-detail`,
+  {
+    method: "GET",
+    query: {
+      eventId: props.eventId,
+    },
+  } as any,
+);
 if (props.id) {
   // const { data: offerData } = await ;
-  const [{ data }] = await Promise.all([
-    getOffer(props.id),
-    fetchBrands(),
-    fetchStates(),
-  ]);
+
+  const { data } = await getOffer(props.id);
   const offerData: OfferItemForm = { ...data.value };
-  offerData.department = offerData.address?.district?.id.split("+")[0] || "";
-  offerData.province =
-    `${offerData.department}+${offerData.address?.district?.id.split("+")[1]}` ||
-    "";
+  // offerData.department = offerData.address?.district?.id.split("+")[0] || "";
+  // offerData.province =
+  //   `${offerData.department}+${offerData.address?.district?.id.split("+")[1]}` ||
+  //   "";
+  offerData.department = offerData.address.district.city.state.id;
+  offerData.province = offerData.address.district.city.id;
   offerData.districtId = offerData.address.district.id;
   offerData.addressLine1 = offerData.address.addressLine1;
   offerData.brandId = offerData.carModel.brand.id;
   offerData.model = offerData.carModel.id;
 
+  initialAuctionAmount.value = (
+    offerData.appraisal *
+    (1 + organizationData.value.startPercentage / 100)
+  ).toFixed(2);
+
   await Promise.all([
     fetchCities(offerData.department),
     fetchDistricts(offerData.province),
     fetchModels(offerData.brandId),
+    fetchStates(),
   ]);
   form = useForm({
     validationSchema: formSchema,
@@ -88,9 +112,22 @@ if (props.id) {
   form = useForm({ validationSchema: formSchema });
 }
 
+console.log("OrganizationData ", organizationData);
+
 watch(form.values, (newValues) => {
-  console.log("Form values:", newValues, props.rucId);
   console.log("Attached Files:", newValues.attachedFiles); // Revisa este log
+  console.log(
+    "Attached Files:",
+    (initialAuctionAmount.value = (
+      newValues.appraisal *
+      (1 + organizationData.value.startPercentage / 100)
+    ).toFixed(2)),
+  ); // Revisa este log
+
+  initialAuctionAmount.value = (
+    newValues.appraisal *
+    (1 + organizationData.value.startPercentage / 100)
+  ).toFixed(2);
 });
 
 const handleStateChange = (stateId: string) => {
@@ -127,9 +164,7 @@ const onSubmit = form.handleSubmit((values: any) => {
         id: districtId,
       },
     },
-    organization: {
-      rucNumber: props.rucId,
-    },
+
     appraisal: Number(values.appraisal),
   };
   if (props.id) {
@@ -197,11 +232,11 @@ const handleFilesChange = (files: File[]) => {
         <FormItem>
           <FormControl>
             <CustomInput
-                type="text"
-                label="Título de la oferta"
-                v-bind="componentField"
-                :disabled="!!(props.id)"
-              />
+              type="text"
+              label="Título de la oferta"
+              v-bind="componentField"
+              :disabled="!!props.id"
+            />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -212,7 +247,7 @@ const handleFilesChange = (files: File[]) => {
             <FormControl>
               <CustomSelect
                 v-bind="componentField"
-                @update:modelValue="(value) => handleBrandChange(value)"       
+                @update:modelValue="(value) => handleBrandChange(value)"
                 :items="brandOptions"
                 placeholder="Marca"
               />
@@ -237,7 +272,7 @@ const handleFilesChange = (files: File[]) => {
           <CustomSelect
             v-bind="componentField"
             :items="years"
-            placeholder="Horario de cierre"
+            placeholder="Año"
           />
         </FormField>
       </div>
@@ -255,15 +290,22 @@ const handleFilesChange = (files: File[]) => {
       </FormField>
       <h2 class="text-primary text-base font-normal leading-5">Ubicación</h2>
       <!-- Departamento -->
+
       <FormField v-slot="{ componentField }" name="department">
         <FormItem>
           <FormControl>
             <CustomSelect
-                v-bind="componentField"
-                @update:modelValue="(value) => handleStateChange(value)"
-                :items="states"
-                placeholder="Departamento"
-              />
+              v-bind="componentField"
+              @update:modelValue="
+                (value) => {
+                  handleStateChange(value);
+                  form.setFieldValue('province', undefined);
+                  form.setFieldValue('districtId', undefined);
+                }
+              "
+              :items="states"
+              placeholder="Departamento"
+            />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -271,12 +313,18 @@ const handleFilesChange = (files: File[]) => {
 
       <div class="flex gap-2">
         <!-- Provincia -->
+
         <FormField v-slot="{ componentField }" name="province">
           <FormItem class="w-1/2">
             <FormControl>
               <CustomSelect
                 v-bind="componentField"
-                @update:modelValue="(value) => handleCityChange(value)"
+                @update:modelValue="
+                  (value) => {
+                    form.setFieldValue('districtId', undefined);
+                    handleCityChange(value);
+                  }
+                "
                 :disabled="!form.values.department"
                 :items="cities"
                 placeholder="Provincia"
@@ -287,6 +335,7 @@ const handleFilesChange = (files: File[]) => {
         </FormField>
 
         <!-- Distrito -->
+
         <FormField v-slot="{ componentField }" name="districtId">
           <FormItem class="w-1/2">
             <FormControl>
@@ -307,10 +356,10 @@ const handleFilesChange = (files: File[]) => {
         <FormItem>
           <FormControl>
             <CustomInput
-                type="text"
-                label="Dirección"
-                v-bind="componentField"
-              />
+              type="text"
+              label="Dirección"
+              v-bind="componentField"
+            />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -320,11 +369,11 @@ const handleFilesChange = (files: File[]) => {
       </h2>
       <div class="flex gap-2">
         <FormField v-slot="{ componentField }" name="appraisal">
-          <FormItem >
+          <FormItem>
             <FormControl>
               <CustomInput
                 type="number"
-                :disabled="!!(props.id)"
+                :disabled="!!props.id"
                 label="Tasación"
                 v-bind="componentField"
               />
@@ -332,18 +381,13 @@ const handleFilesChange = (files: File[]) => {
             <FormMessage />
           </FormItem>
         </FormField>
-        <FormField name="other">
-          <FormItem>
-            <FormControl>
-              <CustomInput
-                type="text"
-                label="Valor inicial de subasta"
-                disabled
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
+
+        <CustomInput
+          type="text"
+          label="Valor inicial de subasta"
+          disabled
+          :model-value="initialAuctionAmount"
+        />
       </div>
       <!-- Botón de Submit -->
       <!-- <Button type="submit">Guardar</Button> -->

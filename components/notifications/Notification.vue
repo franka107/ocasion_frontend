@@ -51,12 +51,10 @@
           <CardFooter class="px-3 py-4">
             <Button
               variant="ghost"
+              :onclick="onArchiveButtonPressed"
               class="bg-[#06b6d4] rounded-full w-full text-[#062a44]"
             >
-              <div
-                :onclick="onArchiveButtonPressed"
-                class="inline-flex items-center gap-2 text-sm font-medium"
-              >
+              <div class="inline-flex items-center gap-2 text-sm font-medium">
                 Archivar
               </div>
             </Button>
@@ -93,12 +91,11 @@ import {
   type NotificationReadedDomainEvent,
 } from "~/types/DomainEvent";
 import { useWebNotification } from "@vueuse/core";
+import { useSound } from "@vueuse/sound";
+import notificationSound from "~/assets/sounds/notification.mp3";
 
-const {
-  getNotReadedNotifications,
-  listenDomainEvents: listenDomainEvent,
-  removeNotifications,
-} = useNotificationAPI();
+const { getNotReadedNotifications, listenDomainEvents, removeNotifications } =
+  useNotificationAPI();
 const {
   data: notifications,
   refresh,
@@ -113,23 +110,20 @@ const webNotification = useWebNotification({
   icon: "/favicon.ico",
 });
 const notificationCreatedListener =
-  listenDomainEvent<NotificationCreatedDomainEvent>(
+  listenDomainEvents<NotificationCreatedDomainEvent>(
     domainEvents.notificationCreated,
   );
-const notificationReadedListener =
-  listenDomainEvent<NotificationReadedDomainEvent>(
-    domainEvents.notificationReaded,
-  );
 
-const onArchiveButtonPressed = () => {
-  removeNotifications(limitedNotifications.value.map((e) => e.id));
+const { play, sound } = useSound(notificationSound);
+
+const onArchiveButtonPressed = async () => {
+  await removeNotifications(limitedNotifications.value.map((e) => e.id));
+  refresh();
 };
 
 watch(notificationCreatedListener.data, (value, oldValue) => {
+  play();
   webNotification.show();
-  refresh();
-});
-watch(notificationReadedListener.data, (value, oldValue) => {
   refresh();
 });
 </script>
