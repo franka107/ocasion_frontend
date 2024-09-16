@@ -55,47 +55,47 @@
     </BaseForm>
     <ForgotPasswordForm v-else @back="toggleForgotPassword" />
     <Dialog
-      v-model:open="isSuspendedDialogOpen"
+      v-model:open="dialogState.isSuspendedDialogOpen"
       :iconSrc="messageIconSrc"
       iconAlt="Icono de alerta"
       title="Cuenta suspendida"
       description="Tu cuenta se encuentra suspendida, por favor contacta al administrador para mayor informacion"
       buttonText="Aceptar"
       iconBgColor="bg-[#f53e3e]"
-      @close="closeSuspendedDialog"
-      @action="closeSuspendedDialog"
+      @close="closeDialog('isSuspendedDialogOpen')"
+      @action="closeDialog('isSuspendedDialogOpen')"
     />
     <Dialog
-      v-model:open="isMaxAttemptsDialogOpen"
+      v-model:open="dialogState.isMaxAttemptsDialogOpen"
       :iconSrc="messageIconSrc"
       iconAlt="Icono de alerta"
       title="Alcanzo el límite de accesos"
       description="Ha alcanzado el límite de intentos. Se le ha enviado un correo para restaurar la contraseña."
       buttonText="Aceptar"
       iconBgColor="bg-[#f53e3e]"
-      @close="closeMaxAttemptsDialog"
-      @action="closeMaxAttemptsDialog"
+      @close="closeDialog('isMaxAttemptsDialogOpen')"
+      @action="closeDialog('isMaxAttemptsDialogOpen')"
     />
     <Dialog
-      v-model:open="isIncorrectCredentialsOpen"
+      v-model:open="dialogState.isIncorrectCredentialsOpen"
       :iconSrc="messageIconSrc"
       iconAlt="Icono de alerta"
       title="Credenciales  incorrectas"
       description="El correo electrónico o la contraseña son incorrectos. Por favor, vuelva a intentarlo."
       buttonText="Aceptar"
       iconBgColor="bg-[#f53e3e]"
-      @close="closeIncorrectCredentialsDialog"
-      @action="closeIncorrectCredentialsDialog"
+      @close="closeDialog('isIncorrectCredentialsOpen')"
+      @action="closeDialog('isIncorrectCredentialsOpen')"
     />
     <Dialog
-      v-model:open="isDialogOpen"
+      v-model:open="dialogState.isDialogOpen"
       :iconSrc="messageIconSrc"
       iconAlt="Icono de alerta"
       title="Contraseña caducada"
       description="La contraseña actual ha caducado, por favor actualice su contraseña"
       buttonText="Aceptar"
       iconBgColor="bg-[#FBBF24]"
-      @close="closeDialog"
+      @close="closeDialog('isDialogOpen')"
       @action="goToUpdatePassword"
     />
   </AuthForm>
@@ -116,21 +116,17 @@ const {
   email,
   password,
   showPassword,
-  closeMaxAttemptsDialog,
-  closeSuspendedDialog,
-  isSuspendedDialogOpen,
+  dialogState,
+
   showForgotPassword,
-  isDialogOpen,
-  isMaxAttemptsDialogOpen,
+
   errors,
   handleSubmit,
   togglePassword,
   toggleForgotPassword,
   closeDialog,
   goToUpdatePassword,
-  isIncorrectCredentialsOpen,
   isLoading,
-  closeIncorrectCredentialsDialog,
 } = useLoginForm();
 
 // Computa si el campo de correo electrónico tiene texto

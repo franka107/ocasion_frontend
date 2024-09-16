@@ -67,6 +67,8 @@ export function useLoginForm() {
 
       if (!response.ok) {
         const errorBody = await response.json();
+
+        console.log("ERROR BODY", errorBody);
         handleApiError(errorBody.data.errors[0]);
         return;
       }
@@ -101,7 +103,7 @@ export function useLoginForm() {
           );
         }
         const organization: Organization = user.organizations[0];
-        router.push(`/dashboard/organization/${organization.id}/events`);
+        router.push(`/organization/${organization.id}/events`);
         break;
       case UserType.Participant:
         router.push("/app");
@@ -110,6 +112,7 @@ export function useLoginForm() {
   };
 
   const handleApiError = (errorBack: any) => {
+    console.log(`Probando ${JSON.stringify(errorBack)}`);
     errors.value.api = errorBack.message;
 
     switch (errorBack.code) {
