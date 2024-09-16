@@ -9,8 +9,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
   if (!PUBLIC_ROUTES.includes(to.path) && !loggedIn.value) {
     return navigateTo("/auth/login");
   } else if (PUBLIC_ROUTES.includes(to.path) && loggedIn.value) {
-    return navigateTo("/organizations");
+    return navigateTo("/dashboard/platform/events");
   }
   return;
 });
-
