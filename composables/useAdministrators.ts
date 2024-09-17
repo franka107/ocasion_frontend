@@ -108,6 +108,7 @@ export function useAdmins() {
       } as any,
     );
 
+    console.log("DATA", data);
     if (status === 200 && data) {
       const url = window.URL.createObjectURL(new Blob([data]));
       const link = document.createElement("a");

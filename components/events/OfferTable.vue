@@ -58,10 +58,7 @@
                 >Crear oferta
               </Button>
             </div>
-            <Button
-              v-if="isOfferActionsVisible"
-              @click="handleViewBids"
-              variant="default"
+            <Button @click="handleViewBids" variant="default"
               >Ver pujas
             </Button>
           </template>

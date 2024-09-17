@@ -17,13 +17,22 @@
         >
           <template #action-button>
             <Button
-              @click="handleExport"
+              as="a"
               variant="default"
+              href="http://localhost:4000/api/v1/user-management/export-users?sortOptions=%5B%7B%22field%22%3A%22id%22%2C%22order%22%3A%22asc%22%7D%5D"
               class="bg-white text-primary border border-[#052339]"
             >
               <CustomIcons name="Download" class="ml-auto" />
               Exportar
             </Button>
+            <!-- <Button -->
+            <!--   @click="handleExport" -->
+            <!--   variant="default" -->
+            <!--   class="bg-white text-primary border border-[#052339]" -->
+            <!-- > -->
+            <!--   <CustomIcons name="Download" class="ml-auto" /> -->
+            <!--   Exportar -->
+            <!-- </Button> -->
             <Button
               @click="
                 () => {
@@ -309,7 +318,7 @@ const handleExport = async () => {
         const url = window.URL.createObjectURL(new Blob([file]));
         const link = document.createElement("a");
         link.href = url;
-        link.setAttribute("download", "usuarios_exportados.xlsx");
+        link.setAttribute("download", "usuarios_exportados.csv");
         document.body.appendChild(link);
         link.click();
         link.remove();
