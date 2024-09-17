@@ -18,7 +18,12 @@
         >
           <template #action-button>
             <Button
-              v-if="isOfferActionsVisible"
+              v-if="
+                isOfferActionsVisible &&
+                myGrants.data.value.includes(
+                  GrantId.OrganizationOffersCanConfirm,
+                )
+              "
               @click="handleConfirmOffers(selectedMultipleData)"
               class="bg-white text-primary border border-primary hover:bg-accent"
               variant="default"
@@ -26,7 +31,10 @@
               >Confirmar oferta
             </Button>
             <Button
-              v-if="isOfferActionsVisible"
+              v-if="
+                isOfferActionsVisible &&
+                myGrants.data.value.includes(GrantId.PlatformOfferCanRetire)
+              "
               @click="handleRetireOffers(selectedMultipleData)"
               class="bg-white text-primary border border-primary hover:bg-accent"
               variant="default"

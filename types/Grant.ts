@@ -16,6 +16,7 @@ export enum GrantId {
   PlatformOfferCanUpdateAppraisal = "PLATFORM_OFFER_CAN_UPDATE_APPRAISAL",
   PlarformUsersCanViewParticipants = "PLATFORM_USERS_CAN_VIEW_PARTICIPANTS",
   PlatformUsersCanViewAdministrators = "PLATFORM_USERS_CAN_VIEW_ADMINISTRATORS",
+  PlatformOfferCanRetire = "PLATFORM_OFFER_CAN_RETIRE",
   /* Organization */
   OrganizationKpisManagement = "ORGANIZATION_KPIS_MANAGEMENT",
   OrganizationEventsManagement = "ORGANIZATION_EVENTS_MANAGEMENT",
@@ -28,4 +29,5 @@ export enum GrantId {
   OrganizationBidCanReject = "ORGANIZATION_BID_CAN_REJECT",
   OrganizationOffersCanDiscuss = "ORGANIZATION_OFFERS_CAN_DISCUSS",
   OrganizationBidCanCounterOffer = "ORGANIZATION_BID_CAN_COUNTER_OFFER",
+  OrganizationOffersCanConfirm = "ORGANIZATION_OFFERS_CAN_CONFIRM",
 }
