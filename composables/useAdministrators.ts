@@ -96,30 +96,6 @@ export function useAdmins() {
     return { status, error, data };
   };
 
-  const getExportUser = async (filterOptions: string) => {
-    const { status, error, data }: any = await useAPI(
-      `${BASE_ADM_URL}/export-users`,
-      {
-        query: {
-          filterOptions: filterOptions,
-        },
-        method: "GET",
-        responseType: "blob",
-      } as any,
-    );
-
-    if (status === 200 && data) {
-      const url = window.URL.createObjectURL(new Blob([data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "users_export.csv");
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    }
-
-    return { status, error };
-  };
 
   return {
     page,
@@ -132,6 +108,5 @@ export function useAdmins() {
     resetUser,
     restoreUserPassword,
     getUser,
-    getExportUser,
   };
 }
