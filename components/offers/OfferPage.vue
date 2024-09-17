@@ -23,13 +23,18 @@
 import EventDetails from "~/components/events/EventDetails.vue";
 import OfferTable from "@/components/events/OfferTable.vue";
 import ContentLayout from "~/layouts/default/ContentLayout.vue";
+import { EventStatus } from "~/types/Event";
 const { openConfirmModal, updateConfirmModal } = useConfirmModal();
 const { publishEvent } = useEvent();
 const route = useRoute();
 const { getEvent } = useEvent();
 const PUBLISHED_STATUS = "PUBLISHED";
 const isEventNotPublished = computed(
-  () => eventDetail.value?.status !== PUBLISHED_STATUS,
+  () =>
+    eventDetail.value?.status !== EventStatus.Published &&
+    eventDetail.value?.status !== EventStatus.InProgress &&
+    eventDetail.value?.status !== EventStatus.Completed &&
+    eventDetail.value?.status !== EventStatus.Finished,
 );
 const props = defineProps<{ eventId: string }>();
 const { data: eventDetail, refresh: refreshEventDetail } = await getEvent(

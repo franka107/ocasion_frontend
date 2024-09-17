@@ -50,8 +50,10 @@
                 >Crear oferta
               </Button>
             </div>
-
-            <Button v-else @click="handleViewBids" variant="default"
+            <Button
+              v-if="isOfferActionsVisible"
+              @click="handleViewBids"
+              variant="default"
               >Ver pujas
             </Button>
           </template>
@@ -100,6 +102,11 @@
                   </div>
 
                   <DropdownMenuItem
+                    v-if="
+                      myGrants.data.value.includes(
+                        GrantId.OrganizationOffersCanDiscuss,
+                      )
+                    "
                     @click="
                       () => {
                         openModalDebate = true;
@@ -129,6 +136,11 @@
                     </div>
                   </DropdownMenuItem>
                   <DropdownMenuItem
+                    v-if="
+                      myGrants.data.value.includes(
+                        GrantId.PlatformOfferCanUpdateAppraisal,
+                      )
+                    "
                     @click="
                       () => {
                         openModifyAppraisal = true;
@@ -246,8 +258,16 @@ const { getEvent } = useEvent();
 const offerId = ref(undefined);
 const showBids = ref(false);
 const bidsId = ref<number | undefined>(undefined);
+// const isOfferActionsVisible = computed(
+//   () => eventDetail.value?.status !== EventStatus.Published,
+// );
+
 const isOfferActionsVisible = computed(
-  () => eventDetail.value?.status !== EventStatus.Published,
+  () =>
+    eventDetail.value?.status !== EventStatus.Published &&
+    eventDetail.value?.status !== EventStatus.InProgress &&
+    eventDetail.value?.status !== EventStatus.Completed &&
+    eventDetail.value?.status !== EventStatus.Finished,
 );
 const filterOptions = ref(
   `[{ "field": "event.id", "type": "equal", "value": "${route.params.eventId}" }]`,
@@ -374,7 +394,11 @@ const handleConfirmOffers = async (values: { type: string; ids: string[] }) => {
     callback: async () => {
       try {
         const { type, ids } = values;
-        const { status } = await confirmOffers({ type, ids });
+        const { status } = await confirmOffers({
+          type,
+          ids,
+          eventId: String(route.params.eventId),
+        });
         if (status.value === "success") {
           refreshOfferTable();
           resetMultipleSelect.value?.();
@@ -405,7 +429,10 @@ const handleRetireOffers = async (values: { type: string; ids: string[] }) => {
     message: `¿Está seguro de retirar la(s) oferta(s) seleccionada(s)?`,
     callback: async () => {
       try {
-        const { status } = await retireOffers(values);
+        const { status } = await retireOffers({
+          ...values,
+          eventId: String(route.params.eventId),
+        });
 
         if (status.value === "success") {
           refreshOfferTable();

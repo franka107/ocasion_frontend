@@ -103,7 +103,7 @@ export function useLoginForm() {
           );
         }
         const organization: Organization = user.organizations[0];
-        router.push(`/organization/${organization.id}/events`);
+        router.push(`/dashboard/organization/${organization.id}/events`);
         break;
       case UserType.Participant:
         router.push("/app");

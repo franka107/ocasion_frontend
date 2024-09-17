@@ -88,7 +88,6 @@ export function getMenuList(
   grants: GrantId[],
   organizationId?: string,
 ): Group[] {
-  console.log(grants);
   const menuList = [
     ...(grants.includes(GrantId.PlatformKpisManagement)
       ? [

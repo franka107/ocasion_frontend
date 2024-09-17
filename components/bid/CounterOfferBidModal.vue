@@ -12,18 +12,17 @@ import { z } from "zod";
 
 const props = defineProps<{
   id: string;
-  name: string;
-  appraisal: number;
+  currentAmount: number;
   modelValue: boolean;
   refreshTable: () => void;
 }>();
 const { openConfirmModal, updateConfirmModal } = useConfirmModal();
-const { discussOffer } = useOfferAPI();
+const { counterOfferBid } = useBidAPI();
 const formSchema = toTypedSchema(
   z.object({
-    counterProposalAmount: z
+    counterOfferAmount: z
       .number()
-      .gte(1, { message: "La contrapropuesta es requerida." })
+      .gte(1, { message: "La contraoferta es requerida." })
       .lte(999999, { message: "El campo no puede exceder los 6 dígitos." }),
   }),
 );
@@ -32,31 +31,31 @@ const form = useForm({
   validationSchema: formSchema,
 });
 const onSubmit = form.handleSubmit((values: any) => {
-  const { counterProposalAmount } = values;
-  handleSubmit({ offerId: props.id, counterProposalAmount });
-  console.log("counterProposalAmount", counterProposalAmount);
+  const { counterOfferAmount } = values;
+  handleSubmit({ id: props.id, counterOfferAmount });
+  console.log("counterOfferAmount", counterOfferAmount);
 });
 const handleSubmit = async (values: any) => {
   openConfirmModal({
-    title: "Enviar Oferta",
-    message: "¿Estás seguro de que deseas enviar esta Oferta?",
+    title: "Enviar Contraoferta de puja",
+    message: "¿Estás seguro de que deseas enviar esta contraoferta?",
     callback: async () => {
-      const { status, error }: any = await discussOffer(values);
+      const { status, error }: any = await counterOfferBid(values);
       if (status.value === "success") {
         emit("update:modelValue", false);
         props.refreshTable();
         updateConfirmModal({
-          title: "Oferta enviada",
-          message: "La oferta ha sido ev exitosamente",
+          title: "Contraoferta de puja enviada",
+          message: "La contraoferta ha sido enviada exitosamente",
           type: "success",
         });
       } else {
         const eMsg =
           error.value.data?.errors?.[0].message ||
           error.value.data.message ||
-          "La oferta no se pudo enviar, intentalo más tarde";
+          "La contraoferta no se pudo enviar, intentalo más tarde";
         updateConfirmModal({
-          title: "Error al crear Oferta",
+          title: "Error al enviar la contraoferta",
           message: eMsg,
           type: "error",
         });
@@ -77,33 +76,25 @@ const handleSubmit = async (values: any) => {
         <AlertDialogHeader class="border-b border-primary">
           <AlertDialogTitle
             class="text-xl tracking-[-0.5px] text-primary text-start mb-[18px] font-[600] px-6"
-            >Debate de precios</AlertDialogTitle
+            >Contraofertar puja</AlertDialogTitle
           >
         </AlertDialogHeader>
         <div class="grid grid-cols-2 gap-3 px-6">
           <CustomInput
             class="h-14 w-full"
-            type="string"
-            label="Nombre del evento"
-            :model-value="props.name"
-            :disabled="true"
-            labelOffset
-          />
-          <CustomInput
-            class="h-14 w-full"
             type="number"
-            label="Tasación"
-            :model-value="props.appraisal"
+            label="Monto actual"
+            :model-value="props.currentAmount"
             :disabled="true"
             labelOffset
           />
-          <FormField v-slot="{ componentField }" name="counterProposalAmount">
+          <FormField v-slot="{ componentField }" name="counterOfferAmount">
             <FormItem>
               <FormControl>
                 <CustomInput
                   class="h-14 w-full"
                   type="number"
-                  label="Tasación"
+                  label="Monto de contraoferta"
                   v-bind="componentField"
                   labelOffset
                 />
@@ -137,4 +128,3 @@ const handleSubmit = async (values: any) => {
     </AlertDialogContent>
   </AlertDialog>
 </template>
-

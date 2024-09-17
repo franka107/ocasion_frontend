@@ -6,10 +6,18 @@ import * as z from "zod";
 
 import { X } from "lucide-vue-next";
 import CustomComboboxMultipleInput from "../ui/custom-combobox-multiple-input/CustomComboboxMultipleInput.vue";
+const props = defineProps<{
+  id: number | undefined;
+  type: "platform" | "organization";
+  onsubmit: (values: any) => void;
+}>();
 const allGrants = ref<Array<{ id: string; name: string }>>([]);
 const fetchGrants = async () => {
   try {
     const { data } = await useAPI("/role-configuration/find-grants", {
+      params: {
+        type: props.type,
+      },
       default: () => [],
     });
     allGrants.value = data.value;
@@ -18,11 +26,6 @@ const fetchGrants = async () => {
   }
 };
 await fetchGrants();
-
-const props = defineProps<{
-  id: number | undefined;
-  onsubmit: (values: any) => void;
-}>();
 
 const formSchema = toTypedSchema(
   z.object({
@@ -92,7 +95,7 @@ if (props.id) {
                 type="text"
                 label="Nombre"
                 v-bind="componentField"
-                :disabled="!!(props.id)"
+                :disabled="!!props.id"
               />
             </FormControl>
             <FormMessage />
@@ -102,10 +105,10 @@ if (props.id) {
           <FormItem>
             <FormControl>
               <Textarea
-              type="text"
-              label="Descripción"
-              v-bind="componentField"
-            />
+                type="text"
+                label="Descripción"
+                v-bind="componentField"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -115,13 +118,13 @@ if (props.id) {
           <FormItem>
             <FormControl>
               <CustomSelect
-                  v-bind="componentField"
-                  :items="[
-                    { id: 'ACTIVE', name: 'Activo' },
-                    { id: 'INACTIVE', name: 'Desactivo' },
-                  ]"
-                  placeholder="Estado"
-                />
+                v-bind="componentField"
+                :items="[
+                  { id: 'ACTIVE', name: 'Activo' },
+                  { id: 'INACTIVE', name: 'Desactivo' },
+                ]"
+                placeholder="Estado"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>

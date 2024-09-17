@@ -83,6 +83,7 @@
         <SheetContent v-model:open="openModal" class="flex flex-col h-full">
           <RolesForm
             :id="roleId"
+            :type="props.organizationId ? 'organization' : 'platform'"
             :onsubmit="roleId !== undefined ? handleEdit : handleCreate"
           />
         </SheetContent>
@@ -201,7 +202,10 @@ const handleCreate = async (values: any) => {
     title: "Crear rol",
     message: "¿Estás seguro de que deseas crear este rol?",
     callback: async () => {
-      const { status, error } = await createRole(values);
+      const { status, error } = await createRole({
+        ...values,
+        organizationId: props.organizationId,
+      });
       console.log(`createRole response:`, status, error);
       if (status.value === "success") {
         openModal.value = false;
