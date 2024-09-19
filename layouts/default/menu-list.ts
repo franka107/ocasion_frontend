@@ -167,6 +167,18 @@ export function getMenuList(
         ]
       : []),
 
+    ...(grants.includes(GrantId.PlatformPaymentManagement)
+      ? [
+          {
+            href: `/dashboard/platform/payments`,
+            label: "Abonos",
+            active: pathname === "/payments",
+            icon: "Pay",
+            submenus: [],
+          },
+        ]
+      : []),
+
     ...(grants.includes(GrantId.OrganizationKpisManagement)
       ? [
           {
@@ -207,6 +219,18 @@ export function getMenuList(
             label: "Roles",
             active: pathname === "/roles",
             icon: "WorkOutline",
+            submenus: [],
+          },
+        ]
+      : []),
+    
+      ...(grants.includes(GrantId.OrganizationPaymentManagement)
+      ? [
+          {
+            href: `/dashboard/organization/payments`,
+            label: "Abonos",
+            active: pathname === "/payments",
+            icon: "Pay",
             submenus: [],
           },
         ]
