@@ -15,6 +15,9 @@ export enum GrantId {
   PlatformOfferCanUpdate = "PLATFORM_OFFER_CAN_UPDATE",
   PlarformUsersCanViewParticipants = "PLATFORM_USERS_CAN_VIEW_PARTICIPANTS",
   PlatformUsersCanViewAdministrators = "PLATFORM_USERS_CAN_VIEW_ADMINISTRATORS",
+  PlatformPaymentManagement = 'PLATFORM_PAYMENT_MANAGEMENT',
+  PlatformPaymentCanConfirm = 'PLATFORM_PAYMENT_CAN_CONFIRM',
+  PlatformPaymentCanObserve = 'PLATFORM_PAYMENT_CAN_OBSERVE',
   /* Organization */
   OrganizationKpisManagement = "ORGANIZATION_KPIS_MANAGEMENT",
   OrganizationEventsManagement = "ORGANIZATION_EVENTS_MANAGEMENT",
@@ -22,4 +25,7 @@ export enum GrantId {
   OrganizationEventsCanEdit = "ORGANIZATION_EVENTS_CAN_EDIT",
   OrganizationUsersManagement = "ORGANIZATION_USERS_MANAGEMENT",
   OrganizationRolesManagement = "ORGANIZATION_ROLES_MANAGEMENT",
+  OrganizationPaymentManagement = 'ORGANIZATION_PAYMENT_MANAGEMENT', 
+  OrganizationPaymentCanConfirm = 'ORGANIZATION_PAYMENT_CAN_CONFIRM',
+  OrganizationPaymentCanObserve = 'ORGANIZATION_PAYMENT_CAN_OBSERVE',
 }
