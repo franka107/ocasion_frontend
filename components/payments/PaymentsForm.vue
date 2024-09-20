@@ -52,7 +52,7 @@ const onSubmit = form.handleSubmit(async (values:any) => {
     <SheetTitle class="text-xl font-medium text-[#64748B]">Observar abono</SheetTitle>
   </SheetHeader>
 
-  <div class="flex-grow overflow-y-auto no-scrollbar flex flex-col">
+  <div class="flex-grow flex flex-col">
     <form class="h-full" @submit="onSubmit">
       <section class="flex flex-col gap-4 flex-grow p-5 h-full">
         <!-- Fields -->

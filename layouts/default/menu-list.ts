@@ -227,7 +227,7 @@ export function getMenuList(
       ...(grants.includes(GrantId.OrganizationPaymentManagement)
       ? [
           {
-            href: `/dashboard/organization/payments`,
+            href: `/dashboard/organization/${organizationId}/payments`,
             label: "Abonos",
             active: pathname === "/payments",
             icon: "Pay",
