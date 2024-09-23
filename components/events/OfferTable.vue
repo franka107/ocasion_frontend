@@ -383,7 +383,7 @@ const handleEdit = async (values: any) => {
           error.value.data.message ||
           "El evento no se pudo actualizar, intentalo más tarde";
         updateConfirmModal({
-          title: "Error al crear evento",
+          title: "Error al actualizar evento",
           message: eMsg,
           type: "error",
         });

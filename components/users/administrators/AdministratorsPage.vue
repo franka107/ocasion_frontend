@@ -136,7 +136,6 @@ const {
   restoreUserPassword,
   editUser,
   resetUser,
-  getExportUser,
 } = useAdmins();
 const { openConfirmModal, updateConfirmModal } = useConfirmModal();
 const filterOptions = ref(
@@ -311,33 +310,29 @@ const handleExport = async () => {
     title: "Exportar usuarios",
     message: "¿Estás seguro de que deseas exportar los usuarios?",
     callback: async () => {
-      const { status, error, file }: any = await getExportUser(
-        filterOptions.value,
-      );
-      if (status.value === "success") {
-        const url = window.URL.createObjectURL(new Blob([file]));
+      try {
+        const { apiUrl } = useRuntimeConfig().public;
         const link = document.createElement("a");
-        link.href = url;
+        link.href = `${apiUrl}/user-management/export-users?filterOptions=${filterOptions.value}`;
         link.setAttribute("download", "usuarios_exportados.csv");
         document.body.appendChild(link);
         link.click();
         link.remove();
-
-        updateConfirmModal({
-          title: "Exportación exitosa",
-          message: "Los usuarios han sido exportados exitosamente.",
-          type: "success",
-        });
-      } else {
+      } catch (error) {
         const eMsg =
-          error.value?.data?.message ||
-          "Error al exportar usuarios. Inténtalo de nuevo más tarde.";
+          error || "Error al exportar usuarios. Inténtalo de nuevo más tarde.";
         updateConfirmModal({
           title: "Error al exportar usuarios",
-          message: eMsg,
+          message: String(eMsg),
           type: "error",
         });
       }
+
+      updateConfirmModal({
+        title: "Exportación exitosa",
+        message: "Los usuarios han sido exportados exitosamente.",
+        type: "success",
+      });
     },
   });
 };
