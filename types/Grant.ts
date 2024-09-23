@@ -18,6 +18,7 @@ export enum GrantId {
   PlatformPaymentManagement = 'PLATFORM_PAYMENT_MANAGEMENT',
   PlatformPaymentCanConfirm = 'PLATFORM_PAYMENT_CAN_CONFIRM',
   PlatformPaymentCanObserve = 'PLATFORM_PAYMENT_CAN_OBSERVE',
+  PlatformTransferenceMangement  = 'PLATFORM_TRANSFERENCE_MANAGEMENT',
   /* Organization */
   OrganizationKpisManagement = "ORGANIZATION_KPIS_MANAGEMENT",
   OrganizationEventsManagement = "ORGANIZATION_EVENTS_MANAGEMENT",
@@ -28,4 +29,5 @@ export enum GrantId {
   OrganizationPaymentManagement = 'ORGANIZATION_PAYMENT_MANAGEMENT', 
   OrganizationPaymentCanConfirm = 'ORGANIZATION_PAYMENT_CAN_CONFIRM',
   OrganizationPaymentCanObserve = 'ORGANIZATION_PAYMENT_CAN_OBSERVE',
+  OrganizationTransferenceManagement = 'ORGANIZATION_TRANSFERENCE_MANAGEMENT',
 }
