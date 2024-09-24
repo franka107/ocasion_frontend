@@ -94,7 +94,7 @@ export function getMenuList(
           {
             href: "/dashboard/platform/graphics",
             label: "Dashboard",
-            active: pathname === "/dashboard",
+            active: pathname === "/dashboard/platform/graphics",
             icon: "Dashboard",
             submenus: [],
           },
@@ -124,7 +124,8 @@ export function getMenuList(
                     {
                       href: "/dashboard/platform/users/administrators",
                       label: "Administradores",
-                      active: pathname === "/users/administrators",
+                      active: pathname.includes("/users/administrators"),
+                      // active: pathname === "/users/administrators",
                     },
                   ]
                 : []),
@@ -133,7 +134,8 @@ export function getMenuList(
                     {
                       href: "/dashboard/platform/users/participants",
                       label: "Participantes",
-                      active: pathname === "/users/participants",
+                      active: pathname.includes("/users/participants"),
+                      // active: pathname === "/users/participants",
                     },
                   ]
                 : []),
@@ -159,7 +161,8 @@ export function getMenuList(
           {
             href: "/dashboard/platform/events",
             label: "Eventos",
-            active: pathname === "/events",
+            active: pathname.includes("/events"),
+            // active: pathname === "/events",
             icon: "Event",
             submenus: [],
           },
@@ -171,7 +174,8 @@ export function getMenuList(
           {
             href: `/dashboard/platform/payments`,
             label: "Abonos",
-            active: pathname === "/payments",
+            active: pathname.includes("/payments"),
+            // active: pathname === "/payments",
             icon: "Pay",
             submenus: [],
           },

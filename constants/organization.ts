@@ -8,7 +8,7 @@ export const organizationSearch: SearchItem[] = [
     },{
         key: 'name',
         type: 'text',
-        placeholder: 'Buscar nombre de organización',
+        placeholder: 'Buscar por Razón social',
         elementClass: 'min-w-[400px]',
         position: 2,
     },{
@@ -33,8 +33,12 @@ export const organizationHeader: HeaderItem[] = [{
     label: 'Razón social',
     sortable: true,
     }, {
-    key: 'date',
-    label: 'Fecha de inicio y fecha de fin del contrato',
+    key: 'contractStartDate',
+    label: 'Fecha de inicio del contrato',
+    },
+    {
+    key: 'contractEndDate',
+    label: 'Fecha de fin del contrato',
     },{
     key: 'status',
     label: 'Estado',
@@ -46,7 +50,7 @@ export const organizationHeader: HeaderItem[] = [{
     },{
     key: 'representativePhoneNumber',
     label: 'Número de administrador',
-    sortable: true
+    sortable: false
     },{
     key: 'actions',
     label: 'Acciones',
