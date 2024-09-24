@@ -62,6 +62,10 @@
           :key="index"
           :variant="'ghost'"
           class="w-full justify-start h-10 mb-1 hover:bg-[#36576e]"
+          :class="cn(
+            `w-full justify-start h-10 mb-1 hover:bg-[#36576e] hover:text-white`,
+            `${submenu.active && 'bg-[#36576e] text-white'}`
+          )"
           as-child
         >
           <NuxtLink :to="submenu.href" class="flex items-center">
@@ -71,6 +75,7 @@
             <p
               :class="[
                 'max-w-[170px] truncate text-[#a6b4bf]',
+                `${submenu.active && 'text-white'}`,
                 isOpen
                   ? 'translate-x-0 opacity-100'
                   : '-translate-x-96 opacity-0',

@@ -184,7 +184,6 @@ const openModal = ref(false);
 const organizationRucNo = ref<number | undefined>(undefined);
 const orderData = computed(() =>
   data.value.data.map((item: OrganizationItem) => ({
-    date: item.contractStartDate + " - " + item.contractEndDate,
     ...item,
   })),
 );
