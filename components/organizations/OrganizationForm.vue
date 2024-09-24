@@ -150,7 +150,10 @@ if (props.id) {
   });
 } else {
   await Promise.all([fetchEconomicActivities(), fetchStates()]);
-  form = useForm({ validationSchema: formSchema });
+  form = useForm({
+    validationSchema: formSchema,
+    initialValues: { startPercentage: 0 },
+  });
 }
 
 const handleStateChange = (stateId: string) => {
@@ -389,8 +392,6 @@ const handleFilesChange = (files: File[]) => {
             <FormControl>
               <CustomInput
                 type="number"
-                step="0.01"
-                min="0"
                 label="Porcentaje de Inicio"
                 v-bind="componentField"
               >

@@ -42,7 +42,11 @@ watch(
       active.value = true;
       return;
     }
-    active.value = !!modelValue.value;
+    //active.value = !!modelValue.value;
+    active.value =
+      modelValue.value !== undefined &&
+      modelValue.value !== null &&
+      modelValue.value !== "";
   },
   { immediate: true },
 );
