@@ -1,10 +1,11 @@
 <template>
   <div class="my-2">
-    <Popover>
+    <Popover v-model:open="open">
       <PopoverTrigger as-child>
         <Button
           variant="outline"
           role="combobox"
+          :aria-expanded="open"
           :class="[
             'w-full justify-between text-left font-normal border-[#0B3859]',
             !modelValue && 'text-muted-foreground',
@@ -33,6 +34,7 @@
                   () => {
                     //modelValue = option.value;
                     onUpdateValue(option.value);
+                    open = false;
                   }
                 "
               >
@@ -70,6 +72,8 @@ const props = defineProps<{
 const emits = defineEmits<{
   (e: "update:modelValue", payload: string | undefined): void;
 }>();
+
+const open = ref(false);
 
 const modelValue = useVModel(props, "value", emits, {
   passive: true,
