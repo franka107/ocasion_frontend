@@ -64,3 +64,23 @@ export interface EvidenseItem {
   export interface IDateModal {
     id: string;
   }
+
+
+  export interface DeliveryDetail {
+    id: string
+    fileIds: string[]
+    deliveryDate: string
+    deliveryAddress: string
+    comment: string
+    status: string
+    files: DeliveryDetailFile[]
+  }
+  
+  export interface DeliveryDetailFile {
+    id: string
+    path: string
+    createdAt: string
+    updatedAt: string
+    __entity: string
+  }
+  

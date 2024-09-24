@@ -66,7 +66,8 @@
         >
           <DeliveryForm
             :id ="deliveryId"
-            :onSubmit="handleConfirmDelivery "
+            :onConfirm="handleConfirmDelivery"
+            :onEdit="handleEditDelivery"
             :closeModal="() => openModalDeliveryTransfer = false"
           />
         </SheetContent>
@@ -103,8 +104,8 @@ const {getDeliverySupport , confirmDeliverySupport ,  editDeliverySupport } = us
 const { getMyGrants } = useAuthManagement();
 const myGrants = await getMyGrants();
 
-const supportId = ref<number | undefined>(undefined);
-const deliveryId = ref<number | undefined | string>(undefined);
+const supportId = ref<string | undefined>(undefined);
+const deliveryId = ref<string | undefined | string>(undefined);
 const dateModal = ref<IDateModal>({ id: "" });
 const OFFER_BASE_URL = "/offer-management";
 const selectedMultipleData = ref<{ type: string, ids: string[]}>({ type: 'empty', ids: [] });
@@ -124,6 +125,7 @@ const { data, refresh }: any = await useAPI(
       limit: 10,
       page,
       filterOptions,
+      relations:  JSON.stringify(["transferenceSupport","deliverySupport"]),
       sortOptions,
     },
   } as any,
@@ -138,7 +140,7 @@ const openSupportForTransferModal = (row: any) => {
   openModalDetailSupport.value = true;
 };
 const openDeliveryForTransferModal = (row: any) => {
-  deliveryId.value = row.id;
+  deliveryId.value = row.deliverySupport?.id;
   openModalDeliveryTransfer.value = true;
 };
 
@@ -172,13 +174,13 @@ const handleConfirmTransference = async ( transferenceSupportId: string  ) => {
     },
   });
 };
-const handleConfirmDelivery = async ( transferenceSupportId: string ) => {
+const handleConfirmDelivery = async ( value: { deliverySupportId: string} ) => {
   openConfirmModal({
     title: "Confirmar Transferencia",
     message: `¿Está seguro de que deseas confirmar esta transferencia?`,
     callback: async () => {
       try {
-        const { status } = await confirmDeliverySupport({ transferenceSupportId });
+        const { status } = await confirmDeliverySupport(value);
         if (status.value === "success") {
           refresh();
           resetMultipleSelect.value?.();
@@ -187,11 +189,11 @@ const handleConfirmDelivery = async ( transferenceSupportId: string ) => {
             message: "La transferencia ha sido confirmado exitosamente",
             type: "success",
           });
+          openModalDeliveryTransfer.value = false;
         } else {
           throw new Error("Error al confirmar esta transferencia");
         }
       } catch (error) {
-        console.log("error", error);
         updateConfirmModal({
           title: "Error al confirmar Transferencia",
           message:
