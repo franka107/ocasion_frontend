@@ -96,7 +96,6 @@ export function useAdmins() {
     return { status, error, data };
   };
 
-
   return {
     page,
     onSearch,

@@ -118,7 +118,7 @@
             ></CustomChip>
           </template>
         </CustomTable>
-        <div v-if="props.organizationId">
+        <div>
           <SheetContent
             v-model:open="openEventModal"
             @pointer-down-outside="(e) => e.preventDefault()"

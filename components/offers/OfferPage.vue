@@ -4,7 +4,10 @@
       <EventDetails :eventDetail="eventDetail">
         <template #default>
           <Button
-            v-if="isEventNotPublished"
+            v-if="
+              isEventNotPublished &&
+              myGrants.data.value.includes(GrantId.PlatformEventsCanPublish)
+            "
             @click="handlePublishEvent"
             variant="default"
             class="bg-white text-primary border border-primary hover:bg-accent"
@@ -23,13 +26,22 @@
 import EventDetails from "~/components/events/EventDetails.vue";
 import OfferTable from "@/components/events/OfferTable.vue";
 import ContentLayout from "~/layouts/default/ContentLayout.vue";
+import { EventStatus } from "~/types/Event";
+import { GrantId } from "~/types/Grant";
 const { openConfirmModal, updateConfirmModal } = useConfirmModal();
 const { publishEvent } = useEvent();
+
+const { getMyGrants } = useAuthManagement();
+const myGrants = await getMyGrants();
 const route = useRoute();
 const { getEvent } = useEvent();
 const PUBLISHED_STATUS = "PUBLISHED";
 const isEventNotPublished = computed(
-  () => eventDetail.value?.status !== PUBLISHED_STATUS,
+  () =>
+    eventDetail.value?.status !== EventStatus.Published &&
+    eventDetail.value?.status !== EventStatus.InProgress &&
+    eventDetail.value?.status !== EventStatus.Completed &&
+    eventDetail.value?.status !== EventStatus.Finished,
 );
 const props = defineProps<{ eventId: string }>();
 const { data: eventDetail, refresh: refreshEventDetail } = await getEvent(

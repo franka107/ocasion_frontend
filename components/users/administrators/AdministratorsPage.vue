@@ -17,13 +17,22 @@
         >
           <template #action-button>
             <Button
-              @click="handleExport"
+              as="a"
               variant="default"
+              href="http://localhost:4000/api/v1/user-management/export-users?sortOptions=%5B%7B%22field%22%3A%22id%22%2C%22order%22%3A%22asc%22%7D%5D"
               class="bg-white text-primary border border-[#052339]"
             >
               <CustomIcons name="Download" class="ml-auto" />
               Exportar
             </Button>
+            <!-- <Button -->
+            <!--   @click="handleExport" -->
+            <!--   variant="default" -->
+            <!--   class="bg-white text-primary border border-[#052339]" -->
+            <!-- > -->
+            <!--   <CustomIcons name="Download" class="ml-auto" /> -->
+            <!--   Exportar -->
+            <!-- </Button> -->
             <Button
               @click="
                 () => {
@@ -301,32 +310,30 @@ const handleExport = async () => {
     title: "Exportar usuarios",
     message: "¿Estás seguro de que deseas exportar los usuarios?",
     callback: async () => {
-        try {
-          const { apiUrl } = useRuntimeConfig().public;
-          const link = document.createElement("a");
-          link.href = `${apiUrl}/user-management/export-users?filterOptions=${filterOptions.value}`;
-          link.setAttribute("download", "usuarios_exportados.csv");
-          document.body.appendChild(link);
-          link.click();
-          link.remove();
-
-        } catch (error) {
-          const eMsg =
-          error ||
-          "Error al exportar usuarios. Inténtalo de nuevo más tarde.";
-          updateConfirmModal({
-            title: "Error al exportar usuarios",
-            message: String(eMsg),
-            type: "error",
-          });
-        }
-
+      try {
+        const { apiUrl } = useRuntimeConfig().public;
+        const link = document.createElement("a");
+        link.href = `${apiUrl}/user-management/export-users?filterOptions=${filterOptions.value}`;
+        link.setAttribute("download", "usuarios_exportados.csv");
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      } catch (error) {
+        const eMsg =
+          error || "Error al exportar usuarios. Inténtalo de nuevo más tarde.";
         updateConfirmModal({
-          title: "Exportación exitosa",
-          message: "Los usuarios han sido exportados exitosamente.",
-          type: "success",
+          title: "Error al exportar usuarios",
+          message: String(eMsg),
+          type: "error",
         });
-    }
+      }
+
+      updateConfirmModal({
+        title: "Exportación exitosa",
+        message: "Los usuarios han sido exportados exitosamente.",
+        type: "success",
+      });
+    },
   });
 };
 </script>

@@ -67,6 +67,8 @@ export function useLoginForm() {
 
       if (!response.ok) {
         const errorBody = await response.json();
+
+        console.log("ERROR BODY", errorBody);
         handleApiError(errorBody.data.errors[0]);
         return;
       }
@@ -110,6 +112,7 @@ export function useLoginForm() {
   };
 
   const handleApiError = (errorBack: any) => {
+    console.log(`Probando ${JSON.stringify(errorBack)}`);
     errors.value.api = errorBack.message;
 
     switch (errorBack.code) {
