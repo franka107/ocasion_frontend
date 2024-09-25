@@ -70,10 +70,9 @@ import ContentLayout from "~/layouts/default/ContentLayout.vue";
 import CustomSimpleCard from "~/components/ui/custom-simple-card/CustomSimpleCard.vue";
 import { GrantId } from "~/types/Grant";
 import type { IDateModal } from "~/types/Evidence";
-import DeliveryForm from "@/components/evidence/DeliveryForm.vue";
-import SupportForm from "@/components/evidence/SupportForm.vue";
-const route = useRoute();
-const organizationId = route.params.organizationId as string;
+import DeliveryForm from "./DeliveryForm.vue";
+import SupportForm from "./SupportForm.vue";
+
 const props = defineProps<{ organizationId: string | null }>();
 const filterOptions = ref(
   props.organizationId
@@ -116,7 +115,6 @@ const { data, refresh }: any = await useAPI(
       filterOptions : ('[]'),
       relations: JSON.stringify(["transferenceSupport", "deliverySupport"]),
       sortOptions,
-      // organizationId,
     },
   } as any,
 );

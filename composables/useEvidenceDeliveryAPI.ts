@@ -3,6 +3,11 @@ import { useAPI } from "./useAPI";
 const BASE_DELIVERY_URL = "/delivery-management";
 
 export function useEvidenceDeliveryAPI(){
+    const page = ref(1);
+    const sortOptions = ref("[]");
+    const onSort = (sortObject: { [key: string]: string }[]) => {
+        sortOptions.value = JSON.stringify(sortObject);
+      };
     const getDeliverySupport = async (id: number | string) => {
         const { status, error, data, refresh }: any = await useAPI(
           `${BASE_DELIVERY_URL}/get-delivery-support-detail`,
@@ -42,6 +47,6 @@ export function useEvidenceDeliveryAPI(){
     };
     
 
-      return {getDeliverySupport , confirmDeliverySupport ,  editDeliverySupport }
+      return {getDeliverySupport , confirmDeliverySupport ,  editDeliverySupport, page, sortOptions ,onSort }
 }
 

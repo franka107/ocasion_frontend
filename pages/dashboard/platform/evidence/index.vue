@@ -1,7 +1,7 @@
 <template>
-    <EvidencePage :organization-id="null" />
+    <EvidencePagePlatf :organization-id="null" />
   </template>
   <script setup lang="ts">
-  import EvidencePage from "~/components/evidence/EvidencePage.vue";
+  import EvidencePagePlatf from "~/components/evidence/EvidencePagePlatf.vue";
   </script>
   

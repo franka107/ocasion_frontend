@@ -54,18 +54,9 @@ export interface EvidenseItem {
   export interface TransferenceSupport {}
   
   export interface DeliverySupport {}
-
-  export enum evidenceStatus {
-    ConfirmedDeposit = 'CONFIRMED_DEPOSIT', // Deposito confirmado
-    InReview = 'IN_REVIEW', // En revision
-    TransferOfGood = 'IN_TRANSFER_OF_GOOD', // En tranferenecia de bienes
-    Delivered = 'DELIVERED', // Entrega
-  }
   export interface IDateModal {
     id: string;
   }
-
-
   export interface DeliveryDetail {
     id: string
     fileIds: string[]
@@ -75,12 +66,42 @@ export interface EvidenseItem {
     status: string
     files: DeliveryDetailFile[]
   }
-  
+  export interface TransferDetail {
+    id: string
+    fileIds: string[]
+    status: string
+    files: DeliveryDetailFile[]
+  }
   export interface DeliveryDetailFile {
     id: string
     path: string
     createdAt: string
     updatedAt: string
     __entity: string
+  }
+  
+  export enum evidenceStatus {
+    Created = 'CREATED', // Nuevo
+    Debated = 'DEBATED', // Debadito
+    Confirmed = 'CONFIRMED', // Confirmado
+    Retired = 'RETIRED', // Retirado
+    InProgress = 'IN_PROGRESS', // En curso
+    Cancelled = 'CANCELLED', // Cancelado
+    InReview = 'IN_REVIEW', // En revision
+    Rejected = 'REJECTED', // Rechazado
+    InDepositReview = 'IN_DEPOSIT_REVIEW', // Rechazado
+    PendingDeposit = 'PENDING_DEPOSIT', // Abono pendiente
+    ObservedDeposit = 'OBSERVED_DEPOSIT', // Abono observado
+    ConfirmedDeposit = 'CONFIRMED_DEPOSIT', // Deposito confirmado
+    InTransferOfGood = 'IN_TRANSFER_OF_GOOD', // En transferencia de bienes
+    Delivered = 'DELIVERED', // Enviado
+    Concreted = 'CONCRETED', // Concreatedo
+    // -----------------
+    PendingOfDelivery = 'PENDING_OF_DELIVERY', // Pendiente de entrega
+  }
+  export enum DeliverySupportStatus {
+    Approved = 'APPROVED', // Verde
+    Observed = 'OBSERVED', // Amarillo
+    Delivered = 'DELIVERED', // Azul
   }
   

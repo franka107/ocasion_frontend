@@ -64,7 +64,7 @@ try {
     files: data.value.files as any
   };
 } catch (error) {
-  console.error("Error al cargar el detalle de la transferencia", error);
+  console.error("Error al cargar el detalle de Sustento de Entrega", error);
 }
 const form = useForm({
   validationSchema: formSchema,
@@ -106,7 +106,7 @@ const onSubmit = async (values:any) => {
     <SheetTitle class="text-xl font-medium text-[#64748B]">Detalle sustento de entrega</SheetTitle>
   </SheetHeader>
   
-  <div class="flex-grow flex flex-col">
+  <div class="flex-grow overflow-y-auto no-scrollbar flex flex-col">
     <form class="h-full" @submit.prevent="onSubmit">
       <section class="flex flex-col gap-4 flex-grow p-5 h-full">
         <div v-if="transferenceDetail">

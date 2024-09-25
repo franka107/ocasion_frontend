@@ -24,7 +24,7 @@ export function useEvidenceTransferAPI(){
         return { status, error };
     };
 
-    const confirmTransference = async (values: {  transferenceSupportId: string }) => {
+    const confirmTransference = async (values: { transferenceSupportId: string }) => {
         const { status, error }: any = await useAPI(
           `${BASE_EVIDENCE_URL}/confirm-transference-support`,
           {
