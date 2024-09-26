@@ -37,7 +37,7 @@ const props = defineProps({
 // const files = ref<File[]>([]);
 const files = ref<{ id: string; path: string; name: string }[]>([]);
 const fileInputRef = ref<HTMLInputElement | null>(null);
-
+const isLoading = ref(false);
 const emit = defineEmits(["update:modelValue"]);
 
 // const uploadFile = async (file: File): Promise<string> => {
@@ -71,6 +71,7 @@ const handleFileChange = async (event: Event) => {
     ); // Limitar a 3 archivos
     const newFileIds: { id: string }[] = [];
     // const newFileData: { id: string; path: string }[] = [];
+    isLoading.value = true;
 
     for (const file of newFiles) {
       try {
@@ -86,6 +87,7 @@ const handleFileChange = async (event: Event) => {
         console.error(error);
       }
     }
+    isLoading.value = false;
     emit("update:modelValue", newFileIds); // Emitir los IDs actualizados
     // emit("update:modelValue", newFileData); // Emitir los datos actualizados
   }
@@ -144,6 +146,11 @@ onMounted(() => {
         <ClipboardIcon class="h-5 w-5 text-gray-400" />
         <p>Abrir archivo</p>
       </div>
+    </div>
+
+    <div v-if="isLoading" class="flex flex-col items-center mt-2 space-y-2">
+      <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-500"></div>
+      <p class="text-green-500 font-semibold text-sm">Subiendo archivos...</p>
     </div>
 
     <div class="space-y-2">
