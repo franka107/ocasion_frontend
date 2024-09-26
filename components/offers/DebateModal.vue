@@ -47,7 +47,7 @@ const handleSubmit = async (values: any) => {
         props.refreshTable();
         updateConfirmModal({
           title: "Oferta enviada",
-          message: "La oferta ha sido ev exitosamente",
+          message: "La oferta ha sido enviada exitosamente",
           type: "success",
         });
       } else {

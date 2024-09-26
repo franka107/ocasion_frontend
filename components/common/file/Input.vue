@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref } from "vue";
 import { CheckIcon, TrashIcon, ClipboardIcon } from "@radix-icons/vue";
 
 const props = defineProps({
@@ -12,6 +12,7 @@ const props = defineProps({
     default: "Cargar máximo hasta 3 archivos (xlsx, docx o pdf)",
   },
   modelValue: {
+    // type: Array as () => string[],
     type: Array as () => { id: string; path: string }[],
     default: () => [],
   },
@@ -33,14 +34,13 @@ const props = defineProps({
   },
 });
 
+// const files = ref<File[]>([]);
 const files = ref<{ id: string; path: string; name: string }[]>([]);
 const fileInputRef = ref<HTMLInputElement | null>(null);
+const isLoading = ref(false);
 const emit = defineEmits(["update:modelValue"]);
 
-const uploadedFiles = computed(() =>
-  files.value.map((file) => ({ id: file.id, path: file.path })),
-);
-
+// const uploadFile = async (file: File): Promise<string> => {
 const uploadFile = async (
   file: File,
 ): Promise<{ id: string; path: string }> => {
@@ -54,6 +54,7 @@ const uploadFile = async (
     } as any);
 
     console.log("File uploaded successfully:", data.value.file);
+    // return data.value.file.id;
     return { id: data.value.file.id, path: data.value.file.path };
   } catch (error) {
     console.error("An error occurred during file upload:", error);
@@ -63,41 +64,53 @@ const uploadFile = async (
 
 const handleFileChange = async (event: Event) => {
   const input = event.target as HTMLInputElement;
-  console.log(`handleFileChange event files length`, input.files?.length);
-  console.log(`handleFileChange ref files length`, files.value.length);
-
   if (input.files) {
     const newFiles = Array.from(input.files).slice(
       0,
       props.limitFiles - files.value.length,
-    );
+    ); // Limitar a 3 archivos
+    const newFileIds: { id: string }[] = [];
+    // const newFileData: { id: string; path: string }[] = [];
+    isLoading.value = true;
+
     for (const file of newFiles) {
       try {
-        const fileData = await uploadFile(file);
-        files.value.push({ ...fileData, name: file.name });
+        // const fileId = await uploadFile(file); // Subir el archivo
+        const fileData = await uploadFile(file); // Subir el archivo
+        const fileName = file.name; // Nombre del archivo subido
+        files.value.push({ ...fileData, name: fileName }); // Agregar el archivo a la lista con nombre
+        props.modelValue.push(fileData); // Agregar el ID del archivo a modelValue
+        newFileIds.push({ id: fileData.id }); // Agregar solo el ID del archivo a la lista de IDs
+        // newFileIds.push(fileId); // Agregar solo el ID del archivo a la lista de IDs
+        // newFileData.push(fileData); // Agregar el objeto con id y path a la lista de datos
       } catch (error) {
         console.error(error);
       }
     }
-    emit("update:modelValue", uploadedFiles.value); // Emitimos los datos de los archivos actualizados
+    isLoading.value = false;
+    emit("update:modelValue", newFileIds); // Emitir los IDs actualizados
+    // emit("update:modelValue", newFileData); // Emitir los datos actualizados
   }
 };
 
 const removeFile = (index: number) => {
   files.value.splice(index, 1);
-  emit("update:modelValue", uploadedFiles.value); // Actualizamos el modelValue después de eliminar el archivo
+  props.modelValue.splice(index, 1); // Eliminar el ID correspondiente en modelValue
+  emit("update:modelValue", props.modelValue); // Emitir los IDs actualizados
 };
 
 const triggerFileInput = () => {
   fileInputRef.value?.click();
 };
 
-// Obtener nombre de archivo desde la ruta
+// watch(files.value, (newVal) => {
+//   console.log(newVal)
+// })
 const getFileNameFromPath = (path: string): string => {
-  return path.split("/").pop() || "Unknown file";
+  return path.split("/").pop() || "Unknown file"; // Obtén el nombre del archivo desde la URL
 };
 
-// Inicializamos los archivos existentes en el montaje
+// Inicializa los archivos existentes
 onMounted(() => {
   files.value = props.modelValue.map((fileData) => ({
     ...fileData,
@@ -135,15 +148,22 @@ onMounted(() => {
       </div>
     </div>
 
+    <div v-if="isLoading" class="flex flex-col items-center mt-2 space-y-2">
+      <div
+        class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-500"
+      ></div>
+      <p class="text-green-500 font-semibold text-sm">Subiendo archivos...</p>
+    </div>
+
     <div class="space-y-2">
       <div
         v-for="(file, index) in files"
-        :key="file.id"
+        :key="index"
         class="border-2 border-[#22c55d] rounded-lg flex items-center justify-between p-2"
       >
-        <span class="text-gray-400 text-sm font-normal leading-5">
-          {{ file.name }}
-        </span>
+        <span class="text-gray-400 text-sm font-normal leading-5">{{
+          file.name
+        }}</span>
         <div class="flex items-center space-x-2">
           <CheckIcon class="h-6 w-6 text-[#22c55d]" />
           <TrashIcon
@@ -154,10 +174,9 @@ onMounted(() => {
         </div>
       </div>
     </div>
-
     <!-- Mostrar el mensaje de error -->
-    <p v-if="errorMessage" class="text-red-500 text-sm mt-2">
-      {{ errorMessage }}
+    <p v-if="props.errorMessage" class="text-red-500 text-sm mt-2">
+      {{ props.errorMessage }}
     </p>
   </div>
 </template>
