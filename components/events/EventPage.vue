@@ -5,8 +5,12 @@
       <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto mt-4">
         <CustomTable
           :data="eventsData"
-          :header="eventListHeaders"
-          :search="eventSearch"
+          :header="
+            eventListHeaders(props.organizationId ? 'organization' : 'platform')
+          "
+          :search="
+            eventSearch(props.organizationId ? 'organization' : 'platform')
+          "
           @onSort="onSort"
           @onSearch="onSearch"
         >
@@ -194,6 +198,19 @@ const onSearch = (item: { [key: string]: string }) => {
   filterOptions.value = JSON.stringify([
     { field: "name", type: "like", value: item.name || "" },
     { field: "status", type: "equal", value: item.status || "" },
+    {
+      field: "organization.name",
+      type: "like",
+      value: item.organizationName || "",
+    },
+    {
+      field: "id",
+      type: "like",
+      value: item.id || "",
+    },
+    { field: "status", type: "equal", value: item.status || "" },
+    { field: "type", type: "equal", value: item.type || "" },
+    { field: "goodType", type: "equal", value: item.goodType || "" },
     ...(props.organizationId
       ? [
           {

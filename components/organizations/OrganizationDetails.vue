@@ -38,14 +38,14 @@
         <div>
           <div class="text-[#64748B] text-sm">Ticket promedio</div>
           <div class="text-primary text-4xl">
-            <sup>S/</sup
+            <sup>$</sup
             >{{ formatCurrency(data.actionedGoods.averageTicketAmount) }}
           </div>
         </div>
         <div>
           <div class="text-[#64748B] text-sm">Monto recaudado</div>
           <div class="text-primary text-4xl">
-            <sup>S/</sup>{{ formatCurrency(data.actionedGoods.amountRaised) }}
+            <sup>$</sup>{{ formatCurrency(data.actionedGoods.amountRaised) }}
           </div>
         </div>
       </div>
@@ -56,13 +56,13 @@
         <div>
           <div class="text-[#64748B] text-sm">Meta esperada</div>
           <div class="text-primary text-4xl">
-            <sup>S/</sup>{{ formatCurrency(data.goal.goalAmount) }}
+            <sup>$</sup>{{ formatCurrency(data.goal.goalAmount) }}
           </div>
         </div>
         <div>
           <div class="text-[#64748B] text-sm">Monto recaudado</div>
           <div class="text-primary text-4xl">
-            <sup>S/</sup>{{ formatCurrency(data.goal.amountRaised) }}
+            <sup>$</sup>{{ formatCurrency(data.goal.amountRaised) }}
           </div>
         </div>
       </div>
