@@ -2,6 +2,8 @@ import type {
   HeaderItem,
   SearchItem,
 } from "@/components/ui/custom-table/CustomTable.vue";
+import { EventType } from "~/types/Event";
+import type { ViewType } from "~/utils/view-types";
 
 export const eventType = new Map<string, string>([
   ["HAND_OVER", "Puesta en mano"],
@@ -41,75 +43,133 @@ export const goodType = new Map<string, string>([
   ["INDUSTRIAL_MACHINERY_AND_EQUIPMENT", "Industrial, maquinaria y equipo"],
 ]);
 
-export const eventSearch: SearchItem[] = [
-  {
-    key: "name",
-    type: "text",
-    placeholder: "Buscar eventos",
-    position: 1,
-  },
-  {
-    key: "status",
-    type: "select",
-    placeholder: "Filtrar por estado",
-    items: [
-      ...Array.from(eventStatus).map(([key, value]) => ({
-        text: value.name,
-        value: key,
-      })),
-      { text: "Todos", value: " " },
-    ],
-    elementClass: "min-w-[400px]",
-    position: 3,
-  },
-];
-export const eventListHeaders: HeaderItem[] = [
-  {
-    key: "id",
-    label: "Código",
-    sortable: true,
-  },
-  {
-    key: "name",
-    label: "Evento",
-    sortable: true,
-  },
-  {
-    key: "type",
-    label: "Tipo",
-  },
-  {
-    key: "createdAt",
-    label: "Creación",
-    sortable: true,
-  },
-  {
-    key: "startDate",
-    label: "Fecha de inicio",
-    sortable: true,
-  },
-  {
-    key: "endDate",
-    label: "Fecha de cierre",
-    sortable: true,
-  },
-  {
-    key: "expectedAmount",
-    label: "Monto Esperado",
-    sortable: true,
-  },
-  {
-    key: "status",
-    label: "Estado",
-    sortable: true,
-  },
-  {
-    key: "actions",
-    label: "",
-    sortable: false,
-    align: "center",
-  },
-];
+export const eventSearch = (viewType: ViewType): SearchItem[] => {
+  return [
+    {
+      key: "name",
+      type: "text",
+      placeholder: "Buscar por nombre",
+      position: 1,
+    },
+    {
+      key: "id",
+      type: "text",
+      placeholder: "Buscar por codigo",
+      position: 1,
+    },
+
+    ...(viewType === "organization"
+      ? []
+      : [
+          {
+            key: "organizationName",
+            type: "text" as any,
+            placeholder: "Buscar por organización",
+            position: 1,
+          },
+        ]),
+    {
+      key: "goodType",
+      type: "select",
+      placeholder: "Filtrar por tipo de bien",
+      items: [
+        ...Array.from(goodType).map(([key, value]) => ({
+          text: value,
+          value: key,
+        })),
+        { text: "Todos", value: " " },
+      ],
+      elementClass: "min-w-[400px]",
+      position: 2,
+    },
+    {
+      key: "type",
+      type: "select",
+      placeholder: "Filtrar por tipo de subasta",
+      items: [
+        ...Array.from(eventType).map(([key, value]) => ({
+          text: value,
+          value: key,
+        })),
+        { text: "Todos", value: " " },
+      ],
+      elementClass: "min-w-[400px]",
+      position: 2,
+    },
+    {
+      key: "status",
+      type: "select",
+      placeholder: "Filtrar por estado",
+      items: [
+        ...Array.from(eventStatus).map(([key, value]) => ({
+          text: value.name,
+          value: key,
+        })),
+        { text: "Todos", value: " " },
+      ],
+      elementClass: "min-w-[400px]",
+      position: 3,
+    },
+  ];
+};
+export const eventListHeaders = (viewType: ViewType): HeaderItem[] => {
+  return [
+    ...(viewType === "organization"
+      ? []
+      : [
+          {
+            key: "organization.name",
+            label: "Organización",
+            sortable: true,
+          },
+        ]),
+    {
+      key: "id",
+      label: "Código",
+      sortable: true,
+    },
+    {
+      key: "name",
+      label: "Evento",
+      sortable: true,
+    },
+    {
+      key: "type",
+      label: "Tipo",
+    },
+    {
+      key: "createdAt",
+      label: "Creación",
+      sortable: true,
+    },
+    {
+      key: "startDate",
+      label: "Fecha de inicio",
+      sortable: true,
+    },
+    {
+      key: "endDate",
+      label: "Fecha de cierre",
+      sortable: true,
+    },
+    {
+      key: "expectedAmount",
+      label: "Monto Esperado",
+      sortable: true,
+    },
+    {
+      key: "status",
+      label: "Estado",
+      sortable: true,
+    },
+    {
+      key: "actions",
+      label: "",
+      sortable: false,
+      align: "center",
+    },
+  ];
+};
 
 export const years = [
   {
