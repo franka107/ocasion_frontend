@@ -25,29 +25,64 @@ const userTypesOptions = Array.from(userType).map(([id, name]) => ({
 }));
 
 // Form schema
-const formSchema = toTypedSchema(
-  z.object({
-    firstName: z.string().min(1, "El nombre es requerido"),
-    lastName: z.string().min(1, "El apellido es requerido"),
-    documentType: z.string().min(1, "Tipo de documento es requerido"),
-    documentIdentifier: z
-      .string()
-      .regex(/^\d+$/, "Este campo debe contener solo dígitos.")
-      .length(9, "El número de documento debe de ser 9 dígitos"),
-    phoneNumber: z.string().min(1, "El número de celular es requerido"),
-    email: z
-      .string()
-      .email("El correo electrónico no es válido")
-      .optional()
-      .nullable(),
-    type: z.string().min(1, "Tipo de usuario es requerido"),
-    organizations: z.union([
-      z.array(z.string()).min(1, "La organización es requerida"),
-      z.string().min(1, "La organización es requerida"),
-    ]),
-    roles: z.array(z.string()).min(1, "El rol de usuario es requerido"),
-  }),
-);
+const administratorFormSchema = z.object({
+  firstName: z.string().min(1, "El nombre es requerido"),
+  lastName: z.string().min(1, "El apellido es requerido"),
+  documentType: z.enum(["DNI", "CE", "PT"]),
+  documentIdentifier: z
+    .string()
+    .regex(/^\d+$/, "El documento debe contener solo dígitos.")
+    .min(1, `El documento del representante es requerido`),
+  phoneNumber: z.string().min(1, "El número de celular es requerido"),
+  email: z
+    .string()
+    .email("El correo electrónico no es válido")
+    .optional()
+    .nullable(),
+  type: z.string().min(1, "Tipo de usuario es requerido"),
+  organizations: z.union([
+    z.array(z.string()).min(1, "La organización es requerida"),
+    z.string().min(1, "La organización es requerida"),
+  ]),
+  roles: z.array(z.string()).min(1, "El rol de usuario es requerido"),
+})
+.partial()
+.superRefine((schema, ctx) => {
+  if (
+    schema.documentType === "DNI" &&
+    schema.documentIdentifier?.length !== 8
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "El dni debe contener 8 digitos",
+      path: ["documentIdentifier"],
+    });
+  }
+  if (
+    schema.documentType !== "DNI" &&
+    schema.documentIdentifier?.length !== 9
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `El ${schema.documentType} debe contener 9 digitos`,
+      path: ["documentIdentifier"],
+    });
+  }
+
+  const requiredFields = ['firstName', 'lastName', 'documentType', 'documentIdentifier', 'phoneNumber', 'type', 'organizations', 'roles'];
+  requiredFields.forEach(field => {
+    if (!schema[field]) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `El campo ${field} es requerido.`,
+        path: [field],
+      });
+    }
+  });
+});
+
+const formSchema = toTypedSchema(administratorFormSchema);
+
 
 interface AdministratorsForm
   extends Omit<IAdminsLItem, "organizations" | "roles"> {
@@ -107,6 +142,11 @@ const formattedOrganizations = computed(() => {
     name: org.name,
   }));
 });
+
+watch(form.values, (newValues) => {
+  console.log("Form values:", newValues);
+});
+
 
 // Watcher to auto-select the role when the user type changes
 watch(
