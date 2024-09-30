@@ -132,7 +132,7 @@ const onSearch = (item: { [key: string]: string }) => {
   console.log(item)
   filterOptions.value = JSON.stringify([
     { field: "status", type: "equal", value: item.status || "" },
-    { field: "organization.name", type: "equal", value: item.organization }
+    { field: "organization.name", type: "like", value: item.organization }
   ]);
   console.log("filterOptions", filterOptions)
 };
@@ -146,6 +146,7 @@ const { data, refresh }: any = await useAPI(
       sortOptions,
     },
   } as any,
+  true
 );
 
 const paymentsData = computed(() => 
