@@ -10,25 +10,23 @@
         <Menu />
         <div class="grid justify-center">
             <div class="max-w-[1280px] mx-[80px]">
-                <h1 class="text-center text-bluePrimary mb-[32px] text-[48px] font-[700] leading-[70px]">Sobre nosotros
+                <h1 class="text-center text-bluePrimary my-[32px] text-[48px] font-[700] leading-[70px]">Sobre nosotros
                 </h1>
             </div>
-            <div class="w-[1280px] grid grid-cols-2 items-center justify-center mx-[80px]">
+            <div class="w-[1280px] grid grid-cols-2 items-center justify-center mx-[80px] mb-[48px]">
                 <div class="w-[631px]">
                     <h2 class="text-left text-[#2872A1] mt-[48px] mb-[10px] text-[18px] font-[700]">CONOCENOS</h2>
-                    <h1 class="text-left text-bluePrimary mb-[18px] text-[40px] font-[700] leading-[50px]">Lorem ipsum
-                        dolor <span class="text-[#F6313C]">sit amet</span></h1>
-                    <p>En DeOcasion, redefinimos la experiencia de compra y venta a través de nuestra innovadora
+                    <h1 class="text-left text-bluePrimary mb-[18px] text-[40px] font-[700] leading-[50px]">¿Quiénes 
+                     <span class="text-[#F6313C]">somos?</span></h1>
+                    <p class="w-[595.13px] text-[#68686C] text-[16px] font-[400]" >En DeOcasion, redefinimos la experiencia de compra y venta a través de nuestra innovadora
                         plataforma de subastas online. Desde nuestro lanzamiento, hemos dedicado nuestros esfuerzos a
                         ofrecer una experiencia única y enriquecedora, facilitando el acceso a productos de alta calidad
                         mediante un proceso de subasta seguro y transparente.</p>
                 </div>
-
                 <img src="/assets/img/nosotros.png" alt="Nosotros">
-    
             </div>
         </div>
-        <div class="grid justify-center">
+        <div class="grid justify-center my-[48px]">
             <div class="w-[1280px] grid justify-center px-[80px]">
 
             <h2 class="text-center text-[#2872A1] mt-[48px] mb-[10px] text-[18px] font-[700]">¿COMO FUNCIONA?</h2>
