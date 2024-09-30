@@ -1,6 +1,6 @@
 <template>
   <div class="w-full">
-    <div class="w-full flex flex-row py-6 gap-x-4 justify-end">
+    <div class="w-full flex flex-row flex-wrap py-6 gap-4 justify-end">
       <template v-for="(item, i) in search" :index="i">
         <template v-if="item">
           <template v-if="item.type === 'text'">
@@ -49,6 +49,7 @@
               label="Fecha de creación"
               format="DD/MM/YYYY"
               :value="searchValues[item.key]"
+              
             />
           </template>
         </template>
