@@ -116,8 +116,12 @@ import { paymentsHeader, paymentStatus, paymentsSearch} from "~/constants/paymen
 import ContentLayout from "~/layouts/default/ContentLayout.vue";
 import CustomSimpleCard from "~/components/ui/custom-simple-card/CustomSimpleCard.vue";
 import { GrantId } from "~/types/Grant";
-
-const filterOptions = ref('[]');
+const props = defineProps<{ organizationId: string | null }>();
+const filterOptions = ref(
+  props.organizationId
+    ? `[{ "field": "organization.id", "type": "equal", "value": "${props.organizationId}" }]`
+    : "[]",
+);
 const openModalObservePayment = ref(false);
 const { openConfirmModal, updateConfirmModal } = useConfirmModal();
 const { confirmPayment, observePayment, page, sortOptions, onSort } = usePaymentAPI()
@@ -129,12 +133,19 @@ const selectedMultipleData = ref<{ type: string, ids: string[]}>({ type: 'empty'
 const resetMultipleSelect = ref<Function | undefined>(undefined);
 const disableMultipleSelect = computed(()=> selectedMultipleData.value.type === 'empty' && selectedMultipleData.value.ids.length === 0);
 const onSearch = (item: { [key: string]: string }) => {
-  console.log(item)
   filterOptions.value = JSON.stringify([
     { field: "status", type: "equal", value: item.status || "" },
-    { field: "organization.name", type: "equal", value: item.organization }
+    { field: "organization.name", type: "equal", value: item.organization },
+    ...(props.organizationId
+      ? [
+          {
+            field: "organization.id",
+            type: "equal",
+            value: props.organizationId,
+          },
+        ]
+      : []),
   ]);
-  console.log("filterOptions", filterOptions)
 };
 const { data, refresh }: any = await useAPI(
   `${BASE_PAY_URL}/find-payments-paginated`,

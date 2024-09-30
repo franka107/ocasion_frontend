@@ -182,6 +182,18 @@ export function getMenuList(
         ]
       : []),
 
+      ...(grants.includes(GrantId.PlatformTransferenceMangement)
+      ? [
+          {
+            href: `/dashboard/platform/evidence`,
+            label: "Evidencias",
+            active: pathname === "/evidence",
+            icon: "Evidence",
+            submenus: [],
+          },
+        ]
+      : []),
+
     ...(grants.includes(GrantId.OrganizationKpisManagement)
       ? [
           {
@@ -234,6 +246,18 @@ export function getMenuList(
             label: "Abonos",
             active: pathname === "/payments",
             icon: "Pay",
+            submenus: [],
+          },
+        ]
+      : []),
+
+      ...(grants.includes(GrantId.OrganizationTransferenceManagement)
+      ? [
+          {
+            href: `/dashboard/organization/${organizationId}/evidence`,
+            label: "Evidencias",
+            active: pathname === "/evidence",
+            icon: "Evidence",
             submenus: [],
           },
         ]
