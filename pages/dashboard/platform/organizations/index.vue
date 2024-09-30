@@ -202,10 +202,13 @@ const handleSuspend = async (id: string, name: string) => {
         });
         refresh();
       } else {
+        const eMsg =
+          error.value.data?.errors?.[0].message ||
+          error.value.data.message ||
+          "La organización no se pudo suspender. \nTe recomendamos intentarlo nuevamente.";
         updateConfirmModal({
           title: "Error al suspender",
-          message:
-            "La organización no se pudo suspender. \nTe recomendamos intentarlo nuevamente.",
+          message: eMsg,
           type: "error",
         });
       }
