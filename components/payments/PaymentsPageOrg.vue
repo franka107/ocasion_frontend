@@ -135,7 +135,7 @@ const disableMultipleSelect = computed(()=> selectedMultipleData.value.type === 
 const onSearch = (item: { [key: string]: string }) => {
   filterOptions.value = JSON.stringify([
     { field: "status", type: "equal", value: item.status || "" },
-    { field: "organization.name", type: "equal", value: item.organization },
+    { field: "organization.name", type: "like", value: item.organization },
     ...(props.organizationId
       ? [
           {
@@ -157,6 +157,7 @@ const { data, refresh }: any = await useAPI(
       sortOptions,
     },
   } as any,
+  true
 );
 
 const paymentsData = computed(() => 

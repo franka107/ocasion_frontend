@@ -92,10 +92,11 @@ if (props.id) {
   offerData.brandId = offerData.carModel.brand.id;
   offerData.model = offerData.carModel.id;
 
-  initialAuctionAmount.value = (
-    offerData.appraisal *
-    (1 + organizationData.value.startPercentage / 100)
-  ).toFixed(2);
+  initialAuctionAmount.value =
+    (
+      offerData.appraisal *
+      (organizationData.value.startPercentage / 100)
+    ).toFixed(2) || "0";
 
   await Promise.all([
     fetchCities(offerData.department),
@@ -120,13 +121,13 @@ watch(form.values, (newValues) => {
     "Attached Files:",
     (initialAuctionAmount.value = (
       newValues.appraisal *
-      (1 + organizationData.value.startPercentage / 100)
+      (organizationData.value.startPercentage / 100)
     ).toFixed(2)),
   ); // Revisa este log
 
   initialAuctionAmount.value = (
     newValues.appraisal *
-    (1 + organizationData.value.startPercentage / 100)
+    (organizationData.value.startPercentage / 100)
   ).toFixed(2);
 });
 
