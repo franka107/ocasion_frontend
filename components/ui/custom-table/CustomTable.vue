@@ -49,7 +49,6 @@
               label="Fecha de creación"
               format="DD/MM/YYYY"
               :value="searchValues[item.key]"
-              
             />
           </template>
         </template>
@@ -130,7 +129,7 @@
                 "
               >
                 <slot :name="headerItem.key" :row="item">
-                  {{ item[headerItem.key] }}
+                  {{ getNestedProperty(item, headerItem.key) }}
                 </slot>
               </td>
             </tr>
