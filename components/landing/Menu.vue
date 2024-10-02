@@ -8,7 +8,7 @@
         <nav class="text-[#152A3C] hover:text-bluePrimary text-[14px] font-[600] flex space-x-3">
           <a href="/landing/home" class="py-[6px] px-[12px]">Inicio</a>
           <a href="/landing/who-we-are" class="py-[6px] px-[12px]">Quiénes Somos</a>
-          <a href="#" class="py-[6px] px-[12px]">Subastas</a>
+          <a href="/landing/auctions" class="py-[6px] px-[12px]">Subastas</a>
           <a href="#" class="py-[6px] px-[12px]">Preguntas Frecuentes</a>
           <a href="#" class="py-[6px] px-[12px]">Contacto</a>
         </nav>

@@ -16,9 +16,11 @@
             <div class="w-[1280px] grid grid-cols-2 items-center justify-center mx-[80px] mb-[48px]">
                 <div class="w-[631px]">
                     <h2 class="text-left text-[#2872A1] mt-[48px] mb-[10px] text-[18px] font-[700]">CONOCENOS</h2>
-                    <h1 class="text-left text-bluePrimary mb-[18px] text-[40px] font-[700] leading-[50px]">¿Quiénes 
-                     <span class="text-[#F6313C]">somos?</span></h1>
-                    <p class="w-[595.13px] text-[#68686C] text-[16px] font-[400]" >En DeOcasion, redefinimos la experiencia de compra y venta a través de nuestra innovadora
+                    <h1 class="text-left text-bluePrimary mb-[18px] text-[40px] font-[700] leading-[50px]">¿Quiénes
+                        <span class="text-[#F6313C]">somos?</span>
+                    </h1>
+                    <p class="w-[595.13px] text-[#68686C] text-[16px] font-[400]">En DeOcasion, redefinimos la
+                        experiencia de compra y venta a través de nuestra innovadora
                         plataforma de subastas online. Desde nuestro lanzamiento, hemos dedicado nuestros esfuerzos a
                         ofrecer una experiencia única y enriquecedora, facilitando el acceso a productos de alta calidad
                         mediante un proceso de subasta seguro y transparente.</p>
@@ -29,13 +31,16 @@
         <div class="grid justify-center my-[48px]">
             <div class="w-[1280px] grid justify-center px-[80px]">
 
-            <h2 class="text-center text-[#2872A1] mt-[48px] mb-[10px] text-[18px] font-[700]">¿COMO FUNCIONA?</h2>
-            <h1 class="text-center text-bluePrimary mb-[32px] text-[48px] font-[700] leading-[70px]">¡No hay que tener miedo a las subastas! <span class="text-[#F6313C]">¡Es sencillo!</span></h1>
-            <p class="text-[16px] text-[#737887] font-[400] mb-[32px]">
-                Las subastas virtuales podrán parecer peligrosas o sospechosas. Sin embargo, en DeOcasión, nos aseguramos en que puedas contar con todas las garantías y seguridades para que tu experiencia sea la mejor del mercado. Por ello, te recomendamos seguir las siguientes indicaciones
-            </p>
-            <img src="/assets/img/video-nosotros.png" alt="">
-        </div>
+                <h2 class="text-center text-[#2872A1] mt-[48px] mb-[10px] text-[18px] font-[700]">¿COMO FUNCIONA?</h2>
+                <h1 class="text-center text-bluePrimary mb-[32px] text-[48px] font-[700] leading-[70px]">¡No hay que
+                    tener miedo a las subastas! <span class="text-[#F6313C]">¡Es sencillo!</span></h1>
+                <p class="text-[16px] text-[#737887] font-[400] mb-[32px]">
+                    Las subastas virtuales podrán parecer peligrosas o sospechosas. Sin embargo, en DeOcasión, nos
+                    aseguramos en que puedas contar con todas las garantías y seguridades para que tu experiencia sea la
+                    mejor del mercado. Por ello, te recomendamos seguir las siguientes indicaciones
+                </p>
+                <img src="/assets/img/video-nosotros.png" alt="">
+            </div>
         </div>
         <Footer />
     </div>
