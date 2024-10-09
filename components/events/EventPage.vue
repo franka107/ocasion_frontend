@@ -1,7 +1,10 @@
 <template>
   <ContentLayout title="Eventos">
     <section>
-      <OrganizationDetails :data="organizationSummary" />
+      <OrganizationDetails
+        v-if="organizationSummary"
+        :data="organizationSummary"
+      />
       <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto mt-4">
         <CustomTable
           :data="eventsData"
@@ -117,8 +120,14 @@
           </template>
           <template #status="{ row }">
             <CustomChip
-              :text="eventStatus.get(row.status)?.name || ''"
-              :variant="eventStatus.get(row.status)?.color as any"
+              :text="eventStatus.get(row?.status)?.name || ''"
+              :variant="eventStatus.get(row?.status)?.color as any"
+            ></CustomChip>
+          </template>
+          <template #goodType="{ row }">
+            <CustomChip
+              :text="goodType.get(row.goodType) || ''"
+              variant="brown"
             ></CustomChip>
           </template>
         </CustomTable>
@@ -167,6 +176,7 @@ import {
   eventStatus,
   eventType,
   eventSearch,
+  goodType,
 } from "~/constants/events";
 import type { IEventLItem, IOrganizationSummary } from "@/types/Event";
 import type { IDataResponse } from "@/types/Common";
@@ -184,11 +194,12 @@ const myGrants = await getMyGrants();
 console.log(myGrants);
 
 const props = defineProps<{ organizationId: string | null }>();
-const filterOptions = ref(
-  props.organizationId
-    ? `[{ "field": "organization.id", "type": "equal", "value": "${props.organizationId}" }]`
-    : "[]",
-);
+// const filterOptions = ref(
+//   props.organizationId
+//     ? `[{ "field": "organization.id", "type": "equal", "value": "${props.organizationId}" }]`
+//     : "[]",
+// );
+const filterOptions = ref(JSON.stringify([]));
 const eventId = ref<string | undefined>("EVE-1");
 const { openConfirmModal, updateConfirmModal } = useConfirmModal();
 const openEventModal = ref(false);
@@ -224,20 +235,26 @@ const onSearch = (item: { [key: string]: string }) => {
 };
 const BASE_ORG_URL = "/event-management";
 const [eventListData, organizationSummaryData] = await Promise.all([
-  useAPI<IDataResponse<IEventLItem[]>>(`${BASE_ORG_URL}/find-events`, {
-    query: {
-      limit: 6,
-      page,
-      filterOptions,
-      sortOptions,
-    },
-  } as any),
-  useAPI<IOrganizationSummary>(`${BASE_ORG_URL}/get-events-summary`, {
-    query: props.organizationId ? { organizationId: props.organizationId } : {},
-  } as any),
+  useAPI<IDataResponse<IEventLItem[]>>(
+    `${BASE_ORG_URL}/find-events-paginated`,
+    {
+      query: {
+        limit: 6,
+        page,
+        filterOptions,
+        sortOptions,
+      },
+    } as any,
+  ),
+  useAPI<IOrganizationSummary>(
+    `${BASE_ORG_URL}/get-events-summary`,
+    {} as any,
+    true,
+  ),
 ]);
 const { data, refresh } = eventListData;
 const organizationSummary = organizationSummaryData.data.value;
+console.log("organizationSymmary", organizationSummary);
 //fix typing
 const eventsData = computed(() =>
   data.value.data.map((item: any) => ({
@@ -245,6 +262,8 @@ const eventsData = computed(() =>
     createdAt: dayjs(item.createdAt).format("YYYY-MM-DD"),
   })),
 );
+
+console.log(eventsData.value);
 
 const handleCreate = async (values: any) => {
   openConfirmModal({

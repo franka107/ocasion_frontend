@@ -116,18 +116,19 @@ if (props.id) {
 console.log("OrganizationData ", organizationData);
 
 watch(form.values, (newValues) => {
+  const startPercentage = Number(organizationData.value?.startPercentage) || 0;
   console.log("Attached Files:", newValues.attachedFiles); // Revisa este log
   console.log(
     "Attached Files:",
     (initialAuctionAmount.value = (
       newValues.appraisal *
-      (organizationData.value.startPercentage / 100)
+      (startPercentage / 100)
     ).toFixed(2)),
   ); // Revisa este log
 
   initialAuctionAmount.value = (
     newValues.appraisal *
-    (organizationData.value.startPercentage / 100)
+    (startPercentage / 100)
   ).toFixed(2);
 });
 

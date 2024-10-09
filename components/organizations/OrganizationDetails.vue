@@ -10,7 +10,7 @@
       <p class="text-[18px] text-[#68686C]">Crea y gestiona tus eventos</p>
     </div>
   </div>
-  
+
   <div class="mt-4 grid lg:grid-cols-[212px,_1fr,_1fr] sm:grid-cols-1 gap-x-4">
     <div class="bg-white rounded-xl p-6 lg:max-w-[212px] mt-3 lg:mt-0">
       <h2 class="text-xl font-semibold text-primary text-center">Eventos</h2>
@@ -18,18 +18,22 @@
         <div class="text-center">
           <div class="text-[#64748B] text-sm">En linea</div>
           <div class="text-primary text-4xl mt-2">
-            <pre>{{ data.status.onlineCount }}</pre>
+            <pre>{{ data.status.inProgressCount }}</pre>
           </div>
         </div>
         <div class="text-center">
           <div class="text-[#64748B] text-sm">Cerrados</div>
-          <div class="text-primary text-4xl mt-2">{{ data.status.closedCount }}</div>
+          <div class="text-primary text-4xl mt-2">
+            {{ data.status.finishedCount }}
+          </div>
         </div>
       </div>
     </div>
-    
+
     <div class="bg-white rounded-xl p-6 mt-3 lg:mt-0">
-      <h2 class="text-xl font-semibold text-primary text-center">Bienes subastados</h2>
+      <h2 class="text-xl font-semibold text-primary text-center">
+        Bienes subastados
+      </h2>
       <div class="flex mt-8 mx-2 justify-around flex-wrap gap-4">
         <div class="flex-1 min-w-[120px] text-center">
           <div class="text-[#64748B] text-sm">Cerrados</div>
@@ -40,7 +44,8 @@
         <div class="flex-1 min-w-[120px] text-center">
           <div class="text-[#64748B] text-sm">Ticket promedio</div>
           <div class="text-primary text-4xl mt-2">
-            <sup>$</sup>{{ formatCurrency(data.actionedGoods.averageTicketAmount) }}
+            <sup>$</sup
+            >{{ formatCurrency(data.actionedGoods.averageTicketAmount) }}
           </div>
         </div>
         <div class="flex-1 min-w-[120px] text-center">
@@ -51,7 +56,7 @@
         </div>
       </div>
     </div>
-    
+
     <div class="bg-white rounded-xl p-6 mt-3 lg:mt-0">
       <h2 class="text-xl font-semibold text-primary text-center">Meta</h2>
       <div class="flex mt-8 mx-2 justify-around">

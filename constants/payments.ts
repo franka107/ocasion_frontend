@@ -5,7 +5,7 @@ import type {
 
 export const paymentStatus = new Map<string, { name: string; color: string }>([
   ["OBSERVED", { name: "Abono observado", color: "orange" }],
-  ["IN REVIEW", { name: "En revisión de abono", color: "blue" }],
+  ["IN_REVIEW", { name: "En revisión de abono", color: "blue" }],
   ["CONFIRMED", { name: "Abono confirmado", color: "green" }],
   ["CANCELLED", { name: "Cancelada", color: "red" }],
   ["CONCRETED", { name: "Concretada", color: "brown" }],
@@ -33,7 +33,7 @@ export const paymentsSearch: SearchItem[] = [
     position: 2,
   },
 ];
-export const paymentsHeader: HeaderItem[] = [
+export const paymentsHeader = (viewType: ViewType): HeaderItem[] => [
   {
     key: "offer.id",
     label: "Cód. Oferta",
@@ -44,11 +44,16 @@ export const paymentsHeader: HeaderItem[] = [
     label: "Evento",
     sortable: true,
   },
-  {
-    key: "organization.name",
-    label: "Organización",
-    sortable: true,
-  },
+  ...(viewType === "platform"
+    ? [
+        {
+          key: "organization.name",
+          label: "Organización",
+          sortable: true,
+        },
+      ]
+    : []),
+
   {
     key: "supportingDetails",
     label: "Detalle sustento",
@@ -76,4 +81,3 @@ export const paymentsHeader: HeaderItem[] = [
     align: "center",
   },
 ];
-

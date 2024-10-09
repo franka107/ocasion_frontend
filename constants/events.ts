@@ -135,7 +135,11 @@ export const eventListHeaders = (viewType: ViewType): HeaderItem[] => {
     },
     {
       key: "type",
-      label: "Tipo",
+      label: "Tipo de evento",
+    },
+    {
+      key: "goodType",
+      label: "Tipo de bien",
     },
     {
       key: "createdAt",
@@ -155,6 +159,11 @@ export const eventListHeaders = (viewType: ViewType): HeaderItem[] => {
     {
       key: "expectedAmount",
       label: "Monto Esperado",
+      sortable: true,
+    },
+    {
+      key: "offerCount",
+      label: "Cantidad de ofertas",
       sortable: true,
     },
     {

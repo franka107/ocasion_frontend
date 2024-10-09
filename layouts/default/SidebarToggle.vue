@@ -1,5 +1,9 @@
 <template>
-  <div :class="cn(`flex w-full`, `${isSidebarOpen ? 'justify-end': 'justify-center'}`)">
+  <div
+    :class="
+      cn(`flex w-full`, `${isSidebarOpen ? 'justify-end' : 'justify-center'}`)
+    "
+  >
     <TooltipProvider disable-hoverable-content>
       <Tooltip :delay-duration="100">
         <TooltipTrigger as-child>
@@ -10,7 +14,7 @@
             class="hover:bg-transparent"
           >
             <CustomIcons
-            name="Arrow"
+              name="Arrow"
               :class="[
                 'h-6 w-6 fill-[#a6b4bf] transition-transform ease-in-out duration-700',
                 isSidebarOpen === true ? 'rotate-180' : 'rotate-0',

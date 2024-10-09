@@ -9,6 +9,7 @@ export function useAuthManagement() {
       {
         method: "GET",
       } as any,
+      true,
     );
     const emptyGrants = ref([]);
     return { status, error, data: data.value ? data : emptyGrants, refresh };

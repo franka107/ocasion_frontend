@@ -11,7 +11,11 @@
           ]"
           :disabled="props.disabled"
         >
-        <span v-if="dateValue" class="absolute text-[#64748B] bg-white text-xs top-[-8px] left-2 px-1">{{ props.label }}</span>
+          <span
+            v-if="dateValue"
+            class="absolute text-[#64748B] bg-white text-xs top-[-8px] left-2 px-1"
+            >{{ props.label }}</span
+          >
           <CalendarIcon class="mr-2 h-4 w-4" />
           {{
             dateValue
@@ -22,8 +26,10 @@
       </PopoverTrigger>
       <PopoverContent class="w-auto p-0">
         <Calendar
+          locale="es"
           :minValue="props.minValue"
           :maxValue="props.maxValue"
+          :isDateDisabled="props.isDateDisabled"
           @update:modelValue="onUpdateValue"
           v-model="dateValue"
           initial-focus
@@ -57,6 +63,7 @@ const props = defineProps<{
   class?: string;
   maxValue?: DateValue;
   minValue?: DateValue;
+  isDateDisabled?: (date: DateValue) => boolean;
   value: string | undefined;
   disabled?: boolean;
 }>();

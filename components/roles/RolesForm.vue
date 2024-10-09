@@ -14,12 +14,16 @@ const props = defineProps<{
 const allGrants = ref<Array<{ id: string; name: string }>>([]);
 const fetchGrants = async () => {
   try {
-    const { data } = await useAPI("/role-configuration/find-grants", {
-      params: {
-        type: props.type,
+    const { data } = await useAPI(
+      "/role-configuration/find-grants",
+      {
+        params: {
+          type: props.type,
+        },
+        default: () => [],
       },
-      default: () => [],
-    });
+      true,
+    );
     allGrants.value = data.value;
   } catch (error) {
     console.error("Error al cargar grants:", error);
@@ -34,7 +38,7 @@ const formSchema = toTypedSchema(
     status: z.enum(["ACTIVE", "INACTIVE"], {
       required_error: "El estado es requerido.",
     }),
-    grants: z
+    grantIds: z
       .array(z.string())
       .min(1, "Debe seleccionar al menos una funcionalidad."),
   }),
@@ -46,7 +50,7 @@ const form = useForm({
     name: "",
     description: "",
     status: "ACTIVE",
-    grants: [],
+    grantIds: [],
   },
 });
 watch(form.values, (newValues) => {
@@ -132,7 +136,7 @@ if (props.id) {
 
         <h2>Funcionalidades</h2>
 
-        <FormField name="grants">
+        <FormField name="grantIds">
           <FormItem>
             <FormField
               v-for="item in allGrants"
@@ -141,7 +145,7 @@ if (props.id) {
               type="checkbox"
               :value="item.id"
               :unchecked-value="false"
-              name="grants"
+              name="grantIds"
             >
               <FormItem class="flex flex-row items-start space-x-3 space-y-0">
                 <FormControl>

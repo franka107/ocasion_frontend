@@ -43,8 +43,8 @@ interface ActionedGoods {
 }
 
 interface Status {
-  closedCount: number;
-  onlineCount: number;
+  finishedCount: number;
+  inProgressCount: number;
 }
 
 interface Goal {
@@ -66,4 +66,3 @@ export enum EventStatus {
   Finished = "FINISHED", // Finalizado
   Completed = "COMPLETED", // Completado
 }
-

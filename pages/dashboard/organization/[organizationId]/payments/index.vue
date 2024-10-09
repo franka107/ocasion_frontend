@@ -1,10 +1,9 @@
 <template>
-  <PaymentsPageOrg :organization-id="organizationId" />
+  <PaymentPage :organization-id="organizationId" type="organization" />
 </template>
 <script setup lang="ts">
-import PaymentsPageOrg from "~/components/payments/PaymentsPageOrg.vue";
+import PaymentPage from "~/components/payments/PaymentPage.vue";
 
 const route = useRoute();
 const organizationId = route.params.organizationId as string;
 </script>
-

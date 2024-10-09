@@ -88,6 +88,10 @@ const organizationFormSchema = z.object({
     .array(z.any())
     .min(1, "Debe subir al menos un archivo")
     .max(3, "Puede subir un máximo de 3 archivos"),
+  logoFiles: z
+    .array(z.any())
+    .min(1, "Debe subir al menos un archivo")
+    .max(2, "Puede subir un máximo de 1 archivo"),
 });
 
 type OrganizationForm = z.infer<typeof organizationFormSchema>;
@@ -213,7 +217,25 @@ const handleFilesChange = (files: File[]) => {
           <FormItem>
             <FormControl>
               <InputFile
+                title="Archivos adjuntos"
+                instructionsText="Cargar máximo 3 elementos(xlsx, docx, pdf)"
+                :limit-files="3"
                 v-model="form.values.attachedFiles"
+                v-bind="componentField"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
+        <FormField v-slot="{ componentField }" name="logoFiles">
+          <FormItem>
+            <FormControl>
+              <InputFile
+                title="Logo de la empresa"
+                instructionsText="Cargar máximo 1 elemento(jpg, png, jpeg)"
+                :limit-files="1"
+                v-model="form.values.logoFiles"
                 v-bind="componentField"
               />
             </FormControl>

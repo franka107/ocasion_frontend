@@ -47,7 +47,7 @@
               "
             >
               <Button
-                v-if="isOfferActionsVisible"
+                v-if="eventDetail?.status !== EventStatus.Published"
                 @click="
                   () => {
                     offerId = undefined;
@@ -93,7 +93,10 @@
                     "
                   >
                     <DropdownMenuItem
-                      :disabled="row.status === OfferStatus.Confirmed"
+                      :disabled="
+                        row.status === OfferStatus.Confirmed ||
+                        eventDetail?.status === EventStatus.Published
+                      "
                       @click="
                         () => {
                           offerId = row.id;

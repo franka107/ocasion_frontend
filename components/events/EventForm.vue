@@ -3,11 +3,21 @@ import { ref, watch, defineProps } from "vue";
 import { useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
+import Holidays from "date-holidays";
 import InputFile from "@/components/common/file/Input.vue";
 import { X } from "lucide-vue-next";
 import type { IEventLItem } from "@/types/Event";
 import { eventType, goodType, eventTimes } from "@/constants/events";
-import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
+import { addDays, eachDayOfInterval, isBefore, isWeekend } from "date-fns";
+import {
+  CalendarDate,
+  startOfMonth,
+  getLocalTimeZone,
+  parseDate,
+  today,
+  type DateValue,
+  parseAbsolute,
+} from "@internationalized/date";
 import Textarea from "../ui/textarea/Textarea.vue";
 import type { Item } from "../ui/custom-select/CustomSelect.vue";
 const EVENT_BASE_URL = "/event-management";
@@ -18,6 +28,123 @@ const props = defineProps<{
   orgid: string;
   onsubmit: (values: any) => void;
 }>();
+
+const countBusinessDays = (start: Date, end: Date) => {
+  const hd = new Holidays({ country: "PE" });
+  const days = eachDayOfInterval({ start, end });
+  let businessDaysCount = 0;
+
+  days.forEach((date) => {
+    const isHoliday = hd.isHoliday(date);
+    const isWeekendDay = isWeekend(date);
+
+    if (!isHoliday && !isWeekendDay) {
+      businessDaysCount++;
+    }
+  });
+
+  return businessDaysCount;
+};
+
+const isBusinessDay = (date: Date): boolean => {
+  const hd = new Holidays({ country: "PE" });
+  const isHoliday = hd.isHoliday(date);
+  const isWeekendDay = isWeekend(date);
+  return !isHoliday && !isWeekendDay;
+};
+
+// Función para sumar 2 días hábiles
+const addBusinessDays = (startDate: Date, numberOfDays: number): Date => {
+  let businessDaysAdded = 0;
+  let currentDate = startDate;
+
+  while (businessDaysAdded < numberOfDays) {
+    currentDate = addDays(currentDate, 1); // Agrega un día
+    if (isBusinessDay(currentDate)) {
+      businessDaysAdded++;
+    }
+  }
+
+  console.log(`currentDate ${currentDate}`);
+  return currentDate;
+};
+
+const validateInitialDate = (date: DateValue): boolean => {
+  const todayDate = new Date();
+  const selectedDate = date.toDate(getLocalTimeZone());
+
+  const businessDaysCountToday = countBusinessDays(todayDate, selectedDate);
+  console.log(`businessDaysCountToday ${businessDaysCountToday}`);
+  if (businessDaysCountToday < 3) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+const validateEndDate = (date: DateValue): boolean => {
+  const startDate = form.values.startDate
+    ? parseDate(form.values.startDate)
+    : null;
+  if (!startDate) return true;
+
+  const selectedDate = date.toDate(getLocalTimeZone());
+
+  const businessDaysCountToday = countBusinessDays(
+    startDate.toDate(getLocalTimeZone()),
+    selectedDate,
+  );
+  console.log(`businessDaysCountToday ${businessDaysCountToday}`);
+  if (businessDaysCountToday > 7) {
+    return true;
+  } else {
+    return false;
+  }
+
+  // const startDate = new Date(this.props.startDate);
+  // const endDate = new Date(this.props.endDate);
+  //
+  // const businessDaysUntilStart = countBusinessDays(todayDate, startDate);
+  // console.log(`currentDate ${todayDate}`);
+  // console.log(`startDate ${startDate}`);
+  // console.log(`endDate ${endDate}`);
+  // console.log(`businessDaysUntilStart ${businessDaysUntilStart}`);
+  // if (isBefore(endDate, startDate)) {
+  //   throw new EventEndDateBeforeStartDateFailure();
+  // }
+
+  // const businessDaysCount = this.countBusinessDays(startDate, endDate);
+  // if (businessDaysCount > 7) {
+  //   throw new EventSevenDaysBeforeStartDateFailure();
+  // }
+};
+
+// const validate = (): boolean => {
+//   const currentDate = new Date();
+//   const startDate = new Date(this.props.startDate);
+//   const endDate = new Date(this.props.endDate);
+//
+//   const businessDaysUntilStart = countBusinessDays(currentDate, startDate);
+//   console.log(`currentDate ${currentDate}`);
+//   console.log(`startDate ${startDate}`);
+//   console.log(`endDate ${endDate}`);
+//   console.log(`businessDaysUntilStart ${businessDaysUntilStart}`);
+//   if (isBefore(endDate, startDate)) {
+//     throw new EventEndDateBeforeStartDateFailure();
+//   }
+//
+//   const businessDaysCountToday = this.countBusinessDays(currentDate, startDate);
+//   if (businessDaysCountToday < 2) {
+//     throw new EventStartDateTwoDaysAfterTodayFailure();
+//   }
+//
+//   const businessDaysCount = this.countBusinessDays(startDate, endDate);
+//   if (businessDaysCount > 7) {
+//     throw new EventSevenDaysBeforeStartDateFailure();
+//   }
+// };
+//
+
 const eventTypesOptions = Array.from(eventType).map(([id, name]) => ({
   id,
   name,
@@ -187,7 +314,12 @@ const handleFilesChange = (files: File[]) => {
                 @update:modelValue="componentField.onChange"
                 label="Fecha de inicio"
                 :value="componentField.modelValue"
-                :minValue="today(getLocalTimeZone())"
+                :minValue="
+                  parseAbsolute(
+                    addBusinessDays(new Date(), 2).toISOString(),
+                    getLocalTimeZone(),
+                  )
+                "
               />
             </FormControl>
             <FormMessage />
@@ -203,6 +335,19 @@ const handleFilesChange = (files: File[]) => {
                 :minValue="
                   form.values.startDate
                     ? parseDate(form.values.startDate)
+                    : undefined
+                "
+                :maxValue="
+                  form.values.startDate
+                    ? parseAbsolute(
+                        addBusinessDays(
+                          parseDate(form.values.startDate).toDate(
+                            getLocalTimeZone(),
+                          ),
+                          6,
+                        ).toISOString(),
+                        getLocalTimeZone(),
+                      )
                     : undefined
                 "
                 :value="componentField.modelValue"

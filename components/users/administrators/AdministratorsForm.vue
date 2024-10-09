@@ -3,8 +3,9 @@ import { ref, watch, defineProps, computed } from "vue";
 import { useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
-import type { IAdminsLItem } from "@/types/Administrators";
+import { UserType, type IAdminsLItem } from "@/types/Administrators";
 import { userType } from "~/constants/administrators";
+import { X } from "lucide-vue-next";
 
 import CustomSelect from "~/components/ui/custom-select/CustomSelect.vue";
 import type { Organization } from "@/types/Administrators";
@@ -19,70 +20,94 @@ const props = defineProps<{
 }>();
 
 const { getUser } = useAdmins();
-const userTypesOptions = Array.from(userType).map(([id, name]) => ({
-  id,
-  name,
-}));
+const userTypesOptions = Array.from(userType)
+  .map(([id, name]) => ({
+    id,
+    name,
+  }))
+  .filter((item) => item.id !== UserType.SuperAdmin);
 
 // Form schema
-const administratorFormSchema = z.object({
-  firstName: z.string().min(1, "El nombre es requerido"),
-  lastName: z.string().min(1, "El apellido es requerido"),
-  documentType: z.enum(["DNI", "CE", "PT"]),
-  documentIdentifier: z
-    .string()
-    .regex(/^\d+$/, "El documento debe contener solo dígitos.")
-    .min(1, `El documento del representante es requerido`),
-  phoneNumber: z.string().min(1, "El número de celular es requerido"),
-  email: z
-    .string()
-    .email("El correo electrónico no es válido")
-    .optional()
-    .nullable(),
-  type: z.string().min(1, "Tipo de usuario es requerido"),
-  organizations: z.union([
-    z.array(z.string()).min(1, "La organización es requerida"),
-    z.string().min(1, "La organización es requerida"),
-  ]),
-  roles: z.array(z.string()).min(1, "El rol de usuario es requerido"),
-})
-.partial()
-.superRefine((schema, ctx) => {
-  if (
-    schema.documentType === "DNI" &&
-    schema.documentIdentifier?.length !== 8
-  ) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "El dni debe contener 8 digitos",
-      path: ["documentIdentifier"],
-    });
-  }
-  if (
-    schema.documentType !== "DNI" &&
-    schema.documentIdentifier?.length !== 9
-  ) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `El ${schema.documentType} debe contener 9 digitos`,
-      path: ["documentIdentifier"],
-    });
-  }
+const administratorFormSchema = z
+  .object({
+    firstName: z.string().min(1, "El nombre es requerido"),
+    lastName: z.string().min(1, "El apellido es requerido"),
+    documentType: z.enum(["DNI", "CE", "PT"]),
+    documentIdentifier: z
+      .string()
+      .regex(/^\d+$/, "El documento debe contener solo dígitos.")
+      .min(1, `El documento del representante es requerido`),
+    phoneNumber: z.string().min(1, "El número de celular es requerido"),
+    email: z
+      .string()
+      .email("El correo electrónico no es válido")
+      .optional()
+      .nullable(),
+    type: z.string().min(1, "Tipo de usuario es requerido"),
+    organizations: z
+      .union([
+        z.array(z.string()).min(1, "La organización es requerida"),
+        z.string().min(1, "La organización es requerida"),
+      ])
+      .optional()
+      .nullable(), // Esto permite que organizations sea nullable
 
-  const requiredFields = ['firstName', 'lastName', 'documentType', 'documentIdentifier', 'phoneNumber', 'type', 'organizations', 'roles'];
-  requiredFields.forEach(field => {
-    if (!schema[field]) {
+    roles: z.array(z.string()).min(1, "El rol de usuario es requerido"),
+  })
+  .partial()
+  .superRefine((schema, ctx) => {
+    if (
+      schema.documentType === "DNI" &&
+      schema.documentIdentifier?.length !== 8
+    ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `El campo ${field} es requerido.`,
-        path: [field],
+        message: "El dni debe contener 8 digitos",
+        path: ["documentIdentifier"],
+      });
+    }
+    if (
+      schema.documentType !== "DNI" &&
+      schema.documentIdentifier?.length !== 9
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `El ${schema.documentType} debe contener 9 digitos`,
+        path: ["documentIdentifier"],
+      });
+    }
+
+    const requiredFields = [
+      "firstName",
+      "lastName",
+      "documentType",
+      "documentIdentifier",
+      "phoneNumber",
+      "type",
+      "roles",
+    ];
+    requiredFields.forEach((field) => {
+      if (!schema[field]) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `El campo ${field} es requerido.`,
+          path: [field],
+        });
+      }
+    });
+    if (
+      schema.type !== UserType.PlatformAdmin &&
+      (!schema.organizations || schema.organizations.length === 0)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "La organización es requerida.",
+        path: ["organizations"],
       });
     }
   });
-});
 
 const formSchema = toTypedSchema(administratorFormSchema);
-
 
 interface AdministratorsForm
   extends Omit<IAdminsLItem, "organizations" | "roles"> {
@@ -92,6 +117,9 @@ interface AdministratorsForm
 
 const organizations = ref<Array<Organization>>([]);
 const roles = ref<Array<{ id: string; name: string }>>([]);
+const rolesFiltered = computed(() =>
+  roles.value.filter((role) => role.id !== "SUPER_ADMIN"),
+);
 
 // Function to fetch organizations and roles
 const fetchData = async (
@@ -147,7 +175,6 @@ watch(form.values, (newValues) => {
   console.log("Form values:", newValues);
 });
 
-
 // Watcher to auto-select the role when the user type changes
 watch(
   () => form.values.type,
@@ -168,7 +195,9 @@ const onSubmit = form.handleSubmit((values: any) => {
     ...restValues,
     organizations: Array.isArray(organizations)
       ? organizations.map((orgId: string) => ({ id: orgId }))
-      : [{ id: organizations }],
+      : organizations
+        ? [{ id: organizations }]
+        : [],
     roles: roles.map((roleId: string) => ({ id: roleId })),
   };
 
@@ -295,7 +324,11 @@ const onSubmit = form.handleSubmit((values: any) => {
         </FormItem>
       </FormField>
       <!-- Organización -->
-      <FormField v-slot="{ componentField }" name="organizations">
+      <FormField
+        v-if="form.values.type !== UserType.PlatformAdmin"
+        v-slot="{ componentField }"
+        name="organizations"
+      >
         <FormItem>
           <FormControl>
             <CustomSelect
@@ -315,7 +348,7 @@ const onSubmit = form.handleSubmit((values: any) => {
             <CustomSelect
               v-bind="componentField"
               multiple
-              :items="roles"
+              :items="rolesFiltered"
               placeholder="Rol Usuario"
             />
           </FormControl>

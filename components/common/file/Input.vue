@@ -69,7 +69,7 @@ const handleFileChange = async (event: Event) => {
       0,
       props.limitFiles - files.value.length,
     ); // Limitar a 3 archivos
-    const newFileIds: { id: string }[] = [];
+    const newFileIds: { id: string; path: string }[] = [];
     // const newFileData: { id: string; path: string }[] = [];
     isLoading.value = true;
 
@@ -80,7 +80,7 @@ const handleFileChange = async (event: Event) => {
         const fileName = file.name; // Nombre del archivo subido
         files.value.push({ ...fileData, name: fileName }); // Agregar el archivo a la lista con nombre
         props.modelValue.push(fileData); // Agregar el ID del archivo a modelValue
-        newFileIds.push({ id: fileData.id }); // Agregar solo el ID del archivo a la lista de IDs
+        newFileIds.push({ id: fileData.id, path: fileData.path }); // Agregar solo el ID del archivo a la lista de IDs
         // newFileIds.push(fileId); // Agregar solo el ID del archivo a la lista de IDs
         // newFileData.push(fileData); // Agregar el objeto con id y path a la lista de datos
       } catch (error) {
@@ -114,7 +114,7 @@ const getFileNameFromPath = (path: string): string => {
 onMounted(() => {
   files.value = props.modelValue.map((fileData) => ({
     ...fileData,
-    name: getFileNameFromPath(fileData.path),
+    name: getFileNameFromPath(fileData.path || ""),
   }));
 });
 </script>

@@ -4,7 +4,8 @@ const PUBLIC_ROUTES = [
   "/auth/update-password",
 ];
 export default defineNuxtRouteMiddleware((to, from) => {
-  const { loggedIn } = useUserSession();
+  const { loggedIn, clear } = useUserSession();
+  console.log(`loggedIn ${loggedIn.value}`);
 
   if (!PUBLIC_ROUTES.includes(to.path) && !loggedIn.value) {
     return navigateTo("/auth/login");

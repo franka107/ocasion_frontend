@@ -1,14 +1,17 @@
-// auth.d.ts
-declare module '#auth-utils' {
-    interface User {
-      // Add your own fields
-      token: string
-    }
-  
-    interface UserSession {
-      // Add your own fields
-        loggedInAt: Date
-    }
+import type { UserDto } from "./types/Administrators";
+
+declare module "#auth-utils" {
+  interface User {
+    // Add your own fields
+    token: string;
+    user: UserDto;
   }
-  
-  export {}
+
+  interface UserSession {
+    // Add your own fields
+    loggedInAt: Date;
+  }
+}
+
+export {};
+

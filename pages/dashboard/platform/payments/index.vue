@@ -1,7 +1,6 @@
 <template>
-  <PaymentsPagePlatf :organization-id="null" />
+  <PaymentPage :organization-id="null" type="platform" />
 </template>
 <script setup lang="ts">
-import PaymentsPagePlatf from "~/components/payments/PaymentsPagePlatf.vue";
+import PaymentPage from "~/components/payments/PaymentPage.vue";
 </script>
-
