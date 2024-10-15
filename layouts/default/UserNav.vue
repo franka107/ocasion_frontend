@@ -34,17 +34,16 @@
 </template>
 
 <script lang="ts" setup>
-import type { User } from "#auth-utils";
-import { ref } from "vue";
-import { useRouter } from "vue-router";
-import { RouterLink } from "vue-router";
+import { ref } from 'vue'
+import { useRouter, RouterLink } from 'vue-router'
+import type { User } from '#auth-utils'
 
-const router = useRouter();
-const { clear, user } = useUserSession();
+const router = useRouter()
+const { clear, user } = useUserSession()
 
 const handleSignOut = async () => {
-  console.log("handleLogout");
-  await clear();
-  router.push("/auth/login");
-};
+  await clear()
+
+  router.push('/auth/login')
+}
 </script>

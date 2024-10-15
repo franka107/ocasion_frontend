@@ -20,45 +20,45 @@
     </div>
   </div>
   <div class="py-4 px-10 rounded-xl items-center bg-white w-full">
-    <div class="grid grid-cols-[2fr_1fr] gap-6">
+    <div class="grid md:grid-cols-[2fr_1fr] grid-cols-1 gap-6">
       <div>
         <h3 class="mb-5 text-sm text-[#676767]">Datos del evento</h3>
         <div
           class="grid grid-cols-[repeat(auto-fill,_minmax(240px,1fr))] md:grid-cols-2 gap-5"
         >
           <InputWithLabel
-            readField
+            read-field
             label="Nombre del evento"
-            :modelValue="eventDetail.name"
+            :model-value="eventDetail.name"
           />
           <InputWithLabel
-            readField
+            read-field
             label="Tipo de Evento"
-            :modelValue="eventType.get(eventDetail.type)"
+            :model-value="eventType.get(eventDetail.type)"
           />
           <div
             class="grid grid-cols-[repeat(auto-fill,_minmax(120px,1fr))] md:grid-cols-2 gap-5"
           >
             <InputWithLabel
-              readField
+              read-field
               label="Fecha de Inicio"
-              :modelValue="eventDetail.startDate"
+              :model-value="eventDetail.startDate"
             />
             <InputWithLabel
-              readField
+              read-field
               label="Fecha de cierre"
-              :modelValue="eventDetail.endDate"
+              :model-value="eventDetail.endDate"
             />
           </div>
           <InputWithLabel
-            readField
+            read-field
             label="Tipo de bien"
-            :modelValue="goodType.get(eventDetail.goodType)"
+            :model-value="goodType.get(eventDetail.goodType)"
           />
           <InputWithLabel
-            readField
+            read-field
             label="Horario de cierre"
-            :modelValue="eventTimes.get(String(eventDetail.closingTime))"
+            :model-value="eventTimes.get(String(eventDetail.closingTime))"
           />
         </div>
       </div>
@@ -68,9 +68,9 @@
           <FormItem>
             <FormControl>
               <InputFile
-                disabled
-                hideRemoveIcon
                 v-model="eventDetail.goodFiles"
+                disabled
+                hide-remove-icon
               />
             </FormControl>
             <FormMessage />
@@ -81,18 +81,17 @@
   </div>
 </template>
 <script setup lang="ts">
-import InputWithLabel from "~/components/auth/inputWithLabel.vue";
-import InputFile from "@/components/common/file/Input.vue";
-import type { IEventLItem } from "@/types/Event";
-import { eventType, goodType, eventTimes } from "@/constants/events";
+import InputWithLabel from '~/components/auth/inputWithLabel.vue'
+import InputFile from '@/components/common/file/Input.vue'
+import type { IEventLItem } from '@/types/Event'
+import { eventType, goodType, eventTimes } from '@/constants/events'
 
-const { params } = useRoute();
-const router = useRouter();
-const props = defineProps<{ eventDetail: IEventLItem }>();
-const { eventDetail } = toRefs(props);
+const { params } = useRoute()
+const router = useRouter()
+const props = defineProps<{ eventDetail: IEventLItem }>()
+const { eventDetail } = toRefs(props)
 const attachedFiles = [
-  { id: "5404523e-bb7d-4927-8fd7-512ff7eb09fb", path: "asda/asdad.svg" },
-  { id: "5404523e-bb7d-4927-8fd7-512ff7eb09fb", path: "asda/asdad.svg" },
-];
+  { id: '5404523e-bb7d-4927-8fd7-512ff7eb09fb', path: 'asda/asdad.svg' },
+  { id: '5404523e-bb7d-4927-8fd7-512ff7eb09fb', path: 'asda/asdad.svg' },
+]
 </script>
-

@@ -7,7 +7,9 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "lint": "eslint --ext \".ts,.js,.vue\" --ignore-path .eslintignore .",
+    "lint:fix": "eslint --fix --ext \".ts,.js,.vue\" --ignore-path .eslintignore ."
   },
   "dependencies": {
     "@internationalized/date": "^3.5.5",
@@ -25,18 +27,26 @@
     "date-holidays": "^3.23.12",
     "dayjs": "^1.11.12",
     "lucide-vue-next": "^0.424.0",
-    "nuxt": "^3.12.4",
+    "nuxt": "^3.13.2",
     "nuxt-auth-utils": "^0.3.5",
+    "nuxt-svgo": "^4.0.6",
     "radix-vue": "^1.9.2",
     "shadcn-nuxt": "^0.10.4",
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
     "vee-validate": "^4.13.2",
     "vue": "latest",
+    "vue-router": "latest",
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@nuxtjs/eslint-config-typescript": "^12.1.0",
+    "@nuxtjs/eslint-module": "^4.1.0",
     "@nuxtjs/tailwindcss": "^6.12.1",
+    "eslint": "^8.52.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "prettier": "^3.0.3",
     "typescript": "^5.5.4"
   }
 }

@@ -12,8 +12,8 @@
           :data="adminsData"
           :header="administratorsHeader"
           :search="administratorsSearch"
-          @onSort="onSort"
-          @onSearch="onSearch"
+          @on-sort="onSort"
+          @on-search="onSearch"
         >
           <template #action-button>
             <Button
@@ -34,19 +34,23 @@
             <!--   Exportar -->
             <!-- </Button> -->
             <Button
-              @click="
-                () => {
-                  admsUserId = undefined;
-                  openModal = true;
-                }
+              v-if="
+                myGrants.data.value.includes(GrantId.PlatformUsersCanCreate) ||
+                myGrants.data.value.includes(GrantId.OrganizationUsersCanCreate)
               "
               variant="default"
+              @click="
+                () => {
+                  admsUserId = undefined
+                  openModal = true
+                }
+              "
               >Agregar</Button
             >
           </template>
           <template #type="{ row }">
             <span class="whitespace-nowrap">{{
-              userType.get(row.type) || ""
+              userType.get(row.type) || ''
             }}</span>
           </template>
           <template #actions="{ row }">
@@ -66,8 +70,8 @@
                   class="bg-primary text-white"
                 >
                   <DropdownMenuItem
-                    @click="handleSuspend(row.id, row.fullName)"
                     :disabled="row.status !== 'ACTIVE'"
+                    @click="handleSuspend(row.id, row.fullName)"
                   >
                     Suspender
                     <CustomIcons name="Forbidden" class="ml-auto" />
@@ -94,39 +98,42 @@
           </template>
         </CustomTable>
         <!-- Fomulario -->
-        <SheetContent class="flex flex-col h-full" v-model:open="openModal">
+        <SheetContent v-model:open="openModal" class="flex flex-col h-full">
           <AdministratorsForm
             :id="admsUserId"
-            :onSubmit="admsUserId !== undefined ? handleEdit : handleCreate"
+            :on-submit="admsUserId !== undefined ? handleEdit : handleCreate"
           />
         </SheetContent>
         <!-- Fomulario -->
       </div>
       <CustomPagination
+        v-model:page="page"
         class="mt-5 mb-[19px]"
         :total="data.count"
         :limit="data.limit"
-        v-model:page="page"
       />
     </div>
   </ContentLayout>
 </template>
 <script setup lang="ts">
-import AdministratorsForm from "~/components/users/administrators/AdministratorsForm.vue";
-import CustomTable from "@/components/ui/custom-table/CustomTable.vue";
-import CustomChip from "@/components/ui/custom-chip/CustomChip.vue";
-import CustomIcons from "@/components/ui/custom-icons/CustomIcons.vue";
-import CustomPagination from "@/components/ui/custom-pagination/CustomPagination.vue";
-import { userType } from "~/constants/administrators";
-import type { IAdminsLItem } from "@/types/Administrators.ts";
+import AdministratorsForm from '~/components/users/administrators/AdministratorsForm.vue'
+import CustomTable from '@/components/ui/custom-table/CustomTable.vue'
+import CustomChip from '@/components/ui/custom-chip/CustomChip.vue'
+import CustomIcons from '@/components/ui/custom-icons/CustomIcons.vue'
+import CustomPagination from '@/components/ui/custom-pagination/CustomPagination.vue'
 import {
+  userType,
   administratorsHeader,
   administratorsSearch,
-} from "~/constants/administrators";
-import ContentLayout from "~/layouts/default/ContentLayout.vue";
-import CustomSimpleCard from "~/components/ui/custom-simple-card/CustomSimpleCard.vue";
+} from '~/constants/administrators'
+import type { IAdminsLItem } from '@/types/Administrators.ts'
+import ContentLayout from '~/layouts/default/ContentLayout.vue'
+import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
+import { GrantId } from '~/types/Grant'
 
-const props = defineProps<{ organizationId: string | null }>();
+const props = defineProps<{ organizationId: string | null }>()
+const { getMyGrants } = useAuthManagement()
+const myGrants = await getMyGrants()
 const {
   page,
   sortOptions,
@@ -136,32 +143,32 @@ const {
   restoreUserPassword,
   editUser,
   resetUser,
-} = useAdmins();
-const { openConfirmModal, updateConfirmModal } = useConfirmModal();
+} = useAdmins()
+const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const filterOptions = ref(
   props.organizationId
     ? `[{"field":"type","type":"equal","value": "PARTICIPANT"},{ "field": "organizations.id", "type": "equal", "value": "${props.organizationId}" }]`
     : `[{"field":"type","type":"not","value": "PARTICIPANT"}]`,
-);
+)
 
-const openModal = ref(false);
-const admsUserId = ref<number | undefined>(undefined);
-const BASE_ADM_URL = "/user-management";
+const openModal = ref(false)
+const admsUserId = ref<number | undefined>(undefined)
+const BASE_ADM_URL = '/user-management'
 const onSearch = (item: { [key: string]: string }) => {
   const filters = [
-    { field: "type", type: "not", value: "PARTICIPANT" || "" },
-    { field: "fullName", type: "like", value: item.fullName || "" },
-  ];
+    { field: 'type', type: 'not', value: 'PARTICIPANT' || '' },
+    { field: 'fullName', type: 'like', value: item.fullName || '' },
+  ]
   item.status &&
-    filters.push({ field: "status", type: "equal", value: item.status || "" });
+    filters.push({ field: 'status', type: 'equal', value: item.status || '' })
   item.createdAt &&
     filters.push({
-      field: "createdAt",
-      type: "equal",
-      value: item.createdAt || "",
-    });
-  filterOptions.value = JSON.stringify(filters);
-};
+      field: 'createdAt',
+      type: 'equal',
+      value: item.createdAt || '',
+    })
+  filterOptions.value = JSON.stringify(filters)
+}
 
 const { data, refresh }: any = await useAPI(
   `${BASE_ADM_URL}/find-users-paginated`,
@@ -173,167 +180,167 @@ const { data, refresh }: any = await useAPI(
       sortOptions,
     },
   } as any,
-);
+)
 
 const adminsData = computed(() =>
   data.value.data.map((item: IAdminsLItem) => ({
     fullName: `${item.firstName} ${item.lastName}`,
     document: `${item.documentType} - ${item.documentIdentifier}`,
     cellphone: item.phoneNumber,
-    organization: item.organizations.map((org) => org.name).join(", "),
+    organization: item.organizations.map((org) => org.name).join(', '),
     ...item,
   })),
-);
+)
 
 const handleSuspend = async (id: string, fullName: string) => {
   openConfirmModal({
-    title: "Suspender usuario",
+    title: 'Suspender usuario',
     message: `¿Estás seguro de suspender a ❝${fullName}❞?`,
     callback: async () => {
-      const { status, error }: any = await suspendUser(id);
-      if (status.value === "success") {
+      const { status, error }: any = await suspendUser(id)
+      if (status.value === 'success') {
         updateConfirmModal({
-          title: "¡Suspensión exitosa!",
-          message: "El usuario ha sido suspendido.",
-          type: "success",
-        });
-        refresh();
+          title: '¡Suspensión exitosa!',
+          message: 'El usuario ha sido suspendido.',
+          type: 'success',
+        })
+        refresh()
       } else {
         updateConfirmModal({
-          title: "Error al suspender",
+          title: 'Error al suspender',
           message:
-            "El usuario no se pudo suspender. \nTe recomendamos intentarlo nuevamente.",
-          type: "error",
-        });
+            'El usuario no se pudo suspender. \nTe recomendamos intentarlo nuevamente.',
+          type: 'error',
+        })
       }
     },
-  });
-};
+  })
+}
 
 const handleUpdateForm = async (user: any) => {
-  openModal.value = true;
-  admsUserId.value = user.id;
-};
+  openModal.value = true
+  admsUserId.value = user.id
+}
 
 const handleCreate = async (values: any) => {
-  console.log("handleCreate ejecutado", values);
+  console.log('handleCreate ejecutado', values)
   openConfirmModal({
-    title: "Crear usuario",
-    message: "¿Estás seguro de que deseas crear este usuario?",
+    title: 'Crear usuario',
+    message: '¿Estás seguro de que deseas crear este usuario?',
     callback: async () => {
-      const { status, error }: any = await createUser(values);
-      if (status.value === "success") {
-        openModal.value = false;
-        refresh();
+      const { status, error }: any = await createUser(values)
+      if (status.value === 'success') {
+        openModal.value = false
+        refresh()
         updateConfirmModal({
-          title: "Usuario creado",
-          message: "El usuario ha sido creado exitosamente",
-          type: "success",
-        });
+          title: 'Usuario creado',
+          message: 'El usuario ha sido creado exitosamente',
+          type: 'success',
+        })
       } else {
         const eMsg =
           error.value.data?.errors?.[0].message ||
           error.value.data.message ||
-          "El usuario no se pudo crear, intentalo más tarde";
+          'El usuario no se pudo crear, intentalo más tarde'
         updateConfirmModal({
-          title: "Error al crear usuario",
+          title: 'Error al crear usuario',
           message: eMsg,
-          type: "error",
-        });
+          type: 'error',
+        })
       }
     },
-  });
-};
+  })
+}
 
 const handleEdit = async (values: any) => {
-  console.log("handleEdit ejecutado", values);
+  console.log('handleEdit ejecutado', values)
   openConfirmModal({
-    title: "Actualizar usuario",
-    message: "¿Estás seguro de que deseas actualizar este usuario?",
+    title: 'Actualizar usuario',
+    message: '¿Estás seguro de que deseas actualizar este usuario?',
     callback: async () => {
-      const { status, error }: any = await editUser(values);
-      if (status.value === "success") {
-        openModal.value = false;
-        refresh();
+      const { status, error }: any = await editUser(values)
+      if (status.value === 'success') {
+        openModal.value = false
+        refresh()
         updateConfirmModal({
-          title: "Usuario actualizado",
-          message: "El usuario ha sido actualizado exitosamente",
-          type: "success",
-        });
+          title: 'Usuario actualizado',
+          message: 'El usuario ha sido actualizado exitosamente',
+          type: 'success',
+        })
       } else {
         const eMsg =
           error.value.data?.errors?.[0].message ||
           error.value.data.message ||
-          "El usuario no se pudo actualizar, intentalo más tarde";
+          'El usuario no se pudo actualizar, intentalo más tarde'
         updateConfirmModal({
-          title: "Error al actualizar usuario",
+          title: 'Error al actualizar usuario',
           message: eMsg,
-          type: "error",
-        });
+          type: 'error',
+        })
       }
     },
-  });
-};
+  })
+}
 
 const handleResetPassword = async (email: string) => {
   openConfirmModal({
-    title: "Restablecer contraseña de usuario",
-    message: "¿Estás seguro de que deseas restablecer contraseña de usuario?",
+    title: 'Restablecer contraseña de usuario',
+    message: '¿Estás seguro de que deseas restablecer contraseña de usuario?',
     callback: async () => {
-      console.log("");
-      const { status, error }: any = await restoreUserPassword(email);
-      if (status.value === "success") {
-        openModal.value = false;
-        refresh();
+      console.log('')
+      const { status, error }: any = await restoreUserPassword(email)
+      if (status.value === 'success') {
+        openModal.value = false
+        refresh()
         updateConfirmModal({
-          title: "Contraseña de usuario restablecida",
-          message: "El usuario ha restablecido la contraseña exitosamente",
-          type: "success",
-        });
+          title: 'Contraseña de usuario restablecida',
+          message: 'El usuario ha restablecido la contraseña exitosamente',
+          type: 'success',
+        })
       } else {
         const eMsg =
           error.value.data?.errors?.[0].message ||
           error.value.data.message ||
-          "El usuario no se pudo restablecer la contraseña de usuario, intentalo más tarde";
+          'El usuario no se pudo restablecer la contraseña de usuario, intentalo más tarde'
         updateConfirmModal({
-          title: "Error al restablecer contraseña de usuario",
+          title: 'Error al restablecer contraseña de usuario',
           message: eMsg,
-          type: "error",
-        });
+          type: 'error',
+        })
       }
     },
-  });
-};
+  })
+}
 
 const handleExport = async () => {
   openConfirmModal({
-    title: "Exportar usuarios",
-    message: "¿Estás seguro de que deseas exportar los usuarios?",
+    title: 'Exportar usuarios',
+    message: '¿Estás seguro de que deseas exportar los usuarios?',
     callback: async () => {
       try {
-        const { apiUrl } = useRuntimeConfig().public;
-        const link = document.createElement("a");
-        link.href = `${apiUrl}/user-management/export-users?filterOptions=${filterOptions.value}`;
-        link.setAttribute("download", "usuarios_exportados.csv");
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
+        const { apiUrl } = useRuntimeConfig().public
+        const link = document.createElement('a')
+        link.href = `${apiUrl}/user-management/export-users?filterOptions=${filterOptions.value}`
+        link.setAttribute('download', 'usuarios_exportados.csv')
+        document.body.appendChild(link)
+        link.click()
+        link.remove()
       } catch (error) {
         const eMsg =
-          error || "Error al exportar usuarios. Inténtalo de nuevo más tarde.";
+          error || 'Error al exportar usuarios. Inténtalo de nuevo más tarde.'
         updateConfirmModal({
-          title: "Error al exportar usuarios",
+          title: 'Error al exportar usuarios',
           message: String(eMsg),
-          type: "error",
-        });
+          type: 'error',
+        })
       }
 
       updateConfirmModal({
-        title: "Exportación exitosa",
-        message: "Los usuarios han sido exportados exitosamente.",
-        type: "success",
-      });
+        title: 'Exportación exitosa',
+        message: 'Los usuarios han sido exportados exitosamente.',
+        type: 'success',
+      })
     },
-  });
-};
+  })
+}
 </script>

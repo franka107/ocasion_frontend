@@ -6,13 +6,13 @@
           :data="offerData"
           :header="offerHeader"
           :search="offerSearch"
-          multipleSelect
-          @onSort="onSort"
-          @onSearch="onSearch"
+          multiple-select
+          @on-sort="onSort"
+          @on-search="onSearch"
           @on-multiple-select="
             ({ ids, type, resetMultipleSelect: onResetMultipleSelect }) => {
-              selectedMultipleData = { ids, type };
-              resetMultipleSelect = onResetMultipleSelect;
+              selectedMultipleData = { ids, type }
+              resetMultipleSelect = onResetMultipleSelect
             }
           "
         >
@@ -24,10 +24,10 @@
                   GrantId.OrganizationOffersCanConfirm,
                 )
               "
-              @click="handleConfirmOffers(selectedMultipleData)"
               class="bg-white text-primary border border-primary hover:bg-accent"
               variant="default"
               :disabled="disableMultipleSelect"
+              @click="handleConfirmOffers(selectedMultipleData)"
               >Confirmar oferta
             </Button>
             <Button
@@ -35,10 +35,10 @@
                 isOfferActionsVisible &&
                 myGrants.data.value.includes(GrantId.PlatformOfferCanRetire)
               "
-              @click="handleRetireOffers(selectedMultipleData)"
               class="bg-white text-primary border border-primary hover:bg-accent"
               variant="default"
               :disabled="disableMultipleSelect"
+              @click="handleRetireOffers(selectedMultipleData)"
               >Retirar oferta
             </Button>
             <div
@@ -48,17 +48,17 @@
             >
               <Button
                 v-if="eventDetail?.status !== EventStatus.Published"
+                variant="default"
                 @click="
                   () => {
-                    offerId = undefined;
-                    openModalOffer = true;
+                    offerId = undefined
+                    openModalOffer = true
                   }
                 "
-                variant="default"
                 >Crear oferta
               </Button>
             </div>
-            <Button @click="handleViewBids" variant="default"
+            <Button variant="default" @click="handleViewBids"
               >Ver pujas
             </Button>
           </template>
@@ -99,8 +99,8 @@
                       "
                       @click="
                         () => {
-                          offerId = row.id;
-                          openModalOffer = true;
+                          offerId = row.id
+                          openModalOffer = true
                         }
                       "
                     >
@@ -117,12 +117,12 @@
                     "
                     @click="
                       () => {
-                        openModalDebate = true;
+                        openModalDebate = true
                         selectedDebateInfo = {
                           name: eventDetail.name,
                           appraisal: row.appraisal,
                           id: row.id,
-                        };
+                        }
                       }
                     "
                   >
@@ -132,9 +132,9 @@
                   <DropdownMenuItem
                     @click="
                       () => {
-                        bidsId = row.id;
-                        openAppraisalHistoryModal = true;
-                        appraisalHistoryModal = { offerId: row.id };
+                        bidsId = row.id
+                        openAppraisalHistoryModal = true
+                        appraisalHistoryModal = { offerId: row.id }
                       }
                     "
                   >
@@ -151,13 +151,13 @@
                     "
                     @click="
                       () => {
-                        openModifyAppraisal = true;
+                        openModifyAppraisal = true
                         changeAppraisalForm = {
                           offerId: row.id,
                           offerName: row.title,
                           oldAppraisal: row.appraisal,
                           newAppraisal: row.appraisal,
-                        };
+                        }
                       }
                     "
                   >
@@ -177,12 +177,12 @@
         </CustomTable>
         <SheetContent
           v-model:open="openAppraisalHistoryModal"
+          class="flex flex-col h-full"
           @pointer-down-outside="(e) => e.preventDefault()"
           @interact-outside="(e) => e.preventDefault()"
-          class="flex flex-col h-full"
         >
           <HistoryForm
-            :bidsId="bidsId"
+            :bids-id="bidsId"
             :offer-id="appraisalHistoryModal.offerId"
             :endpoint="auditBidHistories"
             title="Historial de tasaciones"
@@ -196,17 +196,17 @@
         >
           <OfferForm
             :id="offerId"
-            :eventId="String(route.params.eventId)"
-            :organizationId="String(route.params.organizationId)"
+            :event-id="String(route.params.eventId)"
+            :organization-id="String(route.params.organizationId)"
             :onsubmit="offerId !== undefined ? handleEdit : handleCreate"
           />
         </SheetContent>
         <DebateModal
-          v-model="openModalDebate"
           :id="selectedDebateInfo.id"
+          v-model="openModalDebate"
           :name="selectedDebateInfo.name"
           :appraisal="selectedDebateInfo.appraisal"
-          :refreshTable="refreshOfferTable"
+          :refresh-table="refreshOfferTable"
         ></DebateModal>
         <AppraisalOfferModal
           v-model="openModifyAppraisal"
@@ -214,14 +214,14 @@
           :offer-title="changeAppraisalForm.offerName"
           :new-appraisal="changeAppraisalForm.newAppraisal"
           :old-appraisal="changeAppraisalForm.oldAppraisal"
-          :refreshTable="refreshOfferTable"
+          :refresh-table="refreshOfferTable"
         ></AppraisalOfferModal>
       </div>
       <CustomPagination
+        v-model:page="page"
         class="mt-5 mb-[19px]"
         :total="data.count"
         :limit="data.limit"
-        v-model:page="page"
       />
     </div>
   </section>
@@ -231,26 +231,26 @@
 </template>
 
 <script setup lang="ts">
-import { offerHeader, offerStatus, offerSearch } from "@/constants/offer";
+import { offerHeader, offerStatus, offerSearch } from '@/constants/offer'
 import {
   type OfferListItem,
   type IDebateForm,
   type IChangeAppraisalForm,
   type IAmountHistoryModal,
   OfferStatus,
-} from "~/types/Offer";
-import CustomIcons from "~/components/ui/custom-icons/CustomIcons.vue";
-import OfferForm from "@/components/offers/OfferForm.vue";
-import DebateModal from "@/components/offers/DebateModal.vue";
-import BidTable from "@/components/events/BidTable.vue";
-import AppraisalOfferModal from "~/components/offers/AppraisalOfferModal.vue";
-import { GrantId } from "~/types/Grant";
-import { EventStatus } from "~/types/Event";
+} from '~/types/Offer'
+import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue'
+import OfferForm from '@/components/offers/OfferForm.vue'
+import DebateModal from '@/components/offers/DebateModal.vue'
+import BidTable from '@/components/events/BidTable.vue'
+import AppraisalOfferModal from '~/components/offers/AppraisalOfferModal.vue'
+import { GrantId } from '~/types/Grant'
+import { EventStatus } from '~/types/Event'
 
-const { getMyGrants } = useAuthManagement();
-const myGrants = await getMyGrants();
-const auditBidHistories = "/audit/find-audit-histories";
-const { openConfirmModal, updateConfirmModal } = useConfirmModal();
+const { getMyGrants } = useAuthManagement()
+const myGrants = await getMyGrants()
+const auditBidHistories = '/audit/find-audit-histories'
+const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const {
   page,
   sortOptions,
@@ -259,13 +259,13 @@ const {
   editOffer,
   confirmOffers,
   retireOffers,
-} = useOfferAPI();
-const OFFER_BASE_URL = "/offer-management";
-const route = useRoute();
-const { getEvent } = useEvent();
-const offerId = ref(undefined);
-const showBids = ref(false);
-const bidsId = ref<number | undefined>(undefined);
+} = useOfferAPI()
+const OFFER_BASE_URL = '/offer-management'
+const route = useRoute()
+const { getEvent } = useEvent()
+const offerId = ref(undefined)
+const showBids = ref(false)
+const bidsId = ref<number | undefined>(undefined)
 // const isOfferActionsVisible = computed(
 //   () => eventDetail.value?.status !== EventStatus.Published,
 // );
@@ -276,45 +276,45 @@ const isOfferActionsVisible = computed(
     eventDetail.value?.status !== EventStatus.InProgress &&
     eventDetail.value?.status !== EventStatus.Completed &&
     eventDetail.value?.status !== EventStatus.Finished,
-);
+)
 const filterOptions = ref(
   `[{ "field": "event.id", "type": "equal", "value": "${route.params.eventId}" }]`,
-);
-const openModifyAppraisal = ref(false);
-const openAppraisalHistoryModal = ref(false);
-const appraisalHistoryModal = ref<IAmountHistoryModal>({ offerId: "" });
+)
+const openModifyAppraisal = ref(false)
+const openAppraisalHistoryModal = ref(false)
+const appraisalHistoryModal = ref<IAmountHistoryModal>({ offerId: '' })
 const changeAppraisalForm = ref<IChangeAppraisalForm>({
-  offerId: "",
-  offerName: "",
+  offerId: '',
+  offerName: '',
   oldAppraisal: 0,
   newAppraisal: 0,
-});
-const openModalOffer = ref(false);
-const openModalDebate = ref(false);
-const selectedDebateInfo = ref<IDebateForm>({ name: "", appraisal: 0, id: "" });
+})
+const openModalOffer = ref(false)
+const openModalDebate = ref(false)
+const selectedDebateInfo = ref<IDebateForm>({ name: '', appraisal: 0, id: '' })
 const selectedMultipleData = ref<{ type: string; ids: string[] }>({
-  type: "empty",
+  type: 'empty',
   ids: [],
-});
-const resetMultipleSelect = ref<Function | undefined>(undefined);
+})
+const resetMultipleSelect = ref<Function | undefined>(undefined)
 const disableMultipleSelect = computed(
   () =>
-    selectedMultipleData.value.type === "empty" &&
+    selectedMultipleData.value.type === 'empty' &&
     selectedMultipleData.value.ids.length === 0,
-);
+)
 const onSearch = (item: { [key: string]: string }) => {
   filterOptions.value = JSON.stringify([
-    { field: "title", type: "like", value: item.title || "" },
-    { field: "event.id", type: "equal", value: route.params.eventId },
-  ]);
-};
+    { field: 'title', type: 'like', value: item.title || '' },
+    { field: 'event.id', type: 'equal', value: route.params.eventId },
+  ])
+}
 
 const [
   { data: eventDetail, refresh: refreshEventDetail },
   { data, refresh: refreshOfferTable },
 ]: any = await Promise.all([
   getEvent(route.params.eventId as string),
-  useAPI(`${OFFER_BASE_URL}/find-offers`, {
+  useAPI(`${OFFER_BASE_URL}/find-offers-paginated`, {
     query: {
       limit: 8,
       page,
@@ -322,7 +322,7 @@ const [
       sortOptions,
     },
   } as any),
-]);
+])
 const offerData = computed(() =>
   data.value.data.map((item: OfferListItem) => ({
     brandName: item.carModel.brand.name,
@@ -330,138 +330,138 @@ const offerData = computed(() =>
     addressCity: item.address.district.city.name,
     ...item,
   })),
-);
-//Funcion cambia vista de pujas
+)
+// Funcion cambia vista de pujas
 const handleViewBids = async () => {
-  showBids.value = true;
-  console.log("Bids view enabled", showBids.value);
-};
+  showBids.value = true
+  console.log('Bids view enabled', showBids.value)
+}
 
 const handleCreate = async (values: any) => {
   openConfirmModal({
-    title: "Crear Oferta",
-    message: "¿Estás seguro de que deseas crear este Oferta?",
+    title: 'Crear Oferta',
+    message: '¿Estás seguro de que deseas crear este Oferta?',
     callback: async () => {
-      const { status, error }: any = await createOffer(values);
-      if (status.value === "success") {
-        openModalOffer.value = false;
-        refreshOfferTable();
+      const { status, error }: any = await createOffer(values)
+      if (status.value === 'success') {
+        openModalOffer.value = false
+        refreshOfferTable()
         updateConfirmModal({
-          title: "Oferta creada",
-          message: "La oferta ha sido creada exitosamente",
-          type: "success",
-        });
+          title: 'Oferta creada',
+          message: 'La oferta ha sido creada exitosamente',
+          type: 'success',
+        })
       } else {
         const eMsg =
           error.value.data?.errors?.[0].message ||
           error.value.data.message ||
-          "La oferta no se pudo crear, intentalo más tarde";
+          'La oferta no se pudo crear, intentalo más tarde'
         updateConfirmModal({
-          title: "Error al crear Oferta",
+          title: 'Error al crear Oferta',
           message: eMsg,
-          type: "error",
-        });
+          type: 'error',
+        })
       }
     },
-  });
-};
+  })
+}
 
 const handleEdit = async (values: any) => {
   openConfirmModal({
-    title: "Actualizar Oferta",
-    message: "¿Estás seguro de que deseas actualizar este Oferta?",
+    title: 'Actualizar Oferta',
+    message: '¿Estás seguro de que deseas actualizar este Oferta?',
     callback: async () => {
-      const { status, error }: any = await editOffer(values);
-      if (status.value === "success") {
-        openModalOffer.value = false;
-        refreshOfferTable();
+      const { status, error }: any = await editOffer(values)
+      if (status.value === 'success') {
+        openModalOffer.value = false
+        refreshOfferTable()
         updateConfirmModal({
-          title: "Oferta actualizada",
-          message: "La oferta ha sido actualizado exitosamente",
-          type: "success",
-        });
+          title: 'Oferta actualizada',
+          message: 'La oferta ha sido actualizado exitosamente',
+          type: 'success',
+        })
       } else {
         const eMsg =
           error.value.data?.errors?.[0].message ||
           error.value.data.message ||
-          "El evento no se pudo actualizar, intentalo más tarde";
+          'El evento no se pudo actualizar, intentalo más tarde'
         updateConfirmModal({
-          title: "Error al actualizar evento",
+          title: 'Error al actualizar evento',
           message: eMsg,
-          type: "error",
-        });
+          type: 'error',
+        })
       }
     },
-  });
-};
+  })
+}
 
 const handleConfirmOffers = async (values: { type: string; ids: string[] }) => {
   openConfirmModal({
-    title: "Confirmar Ofertas",
+    title: 'Confirmar Ofertas',
     message: `¿Está seguro de aprobar la(s) oferta(s) seleccionada(s)?`,
     callback: async () => {
       try {
-        const { type, ids } = values;
+        const { type, ids } = values
         const { status } = await confirmOffers({
           type,
           ids,
           eventId: String(route.params.eventId),
-        });
-        if (status.value === "success") {
-          refreshOfferTable();
-          resetMultipleSelect.value?.();
+        })
+        if (status.value === 'success') {
+          refreshOfferTable()
+          resetMultipleSelect.value?.()
           updateConfirmModal({
-            title: "Oferta(s) confirmada(s)",
-            message: "La(s) oferta(s) ha sido confirmada(s) exitosamente",
-            type: "success",
-          });
+            title: 'Oferta(s) confirmada(s)',
+            message: 'La(s) oferta(s) ha sido confirmada(s) exitosamente',
+            type: 'success',
+          })
         } else {
-          throw new Error("Error al confirmar esta(s) oferta(s)");
+          throw new Error('Error al confirmar esta(s) oferta(s)')
         }
       } catch (error) {
-        console.log("error", error);
+        console.log('error', error)
         updateConfirmModal({
-          title: "Error al confirmar Oferta(s)",
+          title: 'Error al confirmar Oferta(s)',
           message:
-            "No se pudo confirmar oferta(s). Por favor, intente nuevamente.",
-          type: "error",
-        });
+            'No se pudo confirmar oferta(s). Por favor, intente nuevamente.',
+          type: 'error',
+        })
       }
     },
-  });
-};
+  })
+}
 
 const handleRetireOffers = async (values: { type: string; ids: string[] }) => {
   openConfirmModal({
-    title: "Retirar Ofertas",
+    title: 'Retirar Ofertas',
     message: `¿Está seguro de retirar la(s) oferta(s) seleccionada(s)?`,
     callback: async () => {
       try {
         const { status } = await retireOffers({
           ...values,
           eventId: String(route.params.eventId),
-        });
+        })
 
-        if (status.value === "success") {
-          refreshOfferTable();
-          resetMultipleSelect.value?.();
+        if (status.value === 'success') {
+          refreshOfferTable()
+          resetMultipleSelect.value?.()
           updateConfirmModal({
-            title: "Oferta(s) retirada(s)",
-            message: "La(s) oferta(s) ha sido retirada(s) exitosamente",
-            type: "success",
-          });
+            title: 'Oferta(s) retirada(s)',
+            message: 'La(s) oferta(s) ha sido retirada(s) exitosamente',
+            type: 'success',
+          })
         } else {
-          throw new Error("Error al retirar esta(s) oferta(s)");
+          throw new Error('Error al retirar esta(s) oferta(s)')
         }
       } catch (error) {
         updateConfirmModal({
-          title: "Error al retirar Oferta(s)",
+          title: 'Error al retirar Oferta(s)',
           message:
-            "No se pudo retirar oferta(s). Por favor, intente nuevamente.",
-          type: "error",
-        });
+            'No se pudo retirar oferta(s). Por favor, intente nuevamente.',
+          type: 'error',
+        })
       }
     },
-  });
-};
+  })
+}
 </script>

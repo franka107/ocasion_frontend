@@ -9,7 +9,7 @@
       <div class="space-y-1 py-2">
         <p class="text-sm font-medium text-white">{{ notification.message }}</p>
         <p class="rounded-full py-1 text-xs text-white/60">
-          {{ notification.tag }} -
+          {{ NotiificationStringMap[notification.tag] }} -
           {{
             notificationDf.format(
               parseAbsolute(
@@ -34,32 +34,36 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from "vue";
-import { Button } from "@/components/ui/button";
-import type { Notification } from "~/types/Notification";
+import { defineProps } from 'vue'
 import {
   DateFormatter,
   getLocalTimeZone,
   parseAbsolute,
   parseDateTime,
-} from "@internationalized/date";
+} from '@internationalized/date'
+import { Button } from '@/components/ui/button'
+import {
+  NotificationTag,
+  NotiificationStringMap,
+  type Notification,
+} from '~/types/Notification'
 
-const emit = defineEmits(["onRemove"]);
-const notificationDf = new DateFormatter("es", {
-  hour: "2-digit",
-  minute: "2-digit",
-  day: "2-digit",
-  month: "long",
-});
+const emit = defineEmits(['onRemove'])
+const notificationDf = new DateFormatter('es', {
+  hour: '2-digit',
+  minute: '2-digit',
+  day: '2-digit',
+  month: 'long',
+})
 
-const { removeNotifications } = useNotificationAPI();
+const { removeNotifications } = useNotificationAPI()
 
 const onNotificationPressed = async () => {
-  await removeNotifications([props.notification.id]);
-  emit("onRemove");
-};
+  await removeNotifications([props.notification.id])
+  emit('onRemove')
+}
 
 const props = defineProps<{
-  notification: Notification;
-}>();
+  notification: Notification
+}>()
 </script>

@@ -1,102 +1,102 @@
 <script setup lang="ts">
-import { ref, watch, defineProps } from "vue";
-import { useForm } from "vee-validate";
-import { toTypedSchema } from "@vee-validate/zod";
-import * as z from "zod";
-import InputFile from "@/components/common/file/Input.vue";
-import type { Organization } from "~/models/organizations";
+import { ref, watch, defineProps } from 'vue'
+import { useForm } from 'vee-validate'
+import { toTypedSchema } from '@vee-validate/zod'
+import * as z from 'zod'
+import { X } from 'lucide-vue-next'
+import { parseDate } from '@internationalized/date'
+import InputFile from '@/components/common/file/Input.vue'
+import type { Organization } from '~/models/organizations'
 
-import { X } from "lucide-vue-next";
-import { parseDate } from "@internationalized/date";
-import CustomComboboxInput from "~/components/ui/custom-combobox-input/CustomComboboxInput.vue";
-const BASE_ORG_URL = "/organization-management";
-let form: any;
+import CustomComboboxInput from '~/components/ui/custom-combobox-input/CustomComboboxInput.vue'
+const BASE_ORG_URL = '/organization-management'
+let form: any
 const props = defineProps<{
-  id: number | undefined;
-  onSubmit: (values: any) => void;
-}>();
+  id: number | undefined
+  onSubmit: (values: any) => void
+}>()
 
 const organizationFormSchema = z.object({
-  name: z.string().min(1, "La razón social es requerida"),
+  name: z.string().min(1, 'La razón social es requerida'),
   id: z
     .string()
-    .regex(/^\d+$/, "Este campo debe contener solo dígitos.")
-    .length(11, "El número de RUC debe de ser 11 dígitos"),
+    .regex(/^\d+$/, 'Este campo debe contener solo dígitos.')
+    .length(11, 'El número de RUC debe de ser 11 dígitos'),
   billingEmail: z
     .string()
-    .email("Debe ser un correo electrónico")
+    .email('Debe ser un correo electrónico')
     .optional()
     .nullable(),
   economicActivityId: z.string().optional().nullable(),
-  addressLine1: z.string().min(1, "La dirección es requerida"),
-  department: z.string().min(1, "El departamento es requerido"),
-  province: z.string().min(1, "La provincia es requerida"),
-  districtId: z.string().min(1, "El distrito es requerido"),
+  addressLine1: z.string().min(1, 'La dirección es requerida'),
+  department: z.string().min(1, 'El departamento es requerido'),
+  province: z.string().min(1, 'La provincia es requerida'),
+  districtId: z.string().min(1, 'El distrito es requerido'),
   contractStartDate: z
     .string()
-    .min(1, "La fecha de inicio del contrato es requerida"),
+    .min(1, 'La fecha de inicio del contrato es requerida'),
   contractEndDate: z
     .string()
-    .min(0, "La fecha de fin del contrato es requerida"),
+    .min(0, 'La fecha de fin del contrato es requerida'),
   startPercentage: z
     .number()
-    .min(0, "El porcentaje de inicio es requerido")
-    .max(100, "El porcentaje no puede exceder el 100%"),
+    .min(0, 'El porcentaje de inicio es requerido')
+    .max(100, 'El porcentaje no puede exceder el 100%'),
   representative: z
     .object({
-      documentType: z.enum(["DNI", "CE", "PT"]),
+      documentType: z.enum(['DNI', 'CE', 'PT']),
       documentIdentifier: z
         .string()
-        .regex(/^\d+$/, "El documento debe contener solo dígitos.")
+        .regex(/^\d+$/, 'El documento debe contener solo dígitos.')
         .min(1, `El documento del representante es requerido`),
     })
     .partial()
     .superRefine((schema, ctx) => {
       if (
-        schema.documentType === "DNI" &&
+        schema.documentType === 'DNI' &&
         schema.documentIdentifier?.length !== 8
       ) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "El dni debe contener 8 digitos",
-          path: ["documentIdentifier"],
-        });
+          message: 'El dni debe contener 8 digitos',
+          path: ['documentIdentifier'],
+        })
       }
       if (
-        schema.documentType !== "DNI" &&
+        schema.documentType !== 'DNI' &&
         schema.documentIdentifier?.length !== 9
       ) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: `El ${schema.documentType} debe contener 9 digitos`,
-          path: ["documentIdentifier"],
-        });
+          path: ['documentIdentifier'],
+        })
       }
-      return true;
+      return true
     }),
   representativeFullName: z
     .string()
-    .min(1, "El nombre y apellidos del representante es requerido")
-    .max(200, "No puede superar los 200 caracteres"),
+    .min(1, 'El nombre y apellidos del representante es requerido')
+    .max(200, 'No puede superar los 200 caracteres'),
   representativePhoneNumber: z
     .string()
-    .max(10, "No puede superar los 10 digitos")
-    .regex(/^\d+$/, "El número de teléfono debe contener solo dígitos.")
+    .max(10, 'No puede superar los 10 digitos')
+    .regex(/^\d+$/, 'El número de teléfono debe contener solo dígitos.')
     .optional()
     .nullable(),
   attachedFiles: z
     .array(z.any())
-    .min(1, "Debe subir al menos un archivo")
-    .max(3, "Puede subir un máximo de 3 archivos"),
+    .min(1, 'Debe subir al menos un archivo')
+    .max(3, 'Puede subir un máximo de 3 archivos'),
   logoFiles: z
     .array(z.any())
-    .min(1, "Debe subir al menos un archivo")
-    .max(2, "Puede subir un máximo de 1 archivo"),
-});
+    .min(1, 'Debe subir al menos un archivo')
+    .max(2, 'Puede subir un máximo de 1 archivo'),
+})
 
-type OrganizationForm = z.infer<typeof organizationFormSchema>;
+type OrganizationForm = z.infer<typeof organizationFormSchema>
 
-const formSchema = toTypedSchema(organizationFormSchema);
+const formSchema = toTypedSchema(organizationFormSchema)
 // interface OrganizationForm extends Organization {
 //   department?: string;
 //   province?: string;
@@ -105,81 +105,80 @@ const formSchema = toTypedSchema(organizationFormSchema);
 //   economicActivityId?: string;
 // }
 const { fetchCities, fetchDistricts, fetchStates, states, cities, districts } =
-  useAddress();
+  useAddress()
 
-const economicActivities = ref<Array<{ id: string; name: string }>>([]);
+const economicActivities = ref<Array<{ id: string; name: string }>>([])
 
 const fetchEconomicActivities = async () => {
   try {
-    const { data } = await useAPI("/economic-activities", {
+    const { data } = await useAPI('/economic-activities', {
       default: () => [],
-    });
-    economicActivities.value = data.value;
+    })
+    economicActivities.value = data.value
   } catch (error) {
-    console.error("Error al cargar actividades económicas:", error);
+    console.error('Error al cargar actividades económicas:', error)
   }
-};
+}
 
 if (props.id) {
   const { data: organizationData } = await useAPI<Organization>(
     `${BASE_ORG_URL}/get-organization-detail`,
     {
-      method: "GET",
+      method: 'GET',
       query: {
         id: props.id,
       },
     } as any,
-  );
-  const orgData: any = { ...organizationData.value, representative: {} };
+  )
+  const orgData: any = { ...organizationData.value, representative: {} }
 
-  orgData.department = orgData.address.district.city.state.id;
-  orgData.province = orgData.address.district.city.id;
-  orgData.districtId = orgData.address.district.id;
-  orgData.economicActivityId = orgData.economicActivity?.id;
-  orgData.addressLine1 = orgData.address.addressLine1;
-  orgData.representative.documentType = orgData.representativeDocumentType;
+  orgData.department = orgData.address.district.city.state.id
+  orgData.province = orgData.address.district.city.id
+  orgData.districtId = orgData.address.district.id
+  orgData.economicActivityId = orgData.economicActivity?.id
+  orgData.addressLine1 = orgData.address.addressLine1
+  orgData.representative.documentType = orgData.representativeDocumentType
   orgData.representative.documentIdentifier =
-    orgData.representativeDocumentIdentifier;
+    orgData.representativeDocumentIdentifier
   await Promise.all([
     fetchCities(orgData.department),
     fetchDistricts(orgData.province),
     fetchEconomicActivities(),
     fetchStates(),
-  ]);
-  console.log("orgData", orgData);
+  ])
+  console.log('orgData', orgData)
 
   form = useForm({
     validationSchema: formSchema,
     initialValues: orgData,
-  });
+  })
 } else {
-  await Promise.all([fetchEconomicActivities(), fetchStates()]);
+  await Promise.all([fetchEconomicActivities(), fetchStates()])
   form = useForm({
     validationSchema: formSchema,
     initialValues: { startPercentage: 0 },
-  });
+  })
 }
 
 const handleStateChange = (stateId: string) => {
-  console.log("stateId", stateId);
-  cities.value = []; // Limpiar las provincias
-  districts.value = []; // Limpiar los distritos
-  fetchCities(stateId);
-};
+  console.log('stateId', stateId)
+  cities.value = [] // Limpiar las provincias
+  districts.value = [] // Limpiar los distritos
+  fetchCities(stateId)
+}
 
 const handleCityChange = (cityId: string) => {
-  districts.value = []; // Limpiar los distritos
-  fetchDistricts(cityId);
-};
+  districts.value = [] // Limpiar los distritos
+  fetchDistricts(cityId)
+}
 
 watch(form.values, (newValues) => {
-  console.log("Form values:", newValues);
-  console.log("Attached Files:", newValues.attachedFiles); // Revisa este log
-});
+  console.log('Form values:', newValues)
+  console.log('Attached Files:', newValues.attachedFiles) // Revisa este log
+})
 
 const onSubmit = form.handleSubmit((values: OrganizationForm) => {
-  const { economicActivityId, addressLine1, districtId, ...restValues } =
-    values;
+  const { economicActivityId, addressLine1, districtId, ...restValues } = values
 
   const formattedValues = {
     ...restValues,
@@ -188,16 +187,16 @@ const onSubmit = form.handleSubmit((values: OrganizationForm) => {
     representativeDocumentIdentifier:
       restValues.representative.documentIdentifier,
     address: {
-      addressLine1: addressLine1,
+      addressLine1,
       district: { id: districtId },
     },
-  };
-  props.onSubmit(formattedValues);
-});
+  }
+  props.onSubmit(formattedValues)
+})
 
 const handleFilesChange = (files: File[]) => {
-  form.values.attachedFiles = files.map((file) => file.name);
-};
+  form.values.attachedFiles = files.map((file) => file.name)
+}
 </script>
 
 <template>
@@ -206,7 +205,7 @@ const handleFilesChange = (files: File[]) => {
       <X class="w-4 h-4 text-muted-foreground" />
     </SheetClose>
     <SheetTitle class="text-xl font-medium text-[#64748B]">{{
-      props.id ? "Actualizar datos de organización" : "Registrar organización"
+      props.id ? 'Actualizar datos de organización' : 'Registrar organización'
     }}</SheetTitle>
   </SheetHeader>
   <div class="flex-grow overflow-y-auto no-scrollbar flex flex-col">
@@ -217,10 +216,10 @@ const handleFilesChange = (files: File[]) => {
           <FormItem>
             <FormControl>
               <InputFile
-                title="Archivos adjuntos"
-                instructionsText="Cargar máximo 3 elementos(xlsx, docx, pdf)"
-                :limit-files="3"
                 v-model="form.values.attachedFiles"
+                title="Archivos adjuntos"
+                instructions-text="Cargar máximo 3 elementos(xlsx, docx, pdf)"
+                :limit-files="3"
                 v-bind="componentField"
               />
             </FormControl>
@@ -232,10 +231,10 @@ const handleFilesChange = (files: File[]) => {
           <FormItem>
             <FormControl>
               <InputFile
-                title="Logo de la empresa"
-                instructionsText="Cargar máximo 1 elemento(jpg, png, jpeg)"
-                :limit-files="1"
                 v-model="form.values.logoFiles"
+                title="Logo de la empresa"
+                instructions-text="Cargar máximo 1 elemento(jpg, png, jpeg)"
+                :limit-files="1"
                 v-bind="componentField"
               />
             </FormControl>
@@ -281,7 +280,6 @@ const handleFilesChange = (files: File[]) => {
           <FormItem>
             <FormControl class="w-full">
               <CustomComboboxInput
-                @update:modelValue="componentField.onChange"
                 label="Actividad económica"
                 class="w-full truncate"
                 :options="
@@ -291,6 +289,7 @@ const handleFilesChange = (files: File[]) => {
                   }))
                 "
                 :value="componentField.modelValue"
+                @update:model-value="componentField.onChange"
               />
             </FormControl>
             <FormMessage />
@@ -436,9 +435,9 @@ const handleFilesChange = (files: File[]) => {
               <FormControl>
                 <DateInput
                   class="my-2"
-                  @update:modelValue="componentField.onChange"
                   label="Fecha de inicio"
                   :value="componentField.modelValue"
+                  @update:model-value="componentField.onChange"
                 />
               </FormControl>
               <FormMessage />
@@ -451,14 +450,14 @@ const handleFilesChange = (files: File[]) => {
               <FormControl>
                 <DateInput
                   class="my-2"
-                  @update:modelValue="componentField.onChange"
                   label="Fecha de fin"
-                  :minValue="
+                  :min-value="
                     form.values.contractStartDate
                       ? parseDate(form.values.contractStartDate)
                       : undefined
                   "
                   :value="componentField.modelValue"
+                  @update:model-value="componentField.onChange"
                 />
               </FormControl>
               <FormMessage />
@@ -473,15 +472,15 @@ const handleFilesChange = (files: File[]) => {
             <FormControl>
               <CustomSelect
                 v-bind="componentField"
-                @update:modelValue="
-                  (value) => {
-                    handleStateChange(value);
-                    form.setFieldValue('province', undefined);
-                    form.setFieldValue('districtId', undefined);
-                  }
-                "
                 :items="states"
                 placeholder="Departamento"
+                @update:model-value="
+                  (value) => {
+                    handleStateChange(value)
+                    form.setFieldValue('province', undefined)
+                    form.setFieldValue('districtId', undefined)
+                  }
+                "
               />
             </FormControl>
             <FormMessage />
@@ -495,15 +494,15 @@ const handleFilesChange = (files: File[]) => {
               <FormControl>
                 <CustomSelect
                   v-bind="componentField"
-                  @update:modelValue="
-                    (value) => {
-                      form.setFieldValue('districtId', undefined);
-                      handleCityChange(value);
-                    }
-                  "
                   :disabled="!form.values.department"
                   :items="cities"
                   placeholder="Provincia"
+                  @update:model-value="
+                    (value) => {
+                      form.setFieldValue('districtId', undefined)
+                      handleCityChange(value)
+                    }
+                  "
                 />
               </FormControl>
               <FormMessage />
@@ -556,7 +555,7 @@ const handleFilesChange = (files: File[]) => {
             )
           "
         >
-          {{ props.id ? "Actualizar datos" : "Registrar" }}
+          {{ props.id ? 'Actualizar datos' : 'Registrar' }}
         </Button>
       </SheetFooter>
     </form>

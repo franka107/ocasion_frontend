@@ -1,125 +1,134 @@
 <script setup lang="ts">
-import { ref, watch, defineProps, computed } from "vue";
-import { useForm } from "vee-validate";
-import { toTypedSchema } from "@vee-validate/zod";
-import * as z from "zod";
-import { UserType, type IAdminsLItem } from "@/types/Administrators";
-import { userType } from "~/constants/administrators";
-import { X } from "lucide-vue-next";
+import { ref, watch, defineProps, computed } from 'vue'
+import { useForm } from 'vee-validate'
+import { toTypedSchema } from '@vee-validate/zod'
+import * as z from 'zod'
+import { X } from 'lucide-vue-next'
+import {
+  UserType,
+  type IAdminsLItem,
+  Organization,
+} from '@/types/Administrators'
+import { userType } from '~/constants/administrators'
 
-import CustomSelect from "~/components/ui/custom-select/CustomSelect.vue";
-import type { Organization } from "@/types/Administrators";
+import CustomSelect from '~/components/ui/custom-select/CustomSelect.vue'
 
-const BASE_ADM_URL = "/user-management";
-const BASE_ORG_URL = "/organization-management";
-const BASE_ROLE_URL = "/role-configuration";
+const BASE_ADM_URL = '/user-management'
+const BASE_ORG_URL = '/organization-management'
+const BASE_ROLE_URL = '/role-configuration'
 
 const props = defineProps<{
-  id: number | undefined;
-  onSubmit: (values: any) => void;
-}>();
+  id: number | undefined
+  onSubmit: (values: any) => void
+}>()
 
-const { getUser } = useAdmins();
-const userTypesOptions = Array.from(userType)
-  .map(([id, name]) => ({
-    id,
-    name,
-  }))
-  .filter((item) => item.id !== UserType.SuperAdmin);
+const { getUser } = useAdmins()
+
+// const userTypesOptions = Array.from(userType)
+//   .map(([id, name]) => ({
+//     id,
+//     name,
+//   }))
+//   .filter((item) => item.id !== UserType.SuperAdmin)
+
+const { data: userTypesOptions } = await useAPI(
+  `${BASE_ADM_URL}/get-user-types`,
+  {} as any,
+)
 
 // Form schema
 const administratorFormSchema = z
   .object({
-    firstName: z.string().min(1, "El nombre es requerido"),
-    lastName: z.string().min(1, "El apellido es requerido"),
-    documentType: z.enum(["DNI", "CE", "PT"]),
+    firstName: z.string().min(1, 'El nombre es requerido'),
+    lastName: z.string().min(1, 'El apellido es requerido'),
+    documentType: z.enum(['DNI', 'CE', 'PT']),
     documentIdentifier: z
       .string()
-      .regex(/^\d+$/, "El documento debe contener solo dígitos.")
+      .regex(/^\d+$/, 'El documento debe contener solo dígitos.')
       .min(1, `El documento del representante es requerido`),
-    phoneNumber: z.string().min(1, "El número de celular es requerido"),
+    phoneNumber: z.string().min(1, 'El número de celular es requerido'),
     email: z
       .string()
-      .email("El correo electrónico no es válido")
+      .email('El correo electrónico no es válido')
       .optional()
       .nullable(),
-    type: z.string().min(1, "Tipo de usuario es requerido"),
+    type: z.string().min(1, 'Tipo de usuario es requerido'),
     organizations: z
       .union([
-        z.array(z.string()).min(1, "La organización es requerida"),
-        z.string().min(1, "La organización es requerida"),
+        z.array(z.string()).min(1, 'La organización es requerida'),
+        z.string().min(1, 'La organización es requerida'),
       ])
       .optional()
       .nullable(), // Esto permite que organizations sea nullable
 
-    roles: z.array(z.string()).min(1, "El rol de usuario es requerido"),
+    roles: z.array(z.string()).min(1, 'El rol de usuario es requerido'),
   })
   .partial()
   .superRefine((schema, ctx) => {
     if (
-      schema.documentType === "DNI" &&
+      schema.documentType === 'DNI' &&
       schema.documentIdentifier?.length !== 8
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "El dni debe contener 8 digitos",
-        path: ["documentIdentifier"],
-      });
+        message: 'El dni debe contener 8 digitos',
+        path: ['documentIdentifier'],
+      })
     }
     if (
-      schema.documentType !== "DNI" &&
+      schema.documentType !== 'DNI' &&
       schema.documentIdentifier?.length !== 9
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: `El ${schema.documentType} debe contener 9 digitos`,
-        path: ["documentIdentifier"],
-      });
+        path: ['documentIdentifier'],
+      })
     }
 
     const requiredFields = [
-      "firstName",
-      "lastName",
-      "documentType",
-      "documentIdentifier",
-      "phoneNumber",
-      "type",
-      "roles",
-    ];
+      'firstName',
+      'lastName',
+      'documentType',
+      'documentIdentifier',
+      'phoneNumber',
+      'type',
+      'roles',
+    ]
     requiredFields.forEach((field) => {
       if (!schema[field]) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: `El campo ${field} es requerido.`,
           path: [field],
-        });
+        })
       }
-    });
+    })
     if (
       schema.type !== UserType.PlatformAdmin &&
       (!schema.organizations || schema.organizations.length === 0)
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "La organización es requerida.",
-        path: ["organizations"],
-      });
+        message: 'La organización es requerida.',
+        path: ['organizations'],
+      })
     }
-  });
+  })
 
-const formSchema = toTypedSchema(administratorFormSchema);
+const formSchema = toTypedSchema(administratorFormSchema)
 
 interface AdministratorsForm
-  extends Omit<IAdminsLItem, "organizations" | "roles"> {
-  organizations?: string[];
-  roles?: string[];
+  extends Omit<IAdminsLItem, 'organizations' | 'roles'> {
+  organizations?: string[]
+  roles?: string[]
 }
 
-const organizations = ref<Array<Organization>>([]);
-const roles = ref<Array<{ id: string; name: string }>>([]);
+const organizations = ref<Array<Organization>>([])
+const roles = ref<Array<{ id: string; name: string }>>([])
 const rolesFiltered = computed(() =>
-  roles.value.filter((role) => role.id !== "SUPER_ADMIN"),
-);
+  roles.value.filter((role) => role.id !== 'SUPER_ADMIN'),
+)
 
 // Function to fetch organizations and roles
 const fetchData = async (
@@ -127,18 +136,31 @@ const fetchData = async (
   target: typeof organizations | typeof roles,
 ) => {
   try {
-    const { data } = await useAPI(url, { default: () => [] });
-    target.value = data.value;
+    const { data } = await useAPI(url, { default: () => [] })
+    target.value = data.value
   } catch (error) {
-    console.error(`Error al cargar datos de ${url}:`, error);
+    console.error(`Error al cargar datos de ${url}:`, error)
   }
-};
+}
 
+const userSession = useUserSession()
+const loggedUserType = userSession.user.value?.user.type
+const type =
+  loggedUserType &&
+  [UserType.SuperAdmin, UserType.PlatformUser, UserType.PlatformAdmin].includes(
+    loggedUserType,
+  )
+    ? 'platform'
+    : 'organization'
+
+if (type === 'platform') {
+  await Promise.all([
+    fetchData(`${BASE_ORG_URL}/find-organizations`, organizations),
+  ])
+}
 // Fetch organizations and roles
-await Promise.all([
-  fetchData(`${BASE_ORG_URL}/find-organizations`, organizations),
-  fetchData(`${BASE_ROLE_URL}/find-roles`, roles),
-]);
+
+await fetchData(`${BASE_ROLE_URL}/find-roles`, roles)
 
 const form = useForm({
   validationSchema: formSchema,
@@ -146,51 +168,49 @@ const form = useForm({
     ? await getUser(props.id).then(({ data: userData }) => {
         const organizationsFormatted = userData.value.organizations.map(
           (item: any) => item.id,
-        );
-        const rolesFormatted = userData.value.roles?.map(
-          (item: any) => item.id,
-        );
+        )
+        const rolesFormatted = userData.value.roles?.map((item: any) => item.id)
         return {
           ...userData.value,
           organizations: organizationsFormatted,
           roles: rolesFormatted,
-        };
+        }
       })
     : undefined,
-});
+})
 
 // Computed property to determine if the organizations should be single-select
 const isOrgSimpleSelect = computed(() =>
-  ["ORGANIZATION_ADMIN", "ORGANIZATION_USER"].includes(form.values.type),
-);
+  ['ORGANIZATION_ADMIN', 'ORGANIZATION_USER'].includes(form.values.type),
+)
 
 const formattedOrganizations = computed(() => {
   return organizations.value.map((org) => ({
     id: org.id,
     name: org.name,
-  }));
-});
+  }))
+})
 
 watch(form.values, (newValues) => {
-  console.log("Form values:", newValues);
-});
+  console.log('Form values:', newValues)
+})
 
 // Watcher to auto-select the role when the user type changes
 watch(
   () => form.values.type,
   (newType) => {
     if (newType) {
-      const matchingRole = roles.value.find((role) => role.id === newType);
+      const matchingRole = roles.value.find((role) => role.id === newType)
       if (matchingRole) {
-        form.setFieldValue("roles", [matchingRole.id]); // Set the role automatically
+        form.setFieldValue('roles', [matchingRole.id]) // Set the role automatically
       }
     }
   },
-);
+)
 
 // Submit handler
 const onSubmit = form.handleSubmit((values: any) => {
-  const { organizations, roles, ...restValues } = values;
+  const { organizations, roles, ...restValues } = values
   const formattedValues = {
     ...restValues,
     organizations: Array.isArray(organizations)
@@ -199,14 +219,14 @@ const onSubmit = form.handleSubmit((values: any) => {
         ? [{ id: organizations }]
         : [],
     roles: roles.map((roleId: string) => ({ id: roleId })),
-  };
-
-  if (props.id) {
-    formattedValues.id = props.id;
   }
 
-  props.onSubmit(formattedValues);
-});
+  if (props.id) {
+    formattedValues.id = props.id
+  }
+
+  props.onSubmit(formattedValues)
+})
 </script>
 
 <template>
@@ -215,7 +235,7 @@ const onSubmit = form.handleSubmit((values: any) => {
       <X class="w-4 h-4 text-muted-foreground" />
     </SheetClose>
     <SheetTitle class="text-xl font-medium text-[#64748B]">{{
-      props.id ? "Actualizar datos de usuario" : "Crear usuario"
+      props.id ? 'Actualizar datos de usuario' : 'Crear usuario'
     }}</SheetTitle>
   </SheetHeader>
   <div class="flex-grow overflow-y-auto no-scrollbar flex flex-col">
@@ -313,19 +333,20 @@ const onSubmit = form.handleSubmit((values: any) => {
           <FormControl>
             <CustomSelect
               v-bind="componentField"
+              :items="userTypesOptions"
+              placeholder="Tipo de Usuario"
               @update:model-value="
                 form.setFieldValue('organizations', isOrgSimpleSelect ? '' : [])
               "
-              :items="userTypesOptions"
-              placeholder="Tipo de Usuario"
             />
           </FormControl>
           <FormMessage />
         </FormItem>
       </FormField>
       <!-- Organización -->
+      <!-- v-if="form.values.type !== UserType.PlatformAdmin" -->
       <FormField
-        v-if="form.values.type !== UserType.PlatformAdmin"
+        v-if="type === 'platform'"
         v-slot="{ componentField }"
         name="organizations"
       >
@@ -369,7 +390,7 @@ const onSubmit = form.handleSubmit((values: any) => {
             )
           "
         >
-          {{ props.id ? "Actualizar datos" : "Crear usuario" }}
+          {{ props.id ? 'Actualizar datos' : 'Crear usuario' }}
         </Button>
       </SheetFooter>
     </form>

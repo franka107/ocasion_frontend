@@ -1,84 +1,83 @@
 import type {
   HeaderItem,
   SearchItem,
-} from "@/components/ui/custom-table/CustomTable.vue";
+} from '@/components/ui/custom-table/CustomTable.vue'
 
 export const userType = new Map<string, string>([
-  ["PLATFORM_ADMIN", "Administrador de plataforma"],
-  ["PLATFORM_USER", "Usuario plataforma"],
-  ["ORGANIZATION_ADMIN", "Administrador de organizacion"],
-  ["SUPER_ADMIN", "Super administrador"],
-  ["ORGANIZATION_USER", "Usuario de organizacion"],
-]);
+  ['PLATFORM_ADMIN', 'Administrador de plataforma'],
+  ['PLATFORM_USER', 'Usuario plataforma'],
+  ['ORGANIZATION_ADMIN', 'Administrador de organizacion'],
+  ['SUPER_ADMIN', 'Super administrador'],
+  ['ORGANIZATION_USER', 'Usuario de organizacion'],
+])
 
 export const administratorsSearch: SearchItem[] = [
   {
-    key: "fullName",
-    type: "text",
-    placeholder: "Buscar usuarios",
+    key: 'fullName',
+    type: 'text',
+    placeholder: 'Buscar usuarios',
     position: 1,
   },
   {
-    key: "createdAt",
-    type: "date",
-    placeholder: "Fecha de creación",
+    key: 'createdAt',
+    type: 'date',
+    placeholder: 'Fecha de creación',
     position: 1,
   },
   {
-    key: "status",
-    type: "select",
-    placeholder: "Filtrar estados",
+    key: 'status',
+    type: 'select',
+    placeholder: 'Filtrar estados',
     items: [
-      { text: "Activo", value: "ACTIVE" },
-      { text: "Suspendido", value: "SUSPENDED" },
-      { text: "Todos", value: " " },
+      { text: 'Activo', value: 'ACTIVE' },
+      { text: 'Suspendido', value: 'SUSPENDED' },
+      { text: 'Todos', value: ' ' },
     ],
-    elementClass: "min-w-[400px]",
+    elementClass: 'min-w-[400px]',
     position: 3,
   },
-];
+]
 
 export const administratorsHeader: HeaderItem[] = [
   {
-    key: "fullName",
-    label: "Nombre y apellidos",
+    key: 'fullName',
+    label: 'Nombre y apellidos',
     sortable: true,
   },
   {
-    key: "document",
-    label: "Documento",
+    key: 'document',
+    label: 'Documento',
     sortable: true,
   },
   {
-    key: "cellphone",
-    label: "Celular",
+    key: 'cellphone',
+    label: 'Celular',
     sortable: true,
   },
   {
-    key: "email",
-    label: "Correo",
+    key: 'email',
+    label: 'Correo',
     sortable: true,
   },
   {
-    key: "type",
-    label: "Tipo de Usuario",
+    key: 'type',
+    label: 'Tipo de Usuario',
     sortable: true,
   },
   {
-    key: "organization",
-    label: "Organización",
+    key: 'organization',
+    label: 'Organización',
     sortable: true,
   },
   {
-    key: "status",
-    label: "Estado",
+    key: 'status',
+    label: 'Estado',
     sortable: true,
   },
   {
-    key: "actions",
-    label: "",
+    key: 'actions',
+    label: '',
     sortable: false,
-    align: "center",
+    align: 'center',
   },
-];
-
+]

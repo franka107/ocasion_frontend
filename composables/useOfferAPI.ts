@@ -1,111 +1,111 @@
-import type { OfferItem } from "~/types/Offer";
-import { useAPI } from "./useAPI";
+import type { OfferDto } from '~/types/Offer'
+import { useAPI } from './useAPI'
 
-const EVENT_BASE_URL = "/offer-management";
-const EVENT_PUBLISH_URL = "/event-management";
-const OFFER_BASE_URL = "/offer-management";
+const EVENT_BASE_URL = '/offer-management'
+const EVENT_PUBLISH_URL = '/event-management'
+const OFFER_BASE_URL = '/offer-management'
 // by convention, composable function names start with "use"
 export function useOfferAPI() {
   // state encapsulated and managed by the composable
-  const page = ref(1);
-  const sortOptions = ref("[]");
+  const page = ref(1)
+  const sortOptions = ref('[]')
 
   const createOffer = async (values: any) => {
     const { status, error }: any = await useAPI(
       `${OFFER_BASE_URL}/create-offer`,
       {
-        method: "POST",
+        method: 'POST',
         body: values,
       } as any,
-    );
-    return { status, error };
-  };
+    )
+    return { status, error }
+  }
 
   const editOffer = async (values: any) => {
     const { status, error }: any = await useAPI(
       `${OFFER_BASE_URL}/update-offer`,
       {
-        method: "PUT",
+        method: 'PUT',
         body: values,
       } as any,
-    );
-    return { status, error };
-  };
+    )
+    return { status, error }
+  }
 
   const modifyOfferAppraisal = async (values: {
-    offerId: string;
-    newAppraisal: number;
+    offerId: string
+    newAppraisal: number
   }) => {
     const { status, error }: any = await useAPI(
       `${EVENT_BASE_URL}/modify-offer-appraisal`,
       {
-        method: "POST",
+        method: 'POST',
         body: values,
       } as any,
-    );
-    return { status, error };
-  };
+    )
+    return { status, error }
+  }
 
   const getOffer = async (id: number | string) => {
-    const { status, error, data } = await useAPI<OfferItem>(
+    const { status, error, data } = await useAPI<OfferDto>(
       `${OFFER_BASE_URL}/get-offer-detail`,
       {
-        method: "GET",
+        method: 'GET',
         query: {
           id,
         },
       } as any,
-    );
-    return { status, error, data };
-  };
+    )
+    return { status, error, data }
+  }
   const discussOffer = async (values: {
-    offerId: string;
-    counterProposalAmount: number;
+    offerId: string
+    counterProposalAmount: number
   }) => {
     const { status, error }: any = await useAPI(
       `${OFFER_BASE_URL}/discuss-offer`,
       {
-        method: "POST",
+        method: 'POST',
         body: values,
       } as any,
-    );
-    return { status, error };
-  };
+    )
+    return { status, error }
+  }
 
   const confirmOffers = async (values: {
-    type: string;
-    ids: string[];
-    eventId: string;
+    type: string
+    ids: string[]
+    eventId: string
   }) => {
     const { status, error }: any = await useAPI(
       `${OFFER_BASE_URL}/confirm-offers`,
       {
-        method: "POST",
+        method: 'POST',
         body: values,
       } as any,
-    );
+    )
 
-    return { status, error };
-  };
+    return { status, error }
+  }
 
   const onSort = (sortObject: { [key: string]: string }[]) => {
-    sortOptions.value = JSON.stringify(sortObject);
-  };
+    sortOptions.value = JSON.stringify(sortObject)
+  }
   const retireOffers = async (values: {
-    type: string;
-    ids: string[];
-    eventId: string;
+    type: string
+    ids: string[]
+    eventId: string
   }) => {
     const { status, error }: any = await useAPI(
       `${OFFER_BASE_URL}/retire-offers`,
       {
-        method: "POST",
+        method: 'POST',
         body: values,
       } as any,
-    );
+    )
 
-    return { status, error };
-  };
+    return { status, error }
+  }
 
   return {
     page,
@@ -118,5 +118,5 @@ export function useOfferAPI() {
     discussOffer,
     confirmOffers,
     retireOffers,
-  };
+  }
 }

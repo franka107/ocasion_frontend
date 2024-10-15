@@ -1,10 +1,13 @@
+export enum NotificationTag {
+  Event = 'EVENT',
+}
 export interface Notification {
-  id: string;
-  message: string;
-  tag: NotificationTag;
-  createdAt: string;
+  id: string
+  message: string
+  tag: NotificationTag
+  createdAt: string
 }
 
-export enum NotificationTag {
-  Event = "EVENT",
+export const NotiificationStringMap = {
+  [NotificationTag.Event]: 'EVENTO',
 }

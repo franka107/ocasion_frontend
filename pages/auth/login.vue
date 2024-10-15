@@ -5,17 +5,17 @@
       title="Bienvenido"
       subtitle="Inicia sesión con tus credenciales."
       submit-text="Ingresar"
-      :submitClass="submitButtonClass"
-      :isActive="isActive"
-      :isLoading="isLoading"
+      :submit-class="submitButtonClass"
+      :is-active="isActive"
+      :is-loading="isLoading"
       @submit="handleSubmit"
     >
       <div class="mb-6 relative">
         <InputWithLabel
           id="email"
+          v-model="email"
           type="email"
           label="Correo electrónico"
-          v-model="email"
           :error="errors.email"
           :class="{ 'border-red-500': errors.email }"
         />
@@ -23,17 +23,17 @@
       <div class="mb-6 relative">
         <InputWithLabel
           id="password"
+          v-model="password"
           :type="showPassword ? 'text' : 'password'"
           label="Contraseña"
-          v-model="password"
           :error="errors.password"
           :class="{ 'border-red-500': errors.password }"
         >
           <template #icon-right>
             <button
-              @click="togglePassword()"
               type="button"
               class="absolute right-3 top-1/2 transform -translate-y-1/2 focus:outline-none"
+              @click="togglePassword()"
             >
               <CustomIcons
                 :name="showPassword ? 'EyeIcon' : 'EyeIconClosed'"
@@ -44,9 +44,9 @@
         </InputWithLabel>
         <div class="flex justify-end mt-2">
           <a
-            @click.prevent="toggleForgotPassword"
             href="#"
             class="font-semibold text-sm text-primary hover:underline h-[20px] rounded-tl-[2px] opacity-100"
+            @click.prevent="toggleForgotPassword"
           >
             ¿Olvidaste tu contraseña?
           </a>
@@ -56,45 +56,45 @@
     <ForgotPasswordForm v-else @back="toggleForgotPassword" />
     <Dialog
       v-model:open="dialogState.isSuspendedDialogOpen"
-      :iconSrc="messageIconSrc"
-      iconAlt="Icono de alerta"
+      :icon-src="messageIconSrc"
+      icon-alt="Icono de alerta"
       title="Cuenta suspendida"
       description="Tu cuenta se encuentra suspendida, por favor contacta al administrador para mayor informacion"
-      buttonText="Aceptar"
-      iconBgColor="bg-[#f53e3e]"
+      button-text="Aceptar"
+      icon-bg-color="bg-[#f53e3e]"
       @close="closeDialog('isSuspendedDialogOpen')"
       @action="closeDialog('isSuspendedDialogOpen')"
     />
     <Dialog
       v-model:open="dialogState.isMaxAttemptsDialogOpen"
-      :iconSrc="messageIconSrc"
-      iconAlt="Icono de alerta"
+      :icon-src="messageIconSrc"
+      icon-alt="Icono de alerta"
       title="Alcanzo el límite de accesos"
       description="Ha alcanzado el límite de intentos. Se le ha enviado un correo para restaurar la contraseña."
-      buttonText="Aceptar"
-      iconBgColor="bg-[#f53e3e]"
+      button-text="Aceptar"
+      icon-bg-color="bg-[#f53e3e]"
       @close="closeDialog('isMaxAttemptsDialogOpen')"
       @action="closeDialog('isMaxAttemptsDialogOpen')"
     />
     <Dialog
       v-model:open="dialogState.isIncorrectCredentialsOpen"
-      :iconSrc="messageIconSrc"
-      iconAlt="Icono de alerta"
+      :icon-src="messageIconSrc"
+      icon-alt="Icono de alerta"
       title="Credenciales  incorrectas"
       description="El correo electrónico o la contraseña son incorrectos. Por favor, vuelva a intentarlo."
-      buttonText="Aceptar"
-      iconBgColor="bg-[#f53e3e]"
+      button-text="Aceptar"
+      icon-bg-color="bg-[#f53e3e]"
       @close="closeDialog('isIncorrectCredentialsOpen')"
       @action="closeDialog('isIncorrectCredentialsOpen')"
     />
     <Dialog
       v-model:open="dialogState.isDialogOpen"
-      :iconSrc="messageIconSrc"
-      iconAlt="Icono de alerta"
+      :icon-src="messageIconSrc"
+      icon-alt="Icono de alerta"
       title="Contraseña caducada"
       description="La contraseña actual ha caducado, por favor actualice su contraseña"
-      buttonText="Aceptar"
-      iconBgColor="bg-[#FBBF24]"
+      button-text="Aceptar"
+      icon-bg-color="bg-[#FBBF24]"
       @close="closeDialog('isDialogOpen')"
       @action="goToUpdatePassword"
     />
@@ -102,15 +102,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { useRouter } from "vue-router";
-import AuthForm from "~/components/auth/authForm.vue";
-import BaseForm from "~/components/auth/baseForm.vue";
-import InputWithLabel from "~/components/auth/inputWithLabel.vue";
-import Dialog from "~/components/auth/dialogForm.vue";
-import ForgotPasswordForm from "~/components/auth/forgotPasswordForm.vue";
-import { useLoginForm } from "~/composables/useLoginForm";
-import messageIcon from "~/assets/icon/png/priority-high.png";
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import AuthForm from '~/components/auth/authForm.vue'
+import BaseForm from '~/components/auth/baseForm.vue'
+import InputWithLabel from '~/components/auth/inputWithLabel.vue'
+import Dialog from '~/components/auth/dialogForm.vue'
+import ForgotPasswordForm from '~/components/auth/forgotPasswordForm.vue'
+import { useLoginForm } from '~/composables/useLoginForm'
+import messageIcon from '~/assets/icon/png/priority-high.png'
 
 const {
   email,
@@ -127,15 +127,15 @@ const {
   closeDialog,
   goToUpdatePassword,
   isLoading,
-} = useLoginForm();
+} = useLoginForm()
 
 // Computa si el campo de correo electrónico tiene texto
-const isActive = computed(() => email.value.length > 0);
+const isActive = computed(() => email.value.length > 0)
 
 const submitButtonClass = computed(() => {
   return isActive.value
-    ? "w-full py-2 mt-4 bg-primary text-white rounded focus:outline-none focus:ring-2 focus:ring-primary"
-    : "w-full py-2 mt-4 bg-gray-200 text-gray-400 rounded cursor-not-allowed";
-});
-const messageIconSrc = messageIcon;
+    ? 'w-full py-2 mt-4 bg-primary text-white rounded focus:outline-none focus:ring-2 focus:ring-primary'
+    : 'w-full py-2 mt-4 bg-gray-200 text-gray-400 rounded cursor-not-allowed'
+})
+const messageIconSrc = messageIcon
 </script>

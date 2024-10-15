@@ -5,27 +5,27 @@ import {
   Bookmark,
   SquarePen,
   LayoutGrid,
-} from "lucide-vue-next";
-import { GrantId } from "~/types/Grant";
+} from 'lucide-vue-next'
+import { GrantId } from '~/types/Grant'
 
 type Submenu = {
-  href: string;
-  label: string;
-  active: boolean;
-};
+  href: string
+  label: string
+  active: boolean
+}
 
 type Menu = {
-  href: string;
-  label: string;
-  active: boolean;
-  icon: string;
-  submenus: Submenu[];
-};
+  href: string
+  label: string
+  active: boolean
+  icon: string
+  submenus: Submenu[]
+}
 
 type Group = {
-  groupLabel: string;
-  menus: Menu[];
-};
+  groupLabel: string
+  menus: Menu[]
+}
 
 // export function getMenuList(pathname: string, grants: GrantId[]): Group[] {
 //   return [
@@ -92,10 +92,10 @@ export function getMenuList(
     ...(grants.includes(GrantId.PlatformKpisManagement)
       ? [
           {
-            href: "/dashboard/platform/graphics",
-            label: "Dashboard",
-            active: pathname === "/dashboard/platform/graphics",
-            icon: "Dashboard",
+            href: '/dashboard/platform/graphics',
+            label: 'Dashboard',
+            active: pathname === '/dashboard/platform/graphics',
+            icon: 'Dashboard',
             submenus: [],
           },
         ]
@@ -103,10 +103,10 @@ export function getMenuList(
     ...(grants.includes(GrantId.PlatformOrganizationsManagement)
       ? [
           {
-            href: "/dashboard/platform/organizations",
-            label: "Organizaciones",
-            active: pathname.includes("/organizations"),
-            icon: "Organization",
+            href: '/dashboard/platform/organizations',
+            label: 'Organizaciones',
+            active: pathname.includes('/organizations'),
+            icon: 'Organization',
             submenus: [],
           },
         ]
@@ -114,17 +114,16 @@ export function getMenuList(
     ...(grants.includes(GrantId.PlatformUsersManagement)
       ? [
           {
-            href: "/dashboard/platform/users",
-            label: "Usuarios",
-            active: pathname.includes("/users"),
-            icon: "Groups",
+            label: 'Usuarios',
+            active: pathname.includes('/users'),
+            icon: 'Groups',
             submenus: [
               ...(grants.includes(GrantId.PlatformUsersCanViewAdministrators)
                 ? [
                     {
-                      href: "/dashboard/platform/users/administrators",
-                      label: "Administradores",
-                      active: pathname.includes("/users/administrators"),
+                      href: '/dashboard/platform/users/administrators',
+                      label: 'Administradores',
+                      active: pathname.includes('/users/administrators'),
                       // active: pathname === "/users/administrators",
                     },
                   ]
@@ -132,9 +131,9 @@ export function getMenuList(
               ...(grants.includes(GrantId.PlarformUsersCanViewParticipants)
                 ? [
                     {
-                      href: "/dashboard/platform/users/participants",
-                      label: "Participantes",
-                      active: pathname.includes("/users/participants"),
+                      href: '/dashboard/platform/users/participants',
+                      label: 'Participantes',
+                      active: pathname.includes('/users/participants'),
                       // active: pathname === "/users/participants",
                     },
                   ]
@@ -147,10 +146,10 @@ export function getMenuList(
     ...(grants.includes(GrantId.PlatformRolesManagement)
       ? [
           {
-            href: "/dashboard/platform/roles",
-            label: "Roles",
-            active: pathname.includes("/roles"),
-            icon: "WorkOutline",
+            href: '/dashboard/platform/roles',
+            label: 'Roles',
+            active: pathname.includes('/roles'),
+            icon: 'WorkOutline',
             submenus: [],
           },
         ]
@@ -159,11 +158,11 @@ export function getMenuList(
     ...(grants.includes(GrantId.PlatformEventsManagement)
       ? [
           {
-            href: "/dashboard/platform/events",
-            label: "Eventos",
-            active: pathname.includes("/events"),
+            href: '/dashboard/platform/events',
+            label: 'Eventos',
+            active: pathname.includes('/events'),
             // active: pathname === "/events",
-            icon: "Event",
+            icon: 'Event',
             submenus: [],
           },
         ]
@@ -173,22 +172,22 @@ export function getMenuList(
       ? [
           {
             href: `/dashboard/platform/payments`,
-            label: "Abonos",
-            active: pathname.includes("/payments"),
+            label: 'Abonos',
+            active: pathname.includes('/payments'),
             // active: pathname === "/payments",
-            icon: "Pay",
+            icon: 'Pay',
             submenus: [],
           },
         ]
       : []),
 
-      ...(grants.includes(GrantId.PlatformTransferenceMangement)
+    ...(grants.includes(GrantId.PlatformTransferenceMangement)
       ? [
           {
             href: `/dashboard/platform/evidence`,
-            label: "Evidencias",
-            active: pathname === "/evidence",
-            icon: "Evidence",
+            label: 'Evidencias',
+            active: pathname === '/evidence',
+            icon: 'Evidence',
             submenus: [],
           },
         ]
@@ -198,9 +197,9 @@ export function getMenuList(
       ? [
           {
             href: `/dashboard/organization/${organizationId}/graphics`,
-            label: "Dashboard",
-            active: pathname === "/graphics",
-            icon: "Dashboard",
+            label: 'Dashboard',
+            active: pathname === '/graphics',
+            icon: 'Dashboard',
             submenus: [],
           },
         ]
@@ -209,9 +208,9 @@ export function getMenuList(
       ? [
           {
             href: `/dashboard/organization/${organizationId}/events`,
-            label: "Eventos",
-            active: pathname === "/events",
-            icon: "Event",
+            label: 'Eventos',
+            active: pathname === '/events',
+            icon: 'Event',
             submenus: [],
           },
         ]
@@ -220,9 +219,9 @@ export function getMenuList(
       ? [
           {
             href: `/dashboard/organization/${organizationId}/users`,
-            label: "Usuarios",
-            active: pathname === "/events",
-            icon: "Groups",
+            label: 'Usuarios',
+            active: pathname === '/events',
+            icon: 'Groups',
             submenus: [],
           },
         ]
@@ -231,44 +230,44 @@ export function getMenuList(
       ? [
           {
             href: `/dashboard/organization/${organizationId}/roles`,
-            label: "Roles",
-            active: pathname === "/roles",
-            icon: "WorkOutline",
-            submenus: [],
-          },
-        ]
-      : []),
-    
-      ...(grants.includes(GrantId.OrganizationPaymentManagement)
-      ? [
-          {
-            href: `/dashboard/organization/${organizationId}/payments`,
-            label: "Abonos",
-            active: pathname === "/payments",
-            icon: "Pay",
+            label: 'Roles',
+            active: pathname === '/roles',
+            icon: 'WorkOutline',
             submenus: [],
           },
         ]
       : []),
 
-      ...(grants.includes(GrantId.OrganizationTransferenceManagement)
+    ...(grants.includes(GrantId.OrganizationPaymentManagement)
       ? [
           {
-            href: `/dashboard/organization/${organizationId}/evidence`,
-            label: "Evidencias",
-            active: pathname === "/evidence",
-            icon: "Evidence",
+            href: `/dashboard/organization/${organizationId}/payments`,
+            label: 'Abonos',
+            active: pathname === '/payments',
+            icon: 'Pay',
             submenus: [],
           },
         ]
       : []),
-  ];
+
+    ...(grants.includes(GrantId.OrganizationTransferenceManagement)
+      ? [
+          {
+            href: `/dashboard/organization/${organizationId}/evidence`,
+            label: 'Evidencias',
+            active: pathname === '/evidence',
+            icon: 'Evidence',
+            submenus: [],
+          },
+        ]
+      : []),
+  ]
   return [
     {
-      groupLabel: "",
+      groupLabel: '',
       menus: menuList,
     },
-  ];
+  ]
 }
 
 // export function getMenuList(pathname: string, grants: GrantId[]): Group[] {

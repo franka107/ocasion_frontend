@@ -1,154 +1,150 @@
 <script setup lang="ts">
-import { ref, watch, defineProps } from "vue";
-import { useForm } from "vee-validate";
-import { toTypedSchema } from "@vee-validate/zod";
-import * as z from "zod";
-import InputFile from "@/components/common/file/Input.vue";
-import type { OfferItem } from "@/types/Offer";
-import { Textarea } from "@/components/ui/textarea";
-import { eventType, goodType, eventTimes, years } from "@/constants/events";
-const BASE_OFFERS_URL = "/offer-management";
-import { X } from "lucide-vue-next";
-import type { Organization } from "~/types/Administrators";
-import Input from "../ui/input/Input.vue";
-let form: any;
-const { getOffer } = useOfferAPI();
+import { ref, watch, defineProps } from 'vue'
+import { useForm } from 'vee-validate'
+import { toTypedSchema } from '@vee-validate/zod'
+import * as z from 'zod'
+import { X } from 'lucide-vue-next'
+import Input from '../ui/input/Input.vue'
+import InputFile from '@/components/common/file/Input.vue'
+import type { OfferDto } from '@/types/Offer'
+import { Textarea } from '@/components/ui/textarea'
+import { eventType, goodType, eventTimes, years } from '@/constants/events'
+import type { Organization } from '~/types/Administrators'
+const BASE_OFFERS_URL = '/offer-management'
+let form: any
+const { getOffer } = useOfferAPI()
 const props = defineProps<{
-  id: string | undefined;
-  eventId: string;
-  onsubmit: (values: any) => void;
-}>();
+  id: string | undefined
+  eventId: string
+  onsubmit: (values: any) => void
+}>()
 
 const {
   brands: brandOptions,
   models: modelOptions,
   fetchBrands,
   fetchModels,
-} = useExtraEndpoints();
-const initialAuctionAmount = ref("0");
+} = useExtraEndpoints()
+const initialAuctionAmount = ref('0')
 // const yearOptions = Array.from({ length: 65 }, (_, i) => ({ id: 1960 + i, name: (1960 + i).toString() }))
 const formSchema = toTypedSchema(
   z.object({
     annexesFiles: z
       .array(z.any())
-      .min(1, "Debe subir al menos un archivo de bien."),
+      .min(1, 'Debe subir al menos un archivo de bien.'),
     attachedFiles: z
       .array(z.any())
-      .min(1, "Debe subir al menos un archivo de bien."),
+      .min(1, 'Debe subir al menos un archivo de bien.'),
     title: z
       .string()
-      .min(1, "El titulo es requerido.")
-      .max(200, "Cant. de carácteres máximo 200."),
-    brandId: z.string().min(1, "El modelo es requerido."),
-    model: z.string().min(1, "El modelo es requerido."),
-    year: z.number().min(1, "El año es requerido"),
-    department: z.string().min(1, "El departamento es requerido"),
-    province: z.string().min(1, "La provincia es requerida"),
-    districtId: z.string().min(1, "El año es requerido"),
+      .min(1, 'El titulo es requerido.')
+      .max(200, 'Cant. de carácteres máximo 200.'),
+    brandId: z.string().min(1, 'El modelo es requerido.'),
+    model: z.string().min(1, 'El modelo es requerido.'),
+    year: z.number().min(1, 'El año es requerido'),
+    department: z.string().min(1, 'El departamento es requerido'),
+    province: z.string().min(1, 'La provincia es requerida'),
+    districtId: z.string().min(1, 'El año es requerido'),
     description: z
       .string()
-      .min(1, "La descripcion es requerido.")
-      .max(1000, "Cant. de carácteres máximo 1000."),
-    addressLine1: z.string().min(1, "La dirección es requerida."),
-    appraisal: z.number().min(1, "La tasación es requerida."),
+      .min(1, 'La descripcion es requerido.')
+      .max(1000, 'Cant. de carácteres máximo 1000.'),
+    addressLine1: z.string().min(1, 'La dirección es requerida.'),
+    appraisal: z.number().min(1, 'La tasación es requerida.'),
   }),
-);
+)
 const { fetchCities, fetchDistricts, fetchStates, states, cities, districts } =
-  useAddress();
+  useAddress()
 
-interface OfferItemForm extends OfferItem {
-  department?: string;
-  province?: string;
-  districtId?: string;
-  addressLine1?: string;
-  brandId?: string;
-  model?: string;
+interface OfferItemForm extends OfferDto {
+  department?: string
+  province?: string
+  districtId?: string
+  addressLine1?: string
+  brandId?: string
+  model?: string
 }
 
-const BASE_ORG_URL = "/organization-management";
+const BASE_ORG_URL = '/organization-management'
 
 const { data: organizationData } = await useAPI<any>(
   `${BASE_ORG_URL}/get-organization-detail`,
   {
-    method: "GET",
+    method: 'GET',
     query: {
       eventId: props.eventId,
     },
   } as any,
-);
+)
 if (props.id) {
   // const { data: offerData } = await ;
 
-  const { data } = await getOffer(props.id);
-  const offerData: OfferItemForm = { ...data.value };
+  const { data } = await getOffer(props.id)
+  const offerData: OfferItemForm = { ...data.value }
   // offerData.department = offerData.address?.district?.id.split("+")[0] || "";
   // offerData.province =
   //   `${offerData.department}+${offerData.address?.district?.id.split("+")[1]}` ||
   //   "";
-  offerData.department = offerData.address.district.city.state.id;
-  offerData.province = offerData.address.district.city.id;
-  offerData.districtId = offerData.address.district.id;
-  offerData.addressLine1 = offerData.address.addressLine1;
-  offerData.brandId = offerData.carModel.brand.id;
-  offerData.model = offerData.carModel.id;
+  offerData.department = offerData.address.district.city.state.id
+  offerData.province = offerData.address.district.city.id
+  offerData.districtId = offerData.address.district.id
+  offerData.addressLine1 = offerData.address.addressLine1
+  offerData.brandId = offerData.carModel.brand.id
+  offerData.model = offerData.carModel.id
 
   initialAuctionAmount.value =
     (
       offerData.appraisal *
       (organizationData.value.startPercentage / 100)
-    ).toFixed(2) || "0";
+    ).toFixed(2) || '0'
 
   await Promise.all([
     fetchCities(offerData.department),
     fetchDistricts(offerData.province),
     fetchModels(offerData.brandId),
     fetchStates(),
-  ]);
+  ])
   form = useForm({
     validationSchema: formSchema,
     initialValues: offerData,
-  });
+  })
 } else {
-  await Promise.all([fetchBrands(), fetchStates()]);
-  form = useForm({ validationSchema: formSchema });
+  await Promise.all([fetchBrands(), fetchStates()])
+  form = useForm({ validationSchema: formSchema })
 }
 
-console.log("OrganizationData ", organizationData);
+console.log('OrganizationData ', organizationData)
 
 watch(form.values, (newValues) => {
-  const startPercentage = Number(organizationData.value?.startPercentage) || 0;
-  console.log("Attached Files:", newValues.attachedFiles); // Revisa este log
-  console.log(
-    "Attached Files:",
-    (initialAuctionAmount.value = (
-      newValues.appraisal *
-      (startPercentage / 100)
-    ).toFixed(2)),
-  ); // Revisa este log
+  const startPercentage = Number(organizationData.value?.startPercentage) || 0
 
   initialAuctionAmount.value = (
     newValues.appraisal *
     (startPercentage / 100)
-  ).toFixed(2);
-});
+  ).toFixed(2)
+
+  if (isNaN(newValues.appraisal)) {
+    initialAuctionAmount.value = '0'
+  }
+})
 
 const handleStateChange = (stateId: string) => {
-  cities.value = []; // Limpiar las provincias
-  districts.value = []; // Limpiar los distritos
-  fetchCities(stateId);
-};
+  cities.value = [] // Limpiar las provincias
+  districts.value = [] // Limpiar los distritos
+  fetchCities(stateId)
+}
 
 const handleBrandChange = (brandId: string) => {
-  modelOptions.value = []; // Limpiar las provincias
-  fetchModels(brandId);
-};
+  modelOptions.value = [] // Limpiar las provincias
+  fetchModels(brandId)
+}
 const handleCityChange = (cityId: string) => {
-  districts.value = []; // Limpiar los distritos
-  fetchDistricts(cityId);
-};
+  districts.value = [] // Limpiar los distritos
+  fetchDistricts(cityId)
+}
 
 const onSubmit = form.handleSubmit((values: any) => {
-  const { addressLine1, districtId, year, model, ...restValues } = values;
+  const { addressLine1, districtId, year, model, ...restValues } = values
 
   const formattedValues = {
     ...restValues,
@@ -161,24 +157,24 @@ const onSubmit = form.handleSubmit((values: any) => {
     year: Number(year),
     address: {
       // id: districtId,
-      addressLine1: addressLine1,
+      addressLine1,
       district: {
         id: districtId,
       },
     },
 
     appraisal: Number(values.appraisal),
-  };
-  if (props.id) {
-    formattedValues.id = props.id;
   }
-  console.log(formattedValues);
-  props.onsubmit(formattedValues);
-});
+  if (props.id) {
+    formattedValues.id = props.id
+  }
+  console.log(formattedValues)
+  props.onsubmit(formattedValues)
+})
 
 const handleFilesChange = (files: File[]) => {
-  form.values.attachedFiles = files.map((file) => file.name);
-};
+  form.values.attachedFiles = files.map((file) => file.name)
+}
 </script>
 
 <template>
@@ -187,7 +183,7 @@ const handleFilesChange = (files: File[]) => {
       <X class="w-4 h-4 text-muted-foreground" />
     </SheetClose>
     <SheetTitle class="text-xl font-medium text-[#64748B]">{{
-      props.id ? "Actualizar oferta" : "Crear oferta"
+      props.id ? 'Actualizar oferta' : 'Crear oferta'
     }}</SheetTitle>
   </SheetHeader>
 
@@ -201,12 +197,12 @@ const handleFilesChange = (files: File[]) => {
         <FormItem>
           <FormControl>
             <InputFile
-              title="Anexos"
-              instructionsText="Cargar máximo 10 elementos (xlsx, docx, pdf)"
-              :limit-files="10"
               v-model="form.values.goodFiles"
-              @update:value="handleFilesChange"
+              title="Anexos"
+              instructions-text="Cargar máximo 10 elementos (xlsx, docx, pdf)"
+              :limit-files="10"
               v-bind="componentField"
+              @update:value="handleFilesChange"
             />
           </FormControl>
           <FormMessage />
@@ -216,12 +212,12 @@ const handleFilesChange = (files: File[]) => {
         <FormItem>
           <FormControl>
             <InputFile
-              title="Fotos y videos"
-              instructionsText="Cargar máximo 12 elementos(mp4, jpg, png)"
-              :limit-files="12"
               v-model="form.values.attachedFiles"
-              @update:value="handleFilesChange"
+              title="Fotos y videos"
+              instructions-text="Cargar máximo 12 elementos(mp4, jpg, png)"
+              :limit-files="12"
               v-bind="componentField"
+              @update:value="handleFilesChange"
             />
           </FormControl>
           <FormMessage />
@@ -249,9 +245,9 @@ const handleFilesChange = (files: File[]) => {
             <FormControl>
               <CustomSelect
                 v-bind="componentField"
-                @update:modelValue="(value) => handleBrandChange(value)"
                 :items="brandOptions"
                 placeholder="Marca"
+                @update:model-value="(value) => handleBrandChange(value)"
               />
             </FormControl>
             <FormMessage />
@@ -298,15 +294,15 @@ const handleFilesChange = (files: File[]) => {
           <FormControl>
             <CustomSelect
               v-bind="componentField"
-              @update:modelValue="
-                (value) => {
-                  handleStateChange(value);
-                  form.setFieldValue('province', undefined);
-                  form.setFieldValue('districtId', undefined);
-                }
-              "
               :items="states"
               placeholder="Departamento"
+              @update:model-value="
+                (value) => {
+                  handleStateChange(value)
+                  form.setFieldValue('province', undefined)
+                  form.setFieldValue('districtId', undefined)
+                }
+              "
             />
           </FormControl>
           <FormMessage />
@@ -321,15 +317,15 @@ const handleFilesChange = (files: File[]) => {
             <FormControl>
               <CustomSelect
                 v-bind="componentField"
-                @update:modelValue="
-                  (value) => {
-                    form.setFieldValue('districtId', undefined);
-                    handleCityChange(value);
-                  }
-                "
                 :disabled="!form.values.department"
                 :items="cities"
                 placeholder="Provincia"
+                @update:model-value="
+                  (value) => {
+                    form.setFieldValue('districtId', undefined)
+                    handleCityChange(value)
+                  }
+                "
               />
             </FormControl>
             <FormMessage />
@@ -406,7 +402,7 @@ const handleFilesChange = (files: File[]) => {
             )
           "
         >
-          {{ props.id ? "Actualizar oferta" : "Crear oferta" }}
+          {{ props.id ? 'Actualizar oferta' : 'Crear oferta' }}
         </Button>
       </SheetFooter>
     </form>
