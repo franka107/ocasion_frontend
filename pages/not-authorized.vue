@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { XCircle } from "lucide-vue-next";
+import { XCircle } from 'lucide-vue-next'
 </script>
 
 <template>
@@ -13,9 +13,23 @@ import { XCircle } from "lucide-vue-next";
         Lo sentimos, no estás autorizado para acceder a este recurso.
       </p>
       <div class="flex flex-col sm:flex-row justify-center gap-4 pt-4">
-        <Button variant="default"> Volver al inicio </Button>
-        <Button variant="outline"> Iniciar sesión </Button>
+        <Button variant="default" @onclick="handleSignOut">
+          Volver al inicio
+        </Button>
+        <Button variant="outline" @onclick="handleSignOut">
+          Iniciar sesión
+        </Button>
       </div>
     </div>
   </div>
 </template>
+
+<script lang="ts">
+const { clear, user } = useUserSession()
+const router = useRouter()
+const handleSignOut = async () => {
+  await clear()
+
+  router.push('/auth/login')
+}
+</script>

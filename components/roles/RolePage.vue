@@ -4,19 +4,26 @@
       <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
         <CustomTable
           :data="roleData"
-          :header="roleHeader"
-          @onSort="onSort"
-          @onSearch="onSearch"
+          :header="
+            roleHeader(props.organizationId ? 'organization' : 'platform')
+          "
+          @on-sort="onSort"
+          @on-search="onSearch"
         >
+          <template #organizationName="{ row }">
+            <div>
+              {{ row.organizations[0]?.name || '' }}
+            </div>
+          </template>
           <template #action-button>
             <Button
+              variant="default"
               @click="
                 () => {
-                  roleId = undefined;
-                  openModal = true;
+                  roleId = undefined
+                  openModal = true
                 }
               "
-              variant="default"
             >
               Crear rol
             </Button>
@@ -89,51 +96,50 @@
         </SheetContent>
       </div>
       <CustomPagination
+        v-model:page="page"
         class="mt-5 mb-[19px]"
         :total="data.count"
         :limit="data.limit"
-        v-model:page="page"
       />
     </div>
   </ContentLayout>
 </template>
 
 <script setup lang="ts">
-import CustomTable from "@/components/ui/custom-table/CustomTable.vue";
-import CustomChip from "@/components/ui/custom-chip/CustomChip.vue";
-import CustomIcons from "@/components/ui/custom-icons/CustomIcons.vue";
-import CustomPagination from "@/components/ui/custom-pagination/CustomPagination.vue";
-import { roleHeader } from "~/constants/roles";
-import { useRoles } from "@/composables/useRoles";
-import ConfirmModal from "~/components/ui/confirm-modal/ConfirmModal.vue";
-import RolesForm from "@/components/roles/RolesForm.vue";
-import { type IRoleItem } from "~/types/Roles";
-import type { IDataResponse } from "~/types/Common";
-import type { IOrganizationSummary } from "~/types/Roles";
-import ContentLayout from "~/layouts/default/ContentLayout.vue";
-const props = defineProps<{ organizationId: string | null }>();
+import CustomTable from '@/components/ui/custom-table/CustomTable.vue'
+import CustomChip from '@/components/ui/custom-chip/CustomChip.vue'
+import CustomIcons from '@/components/ui/custom-icons/CustomIcons.vue'
+import CustomPagination from '@/components/ui/custom-pagination/CustomPagination.vue'
+import { roleHeader } from '~/constants/roles'
+import { useRoles } from '@/composables/useRoles'
+import ConfirmModal from '~/components/ui/confirm-modal/ConfirmModal.vue'
+import RolesForm from '@/components/roles/RolesForm.vue'
+import { type IRoleItem, IOrganizationSummary } from '~/types/Roles'
+import type { IDataResponse } from '~/types/Common'
+import ContentLayout from '~/layouts/default/ContentLayout.vue'
+const props = defineProps<{ organizationId: string | null }>()
 
-const route = useRoute();
+const route = useRoute()
 const {
   page,
-  //filterOptions,
+  // filterOptions,
   sortOptions,
   onSort,
   onSearch,
   deleteRole,
   createRole,
   editRole,
-} = useRoles();
-const { openConfirmModal, updateConfirmModal } = useConfirmModal();
-const roleId = ref<number | undefined>(undefined);
-const BASE_ROLE_URL = "/role-configuration";
-const openModal = ref(false);
+} = useRoles()
+const { openConfirmModal, updateConfirmModal } = useConfirmModal()
+const roleId = ref<number | undefined>(undefined)
+const BASE_ROLE_URL = '/role-configuration'
+const openModal = ref(false)
 
 const filterOptions = ref(
   props.organizationId
     ? `[{ "field": "organizations.id", "type": "equal", "value": "${props.organizationId}" }]`
     : `[]`,
-);
+)
 
 const { data, refresh, error }: any = await useAPI(
   `${BASE_ROLE_URL}/find-roles-paginated`,
@@ -145,15 +151,15 @@ const { data, refresh, error }: any = await useAPI(
       sortOptions,
     },
   } as any,
-);
+)
 
 const handleUpdateForm = async (row: any) => {
-  roleId.value = row.id;
-  openModal.value = true;
-};
-console.log("API Response:", data);
-console.log("Error:", error);
-console.log("Data Value:", data.value);
+  roleId.value = row.id
+  openModal.value = true
+}
+console.log('API Response:', data)
+console.log('Error:', error)
+console.log('Data Value:', data.value)
 
 // const roleData = computed(() => {
 //   if (!Array.isArray(data.value)) return [];
@@ -169,93 +175,93 @@ const roleData = computed(() =>
   data.value.data.map((item: any) => ({
     ...item,
   })),
-);
-console.log("API Response:", data.value);
+)
+console.log('API Response:', data.value)
 
 const handleDelete = async (name: string) => {
   openConfirmModal({
-    title: "Eliminar rol",
+    title: 'Eliminar rol',
     message: `¿Está seguro que desea eliminar el rol ❝${name}❞?`,
     callback: async () => {
-      const { status } = await deleteRole(name);
-      if (status === "success") {
+      const { status } = await deleteRole(name)
+      if (status === 'success') {
         updateConfirmModal({
-          title: "¡Eliminación exitosa!",
-          message: "El rol ha sido eliminado.",
-          type: "success",
-        });
-        refresh();
+          title: '¡Eliminación exitosa!',
+          message: 'El rol ha sido eliminado.',
+          type: 'success',
+        })
+        refresh()
       } else {
         updateConfirmModal({
-          title: "Error al eliminar",
+          title: 'Error al eliminar',
           message:
-            "El rol no se pudo eliminar. \nTe recomendamos intentarlo nuevamente.",
-          type: "error",
-        });
+            'El rol no se pudo eliminar. \nTe recomendamos intentarlo nuevamente.',
+          type: 'error',
+        })
       }
     },
-  });
-};
+  })
+}
 
 const handleCreate = async (values: any) => {
   openConfirmModal({
-    title: "Crear rol",
-    message: "¿Estás seguro de que deseas crear este rol?",
+    title: 'Crear rol',
+    message: '¿Estás seguro de que deseas crear este rol?',
     callback: async () => {
       const { status, error } = await createRole({
         ...values,
         organizationId: props.organizationId,
-      });
-      console.log(`createRole response:`, status, error);
-      if (status.value === "success") {
-        openModal.value = false;
-        refresh();
+      })
+      console.log(`createRole response:`, status, error)
+      if (status.value === 'success') {
+        openModal.value = false
+        refresh()
         updateConfirmModal({
-          title: "Rol creado",
-          message: "El rol ha sido creado exitosamente",
-          type: "success",
-        });
+          title: 'Rol creado',
+          message: 'El rol ha sido creado exitosamente',
+          type: 'success',
+        })
       } else {
         const eMsg =
           error?.data?.errors?.[0]?.message ||
           error?.data?.message ||
-          "El rol no se pudo crear, intentalo más tarde";
+          'El rol no se pudo crear, intentalo más tarde'
         updateConfirmModal({
-          title: "Error al crear rol",
+          title: 'Error al crear rol',
           message: eMsg,
-          type: "error",
-        });
+          type: 'error',
+        })
       }
     },
-  });
-};
+  })
+}
 
 const handleEdit = async (values: any) => {
   openConfirmModal({
-    title: "Actualizar rol",
-    message: "¿Estás seguro de que deseas actualizar este rol?",
+    title: 'Actualizar rol',
+    message: '¿Estás seguro de que deseas actualizar este rol?',
     callback: async () => {
-      const { status, error } = await editRole(values);
-      if (status.value === "success") {
-        openModal.value = false;
-        refresh();
+      const { status, error } = await editRole(values)
+      if (status.value === 'success') {
+        openModal.value = false
+        refresh()
         updateConfirmModal({
-          title: "Rol actualizado",
-          message: "El rol ha sido actualizado exitosamente",
-          type: "success",
-        });
+          title: 'Rol actualizado',
+          message: 'El rol ha sido actualizado exitosamente',
+          type: 'success',
+        })
       } else {
         const eMsg =
           error?.data?.errors?.[0]?.message ||
           error?.data?.message ||
-          "El rol no se pudo actualizar, intentalo más tarde";
+          'El rol no se pudo actualizar, intentalo más tarde'
         updateConfirmModal({
-          title: "Error al actualizar rol",
+          title: 'Error al actualizar rol',
           message: eMsg,
-          type: "error",
-        });
+          type: 'error',
+        })
       }
     },
-  });
-};
+  })
+}
 </script>
