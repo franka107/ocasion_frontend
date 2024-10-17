@@ -7,9 +7,6 @@
       isSidebarOpen === false ? 'lg:ml-[90px]' : 'lg:ml-72',
     ]"
   >
-    <h1>
-      {{ idledFor }}
-    </h1>
     <slot />
     <ConfirmModal />
     <CommonDialog

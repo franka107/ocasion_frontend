@@ -349,7 +349,6 @@ const onSubmit = form.handleSubmit((values: any) => {
       <FormField v-slot="{ componentField }" name="organizations">
         <FormItem>
           <FormControl class="w-full">
-            <p>{{ componentField.modelValue }}</p>
             <CustomComboboxInput
               :label="isOrgSimpleSelect ? 'Organización' : 'Organizaciones'"
               class="w-full truncate"
