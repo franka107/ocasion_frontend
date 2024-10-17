@@ -12,6 +12,7 @@ import {
 import { userType } from '~/constants/administrators'
 
 import CustomSelect from '~/components/ui/custom-select/CustomSelect.vue'
+import CustomComboboxInput from '~/components/ui/custom-combobox-input/CustomComboboxInput.vue'
 
 const BASE_ADM_URL = '/user-management'
 const BASE_ORG_URL = '/organization-management'
@@ -31,7 +32,7 @@ const { getUser } = useAdmins()
 //   }))
 //   .filter((item) => item.id !== UserType.SuperAdmin)
 
-const { data: userTypesOptions } = await useAPI(
+const { data: userTypesOptions } = await useAPI<any[]>(
   `${BASE_ADM_URL}/get-user-types`,
   {} as any,
 )
@@ -186,8 +187,8 @@ const isOrgSimpleSelect = computed(() =>
 
 const formattedOrganizations = computed(() => {
   return organizations.value.map((org) => ({
-    id: org.id,
-    name: org.name,
+    value: org.id,
+    label: org.name,
   }))
 })
 
@@ -345,23 +346,39 @@ const onSubmit = form.handleSubmit((values: any) => {
       </FormField>
       <!-- Organización -->
       <!-- v-if="form.values.type !== UserType.PlatformAdmin" -->
-      <FormField
-        v-if="type === 'platform'"
-        v-slot="{ componentField }"
-        name="organizations"
-      >
+      <FormField v-slot="{ componentField }" name="organizations">
         <FormItem>
-          <FormControl>
-            <CustomSelect
-              v-bind="componentField"
+          <FormControl class="w-full">
+            <p>{{ componentField.modelValue }}</p>
+            <CustomComboboxInput
+              :label="isOrgSimpleSelect ? 'Organización' : 'Organizaciones'"
+              class="w-full truncate"
+              :options="formattedOrganizations"
               :multiple="!isOrgSimpleSelect"
-              :items="formattedOrganizations"
-              placeholder="Organización"
+              :value="componentField.modelValue"
+              @update:model-value="componentField.onChange"
             />
           </FormControl>
           <FormMessage />
         </FormItem>
       </FormField>
+      <!-- <FormField -->
+      <!--   v-if="type === 'platform'" -->
+      <!--   v-slot="{ componentField }" -->
+      <!--   name="organizations" -->
+      <!-- > -->
+      <!--   <FormItem> -->
+      <!--     <FormControl> -->
+      <!--       <CustomSelect -->
+      <!--         v-bind="componentField" -->
+      <!--         :multiple="!isOrgSimpleSelect" -->
+      <!--         :items="formattedOrganizations" -->
+      <!--         placeholder="Organización" -->
+      <!--       /> -->
+      <!--     </FormControl> -->
+      <!--     <FormMessage /> -->
+      <!--   </FormItem> -->
+      <!-- </FormField> -->
       <!-- Rol Usuario -->
       <FormField v-slot="{ componentField }" name="roles">
         <FormItem>

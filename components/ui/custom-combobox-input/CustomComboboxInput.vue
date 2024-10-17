@@ -12,11 +12,12 @@
             props.class,
           ]"
         >
-          {{
-            modelValue
-              ? options.find((value) => value.value === modelValue)?.label
-              : props.label
-          }}
+          <!-- {{ -->
+          <!--   modelValue -->
+          <!--     ? options.find((value) => value.value === modelValue)?.label -->
+          <!--     : props.label -->
+          <!-- }} -->
+          {{ currentLabel || props.label }}
           <CaretSortIcon class="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -32,21 +33,21 @@
                 :value="option.label"
                 @select="
                   () => {
-                    //modelValue = option.value;
-                    onUpdateValue(option.value);
-                    open = false;
+                    handleSelect(option.value)
+                    // onUpdateValue(option.value)
+                    // open = false
                   }
                 "
               >
-                {{ option.label }}
-                <CheckIcon
-                  :class="
-                    cn(
-                      'ml-auto h-4 w-4',
-                      option.value === modelValue ? 'opacity-100' : 'opacity-0',
-                    )
+                <Check
+                  v-if="
+                    option.value === currentValue ||
+                    (Array.isArray(currentValue) &&
+                      currentValue.includes(option.value))
                   "
+                  class="flex items-center justify-center h-4 w-4 mr-2"
                 />
+                {{ option.label }}
               </CommandItem>
             </CommandGroup>
           </CommandList>
@@ -57,30 +58,92 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, defineProps, defineEmits } from "vue";
-import { useVModel } from "@vueuse/core";
-import { CaretSortIcon } from "@radix-icons/vue";
+import { ref, computed, defineProps, defineEmits } from 'vue'
+import { useVModel } from '@vueuse/core'
+import { CaretSortIcon } from '@radix-icons/vue'
+import { withDefault } from 'radix-vue'
+import { Check, CheckIcon } from 'lucide-vue-next'
+export interface Item {
+  id: string | number
+  name: string
+}
 
-const props = defineProps<{
-  label: string;
-  class?: string;
-  options: { value: string; label: any }[];
-  value: string | undefined;
-  disabled?: boolean;
-}>();
+const props = withDefaults(
+  defineProps<{
+    label: string
+    class?: string
+    options: { value: string; label: any }[]
+    value: undefined | string | number | Item | (string | number)[]
+    multiple?: boolean
+  }>(),
+  {
+    class: '',
+    multiple: false,
+  },
+)
 
 const emits = defineEmits<{
-  (e: "update:modelValue", payload: string | undefined): void;
-}>();
+  (
+    e: 'update:modelValue',
+    payload: undefined | string | number | Item | (string | number)[],
+  ): void
+}>()
 
-const open = ref(false);
+const open = ref(false)
 
-const modelValue = useVModel(props, "value", emits, {
+const modelValue = useVModel(props, 'value', emits, {
   passive: true,
   defaultValue: props.value,
-});
+})
 
-const onUpdateValue = (newValue: any | undefined) => {
-  emits("update:modelValue", newValue ? newValue : undefined);
-};
+const currentValue = ref<
+  undefined | string | number | Item | (string | number)[]
+>(undefined)
+
+//
+watch(
+  () => modelValue.value,
+  (val) => {
+    currentValue.value = val
+  },
+  { immediate: true },
+)
+
+const currentLabel = computed(() => {
+  if (currentValue.value === undefined) return ''
+  if (['string', 'number'].includes(typeof currentValue.value)) {
+    return (
+      props.options.find((item) => item.value === currentValue.value)?.label ||
+      props.label
+    )
+  }
+  if (Array.isArray(currentValue.value)) {
+    return currentValue.value
+      .map((id) => props.options.find((item) => item.value === id)?.label)
+      .join(', ')
+  }
+  return ''
+})
+
+const handleSelect = (value: string | number) => {
+  if (!props.multiple) {
+    if (currentValue.value !== value) {
+      currentValue.value = value
+      emits('update:modelValue', value)
+    }
+    open.value = false
+  } else {
+    if (currentValue.value === undefined) {
+      currentValue.value = [value]
+    } else if (Array.isArray(currentValue.value)) {
+      const index = currentValue.value.findIndex((item) => item === value)
+      if (index !== -1) {
+        currentValue.value.splice(index, 1)
+      } else {
+        currentValue.value.push(value)
+      }
+    }
+    emits('update:modelValue', currentValue.value)
+  }
+}
 </script>

@@ -67,7 +67,7 @@
     <ComboboxRoot
       v-model="modelValue"
       v-model:open="open"
-      v-model:searchTerm="searchTerm"
+      v-model:search-term="searchTerm"
       class="w-full"
     >
       <ComboboxAnchor as-child>
@@ -95,15 +95,15 @@
                 @select.prevent="
                   (ev) => {
                     if (typeof ev.detail.value === 'string') {
-                      searchTerm = '';
+                      searchTerm = ''
                       const newModelValue = (modelValue || []).push(
                         ev.detail.value,
-                      );
-                      onUpdateValue(newModelValue);
+                      )
+                      onUpdateValue(newModelValue)
                     }
 
                     if (filteredOptions.length === 0) {
-                      open = false;
+                      open = false
                     }
                   }
                 "
@@ -119,57 +119,57 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, defineProps, defineEmits } from "vue";
-import { useVModel } from "@vueuse/core";
-import { CaretSortIcon } from "@radix-icons/vue";
+import { ref, computed, defineProps, defineEmits } from 'vue'
+import { useVModel } from '@vueuse/core'
+import { CaretSortIcon } from '@radix-icons/vue'
 import {
   ComboboxAnchor,
   ComboboxContent,
   ComboboxInput,
   ComboboxPortal,
   ComboboxRoot,
-} from "radix-vue";
+} from 'radix-vue'
 import {
   CommandEmpty,
   CommandGroup,
   CommandItem,
   CommandList,
-} from "@/components/ui/command";
+} from '@/components/ui/command'
 import {
   TagsInput,
   TagsInputInput,
   TagsInputItem,
   TagsInputItemDelete,
   TagsInputItemText,
-} from "@/components/ui/tags-input";
+} from '@/components/ui/tags-input'
 
-const modelValue = ref<string[]>([]);
+const modelValue = ref<string[]>([])
 
 const props = defineProps<{
-  label: string;
-  class?: string;
-  options: { value: string; label: any }[];
-  value: string[] | undefined;
-  disabled?: boolean;
-}>();
+  label: string
+  class?: string
+  options: { value: string; label: any }[]
+  value: string[] | undefined
+  disabled?: boolean
+}>()
 
 const emits = defineEmits<{
-  (e: "update:modelValue", payload: string[] | undefined): void;
-}>();
+  (e: 'update:modelValue', payload: string[] | undefined): void
+}>()
 
 const filteredOptions = computed(() =>
   props.options.filter((i) => !modelValue.value?.includes(i.label)),
-);
+)
 
 // const modelValue = useVModel(props, "value", emits, {
 //   passive: true,
 //   defaultValue: props.value,
 // });
 //
-const open = ref(false);
-const searchTerm = ref("");
+const open = ref(false)
+const searchTerm = ref('')
 
 const onUpdateValue = (newValue: any | undefined) => {
-  emits("update:modelValue", newValue ? newValue : undefined);
-};
+  emits('update:modelValue', newValue || undefined)
+}
 </script>
