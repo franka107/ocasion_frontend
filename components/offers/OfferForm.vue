@@ -101,6 +101,7 @@ if (props.id) {
   await Promise.all([
     fetchCities(offerData.department),
     fetchDistricts(offerData.province),
+    fetchBrands(),
     fetchModels(offerData.brandId),
     fetchStates(),
   ])
