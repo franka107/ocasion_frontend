@@ -251,6 +251,7 @@ const onSubmit = form.handleSubmit((values: any) => {
                 type="text"
                 label="Nombres"
                 v-bind="componentField"
+                :disabled="!!props.id"
               />
             </FormControl>
             <FormMessage />
@@ -264,6 +265,7 @@ const onSubmit = form.handleSubmit((values: any) => {
                 type="text"
                 label="Apellidos"
                 v-bind="componentField"
+                :disabled="!!props.id"
               />
             </FormControl>
             <FormMessage />
@@ -284,6 +286,7 @@ const onSubmit = form.handleSubmit((values: any) => {
                   { id: 'PT', name: 'PT' },
                 ]"
                 placeholder="Tipo de Documento"
+                :disabled="!!props.id"
               />
             </FormControl>
             <FormMessage />
@@ -297,6 +300,7 @@ const onSubmit = form.handleSubmit((values: any) => {
                 type="text"
                 label="N° documento"
                 v-bind="componentField"
+                :disabled="!!props.id"
               />
             </FormControl>
             <FormMessage />
@@ -334,10 +338,17 @@ const onSubmit = form.handleSubmit((values: any) => {
           <FormControl>
             <CustomSelect
               v-bind="componentField"
-              :items="userTypesOptions"
+              :items="
+                userTypesOptions.filter(
+                  (userType) => userType.id != 'SUPER_ADMIN',
+                )
+              "
               placeholder="Tipo de Usuario"
               @update:model-value="
-                form.setFieldValue('organizations', isOrgSimpleSelect ? '' : [])
+                form.setFieldValue(
+                  'organizations',
+                  isOrgSimpleSelect ? '' : organizations.map((org) => org.id),
+                )
               "
             />
           </FormControl>
@@ -386,6 +397,11 @@ const onSubmit = form.handleSubmit((values: any) => {
               v-bind="componentField"
               multiple
               :items="rolesFiltered"
+              :disabled="
+                [UserType.PlatformAdmin, UserType.OrganizationAdmin].includes(
+                  form.values.type,
+                )
+              "
               placeholder="Rol Usuario"
             />
           </FormControl>

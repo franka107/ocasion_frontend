@@ -43,6 +43,11 @@ export default defineNuxtPlugin((nuxtApp) => {
           navigateTo('/not-authorized')
         })
       }
+      if ([BackendErrors.SharedKernelUserSuspended].includes(code)) {
+        await nuxtApp.runWithContext(async () => {
+          navigateTo('/suspended')
+        })
+      }
     },
   })
 

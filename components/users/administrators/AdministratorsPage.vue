@@ -1,7 +1,7 @@
 <template>
   <ContentLayout title="Usuarios">
     <CustomSimpleCard
-      title="Panel Super administrador"
+      title="Panel administrador"
       class="mb-6"
       sub-title="Gestiona eventos usuarios y reportes"
     />
@@ -10,12 +10,40 @@
       <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
         <CustomTable
           :data="adminsData"
-          :header="administratorsHeader"
-          :search="administratorsSearch"
+          multiple-select
+          :header="
+            administratorsHeader(
+              props.organizationId ? 'organization' : 'platform',
+            )
+          "
+          :search="
+            administratorsSearch(
+              props.organizationId ? 'organization' : 'platform',
+            )
+          "
           @on-sort="onSort"
           @on-search="onSearch"
+          @on-multiple-select="
+            ({ ids, type, resetMultipleSelect: onResetMultipleSelect }) => {
+              selectedMultipleData = { ids, type }
+              resetMultipleSelect = onResetMultipleSelect
+            }
+          "
         >
           <template #action-button>
+            <Button
+              v-if="
+                myGrants.data.value.includes(GrantId.PlatformUsersCanSuspend) ||
+                myGrants.data.value.includes(
+                  GrantId.OrganizationUsersCanSuspend,
+                )
+              "
+              class="bg-white text-primary border border-primary hover:bg-accent"
+              variant="default"
+              :disabled="disableMultipleSelect"
+              @click="handleSuspendUsers(selectedMultipleData)"
+              >Suspender usuarios
+            </Button>
             <Button
               as="a"
               variant="default"
@@ -23,6 +51,7 @@
               class="bg-white text-primary border border-[#052339]"
             >
               <CustomIcons name="Download" class="ml-auto" />
+
               Exportar
             </Button>
             <!-- <Button -->
@@ -69,14 +98,24 @@
                   align="start"
                   class="bg-primary text-white"
                 >
-                  <DropdownMenuItem
-                    :disabled="row.status !== 'ACTIVE'"
-                    @click="handleSuspend(row.id, row.fullName)"
+                  <div
+                    v-if="
+                      myGrants.data.value.includes(
+                        GrantId.PlatformUsersCanSuspend,
+                      )
+                    "
                   >
-                    Suspender
-                    <CustomIcons name="Forbidden" class="ml-auto" />
-                  </DropdownMenuItem>
+                    <DropdownMenuItem
+                      :disabled="row.status !== 'ACTIVE'"
+                      @click="handleSuspend(row.id, row.fullName)"
+                    >
+                      Suspender
+                      <CustomIcons name="Forbidden" class="ml-auto" />
+                    </DropdownMenuItem>
+                  </div>
+
                   <DropdownMenuSeparator />
+
                   <DropdownMenuItem @click="handleResetPassword(row.email)">
                     Reenviar Correo
                     <CustomIcons name="Reload" class="ml-auto" />
@@ -98,7 +137,12 @@
           </template>
         </CustomTable>
         <!-- Fomulario -->
-        <SheetContent v-model:open="openModal" class="flex flex-col h-full">
+        <SheetContent
+          v-model:open="openModal"
+          class="flex flex-col h-full"
+          @pointer-down-outside="(e) => e.preventDefault()"
+          @interact-outside="(e) => e.preventDefault()"
+        >
           <AdministratorsForm
             :id="admsUserId"
             :on-submit="admsUserId !== undefined ? handleEdit : handleCreate"
@@ -138,26 +182,35 @@ const {
   page,
   sortOptions,
   onSort,
-  suspendUser,
+  suspendUsers,
   createUser,
   restoreUserPassword,
   editUser,
   resetUser,
 } = useAdmins()
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
-const filterOptions = ref(
-  props.organizationId
-    ? `[{"field":"type","type":"equal","value": "PARTICIPANT"},{ "field": "organizations.id", "type": "equal", "value": "${props.organizationId}" }]`
-    : `[{"field":"type","type":"not","value": "PARTICIPANT"}]`,
-)
+const filterOptions = ref('[]')
+// const filterOptions = ref(
+//   props.organizationId
+//     ? `[{"field":"type","type":"equal","value": "PARTICIPANT"},{ "field": "organizations.id", "type": "equal", "value": "${props.organizationId}" }]`
+//     : `[{"field":"type","type":"not","value": "PARTICIPANT"}]`,
+// )
 
 const openModal = ref(false)
 const admsUserId = ref<number | undefined>(undefined)
 const BASE_ADM_URL = '/user-management'
 const onSearch = (item: { [key: string]: string }) => {
   const filters = [
+    {
+      field: 'organization.name',
+      type: 'like',
+      value: item.organizationName || '',
+    },
+
     { field: 'type', type: 'not', value: 'PARTICIPANT' || '' },
     { field: 'fullName', type: 'like', value: item.fullName || '' },
+    { field: 'email', type: 'like', value: item.email || '' },
+    { field: 'phoneNumber', type: 'like', value: item.phoneNumber || '' },
   ]
   item.status &&
     filters.push({ field: 'status', type: 'equal', value: item.status || '' })
@@ -171,7 +224,7 @@ const onSearch = (item: { [key: string]: string }) => {
 }
 
 const { data, refresh }: any = await useAPI(
-  `${BASE_ADM_URL}/find-users-paginated`,
+  `${BASE_ADM_URL}/find-administrators-paginated`,
   {
     query: {
       limit: 8,
@@ -192,6 +245,44 @@ const adminsData = computed(() =>
   })),
 )
 
+const resetMultipleSelect = ref<Function | undefined>(undefined)
+const route = useRoute()
+const handleSuspendUsers = async (values: { type: string; ids: string[] }) => {
+  openConfirmModal({
+    title: 'Suspender usuarios',
+    message: `¿Está seguro de suspender a lo(s) usuario(s) seleccionado(s)?`,
+    callback: async () => {
+      try {
+        const { type, ids } = values
+        const { status } = await suspendUsers({
+          type,
+          ids,
+          organizationId: String(route.params.organizationId),
+        })
+        if (status.value === 'success') {
+          refresh()
+          resetMultipleSelect.value?.()
+          updateConfirmModal({
+            title: 'Usuario(s) suspendidos(s)',
+            message: 'Lo(s) usuarios(s) ha sido suspendido(s) exitosamente',
+            type: 'success',
+          })
+        } else {
+          throw new Error('Error al suspender estos usuari(s)')
+        }
+      } catch (error) {
+        console.log('error', error)
+        updateConfirmModal({
+          title: 'Error al suspender Usuario(s)',
+          message:
+            'No se pudo suspender usuario(s). Por favor, intente nuevamente.',
+          type: 'error',
+        })
+      }
+    },
+  })
+}
+
 const handleSuspend = async (id: string, fullName: string) => {
   openConfirmModal({
     title: 'Suspender usuario',
@@ -208,6 +299,31 @@ const handleSuspend = async (id: string, fullName: string) => {
       } else {
         updateConfirmModal({
           title: 'Error al suspender',
+          message:
+            'El usuario no se pudo suspender. \nTe recomendamos intentarlo nuevamente.',
+          type: 'error',
+        })
+      }
+    },
+  })
+}
+
+const handleActivate = async (id: string, fullName: string) => {
+  openConfirmModal({
+    title: 'Activar usuario',
+    message: `¿Estás seguro de activar a ❝${fullName}❞?`,
+    callback: async () => {
+      const { status, error }: any = await suspendUser(id)
+      if (status.value === 'success') {
+        updateConfirmModal({
+          title: '¡Activación exitosa!',
+          message: 'El usuario ha sido activado.',
+          type: 'success',
+        })
+        refresh()
+      } else {
+        updateConfirmModal({
+          title: 'Error al activar',
           message:
             'El usuario no se pudo suspender. \nTe recomendamos intentarlo nuevamente.',
           type: 'error',
@@ -311,6 +427,16 @@ const handleResetPassword = async (email: string) => {
     },
   })
 }
+
+const selectedMultipleData = ref<{ type: string; ids: string[] }>({
+  type: 'empty',
+  ids: [],
+})
+const disableMultipleSelect = computed(
+  () =>
+    selectedMultipleData.value.type === 'empty' &&
+    selectedMultipleData.value.ids.length === 0,
+)
 
 const handleExport = async () => {
   openConfirmModal({

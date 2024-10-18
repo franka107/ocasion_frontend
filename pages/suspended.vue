@@ -4,14 +4,12 @@
   >
     <div class="max-w-md w-full space-y-8 text-center">
       <XCircle class="mx-auto h-24 w-24 text-destructive" />
-      <h1 class="text-4xl font-bold text-foreground">No autorizado</h1>
+      <h1 class="text-4xl font-bold text-foreground">Cuenta suspendida</h1>
       <p class="text-xl text-muted-foreground">
-        Lo sentimos, no estás autorizado para acceder a este recurso.
+        Lo sentimos, tu cuenta ha sido suspendida, si deseas mas información
+        comunicate con tu supervisor o envia un correo a contacto@deocasion.pe
       </p>
       <div class="flex flex-col sm:flex-row justify-center gap-4 pt-4">
-        <Button variant="default" @click="handleBackClick">
-          Volver al inicio
-        </Button>
         <Button variant="outline" @click="handleSignOut">
           Iniciar sesión
         </Button>

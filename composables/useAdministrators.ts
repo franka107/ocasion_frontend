@@ -1,46 +1,49 @@
-import type { IAdminsLItem } from "~/types/Administrators";
-const BASE_ADM_URL = "/user-management";
+import type { IAdminsLItem } from '~/types/Administrators'
+const BASE_ADM_URL = '/user-management'
 
 export function useAdmins() {
-  const page = ref(1);
-  const filterOptions = ref("[]");
-  const sortOptions = ref("[]");
+  const page = ref(1)
+  const filterOptions = ref('[]')
+  const sortOptions = ref('[]')
   const onSort = (sortObject: { [key: string]: string }[]) => {
-    sortOptions.value = JSON.stringify(sortObject);
-  };
+    sortOptions.value = JSON.stringify(sortObject)
+  }
 
   const onSearch = (item: { [key: string]: string }) => {
     const filters = [
-      { field: "type", type: "like", value: "PARTICIPANT" || "" },
-    ];
+      { field: 'type', type: 'like', value: 'PARTICIPANT' || '' },
+    ]
 
     if (item.status) {
-      filters.push({ field: "status", type: "equal", value: item.status });
+      filters.push({ field: 'status', type: 'equal', value: item.status })
     }
 
-    filterOptions.value = JSON.stringify(filters);
-  };
+    filterOptions.value = JSON.stringify(filters)
+  }
 
   const createUser = async (values: any) => {
     const { status, error }: any = await useAPI(`${BASE_ADM_URL}/create-user`, {
-      method: "POST",
+      method: 'POST',
       body: values,
-    } as any);
-    return { status, error };
-  };
+    } as any)
+    return { status, error }
+  }
 
-  const suspendUser = async (id: string) => {
+  const suspendUsers = async (values: {
+    type: string
+    ids: string[]
+    organizationId: string
+  }) => {
     const { status, error }: any = await useAPI(
-      `${BASE_ADM_URL}/suspend-user`,
+      `${BASE_ADM_URL}/suspend-users`,
       {
-        method: "POST",
-        body: {
-          id,
-        },
+        method: 'POST',
+        body: values,
       } as any,
-    );
-    return { status, error };
-  };
+    )
+
+    return { status, error }
+  }
 
   // const editUser = async (values: any) => {
   //   const { status, error }: any = await useAPI(`${BASE_ADM_URL}/update-user`, {
@@ -51,50 +54,50 @@ export function useAdmins() {
   // };
   const editUser = async (values: any) => {
     const { status, error }: any = await useAPI(`${BASE_ADM_URL}/update-user`, {
-      method: "POST",
+      method: 'POST',
       body: values,
-    } as any);
-    return { status, error };
-  };
+    } as any)
+    return { status, error }
+  }
 
   const resetUser = async (id: string) => {
     const { status, error }: any = await useAPI(
       `${BASE_ADM_URL}/reset-user-password`,
       {
-        method: "POST",
+        method: 'POST',
         body: {
           id,
         },
       } as any,
-    );
-    return { status, error };
-  };
+    )
+    return { status, error }
+  }
 
   const restoreUserPassword = async (email: string) => {
     const { status, error }: any = await useAPI(
       `auth-management/restore-user-password`,
       {
-        method: "POST",
+        method: 'POST',
         body: {
-          email: email,
+          email,
         },
       } as any,
-    );
-    return { status, error };
-  };
+    )
+    return { status, error }
+  }
 
   const getUser = async (id: number | string) => {
     const { status, error, data } = await useAPI<IAdminsLItem>(
       `${BASE_ADM_URL}/get-user-detail`,
       {
-        method: "GET",
+        method: 'GET',
         query: {
           id,
         },
       } as any,
-    );
-    return { status, error, data };
-  };
+    )
+    return { status, error, data }
+  }
 
   return {
     page,
@@ -103,9 +106,9 @@ export function useAdmins() {
     onSort,
     createUser,
     editUser,
-    suspendUser,
+    suspendUsers,
     resetUser,
     restoreUserPassword,
     getUser,
-  };
+  }
 }

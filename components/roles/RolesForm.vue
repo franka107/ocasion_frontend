@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import { ref, watch, defineProps } from "vue";
-import { useForm } from "vee-validate";
-import { toTypedSchema } from "@vee-validate/zod";
-import * as z from "zod";
+import { ref, watch, defineProps } from 'vue'
+import { useForm } from 'vee-validate'
+import { toTypedSchema } from '@vee-validate/zod'
+import * as z from 'zod'
 
-import { X } from "lucide-vue-next";
-import CustomComboboxMultipleInput from "../ui/custom-combobox-multiple-input/CustomComboboxMultipleInput.vue";
+import { X } from 'lucide-vue-next'
+import CustomComboboxMultipleInput from '../ui/custom-combobox-multiple-input/CustomComboboxMultipleInput.vue'
 const props = defineProps<{
-  id: number | undefined;
-  type: "platform" | "organization";
-  onsubmit: (values: any) => void;
-}>();
-const allGrants = ref<Array<{ id: string; name: string }>>([]);
+  id: number | undefined
+  type: 'platform' | 'organization'
+  onsubmit: (values: any) => void
+}>()
+const allGrants = ref<Array<{ id: string; name: string }>>([])
 const fetchGrants = async () => {
   try {
     const { data } = await useAPI(
-      "/role-configuration/find-grants",
+      '/role-configuration/find-grants',
       {
         params: {
           type: props.type,
@@ -23,58 +23,58 @@ const fetchGrants = async () => {
         default: () => [],
       },
       true,
-    );
-    allGrants.value = data.value;
+    )
+    allGrants.value = data.value
   } catch (error) {
-    console.error("Error al cargar grants:", error);
+    console.error('Error al cargar grants:', error)
   }
-};
-await fetchGrants();
+}
+await fetchGrants()
 
 const formSchema = toTypedSchema(
   z.object({
-    name: z.string().min(1, "El nombre del rol es requerido."),
-    description: z.string().min(1, "La descripción es requerida."),
-    status: z.enum(["ACTIVE", "INACTIVE"], {
-      required_error: "El estado es requerido.",
+    name: z.string().min(1, 'El nombre del rol es requerido.'),
+    description: z.string().min(1, 'La descripción es requerida.'),
+    status: z.enum(['ACTIVE', 'INACTIVE'], {
+      required_error: 'El estado es requerido.',
     }),
     grantIds: z
       .array(z.string())
-      .min(1, "Debe seleccionar al menos una funcionalidad."),
+      .min(1, 'Debe seleccionar al menos una funcionalidad.'),
   }),
-);
+)
 
 const form = useForm({
   validationSchema: formSchema,
   initialValues: {
-    name: "",
-    description: "",
-    status: "ACTIVE",
+    name: '',
+    description: '',
+    status: 'ACTIVE',
     grantIds: [],
   },
-});
+})
 watch(form.values, (newValues) => {
-  console.log("Form values:", newValues);
-  console.log(form.errors.value);
-});
+  console.log('Form values:', newValues)
+  console.log(form.errors.value)
+})
 
 const onSubmit = form.handleSubmit((values) => {
   const formattedValues = {
     ...values,
     id: props.id,
-  };
-  props.onsubmit(formattedValues);
-});
+  }
+  props.onsubmit(formattedValues)
+})
 
 if (props.id) {
   const { data } = await useAPI<any>(`role-configuration/get-role-detail`, {
-    method: "GET",
+    method: 'GET',
     query: {
       id: props.id,
     },
-  } as any);
-  console.log(data.value);
-  form.setValues(data.value);
+  } as any)
+  console.log(data.value)
+  form.setValues(data.value)
 }
 </script>
 
@@ -84,13 +84,13 @@ if (props.id) {
       <X class="w-4 h-4 text-muted-foreground" />
     </SheetClose>
     <SheetTitle class="text-xl font-medium text-[#64748B]">{{
-      props.id ? "Actualizar rol" : "Registrar rol"
+      props.id ? 'Actualizar rol' : 'Registrar rol'
     }}</SheetTitle>
   </SheetHeader>
 
   <div class="flex-grow overflow-y-auto no-scrollbar flex flex-col">
     <form class="h-full" @submit="onSubmit">
-      <section class="flex flex-col gap-4 flex-grow p-5 h-full">
+      <section class="flex flex-col gap-4 flex-grow p-5">
         <!-- Fields -->
         <FormField v-slot="{ componentField }" name="name">
           <FormItem>
@@ -215,7 +215,7 @@ if (props.id) {
             )
           "
         >
-          {{ props.id ? "Actualizar rol" : "Crear rol" }}
+          {{ props.id ? 'Actualizar rol' : 'Crear rol' }}
         </Button>
       </SheetFooter>
     </form>

@@ -1,20 +1,49 @@
 <script lang="ts" setup>
 import { type HTMLAttributes, computed, ref } from 'vue'
-import { CalendarRoot, type CalendarRootEmits, type CalendarRootProps, useDateFormatter, useForwardPropsEmits } from 'radix-vue'
+import {
+  CalendarRoot,
+  type CalendarRootEmits,
+  type CalendarRootProps,
+  useDateFormatter,
+  useForwardPropsEmits,
+} from 'radix-vue'
 import { createDecade, createYear, toDate } from 'radix-vue/date'
-import { type DateValue, getLocalTimeZone, today } from '@internationalized/date'
+import {
+  type DateValue,
+  getLocalTimeZone,
+  today,
+} from '@internationalized/date'
 import { useVModel } from '@vueuse/core'
-import { CalendarCell, CalendarCellTrigger, CalendarGrid, CalendarGridBody, CalendarGridHead, CalendarGridRow, CalendarHeadCell, CalendarHeader, CalendarHeading } from '.'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  CalendarCell,
+  CalendarCellTrigger,
+  CalendarGrid,
+  CalendarGridBody,
+  CalendarGridHead,
+  CalendarGridRow,
+  CalendarHeadCell,
+  CalendarHeader,
+  CalendarHeading,
+} from '.'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 
-const props = withDefaults(defineProps<CalendarRootProps & { class?: HTMLAttributes['class'] }>(), {
-  modelValue: undefined,
-  placeholder() {
-    return today(getLocalTimeZone())
+const props = withDefaults(
+  defineProps<CalendarRootProps & { class?: HTMLAttributes['class'] }>(),
+  {
+    modelValue: undefined,
+    placeholder() {
+      return today(getLocalTimeZone())
+    },
+    weekdayFormat: 'short',
   },
-  weekdayFormat: 'short',
-})
+)
 const emits = defineEmits<CalendarRootEmits>()
 
 const delegatedProps = computed(() => {
@@ -44,14 +73,16 @@ const formatter = useDateFormatter('es')
       <CalendarHeading class="flex w-full items-center justify-between gap-2">
         <!-- Select de Mes -->
         <Select
-          :default-value="placeholder.month.toString()"
-          @update:model-value="(v) => {
-            if (!v || !placeholder) return;
-            if (Number(v) === placeholder?.month) return;
-            placeholder = placeholder.set({
-              month: Number(v),
-            })
-          }"
+          :default-value="placeholder?.month.toString()"
+          @update:model-value="
+            (v) => {
+              if (!v || !placeholder) return
+              if (Number(v) === placeholder?.month) return
+              placeholder = placeholder.set({
+                month: Number(v),
+              })
+            }
+          "
         >
           <SelectTrigger aria-label="Select month" class="w-[60%]">
             <SelectValue placeholder="Select month" />
@@ -59,7 +90,8 @@ const formatter = useDateFormatter('es')
           <SelectContent class="max-h-[200px]">
             <SelectItem
               v-for="month in createYear({ dateObj: date })"
-              :key="month.toString()" :value="month.month.toString()"
+              :key="month.toString()"
+              :value="month.month.toString()"
             >
               {{ formatter.custom(toDate(month), { month: 'long' }) }}
             </SelectItem>
@@ -68,22 +100,29 @@ const formatter = useDateFormatter('es')
 
         <!-- Select de Año -->
         <Select
-          :default-value="placeholder.year.toString()"
-          @update:model-value="(v) => {
-            if (!v || !placeholder) return;
-            if (Number(v) === placeholder?.year) return;
-            placeholder = placeholder.set({
-              year: Number(v),
-            })
-          }"
+          :default-value="placeholder?.year.toString()"
+          @update:model-value="
+            (v) => {
+              if (!v || !placeholder) return
+              if (Number(v) === placeholder?.year) return
+              placeholder = placeholder.set({
+                year: Number(v),
+              })
+            }
+          "
         >
           <SelectTrigger aria-label="Select year" class="w-[40%]">
             <SelectValue placeholder="Select year" />
           </SelectTrigger>
           <SelectContent class="max-h-[200px]">
             <SelectItem
-              v-for="yearValue in createDecade({ dateObj: date, startIndex: -10, endIndex: 10 })"
-              :key="yearValue.toString()" :value="yearValue.year.toString()"
+              v-for="yearValue in createDecade({
+                dateObj: date,
+                startIndex: -10,
+                endIndex: 10,
+              })"
+              :key="yearValue.toString()"
+              :value="yearValue.year.toString()"
             >
               {{ yearValue.year }}
             </SelectItem>
@@ -102,8 +141,16 @@ const formatter = useDateFormatter('es')
           </CalendarGridRow>
         </CalendarGridHead>
         <CalendarGridBody>
-          <CalendarGridRow v-for="(weekDates, index) in month.rows" :key="`weekDate-${index}`" class="mt-2 w-full">
-            <CalendarCell v-for="weekDate in weekDates" :key="weekDate.toString()" :date="weekDate">
+          <CalendarGridRow
+            v-for="(weekDates, index) in month.rows"
+            :key="`weekDate-${index}`"
+            class="mt-2 w-full"
+          >
+            <CalendarCell
+              v-for="weekDate in weekDates"
+              :key="weekDate.toString()"
+              :date="weekDate"
+            >
               <CalendarCellTrigger :day="weekDate" :month="month.value" />
             </CalendarCell>
           </CalendarGridRow>

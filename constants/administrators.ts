@@ -11,11 +11,33 @@ export const userType = new Map<string, string>([
   ['ORGANIZATION_USER', 'Usuario de organizacion'],
 ])
 
-export const administratorsSearch: SearchItem[] = [
+export const administratorsSearch = (viewType: ViewType): SearchItem[] => [
+  ...(viewType === 'organization'
+    ? []
+    : [
+        {
+          key: 'organizationName',
+          type: 'text' as any,
+          placeholder: 'Buscar por organización',
+          position: 1,
+        },
+      ]),
   {
     key: 'fullName',
     type: 'text',
-    placeholder: 'Buscar usuarios',
+    placeholder: 'Buscar por nombre y apellidos',
+    position: 1,
+  },
+  {
+    key: 'email',
+    type: 'text',
+    placeholder: 'Buscar por email',
+    position: 1,
+  },
+  {
+    key: 'phoneNumber',
+    type: 'text',
+    placeholder: 'N. Celular',
     position: 1,
   },
   {
@@ -38,7 +60,16 @@ export const administratorsSearch: SearchItem[] = [
   },
 ]
 
-export const administratorsHeader: HeaderItem[] = [
+export const administratorsHeader = (viewType: ViewType): HeaderItem[] => [
+  ...(viewType === 'organization'
+    ? []
+    : [
+        {
+          key: 'organization',
+          label: 'Organización',
+          sortable: true,
+        },
+      ]),
   {
     key: 'fullName',
     label: 'Nombre y apellidos',
@@ -64,11 +95,7 @@ export const administratorsHeader: HeaderItem[] = [
     label: 'Tipo de Usuario',
     sortable: true,
   },
-  {
-    key: 'organization',
-    label: 'Organización',
-    sortable: true,
-  },
+
   {
     key: 'status',
     label: 'Estado',

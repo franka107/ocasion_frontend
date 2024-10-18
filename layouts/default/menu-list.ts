@@ -111,6 +111,18 @@ export function getMenuList(
           },
         ]
       : []),
+    // ...(grants.includes(GrantId.OrganizationUsersManagement)
+    //   ? [
+    //       {
+    //         href: `/dashboard/organization/${organizationId}/users`,
+    //         label: 'Usuarios',
+    //         active: pathname === '/events',
+    //         icon: 'Groups',
+    //         submenus: [],
+    //       },
+    //     ]
+    //   : []),
+
     ...(grants.includes(GrantId.PlatformUsersManagement)
       ? [
           {
@@ -204,6 +216,41 @@ export function getMenuList(
           },
         ]
       : []),
+    ...(grants.includes(GrantId.OrganizationUsersManagement)
+      ? [
+          {
+            label: 'Usuarios',
+            active: pathname.includes('/users'),
+            icon: 'Groups',
+            submenus: [
+              ...(grants.includes(
+                GrantId.OrganizationUsersCanViewAdministrators,
+              )
+                ? [
+                    {
+                      // href: '/dashboard/platform/users/administrators',
+                      href: `/dashboard/organization/${organizationId}/users/administrators`,
+                      label: 'Administradores',
+                      active: pathname.includes('/users/administrators'),
+                      // active: pathname === "/users/administrators",
+                    },
+                  ]
+                : []),
+              ...(grants.includes(GrantId.OrganizationUsersCanViewParticipants)
+                ? [
+                    {
+                      // href: '/dashboard/platform/users/participants',
+                      href: `/dashboard/organization/${organizationId}/users/participants`,
+                      label: 'Participantes',
+                      active: pathname.includes('/users/participants'),
+                      // active: pathname === "/users/participants",
+                    },
+                  ]
+                : []),
+            ],
+          },
+        ]
+      : []),
     ...(grants.includes(GrantId.OrganizationEventsManagement)
       ? [
           {
@@ -215,17 +262,7 @@ export function getMenuList(
           },
         ]
       : []),
-    ...(grants.includes(GrantId.OrganizationUsersManagement)
-      ? [
-          {
-            href: `/dashboard/organization/${organizationId}/users`,
-            label: 'Usuarios',
-            active: pathname === '/events',
-            icon: 'Groups',
-            submenus: [],
-          },
-        ]
-      : []),
+
     ...(grants.includes(GrantId.OrganizationRolesManagement)
       ? [
           {
