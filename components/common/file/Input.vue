@@ -127,7 +127,6 @@ onMounted(() => {
       class="border-dashed border-2 mb-2 border-gray-300 rounded-lg p-3 text-center flex flex-col items-center bg-primary/5"
     >
       <p class="mb-1 text-primary font-semibold text-sm leading-5">
-        {{ JSON.stringify(files.map((file) => file.id)) }}
         {{ title }}
       </p>
       <p class="text-xs text-gray-500 text-primary font-normal leading-5">
