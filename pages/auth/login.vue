@@ -98,6 +98,17 @@
       @close="closeDialog('isDialogOpen')"
       @action="goToUpdatePassword"
     />
+    <Dialog
+      v-model:open="dialogState.isCommonErrorDialogOpen"
+      :icon-src="messageIconSrc"
+      icon-alt="Icono de alerta"
+      title="Error"
+      :description="commonErrorDialogMessage"
+      button-text="Aceptar"
+      icon-bg-color="bg-[#FBBF24]"
+      @close="closeDialog('isCommonErrorDialogOpen')"
+      @action="closeDialog('isCommonErrorDialogOpen')"
+    />
   </AuthForm>
 </template>
 
@@ -127,6 +138,7 @@ const {
   closeDialog,
   goToUpdatePassword,
   isLoading,
+  commonErrorDialogMessage,
 } = useLoginForm()
 
 // Computa si el campo de correo electrónico tiene texto

@@ -1,151 +1,154 @@
-import { ref } from "vue";
-import { z } from "zod";
-import { useRouter } from "vue-router";
-import { UserType } from "~/types/Administrators";
-import type { Organization } from "~/models/organizations";
+import { ref } from 'vue'
+import { z } from 'zod'
+import { useRouter } from 'vue-router'
+import { UserType } from '~/types/Administrators'
+import type { Organization } from '~/models/organizations'
 
 export function useLoginForm() {
-  const email = ref("");
-  const password = ref("");
-  const showPassword = ref(false);
-  const showForgotPassword = ref(false);
-  const isLoading = ref(false);
+  const email = ref('')
+  const password = ref('')
+  const showPassword = ref(false)
+  const showForgotPassword = ref(false)
+  const isLoading = ref(false)
+  const commonErrorDialogMessage = ref('')
 
   const dialogState = ref({
     isDialogOpen: false,
     isMaxAttemptsDialogOpen: false,
     isIncorrectCredentialsOpen: false,
     isSuspendedDialogOpen: false,
-  });
+    isCommonErrorDialogOpen: false,
+  })
 
   const errors = ref({
-    email: "",
-    password: "",
-    api: "",
-  });
+    email: '',
+    password: '',
+    api: '',
+  })
 
-  const router = useRouter();
+  const router = useRouter()
 
   const schema = z.object({
-    email: z.string().email("Correo electrónico inválido"),
-    password: z.string().min(1, "La contraseña es requerida"),
-  });
+    email: z.string().email('Correo electrónico inválido'),
+    password: z.string().min(1, 'La contraseña es requerida'),
+  })
 
   const AUTH_ERRORS = {
-    INVALID_CREDENTIALS: "AUTH.INVALID_CREDENTIALS",
-    MAX_ATTEMPTS_LIMIT_EXCEED: "AUTH.MAX_ATTEMPTS_LIMIT_EXCEED",
-    USER_IS_SUSPENDED: "AUTH.USER_IS_SUSPENDED",
-  };
+    INVALID_CREDENTIALS: 'AUTH.INVALID_CREDENTIALS',
+    MAX_ATTEMPTS_LIMIT_EXCEED: 'AUTH.MAX_ATTEMPTS_LIMIT_EXCEED',
+    USER_IS_SUSPENDED: 'AUTH.USER_IS_SUSPENDED',
+  }
 
   const validate = () => {
-    errors.value = { email: "", password: "", api: "" };
+    errors.value = { email: '', password: '', api: '' }
     try {
-      schema.parse({ email: email.value, password: password.value });
-      return true;
+      schema.parse({ email: email.value, password: password.value })
+      return true
     } catch (error) {
       if (error instanceof z.ZodError) {
         error.errors.forEach((err: any) => {
-          errors.value[err.path[0]] = err.message;
-        });
+          errors.value[err.path[0]] = err.message
+        })
       }
-      return false;
+      return false
     }
-  };
+  }
 
-  const { fetch: fetchUserSession } = useUserSession();
+  const { fetch: fetchUserSession } = useUserSession()
 
   const handleSubmit = async () => {
-    if (!validate()) return;
+    if (!validate()) return
 
-    isLoading.value = true;
+    isLoading.value = true
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.value, password: password.value }),
-      });
+      })
 
       if (!response.ok) {
-        const errorBody = await response.json();
+        const errorBody = await response.json()
 
-        console.log("ERROR BODY", errorBody);
-        handleApiError(errorBody.data.errors[0]);
-        return;
+        console.log('ERROR BODY', errorBody)
+        handleApiError(errorBody.data.errors[0])
+        return
       }
 
-      await fetchUserSession();
+      await fetchUserSession()
 
-      const successBody = await response.json();
+      const successBody = await response.json()
 
-      handleLoginRouting(successBody.user);
+      handleLoginRouting(successBody.user)
     } catch (error) {
       errors.value.api =
-        "Hubo un error durante el inicio de sesión. Por favor, intente de nuevo.";
+        'Hubo un error durante el inicio de sesión. Por favor, intente de nuevo.'
     } finally {
-      isLoading.value = false;
+      isLoading.value = false
     }
-  };
+  }
 
   const handleLoginRouting = (user: any) => {
-    const userType: UserType = user.type;
-    console.log("userType", userType);
+    const userType: UserType = user.type
+    console.log('userType', userType)
     switch (userType) {
       case UserType.SuperAdmin:
       case UserType.PlatformUser:
       case UserType.PlatformAdmin:
-        router.push("/dashboard/platform/events");
-        break;
+        router.push('/dashboard/platform/events')
+        break
       case UserType.OrganizationUser:
       case UserType.OrganizationAdmin:
         if (user.organizations.length === 0) {
           throw new Error(
-            "No hay organizaciones asociadas al usuario de tipo organizacion",
-          );
+            'No hay organizaciones asociadas al usuario de tipo organizacion',
+          )
         }
-        const organization: Organization = user.organizations[0];
-        router.push(`/dashboard/organization/${organization.id}/events`);
-        break;
+        const organization: Organization = user.organizations[0]
+        router.push(`/dashboard/organization/${organization.id}/events`)
+        break
       case UserType.Participant:
-        router.push("/app");
-        break;
+        router.push('/app')
+        break
     }
-  };
+  }
 
   const handleApiError = (errorBack: any) => {
-    console.log(`Probando ${JSON.stringify(errorBack)}`);
-    errors.value.api = errorBack.message;
+    console.log(`Probando ${JSON.stringify(errorBack)}`)
+    errors.value.api = errorBack.message
 
     switch (errorBack.code) {
       case AUTH_ERRORS.INVALID_CREDENTIALS:
-        dialogState.value.isIncorrectCredentialsOpen = true;
-        break;
+        dialogState.value.isIncorrectCredentialsOpen = true
+        break
       case AUTH_ERRORS.MAX_ATTEMPTS_LIMIT_EXCEED:
-        dialogState.value.isMaxAttemptsDialogOpen = true;
-        break;
+        dialogState.value.isMaxAttemptsDialogOpen = true
+        break
       case AUTH_ERRORS.USER_IS_SUSPENDED:
-        dialogState.value.isSuspendedDialogOpen = true;
-        break;
+        dialogState.value.isSuspendedDialogOpen = true
+        break
       default:
-        errors.value.api = "Error desconocido. Intente de nuevo.";
-        break;
+        dialogState.value.isCommonErrorDialogOpen = true
+        commonErrorDialogMessage.value = errorBack.message
+        break
     }
-  };
+  }
 
   const togglePassword = () => {
-    showPassword.value = !showPassword.value;
-  };
+    showPassword.value = !showPassword.value
+  }
 
   const toggleForgotPassword = () => {
-    showForgotPassword.value = !showForgotPassword.value;
-  };
+    showForgotPassword.value = !showForgotPassword.value
+  }
 
   const closeDialog = (dialogName) => {
-    dialogState.value[dialogName] = false;
-  };
+    dialogState.value[dialogName] = false
+  }
 
   const goToUpdatePassword = () => {
-    router.push("/auth/updatePassword");
-  };
+    router.push('/auth/updatePassword')
+  }
 
   return {
     email,
@@ -161,5 +164,6 @@ export function useLoginForm() {
     toggleForgotPassword,
     closeDialog,
     goToUpdatePassword,
-  };
+    commonErrorDialogMessage,
+  }
 }

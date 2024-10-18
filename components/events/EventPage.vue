@@ -85,7 +85,9 @@
                   >
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
-                      :disabled="row.status === 'CANCELLED'"
+                      :disabled="
+                        row.status === 'CANCELLED' || row.status === 'PUBLISHED'
+                      "
                       @click="
                         () => {
                           eventId = row.id
