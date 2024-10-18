@@ -154,11 +154,6 @@ const type =
     ? 'platform'
     : 'organization'
 
-if (type === 'platform') {
-  await Promise.all([
-    fetchData(`${BASE_ORG_URL}/find-organizations`, organizations),
-  ])
-}
 // Fetch organizations and roles
 
 await fetchData(`${BASE_ROLE_URL}/find-roles`, roles)
@@ -180,6 +175,17 @@ const form = useForm({
     : undefined,
 })
 
+if (type === 'platform') {
+  await Promise.all([
+    fetchData(`${BASE_ORG_URL}/find-organizations`, organizations),
+  ])
+} else {
+  const availableOrganizations = userSession.user.value?.user.organizations
+  if (availableOrganizations) {
+    organizations.value = availableOrganizations
+    form.setFieldValue('organizations', availableOrganizations[0].id) // Set the role automatically
+  }
+}
 // Computed property to determine if the organizations should be single-select
 const isOrgSimpleSelect = computed(() =>
   ['ORGANIZATION_ADMIN', 'ORGANIZATION_USER'].includes(form.values.type),
