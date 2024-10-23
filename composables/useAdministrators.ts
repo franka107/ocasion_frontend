@@ -29,11 +29,7 @@ export function useAdmins() {
     return { status, error }
   }
 
-  const suspendUsers = async (values: {
-    type: string
-    ids: string[]
-    organizationId: string
-  }) => {
+  const suspendUsers = async (values: { type: string; ids: string[] }) => {
     const { status, error }: any = await useAPI(
       `${BASE_ADM_URL}/suspend-users`,
       {

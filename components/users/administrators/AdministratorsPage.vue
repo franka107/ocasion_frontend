@@ -45,13 +45,20 @@
               >Suspender usuarios
             </Button>
             <Button
+              v-if="
+                myGrants.data.value.includes(
+                  GrantId.PlatformUsersCanExportAdministrators,
+                ) ||
+                myGrants.data.value.includes(
+                  GrantId.OrganizationUsersCanExportAdministrators,
+                )
+              "
               as="a"
               variant="default"
-              href="http://localhost:4000/api/v1/user-management/export-users?sortOptions=%5B%7B%22field%22%3A%22id%22%2C%22order%22%3A%22asc%22%7D%5D"
+              href="http://localhost:4000/api/v1/user-management/export-users"
               class="bg-white text-primary border border-[#052339]"
             >
               <CustomIcons name="Download" class="ml-auto" />
-
               Exportar
             </Button>
             <!-- <Button -->
@@ -98,21 +105,21 @@
                   align="start"
                   class="bg-primary text-white"
                 >
-                  <div
-                    v-if="
-                      myGrants.data.value.includes(
-                        GrantId.PlatformUsersCanSuspend,
-                      )
-                    "
-                  >
-                    <DropdownMenuItem
-                      :disabled="row.status !== 'ACTIVE'"
-                      @click="handleSuspend(row.id, row.fullName)"
-                    >
-                      Suspender
-                      <CustomIcons name="Forbidden" class="ml-auto" />
-                    </DropdownMenuItem>
-                  </div>
+                  <!-- <div -->
+                  <!--   v-if=" -->
+                  <!--     myGrants.data.value.includes( -->
+                  <!--       GrantId.PlatformUsersCanSuspend, -->
+                  <!--     ) -->
+                  <!--   " -->
+                  <!-- > -->
+                  <!--   <DropdownMenuItem -->
+                  <!--     :disabled="row.status !== 'ACTIVE'" -->
+                  <!--     @click="handleSuspend(row.id, row.fullName)" -->
+                  <!--   > -->
+                  <!--     Suspender -->
+                  <!--     <CustomIcons name="Forbidden" class="ml-auto" /> -->
+                  <!--   </DropdownMenuItem> -->
+                  <!-- </div> -->
 
                   <DropdownMenuSeparator />
 
@@ -257,7 +264,6 @@ const handleSuspendUsers = async (values: { type: string; ids: string[] }) => {
         const { status } = await suspendUsers({
           type,
           ids,
-          organizationId: String(route.params.organizationId),
         })
         if (status.value === 'success') {
           refresh()

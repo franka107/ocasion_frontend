@@ -1,6 +1,6 @@
 <template>
   <ContentLayout title="Eventos">
-    <section>
+    <section v-if="data">
       <OrganizationDetails
         v-if="organizationSummary"
         :data="organizationSummary"
@@ -39,7 +39,7 @@
           </template>
           <template #type="{ row }">
             <span class="whitespace-nowrap">{{
-              eventType.get(row.type) || ''
+              eventType.get(row?.type) || ''
             }}</span>
           </template>
           <template #closingTime="{ row }">
@@ -133,7 +133,7 @@
           </template>
           <template #goodType="{ row }">
             <CustomChip
-              :text="goodType.get(row.goodType) || ''"
+              :text="goodType.get(row?.goodType) || ''"
               variant="brown"
             ></CustomChip>
           </template>
@@ -164,8 +164,8 @@
       <CustomPagination
         v-model:page="page"
         class="mt-5 mb-[19px]"
-        :total="data.count"
-        :limit="data.limit"
+        :total="data?.count"
+        :limit="data?.limit"
       />
     </section>
   </ContentLayout>
@@ -261,6 +261,7 @@ const [eventListData, organizationSummaryData] = await Promise.all([
   ),
 ])
 const { data, refresh } = eventListData
+
 const organizationSummary = organizationSummaryData.data.value
 // fix typing
 const eventsData = computed(() =>

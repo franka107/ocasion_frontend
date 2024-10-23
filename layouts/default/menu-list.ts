@@ -236,17 +236,17 @@ export function getMenuList(
                     },
                   ]
                 : []),
-              ...(grants.includes(GrantId.OrganizationUsersCanViewParticipants)
-                ? [
-                    {
-                      // href: '/dashboard/platform/users/participants',
-                      href: `/dashboard/organization/${organizationId}/users/participants`,
-                      label: 'Participantes',
-                      active: pathname.includes('/users/participants'),
-                      // active: pathname === "/users/participants",
-                    },
-                  ]
-                : []),
+              // ...(grants.includes(GrantId.OrganizationUsersCanViewParticipants)
+              //   ? [
+              //       {
+              //         // href: '/dashboard/platform/users/participants',
+              //         href: `/dashboard/organization/${organizationId}/users/participants`,
+              //         label: 'Participantes',
+              //         active: pathname.includes('/users/participants'),
+              //         // active: pathname === "/users/participants",
+              //       },
+              //     ]
+              //   : []),
             ],
           },
         ]

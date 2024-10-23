@@ -40,7 +40,7 @@ export const roleHeader = (viewType: ViewType): HeaderItem[] => [
     sortable: true,
   },
   {
-    key: 'usersCount',
+    key: 'userCount',
     label: 'Cant.',
     sortable: true,
   },
