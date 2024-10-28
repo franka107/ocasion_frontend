@@ -93,6 +93,26 @@
                   <div
                     v-if="
                       myGrants.data.value.includes(
+                        GrantId.PlatformOrganizationsCanAssignAdministrator,
+                      )
+                    "
+                  >
+                    <DropdownMenuItem
+                      @click="
+                        () => {
+                          organizationId = row.id
+                          openAssignAdministratorModal = true
+                        }
+                      "
+                    >
+                      Asignar administrador
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </div>
+
+                  <div
+                    v-if="
+                      myGrants.data.value.includes(
                         GrantId.PlatformOrganizationsCanUpdate,
                       )
                     "
@@ -128,6 +148,20 @@
           />
         </SheetContent>
         <!-- Fomulario -->
+
+        <div>
+          <SheetContent
+            v-model:open="openAssignAdministratorModal"
+            class="flex flex-col h-full"
+            @pointer-down-outside="(e) => e.preventDefault()"
+            @interact-outside="(e) => e.preventDefault()"
+          >
+            <OrganizationsOrganizationAssignAdministrator
+              :organization-id="String(organizationId)"
+              :onsubmit="handleAssignAdministrator"
+            />
+          </SheetContent>
+        </div>
       </div>
       <CustomPagination
         v-model:page="page"
@@ -160,6 +194,7 @@ const {
   onSort,
   onSearch,
   suspendOrganization,
+  assignAdministrator,
   activateOrganization,
   createOrganization,
   editOrganization,
@@ -180,6 +215,7 @@ const { data, refresh }: any = await useAPI(
   } as any,
 )
 
+const openAssignAdministratorModal = ref(false)
 const openModal = ref(false)
 const organizationRucNo = ref<number | undefined>(undefined)
 const orderData = computed(() =>
@@ -187,6 +223,37 @@ const orderData = computed(() =>
     ...item,
   })),
 )
+
+const organizationId = ref<string | undefined>('')
+
+const handleAssignAdministrator = async (values: any) => {
+  openConfirmModal({
+    title: 'Asignar administrador',
+    message: '¿Estás seguro de que deseas asignar este administrador?',
+    callback: async () => {
+      const { status, error }: any = await assignAdministrator(values)
+      if (status.value === 'success') {
+        openAssignAdministratorModal.value = false
+        refresh()
+        updateConfirmModal({
+          title: 'Asignación de administrador exitosa',
+          message: 'El administrador se ha asignado exitosamente',
+          type: 'success',
+        })
+      } else {
+        const eMsg =
+          error.value.data?.errors?.[0].message ||
+          error.value.data.message ||
+          'El administrador no se pudo actualizar, intentalo más tarde'
+        updateConfirmModal({
+          title: 'Error al asignar administrador',
+          message: eMsg,
+          type: 'error',
+        })
+      }
+    },
+  })
+}
 
 const handleSuspend = async (id: string, name: string) => {
   openConfirmModal({

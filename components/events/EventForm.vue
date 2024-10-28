@@ -313,14 +313,14 @@ const handleFilesChange = (files: File[]) => {
                 class="my-2"
                 label="Fecha de inicio"
                 :value="componentField.modelValue"
-                :min-value="
-                  parseAbsolute(
-                    addBusinessDays(new Date(), 2).toISOString(),
-                    getLocalTimeZone(),
-                  )
-                "
                 @update:model-value="componentField.onChange"
               />
+              <!-- :min-value=" -->
+              <!--   parseAbsolute( -->
+              <!--     addBusinessDays(new Date(), 2).toISOString(), -->
+              <!--     getLocalTimeZone(), -->
+              <!--   ) -->
+              <!-- " -->
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -331,28 +331,28 @@ const handleFilesChange = (files: File[]) => {
               <DateInput
                 class="my-2"
                 label="Fecha de fin"
-                :min-value="
-                  form.values.startDate
-                    ? parseDate(form.values.startDate)
-                    : undefined
-                "
-                :max-value="
-                  form.values.startDate
-                    ? parseAbsolute(
-                        addBusinessDays(
-                          parseDate(form.values.startDate).toDate(
-                            getLocalTimeZone(),
-                          ),
-                          6,
-                        ).toISOString(),
-                        getLocalTimeZone(),
-                      )
-                    : undefined
-                "
                 :value="componentField.modelValue"
                 :disabled="!form.values.startDate"
                 @update:model-value="componentField.onChange"
               />
+              <!-- :min-value=" -->
+              <!--   form.values.startDate -->
+              <!--     ? parseDate(form.values.startDate) -->
+              <!--     : undefined -->
+              <!-- " -->
+              <!-- :max-value=" -->
+              <!--   form.values.startDate -->
+              <!--     ? parseAbsolute( -->
+              <!--         addBusinessDays( -->
+              <!--           parseDate(form.values.startDate).toDate( -->
+              <!--             getLocalTimeZone(), -->
+              <!--           ), -->
+              <!--           6, -->
+              <!--         ).toISOString(), -->
+              <!--         getLocalTimeZone(), -->
+              <!--       ) -->
+              <!--     : undefined -->
+              <!-- " -->
             </FormControl>
             <FormMessage />
           </FormItem>

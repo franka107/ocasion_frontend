@@ -44,6 +44,23 @@
               @click="handleSuspendUsers(selectedMultipleData)"
               >Suspender usuarios
             </Button>
+            <!-- <Button -->
+            <!--   v-if=" -->
+            <!--     myGrants.data.value.includes( -->
+            <!--       GrantId.PlatformUsersCanExportAdministrators, -->
+            <!--     ) || -->
+            <!--     myGrants.data.value.includes( -->
+            <!--       GrantId.OrganizationUsersCanExportAdministrators, -->
+            <!--     ) -->
+            <!--   " -->
+            <!--   as="a" -->
+            <!--   variant="default" -->
+            <!--   href="http://localhost:4000/api/v1/user-management/export-users" -->
+            <!--   class="bg-white text-primary border border-[#052339]" -->
+            <!-- > -->
+            <!--   <CustomIcons name="Download" class="ml-auto" /> -->
+            <!--   Exportar -->
+            <!-- </Button> -->
             <Button
               v-if="
                 myGrants.data.value.includes(
@@ -53,22 +70,14 @@
                   GrantId.OrganizationUsersCanExportAdministrators,
                 )
               "
-              as="a"
               variant="default"
-              href="http://localhost:4000/api/v1/user-management/export-users"
               class="bg-white text-primary border border-[#052339]"
+              :disabled="!disableMultipleSelect"
+              @click="handleExport"
             >
               <CustomIcons name="Download" class="ml-auto" />
               Exportar
             </Button>
-            <!-- <Button -->
-            <!--   @click="handleExport" -->
-            <!--   variant="default" -->
-            <!--   class="bg-white text-primary border border-[#052339]" -->
-            <!-- > -->
-            <!--   <CustomIcons name="Download" class="ml-auto" /> -->
-            <!--   Exportar -->
-            <!-- </Button> -->
             <Button
               v-if="
                 myGrants.data.value.includes(GrantId.PlatformUsersCanCreate) ||
@@ -185,6 +194,7 @@ import { GrantId } from '~/types/Grant'
 const props = defineProps<{ organizationId: string | null }>()
 const { getMyGrants } = useAuthManagement()
 const myGrants = await getMyGrants()
+const userSession = useUserSession()
 const {
   page,
   sortOptions,
@@ -451,12 +461,51 @@ const handleExport = async () => {
     callback: async () => {
       try {
         const { apiUrl } = useRuntimeConfig().public
+        const response = await fetch(
+          `${apiUrl}/user-management/export-users?filterOptions=${filterOptions.value}`,
+          {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${userSession.user.value?.token}`,
+              'Content-Type': 'application/json',
+            },
+          },
+        )
+        // Convertir la respuesta en un blob
+        const blob = await response.blob()
+
+        // Crear un enlace temporal para la descarga
         const link = document.createElement('a')
-        link.href = `${apiUrl}/user-management/export-users?filterOptions=${filterOptions.value}`
-        link.setAttribute('download', 'usuarios_exportados.csv')
+        link.href = URL.createObjectURL(blob)
+        link.setAttribute('download', 'usuarios.csv')
         document.body.appendChild(link)
         link.click()
         link.remove()
+
+        // Liberar la URL del blob
+        URL.revokeObjectURL(link.href)
+
+        if (!response.ok) {
+          const error = await response.json()
+          const eMsg =
+            error.errors?.[0].message ||
+            error.message ||
+            'Error al exportar usuarios. Inténtalo de nuevo más tarde.'
+          updateConfirmModal({
+            title: 'Error al exportar usuarios',
+            message: String(eMsg),
+            type: 'error',
+          })
+        }
+
+        // ------------------------------------------------
+        // const { apiUrl } = useRuntimeConfig().public
+        // const link = document.createElement('a')
+        // link.href = `${apiUrl}/user-management/export-users`
+        // link.setAttribute('download', 'usuarios.csv')
+        // document.body.appendChild(link)
+        // link.click()
+        // link.remove()
       } catch (error) {
         const eMsg =
           error || 'Error al exportar usuarios. Inténtalo de nuevo más tarde.'

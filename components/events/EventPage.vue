@@ -199,7 +199,6 @@ const { page, sortOptions, onSort, createEvent, editEvent, cancelEvent } =
   useEvent()
 const { getMyGrants } = useAuthManagement()
 const myGrants = await getMyGrants()
-console.log(myGrants)
 
 const props = defineProps<{ organizationId: string | null }>()
 // const filterOptions = ref(

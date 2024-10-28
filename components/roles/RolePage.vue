@@ -62,6 +62,21 @@
                     Actualizar datos
                     <CustomIcons name="ArrowLeft" class="ml-auto" />
                   </DropdownMenuItem>
+                  <div
+                    v-if="
+                      myGrants.data.value.includes(
+                        GrantId.PlatformRolesCanDelete,
+                      ) ||
+                      myGrants.data.value.includes(
+                        GrantId.OrganizationRolesCanDelete,
+                      )
+                    "
+                  >
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem @click="handleDelete(row.id, row.name)">
+                      Eliminar
+                    </DropdownMenuItem>
+                  </div>
                   <!-- <DropdownMenuSeparator /> -->
                   <!-- <DropdownMenuItem> -->
                   <!--   <NuxtLink :to="`/`">Ver Detalle</NuxtLink> -->
@@ -87,7 +102,12 @@
             ></CustomChip>
           </template>
         </CustomTable>
-        <SheetContent v-model:open="openModal" class="flex flex-col h-full">
+        <SheetContent
+          v-model:open="openModal"
+          class="flex flex-col h-full"
+          @pointer-down-outside="(e) => e.preventDefault()"
+          @interact-outside="(e) => e.preventDefault()"
+        >
           <RolesForm
             :id="roleId"
             :type="props.organizationId ? 'organization' : 'platform'"
@@ -117,9 +137,12 @@ import RolesForm from '@/components/roles/RolesForm.vue'
 import { type IRoleItem, IOrganizationSummary } from '~/types/Roles'
 import type { IDataResponse } from '~/types/Common'
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
+import { GrantId } from '~/types/Grant'
 const props = defineProps<{ organizationId: string | null }>()
 
+const { getMyGrants } = useAuthManagement()
 const route = useRoute()
+const myGrants = await getMyGrants()
 const {
   page,
   // filterOptions,
@@ -135,11 +158,12 @@ const roleId = ref<number | undefined>(undefined)
 const BASE_ROLE_URL = '/role-configuration'
 const openModal = ref(false)
 
-const filterOptions = ref(
-  props.organizationId
-    ? `[{ "field": "organizations.id", "type": "equal", "value": "${props.organizationId}" }]`
-    : `[]`,
-)
+// const filterOptions = ref(
+//   props.organizationId
+//     ? `[{ "field": "organizations.id", "type": "equal", "value": "${props.organizationId}" }]`
+//     : `[]`,
+// )
+const filterOptions = ref(`[]`)
 
 const { data, refresh, error }: any = await useAPI(
   `${BASE_ROLE_URL}/find-roles-paginated`,
@@ -174,17 +198,31 @@ console.log('Data Value:', data.value)
 const roleData = computed(() =>
   data.value.data.map((item: any) => ({
     ...item,
+    createdAt: new Date(item.createdAt).toLocaleString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }),
+    updatedAt: new Date(item.updatedAt).toLocaleString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }),
   })),
 )
 console.log('API Response:', data.value)
 
-const handleDelete = async (name: string) => {
+const handleDelete = async (id: string, name: string) => {
   openConfirmModal({
     title: 'Eliminar rol',
     message: `¿Está seguro que desea eliminar el rol ❝${name}❞?`,
     callback: async () => {
-      const { status } = await deleteRole(name)
-      if (status === 'success') {
+      const { status, error } = await deleteRole(id)
+      if (status.value === 'success') {
         updateConfirmModal({
           title: '¡Eliminación exitosa!',
           message: 'El rol ha sido eliminado.',
@@ -192,10 +230,13 @@ const handleDelete = async (name: string) => {
         })
         refresh()
       } else {
+        const eMsg =
+          error.value.data?.errors?.[0].message ||
+          error.value.data.message ||
+          'El rol no se pudo eliminar. \nTe recomendamos intentarlo nuevamente.'
         updateConfirmModal({
           title: 'Error al eliminar',
-          message:
-            'El rol no se pudo eliminar. \nTe recomendamos intentarlo nuevamente.',
+          message: eMsg,
           type: 'error',
         })
       }
@@ -212,7 +253,6 @@ const handleCreate = async (values: any) => {
         ...values,
         organizationId: props.organizationId,
       })
-      console.log(`createRole response:`, status, error)
       if (status.value === 'success') {
         openModal.value = false
         refresh()
@@ -222,9 +262,10 @@ const handleCreate = async (values: any) => {
           type: 'success',
         })
       } else {
+        console.log(`error ${error.data}`)
         const eMsg =
-          error?.data?.errors?.[0]?.message ||
-          error?.data?.message ||
+          error?.value.data?.errors?.[0]?.message ||
+          error?.value.data?.message ||
           'El rol no se pudo crear, intentalo más tarde'
         updateConfirmModal({
           title: 'Error al crear rol',

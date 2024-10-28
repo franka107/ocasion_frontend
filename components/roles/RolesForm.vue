@@ -11,7 +11,26 @@ const props = defineProps<{
   type: 'platform' | 'organization'
   onsubmit: (values: any) => void
 }>()
-const allGrants = ref<Array<{ id: string; name: string }>>([])
+const allGrants = ref<Array<{ id: string; name: string; type: string }>>([])
+const structuredAllGrants = ref<
+  Array<{
+    headLabel: string
+    grants: { id: string; name: string; type: string }[]
+  }>
+>([])
+
+const modulePresentations: any = {
+  'event-management': 'Gestión de eventos',
+  'organization-management': 'Gestión de organizaciones',
+  'delivery-management': 'Gestión de envios',
+  'transference-management': 'Gestión de transferencias',
+  'payment-management': 'Gestión de pagos',
+  'offer-management': 'Gestión de ofertas',
+  'role-management': 'Gestión de roles',
+  'user-management': 'Gestión de usuarios',
+  'bid-management': 'Gestión de bajas',
+  'kpi-management': 'KPI/s',
+}
 const fetchGrants = async () => {
   try {
     const { data } = await useAPI(
@@ -25,6 +44,22 @@ const fetchGrants = async () => {
       true,
     )
     allGrants.value = data.value
+    // structuredAllGrants.value = data.value
+    structuredAllGrants.value = (data.value as any[]).reduce(
+      (acc, permission) => {
+        const { module } = permission
+        if (!acc[module]) {
+          acc[module] = {
+            headLabel: modulePresentations[module] || module,
+            grants: [],
+          }
+        }
+        acc[module].grants.push(permission)
+        return acc
+      },
+      {},
+    )
+    console.log(structuredAllGrants)
   } catch (error) {
     console.error('Error al cargar grants:', error)
   }
@@ -125,7 +160,7 @@ if (props.id) {
                 v-bind="componentField"
                 :items="[
                   { id: 'ACTIVE', name: 'Activo' },
-                  { id: 'INACTIVE', name: 'Desactivo' },
+                  { id: 'INACTIVE', name: 'Inactivo' },
                 ]"
                 placeholder="Estado"
               />
@@ -137,29 +172,35 @@ if (props.id) {
         <h2>Funcionalidades</h2>
 
         <FormField name="grantIds">
-          <FormItem>
-            <FormField
-              v-for="item in allGrants"
-              v-slot="{ value, handleChange }"
-              :key="item.id"
-              type="checkbox"
-              :value="item.id"
-              :unchecked-value="false"
-              name="grantIds"
-            >
-              <FormItem class="flex flex-row items-start space-x-3 space-y-0">
-                <FormControl>
-                  <Checkbox
-                    :checked="(value || []).includes(item.id)"
-                    @update:checked="handleChange"
-                  />
-                </FormControl>
-                <FormLabel class="font-normal">
-                  {{ item.name }}
-                </FormLabel>
-              </FormItem>
-            </FormField>
-          </FormItem>
+          <div
+            v-for="module in Object.values(structuredAllGrants)"
+            :key="module.headLabel"
+          >
+            <h1 class="text-lg font-semibold pb-2">{{ module.headLabel }}</h1>
+            <FormItem>
+              <FormField
+                v-for="item in module.grants"
+                v-slot="{ value, handleChange }"
+                :key="item.id"
+                type="checkbox"
+                :value="item.id"
+                :unchecked-value="false"
+                name="grantIds"
+              >
+                <FormItem class="flex flex-row items-start space-x-3 space-y-0">
+                  <FormControl>
+                    <Checkbox
+                      :checked="(value || []).includes(item.id)"
+                      @update:checked="handleChange"
+                    />
+                  </FormControl>
+                  <FormLabel class="font-normal">
+                    {{ item.name }}
+                  </FormLabel>
+                </FormItem>
+              </FormField>
+            </FormItem>
+          </div>
         </FormField>
 
         <!-- <FormField v-slot="{ componentField }" name="grants"> -->

@@ -276,7 +276,7 @@ const handleFilesChange = (files: File[]) => {
         </FormField>
 
         <!-- Actividad Económica -->
-        <FormField v-slot="{ componentField }" name="economicActivityId">
+        <FormField v-slot="{ componentField }" name="userId">
           <FormItem>
             <FormControl class="w-full">
               <CustomComboboxInput
