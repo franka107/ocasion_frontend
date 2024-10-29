@@ -3,6 +3,10 @@
     <div class="w-full flex flex-row flex-wrap py-6 gap-4 justify-end">
       <template v-for="(item, i) in search" :index="i">
         <template v-if="item">
+          <div v-if="item.label" class="flex flex-col w-[200px]">
+          <label v-if="item.label" class="text-sm font-medium text-gray-700 mb-[6px]">
+            {{ item.label }}
+          </label>
           <template v-if="item.type === 'text'">
             <Input
               v-model="searchValues[item.key]"
@@ -51,17 +55,19 @@
               :value="searchValues[item.key]"
             />
           </template>
+        </div>
         </template>
       </template>
       <slot name="action-button">
         <!-- Default button in case no prop is passed -->
       </slot>
     </div>
-    <div class="overflow-auto">
+    <div class="overflow-auto" :class="[props.class]">
       <table class="table w-full">
         <thead>
           <tr
-            class="border-b-[1px] border-dotted border-primary font-bold text-sm text-primary"
+           :class="[props.class]"
+            class=" border-b-[1px] border-dotted border-primary font-bold text-sm text-primary "
           >
             <th class="h-[54px]" v-if="props.multipleSelect">
               <button @click="changeGeneralCheckbox">
@@ -180,6 +186,7 @@ export interface SearchItem {
   items?: SearchSelectItem[];
   key: string;
   elementClass?: string;
+  label?: string; 
 }
 export interface HeaderItem {
   key: string;
@@ -195,10 +202,12 @@ interface Props {
   multipleSelect?: boolean;
   multipleSelectKey?: string;
   class?: string | object;
+  bgClass?: string;
 }
 const props = withDefaults(defineProps<Props>(), {
   multipleSelect: false,
   multipleSelectKey: "id",
+  class: "",
 });
 
 const emit = defineEmits(["onSort", "onSearch", "onMultipleSelect"]);
