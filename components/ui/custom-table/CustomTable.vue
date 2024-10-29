@@ -3,8 +3,8 @@
     <div class="w-full flex flex-row flex-wrap py-6 gap-4 justify-end">
       <template v-for="(item, i) in search" :index="i">
         <template v-if="item">
-          <div v-if="item.label" class="flex flex-col w-[200px]">
-          <label v-if="item.label" class="text-sm font-medium text-gray-700 mb-[6px]">
+          <div class="flex flex-col w-[200px]">
+            <label v-if="item.label" class="text-sm font-medium text-gray-700 mb-[6px]">
             {{ item.label }}
           </label>
           <template v-if="item.type === 'text'">
