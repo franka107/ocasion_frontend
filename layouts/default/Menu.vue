@@ -98,12 +98,12 @@
               :label="menu.label"
               :active="menu.active"
               :submenus="menu.submenus"
-              :isOpen="isSidebarOpen"
+              :is-open="isSidebarOpen"
             />
           </div>
         </li>
 
-        <li class="w-full grow flex items-end" v-if="props.showToggleButton">
+        <li v-if="props.showToggleButton" class="w-full grow flex items-end">
           <SidebarToggle v-model:is-sidebar-open="isSidebarOpen" />
         </li>
       </ul>
@@ -112,16 +112,17 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from "vue";
-import { useRoute } from "vue-router";
-import { BookmarkMinus, Ellipsis, LogOut } from "lucide-vue-next";
-import ScrollArea from "~/components/ui/scroll-area/ScrollArea.vue";
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { BookmarkMinus, Ellipsis, LogOut } from 'lucide-vue-next'
 
-const { getMyGrants } = useAuthManagement();
+import { getMenuList } from './menu-list'
+import CollapseMenuButton from './CollapseMenuButton.vue'
+import SidebarToggle from './SidebarToggle.vue'
+import ScrollArea from '~/components/ui/scroll-area/ScrollArea.vue'
+import { UserType } from '~/types/Administrators'
 
-import { getMenuList } from "./menu-list";
-import CollapseMenuButton from "./CollapseMenuButton.vue";
-import SidebarToggle from "./SidebarToggle.vue";
+const { getMyGrants } = useAuthManagement()
 // const props = defineProps({
 //   isSidebarOpen: {
 //     type: Boolean,
@@ -129,22 +130,28 @@ import SidebarToggle from "./SidebarToggle.vue";
 //   },
 // });
 //
-const myGrants = await getMyGrants();
+const myGrants = await getMyGrants()
 
-const isSidebarOpen = defineModel<boolean>("isSidebarOpen", { required: true });
+const isSidebarOpen = defineModel<boolean>('isSidebarOpen', { required: true })
 const props = defineProps<{
-  showToggleButton: boolean;
-}>();
+  showToggleButton: boolean
+}>()
 
-const route = useRoute();
-const pathname = computed(() => route.path);
+const userSession = useUserSession()
+console.log(`userSession type ${userSession.user.value?.user.type}`)
+const type = userSession.user.value?.user.type === UserType.Participant
+console.log(`userSession type ${type}`)
+
+const route = useRoute()
+const pathname = computed(() => route.path)
 const menuList = computed(() =>
   getMenuList(
     pathname.value,
     myGrants.data.value ?? [],
+    type,
     route.params.organizationId as string,
   ),
-);
+)
 
 function handleSignOut() {
   // Lógica para cerrar sesión

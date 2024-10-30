@@ -108,7 +108,7 @@ export function useLoginForm() {
         router.push(`/dashboard/organization/${organization.id}/events`)
         break
       case UserType.Participant:
-        router.push('/app')
+        router.push('/dashboard/participant/my-bids')
         break
     }
   }
