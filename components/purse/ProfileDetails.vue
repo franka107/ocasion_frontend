@@ -8,7 +8,7 @@
             </div>
         </div>
         <div class="h 10 w 10">
-            <Button variant="default" @click="router.back">
+            <Button variant="default" @click="">
                 Editar
             </Button>
         </div>

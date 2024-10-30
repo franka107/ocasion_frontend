@@ -33,6 +33,13 @@ import type {
       placeholder: "Inicio",
       position: 3,
     },
+    {
+      key: "",
+      type: "date",
+      label: "-",
+      placeholder: "Inicio",
+      position: 4,
+    },
 
   ];
   export const purseHeader: HeaderItem[] = [
