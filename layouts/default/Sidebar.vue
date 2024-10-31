@@ -6,7 +6,7 @@
     ]"
   >
     <div
-      class="relative bg-[#20445e] h-full flex flex-col px-3 py-4 overflow-y-auto shadow-md dark:shadow-zinc-800"
+      :class="`relative ${isParticipant ? 'bg-white' : 'bg-[#20445e]'} h-full flex flex-col px-3 py-4 overflow-y-auto shadow-md dark:shadow-zinc-800`"
     >
       <div
         :class="[
@@ -14,16 +14,16 @@
           isSidebarOpen === false ? 'translate-x-1' : 'translate-x-0',
         ]"
         to="/backoffice"
-        class="flex  gap-2 pl-3 pt-1 pb-3"
+        class="flex gap-2 pl-3 pt-1 pb-3"
       >
         <div v-if="isSidebarOpen">
           <img
-            :src="alternativeLogo"
+            :src="isParticipant ? logo : alternativeLogo"
             alt="Company Logo"
             :class="cn('rounded-md object-contain h-11')"
           />
         </div>
-        <div class="w-full" v-else>
+        <div v-else class="w-full">
           <img
             :src="smallLogo"
             alt="Company Logo"
@@ -31,18 +31,25 @@
           />
         </div>
       </div>
-      <Menu v-model:isSidebarOpen="isSidebarOpen" :showToggleButton="true" />
+      <Menu
+        v-model:is-sidebar-open="isSidebarOpen"
+        :show-toggle-button="true"
+      />
     </div>
   </aside>
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
-import Menu from "./Menu.vue";
-import SidebarToggle from "./SidebarToggle.vue";
-import { PanelsTopLeft } from "lucide-vue-next";
-import smallLogo from "@/assets/img/small_logo.png";
-import alternativeLogo from "@/assets/img/alternative_logo.png";
+import { ref } from 'vue'
+import { PanelsTopLeft } from 'lucide-vue-next'
+import Menu from './Menu.vue'
+import SidebarToggle from './SidebarToggle.vue'
+import smallLogo from '@/assets/img/small_logo.png'
+import logo from '@/assets/img/logo.png'
+import alternativeLogo from '@/assets/img/alternative_logo.png'
+import { UserType } from '~/types/Administrators'
 
-const isSidebarOpen = defineModel<boolean>("isSidebarOpen", { required: true });
+const isSidebarOpen = defineModel<boolean>('isSidebarOpen', { required: true })
+const userSession = useUserSession()
+const isParticipant = userSession.user.value?.user.type === UserType.Participant
 </script>
