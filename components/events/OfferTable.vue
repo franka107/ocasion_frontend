@@ -58,7 +58,13 @@
                 >Crear oferta
               </Button>
             </div>
-            <Button variant="default" @click="handleViewBids"
+            <Button
+              v-if="
+                myGrants.data.value.includes(GrantId.OrganizationBidCanView) ||
+                myGrants.data.value.includes(GrantId.PlatformBidCanView)
+              "
+              variant="default"
+              @click="handleViewBids"
               >Ver pujas
             </Button>
           </template>
