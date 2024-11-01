@@ -110,6 +110,10 @@ module.exports = {
           from: { opacity: 0, transform: 'translate(-50%, -48%) scale(0.96)' },
           to: { opacity: 1, transform: 'translate(-50%, -50%) scale(1)' },
         },
+        twinkleShadow: {
+          from: { 'box-shadow': '0px 0px 4px 0px #F6313C99'},
+          to: { 'box-shadow': '0px 0px 4px 0px #FFFFFF' },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -118,6 +122,7 @@ module.exports = {
         "collapsible-up": "collapsible-up 0.2s ease-in-out",
         overlayShow: 'overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1)',
         contentShow: 'contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1)',
+        "twinkle-shadow": 'twinkleShadow .5s infinite alternate',
       },
     },
   },

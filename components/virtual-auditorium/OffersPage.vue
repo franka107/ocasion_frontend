@@ -1,8 +1,30 @@
 <script setup lang="ts">
+import { useWebSocket } from '@vueuse/core'
+// const { status, data, send, open, close } = useWebSocket('ws://websocketurl')
 import AuditoriumList from '~/components/virtual-auditorium/AuditoriumList.vue'
 import OfferDetailsItem from '~/components/virtual-auditorium/OfferDetailsItem.vue'
 import CustomPagination from '~/components/ui/custom-pagination/CustomPagination.vue'
+import type { OfferListItem } from '~/types/Offer';
+import type { IDataResponse } from '~/types/Common';
+const OFFER_BASE_URL = '/offer-management'
 const options = ["Todos", "Finalizado", "Por vencer"];
+const { page, sortOptions, } = useOfferAPI()
+const filterOptions = ref('[]')
+const selectedOffer = ref<OfferListItem | undefined>(undefined)
+const { data: offerListData } = await 
+  useAPI<IDataResponse<OfferListItem>>(`${OFFER_BASE_URL}/find-offers-paginated-for-participant`, {
+    query: {
+      limit: 8,
+      page,
+      filterOptions,
+      sortOptions,
+    },
+  } as any)
+const offerList = computed(() => offerListData.value.data || [])
+
+const onSelectOffer = (offer: OfferListItem) => {
+    selectedOffer.value = offer
+}
 </script>
 
 <template>
@@ -23,13 +45,14 @@ const options = ["Todos", "Finalizado", "Por vencer"];
                     </SelectContent>
                 </Select>
             </div>
-            <AuditoriumList />
+            <AuditoriumList :offerList="offerList" @onSelectOffer="onSelectOffer" />
             <CustomPagination 
               class="mt-[32px]"
-             :total="1"
-             :limit="1"
+             :total="offerListData.count"
+             v-model:page="page"
+             :limit="8"
             />
         </div>
-            <OfferDetailsItem  class="hidden xl:block"/>
+            <OfferDetailsItem  class="hidden xl:block" v-if="selectedOffer" :offer="selectedOffer" />
     </section>
 </template>

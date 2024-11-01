@@ -33,6 +33,7 @@ export default defineNuxtConfig({
       },
     ],
     '@vueuse/nuxt',
+    'nuxt-countdown',
   ],
   shadcn: {
     /**
