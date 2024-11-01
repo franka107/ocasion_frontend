@@ -3,50 +3,74 @@ import { ref, watch, defineProps } from 'vue'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
+import Dialog from '~/components/auth/dialogForm.vue'
 import NuxtLayout from '~/components/auth/authForm.vue'
 import BaseForm from '~/components/auth/baseForm.vue'
 import CustomInput from '~/components/ui/custom-input/CustomInput.vue'
 import CustomSelect from '~/components/ui/custom-select/CustomSelect.vue'
+import messageIcon from '~/assets/icon/png/check-icon.png'
+import priorityHigh from '~/assets/icon/png/priority-high.png'
 import CheckBox from '~/components/ui/checkbox/Checkbox.vue'
 
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const { authSignIn } = useAuthManagement()
 
-const openModal = ref(false)
-const isSubmitting = ref(false);
+const isSuccessDialogOpen = ref(false)
+const isErrorDialogOpen = ref(false)
+const errorDialogMessage = ref('')
+
+const closeSuccessDialog = () => {
+  isSuccessDialogOpen.value = false
+}
+
+const closeErrorDialog = () => {
+  isErrorDialogOpen.value = false
+}
+const isSubmitting = ref(false)
 const registerFormSchema = z.object({
   firstName: z.string().min(1, 'El nombre es requerido'),
   lastName: z.string().min(1, 'El apellido es requerido'),
-  representative: z.object({
-    documentType: z.enum(['DNI', 'CE', 'PT']),
-    documentIdentifier: z
-      .string()
-      .regex(/^\d+$/, 'El documento debe contener solo dígitos.')
-      .min(1, 'El documento del representante es requerido'),
-  })
-  .partial()
-  .superRefine((schema, ctx) => {
-    if (schema.documentType === 'DNI' && schema.documentIdentifier?.length !== 8) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'El dni debe contener 8 digitos',
-        path: ['documentIdentifier'],
-      })
-    }
-    if (schema.documentType !== 'DNI' && schema.documentIdentifier?.length !== 9) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `El ${schema.documentType} debe contener 9 digitos`,
-        path: ['documentIdentifier'],
-      })
-    }
-  }),
+  representative: z
+    .object({
+      documentType: z.enum(['DNI', 'CE', 'PT']),
+      documentIdentifier: z
+        .string()
+        .regex(/^\d+$/, 'El documento debe contener solo dígitos.')
+        .min(1, 'El documento del representante es requerido'),
+    })
+    .partial()
+    .superRefine((schema, ctx) => {
+      if (
+        schema.documentType === 'DNI' &&
+        schema.documentIdentifier?.length !== 8
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'El dni debe contener 8 digitos',
+          path: ['documentIdentifier'],
+        })
+      }
+      if (
+        schema.documentType !== 'DNI' &&
+        schema.documentIdentifier?.length !== 9
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `El ${schema.documentType} debe contener 9 digitos`,
+          path: ['documentIdentifier'],
+        })
+      }
+    }),
   gender: z.enum(['MALE', 'FEMALE']),
   maritalStatus: z.enum(['SINGLE', 'MARRIED', 'WIDOWED', 'DIVORCED']),
   email: z.string().email('Debe ser un correo electrónico válido'),
   birthDate: z.string().nonempty('La fecha de nacimiento es requerida'),
-  phoneNumber: z.string().min(9, 'El número de teléfono debe tener al menos 10 dígitos'),
-  areConditionsAccepted: z.boolean().refine(val => val === true, 'Debe aceptar los términos y condiciones'),
+  phoneNumber: z
+    .string()
+    .min(9, 'El número de teléfono debe tener al menos 10 dígitos'),
+  areConditionsAccepted: z
+    .boolean()
+    .refine((val) => val === true, 'Debe aceptar los términos y condiciones'),
   personType: z.enum(['NATURAL_PERSON', 'JURIDIC_PERSON']),
 })
 
@@ -77,27 +101,35 @@ watch(form.values, (newValues) => {
 //   console.log('Errores actuales:', newErrors);
 // });
 
-const onSubmit = form.handleSubmit(async(values: RegisterForm) => {
-  if (isSubmitting.value) return;
-  isSubmitting.value = true;
+const onSubmit = form.handleSubmit(async (values: RegisterForm) => {
+  if (isSubmitting.value) return
+  isSubmitting.value = true
   try {
-    const { representative, ...restValues } = values;
+    const { representative, ...restValues } = values
     const formattedValues = {
       ...restValues,
       documentType: representative.documentType,
       documentIdentifier: representative.documentIdentifier,
-    };
+    }
 
-    await handleCreate(formattedValues);
+    await handleSignIn(formattedValues)
   } finally {
-    isSubmitting.value = false;
+    isSubmitting.value = false
   }
 })
 
-const handleCreate = async (values: any) => {
-  console.log("handleCreate values:", values);
+const handleSignIn = async (values: any) => {
   const { status, error }: any = await authSignIn(values)
-  console.log(status.value);
+  if (status.value === 'success') {
+    isSuccessDialogOpen.value = true
+  } else {
+    const eMsg =
+      error.value.data?.errors?.[0].message ||
+      error.value.data.message ||
+      'No se puedo continuar con el proceso de registro. \nTe recomendamos intentarlo nuevamente.'
+    errorDialogMessage.value = eMsg
+    isErrorDialogOpen.value = true
+  }
 }
 </script>
 
@@ -143,7 +175,11 @@ const handleCreate = async (values: any) => {
           <FormField v-slot="{ componentField }" name="firstName">
             <FormItem>
               <FormControl>
-                <CustomInput type="text" label="Nombre" v-bind="componentField" />
+                <CustomInput
+                  type="text"
+                  label="Nombre"
+                  v-bind="componentField"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -153,7 +189,11 @@ const handleCreate = async (values: any) => {
           <FormField v-slot="{ componentField }" name="lastName">
             <FormItem>
               <FormControl>
-                <CustomInput type="text" label="Apellido" v-bind="componentField" />
+                <CustomInput
+                  type="text"
+                  label="Apellido"
+                  v-bind="componentField"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -162,7 +202,10 @@ const handleCreate = async (values: any) => {
 
         <div class="grid grid-cols-2 gap-4">
           <!-- Tipo de Documento -->
-          <FormField v-slot="{ componentField }" name="representative.documentType">
+          <FormField
+            v-slot="{ componentField }"
+            name="representative.documentType"
+          >
             <FormItem>
               <FormControl>
                 <CustomSelect
@@ -180,10 +223,17 @@ const handleCreate = async (values: any) => {
           </FormField>
 
           <!-- Número de Documento -->
-          <FormField v-slot="{ componentField }" name="representative.documentIdentifier">
+          <FormField
+            v-slot="{ componentField }"
+            name="representative.documentIdentifier"
+          >
             <FormItem>
               <FormControl>
-                <CustomInput type="text" label="Número de Documento" v-bind="componentField" />
+                <CustomInput
+                  type="text"
+                  label="Número de Documento"
+                  v-bind="componentField"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -232,7 +282,11 @@ const handleCreate = async (values: any) => {
           <FormField v-slot="{ componentField }" name="birthDate">
             <FormItem>
               <FormControl>
-                <CustomInput type="date" label="Fecha de Nacimiento" v-bind="componentField" />
+                <CustomInput
+                  type="date"
+                  label="Fecha de Nacimiento"
+                  v-bind="componentField"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -244,7 +298,11 @@ const handleCreate = async (values: any) => {
           <FormField v-slot="{ componentField }" name="phoneNumber">
             <FormItem>
               <FormControl>
-                <CustomInput type="tel" label="Número de Teléfono" v-bind="componentField" />
+                <CustomInput
+                  type="tel"
+                  label="Número de Teléfono"
+                  v-bind="componentField"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -253,7 +311,11 @@ const handleCreate = async (values: any) => {
           <FormField v-slot="{ componentField }" name="email">
             <FormItem>
               <FormControl>
-                <CustomInput type="email" label="Email" v-bind="componentField" />
+                <CustomInput
+                  type="email"
+                  label="Email"
+                  v-bind="componentField"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -265,15 +327,44 @@ const handleCreate = async (values: any) => {
             <FormControl>
               <Checkbox
                 :checked="componentField.modelValue"
-                @update:checked="componentField.onChange"
                 v-bind="componentField"
+                @update:checked="componentField.onChange"
               />
-              <label class="text-[14px]">He leído, conozco las condiciones para el tratamiento de mis datos personales y doy mi consentimiento, en su caso, tal y como se describe en <b>Aviso de privacidad y Términos de uso</b></label>
+              <label class="text-[14px]"
+                >He leído, conozco las condiciones para el tratamiento de mis
+                datos personales y doy mi consentimiento, en su caso, tal y como
+                se describe en
+                <b>Aviso de privacidad y Términos de uso</b></label
+              >
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
       </div>
     </BaseForm>
+
+    <Dialog
+      v-model:open="isSuccessDialogOpen"
+      :icon-src="messageIcon"
+      icon-alt="Icono de alerta"
+      title="Registro exitoso"
+      description="Revise su bandeja de entrada para continuar con el proceso de registro"
+      button-text="Aceptar"
+      icon-bg-color="bg-[#00BB8E]"
+      @close="closeSuccessDialog"
+      @action="closeSuccessDialog"
+    />
+
+    <Dialog
+      v-model:open="isErrorDialogOpen"
+      :icon-src="priorityHigh"
+      icon-alt="Icono de alerta"
+      title="Error"
+      :description="errorDialogMessage"
+      button-text="Aceptar"
+      icon-bg-color="bg-[#FBBF24]"
+      @close="closeErrorDialog"
+      @action="closeErrorDialog"
+    />
   </NuxtLayout>
 </template>
