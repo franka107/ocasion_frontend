@@ -10,8 +10,8 @@
             :data="paymentsData"
             :header="paymentsHeader(props.type)"
             :search="paymentsSearch"
-            @onSort="onSort"
-            @onSearch="onSearch"
+            @on-sort="onSort"
+            @on-search="onSearch"
           >
             <template #actions="{ row }">
               <div class="flex justify-center">
@@ -39,8 +39,8 @@
                       <DropdownMenuItem
                         @click="
                           () => {
-                            paymentsId = row.id;
-                            openModalObservePayment = true;
+                            paymentsId = row.id
+                            openModalObservePayment = true
                           }
                         "
                       >
@@ -80,76 +80,76 @@
           >
             <PaymentsForm
               :id="paymentsId"
-              :onSubmit="handleObserve"
-              :closeModal="() => (openModalObservePayment = false)"
+              :on-submit="handleObserve"
+              :close-modal="() => (openModalObservePayment = false)"
             />
           </SheetContent>
         </div>
         <CustomPagination
+          v-model:page="page"
           class="mt-5 mb-[19px]"
           :total="data.count"
           :limit="data.limit"
-          v-model:page="page"
         />
       </div>
     </ContentLayout>
   </section>
 </template>
 <script setup lang="ts">
-import CustomTable from "@/components/ui/custom-table/CustomTable.vue";
-import CustomChip from "@/components/ui/custom-chip/CustomChip.vue";
-import CustomPagination from "@/components/ui/custom-pagination/CustomPagination.vue";
-import type { IPaymentsLItem } from "@/types/Payment.ts";
+import CustomTable from '@/components/ui/custom-table/CustomTable.vue'
+import CustomChip from '@/components/ui/custom-chip/CustomChip.vue'
+import CustomPagination from '@/components/ui/custom-pagination/CustomPagination.vue'
+import type { IPaymentsLItem } from '@/types/Payment.ts'
 import {
   paymentsHeader,
   paymentStatus,
   paymentsSearch,
-} from "~/constants/payments";
-import ContentLayout from "~/layouts/default/ContentLayout.vue";
-import CustomSimpleCard from "~/components/ui/custom-simple-card/CustomSimpleCard.vue";
-import { GrantId } from "~/types/Grant";
+} from '~/constants/payments'
+import ContentLayout from '~/layouts/default/ContentLayout.vue'
+import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
+import { GrantId } from '~/types/Grant'
 const props = defineProps<{
-  type: "organization" | "platform";
-  organizationId: string | null;
-}>();
+  type: 'organization' | 'platform'
+  organizationId: string | null
+}>()
 const filterOptions = ref(
-  props.type === "organization"
+  props.type === 'organization'
     ? `[{ "field": "organization.id", "type": "equal", "value": "${props.organizationId}" }]`
-    : "[]",
-);
-const openModalObservePayment = ref(false);
-const { openConfirmModal, updateConfirmModal } = useConfirmModal();
+    : '[]',
+)
+const openModalObservePayment = ref(false)
+const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const { confirmPayment, observePayment, page, sortOptions, onSort } =
-  usePaymentAPI();
-const { getMyGrants } = useAuthManagement();
-const myGrants = await getMyGrants();
-const paymentsId = ref<number | undefined>(undefined);
-const BASE_PAY_URL = "/payment-management";
+  usePaymentAPI()
+const { getMyGrants } = useAuthManagement()
+const myGrants = await getMyGrants()
+const paymentsId = ref<number | undefined>(undefined)
+const BASE_PAY_URL = '/payment-management'
 const selectedMultipleData = ref<{ type: string; ids: string[] }>({
-  type: "empty",
+  type: 'empty',
   ids: [],
-});
-const resetMultipleSelect = ref<Function | undefined>(undefined);
+})
+const resetMultipleSelect = ref<Function | undefined>(undefined)
 const disableMultipleSelect = computed(
   () =>
-    selectedMultipleData.value.type === "empty" &&
+    selectedMultipleData.value.type === 'empty' &&
     selectedMultipleData.value.ids.length === 0,
-);
+)
 const onSearch = (item: { [key: string]: string }) => {
   filterOptions.value = JSON.stringify([
-    { field: "status", type: "equal", value: item.status || "" },
-    { field: "organization.name", type: "like", value: item.organization },
+    { field: 'status', type: 'equal', value: item.status || '' },
+    { field: 'organization.name', type: 'like', value: item.organization },
     ...(props.organizationId
       ? [
           {
-            field: "organization.id",
-            type: "equal",
+            field: 'organization.id',
+            type: 'equal',
             value: props.organizationId,
           },
         ]
       : []),
-  ]);
-};
+  ])
+}
 const { data, refresh }: any = await useAPI(
   `${BASE_PAY_URL}/find-payments-paginated`,
   {
@@ -161,82 +161,82 @@ const { data, refresh }: any = await useAPI(
     },
   } as any,
   true,
-);
+)
 
 const paymentsData = computed(() =>
   data.value.data.map((item: IPaymentsLItem, index: number) => ({
-    code: "-",
-    supportingDetails: "Documento.pdf",
-    date: new Date(item.submittedAt).toLocaleString("es-ES", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+    code: '-',
+    supportingDetails: 'Documento.pdf',
+    date: new Date(item.submittedAt).toLocaleString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     }),
     ...item,
-    event: item.event?.name || "-",
+    event: item.event?.name || '-',
   })),
-);
+)
 
 const handleConfirmPayment = async (paymentId: string) => {
-  console.log(paymentId);
+  console.log(paymentId)
   openConfirmModal({
-    title: "Confirmar abono",
+    title: 'Confirmar abono',
     message: `¿Está seguro de que deseas confirmar este abono?`,
     callback: async () => {
       try {
         // const { paymentId } = values;
-        const { status } = await confirmPayment({ paymentId });
-        if (status.value === "success") {
-          refresh();
-          resetMultipleSelect.value?.();
+        const { status } = await confirmPayment({ paymentId })
+        if (status.value === 'success') {
+          refresh()
+          resetMultipleSelect.value?.()
           updateConfirmModal({
-            title: "Abono confirmado",
-            message: "El abono ha sido confirmado exitosamente",
-            type: "success",
-          });
+            title: 'Abono confirmado',
+            message: 'El abono ha sido confirmado exitosamente',
+            type: 'success',
+          })
         } else {
-          throw new Error("Error al confirmar este abono");
+          throw new Error('Error al confirmar este abono')
         }
       } catch (error) {
-        console.log("error", error);
+        console.log('error', error)
         updateConfirmModal({
-          title: "Error al confirmar Abono",
-          message: "No se pudo confirmar Abono. Por favor, intente nuevamente.",
-          type: "error",
-        });
+          title: 'Error al confirmar Abono',
+          message: 'No se pudo confirmar Abono. Por favor, intente nuevamente.',
+          type: 'error',
+        })
       }
     },
-  });
-};
+  })
+}
 
 const handleObserve = async (values: any) => {
   openConfirmModal({
-    title: "Actualizar abono",
-    message: "¿Estás seguro de que deseas actualizar este Abono?",
+    title: 'Actualizar abono',
+    message: '¿Estás seguro de que deseas actualizar este Abono?',
     callback: async () => {
-      const { status, error }: any = await observePayment(values);
-      if (status.value === "success") {
-        openModalObservePayment.value = false;
-        refresh();
+      const { status, error }: any = await observePayment(values)
+      if (status.value === 'success') {
+        openModalObservePayment.value = false
+        refresh()
         updateConfirmModal({
-          title: "Abono actualizado",
-          message: "El abono ha sido actualizado exitosamente",
-          type: "success",
-        });
+          title: 'Abono actualizado',
+          message: 'El abono ha sido actualizado exitosamente',
+          type: 'success',
+        })
       } else {
         const eMsg =
           error.value.data?.errors?.[0].message ||
           error.value.data.message ||
-          "El abono no se pudo actualizar, intentalo más tarde";
+          'El abono no se pudo actualizar, intentalo más tarde'
         updateConfirmModal({
-          title: "Error al actualizar bono",
+          title: 'Error al actualizar bono',
           message: eMsg,
-          type: "error",
-        });
+          type: 'error',
+        })
       }
     },
-  });
-};
+  })
+}
 </script>
