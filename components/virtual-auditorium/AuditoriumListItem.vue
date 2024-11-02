@@ -24,6 +24,10 @@ const cardClass = (totalSeconds: number, offer: OfferListItem) => {
   }
   return ''
 }
+const router = useRouter();
+const handleEventsDetail = async (offer: any) => {
+  router.push(`/dashboard/participant/virtual-auditorium/offers/offerdetail`);
+};
 </script>
 <template> 
   <Countdown
@@ -33,46 +37,46 @@ const cardClass = (totalSeconds: number, offer: OfferListItem) => {
   >
     <div
       tabindex="0"
-      :class="cn(`w-[219px] h-[300px] flex flex-col box-content shadow-[0px_0px_4px_0px_#0000001A] cursor-pointer
-       bg-white rounded-[8px] overflow-hidden border-box focus:border-2 border-transparent focus:border-[#414967]`, cardClass(totalSeconds, offer))">
+      :class="cn(`w-full flex flex-col box-content shadow-[0px_0px_4px_0px_#0000001A] cursor-pointer
+       bg-white rounded-lg overflow-hidden border-box focus:border-2 border-transparent focus:border-[#414967]`, cardClass(totalSeconds, offer))">
       <!-- Contador en cajitas -->
-      <div class="text-[#FFFFFF] text-[14px] leading-[16.41px] font-[500] bg-[#C7E0F0] text-center py-[8px]">
-        <div class="flex items-center space-x-2 justify-center text-[#152A3C] text-[10px] font-[600]">
-          <div class="w-[36px] h-[20px] border border-[#152A3C] rounded-[8px] flex items-center justify-center">
-            {{ days }}<span class="text-[#F6313C] ml-[3px]">d</span>
+      <div class="bg-[#C7E0F0] text-white text-sm font-medium text-center py-2">
+        <div class="flex items-center space-x-2 justify-center text-[#152A3C] text-xs font-semibold">
+          <div class="w-9 h-5 border border-[#152A3C] rounded-md flex items-center justify-center">
+            {{ days }}<span class="text-[#F6313C] ml-1">d</span>
           </div>
           <span>:</span>
-          <div class="w-[36px] h-[20px] border border-[#152A3C] rounded-[8px] flex items-center justify-center">
-            {{ hours }}<span class="text-[#F6313C] ml-[3px]">h</span>
+          <div class="w-9 h-5 border border-[#152A3C] rounded-md flex items-center justify-center">
+            {{ hours }}<span class="text-[#F6313C] ml-1">h</span>
           </div>
           <span>:</span>
-          <div class="w-[36px] h-[20px] border border-[#152A3C] rounded-[8px] flex items-center justify-center ">
-            {{ minutes }}<span class="text-[#F6313C] ml-[3px]">m</span>
+          <div class="w-9 h-5 border border-[#152A3C] rounded-md flex items-center justify-center">
+            {{ minutes }}<span class="text-[#F6313C] ml-1">m</span>
           </div>
           <span>:</span>
-          <div class="w-[36px] h-[20px] border border-[#152A3C] rounded-[8px] flex items-center justify-center">
-            {{ seconds }}<span class="text-[#F6313C] ml-[3px]">s</span>
+          <div class="w-9 h-5 border border-[#152A3C] rounded-md flex items-center justify-center">
+            {{ seconds }}<span class="text-[#F6313C] ml-1">s</span>
           </div>
         </div>
       </div>  
       <!-- Información de la tarjeta -->
-      <div class="px-[8px] py-[8px]">
-        <div class="h-[99px]">
-            <img src="/assets/img/auto_card.png" alt="Imagen del auto" class="w-full h-full object-cover rounded-[8px]" />
+      <div class="px-2 py-2">
+        <div class="h-24">
+          <img src="/assets/img/auto_card.png" alt="Imagen del auto" class="w-full h-full object-cover rounded-md" />
         </div>  
-        <p class="text-[#152A3C] text-[12px] font-[700] my-[12px] leading-[9px]">N°{{ offer.id }}</p>
-        <h2 class="text-[#20445E] text-[14px] font-[600] leading-[16px] pb-[8px]">
+        <p class="text-[#152A3C] text-[12px] font-[700] my-3 leading-2">N°{{ offer.id }}</p>
+        <h2 class="text-[#20445E] text-sm font-semibold leading-4 pb-2">
           {{ offer.title }}
         </h2>
-        <p class="text-[#68686C] text-[12px] font-[600] text-center leading-[20px] mb-[8px] flex items-center justify-between">
-            Valor actual 
-            <CustomIcons name="Info" class="w-4 h-4 text-primary" />
-            <span class="font-[700] text-[14px] text-[#20445E] ">USD ${{ offer.bid?.amount || 0 }}</span>
-        </p>
-
+        <div class="flex items-center justify-center space-x-2 text-[#68686C] text-xs font-semibold mb-2">
+          <span>Valor actual</span>
+          <CustomIcons name="Info" class="w-5 h-5 text-primary" />
+          <span class="font-bold text-sm text-[#20445E]">USD ${{ offer.bid?.amount || 0 }}</span>
+        </div>
         <div class="flex justify-end">
           <button
-            class="px-4 py-1 text-[14px] text-[#388EBF] font-[500] hover:text-white hover:bg-bluePrimary rounded-[8px]"
+            class="px-4 py-1 text-sm text-[#388EBF] font-medium hover:text-white hover:bg-bluePrimary rounded-md"
+            @click="handleEventsDetail"
           >
             Ver detalle
           </button>

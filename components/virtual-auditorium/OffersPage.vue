@@ -41,34 +41,106 @@ socket.on('offerUpdated', (newOffer: OfferListItem) => {
         }
     }
 })
+
+/*Mover a un componente */
+import { X } from "lucide-vue-next";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+
+const isModalOpen = ref(false)
+
+const openModal = () => {
+  isModalOpen.value = true
+}
+
+const closeModal = () => {
+  isModalOpen.value = false
+}
+/**/
 </script>
 
 <template>
-    <section class="flex gap-x-[16px] w-full max-w-[1324px]">
+    <section class="flex gap-x-4 w-full max-w-[1324px]">
         <div class="max-w-[901px]">
-            <div class="flex h-[56px] items-center text-[#152A3C] justify-end mb-[8px] gap-x-[10px] px-[8px]">
-                <label class="font-[600] text-[14px] md:text-[16px] leading-[24px]">Ordenar por:</label>
-                <Select>
-                    <SelectTrigger
-                        class="max-w-[180px] text-[12px] md:text-[16px] font-[400] border border-[#CBD5E1] rounded-md p-2 text-[#152A3C]">
-                        <SelectValue placeholder="Todos" class="max-w-[180px]"/>
+          <div class="flex h-[56px] items-center text-[#152A3C] justify-end mb-[8px] gap-x-4 px-[8px]">
+           <label class="font-semibold text-sm md:text-base leading-6">Ordenar por:</label>
+              <Select>
+                <SelectTrigger
+                  class="max-w-[180px] text-xs md:text-base font-normal border border-[#CBD5E1] rounded-md p-2 text-[#152A3C]"
+                >
+                  <SelectValue placeholder="Todos" class="max-w-[180px]" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem v-for="option in options" :key="option" :value="option"
-                            class="flex justify-center text-center rounded-[8px] font-[500] text-[12px] md:text-[14px] p-[5px] text-[#152A3C] hover:bg-[#F1F5F9]">
-                            {{ option }}
-                        </SelectItem>
+                      <SelectItem
+                        v-for="option in options"
+                        :key="option"
+                        :value="option"
+                        class="flex justify-center text-center rounded-md font-medium text-xs md:text-sm p-2 text-[#152A3C] hover:bg-[#F1F5F9]"
+                      >
+                        {{ option }}
+                      </SelectItem>
                     </SelectContent>
                 </Select>
+                  <!-- Botón para abrir el modal OfferDetailItem móvil -->
+                <Button
+                  @click="openModal"
+                  variant="default"
+                  class="hidden xl:hidden px-4 py-2">
+                  Ver detalle
+                </Button>
             </div>
             <AuditoriumList :offerList="offerList" @onSelectOffer="(value) => { selectedOffer = value }" />
             <CustomPagination 
-              class="mt-[32px]"
+              class="mt-8"
              :total="offerListData.count"
              v-model:page="page"
              :limit="8"
             />
         </div>
-            <OfferDetailsItem  class="hidden xl:block" v-if="selectedOffer" :offer="selectedOffer" :onPlaceBid="onPlaceBid" />
+        <OfferDetailsItem  class="hidden xl:block w-full max-w-[350px]" v-if="selectedOffer" :offer="selectedOffer" :onPlaceBid="onPlaceBid" />
+        <!-- Modal OfferDetailItem móvil -->
+        <AlertDialog
+          :open="isModalOpen"
+          class="z-[30]"
+          @update:open="closeModal"
+        >
+          <AlertDialogContent class="z-[98] max-w-[400px] px-0 py-4">
+            <AlertDialogHeader class="flex flex-row justify-between items-center border-b border-primary">
+              <AlertDialogTitle
+                class="text-lg tracking-tight text-primary text-start font-semibold px-4"
+                >Detalle de la oferta</AlertDialogTitle
+              >
+              <SheetClose class="mr-4 rounded-full p-3 hover:bg-[#f1f5f9]">
+                <X class="w-4 h-4 text-muted-foreground" />
+              </SheetClose>
+            </AlertDialogHeader>
+            <div class="px-4">
+              <OfferDetailsItem  v-if="selectedOffer" :offer="selectedOffer" :onPlaceBid="onPlaceBid" />
+            </div>
+            <AlertDialogFooter class="px-4 mt-4 flex justify-end gap-4">
+              <Button
+                type="button"
+                class="text-base font-semibold bg-white text-primary border border-primary hover:bg-accent"
+                @click="closeModal"
+                >Cerrar</Button
+              >
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
     </section>
 </template>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+</style>
