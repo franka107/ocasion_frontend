@@ -28,8 +28,24 @@ const closeErrorDialog = () => {
 }
 const isSubmitting = ref(false)
 const registerFormSchema = z.object({
-  firstName: z.string().min(1, 'El nombre es requerido'),
-  lastName: z.string().min(1, 'El apellido es requerido'),
+  personType: z.enum(['NATURAL_PERSON', 'JURIDIC_PERSON']),
+
+  firstName: z.string().min(1, 'El nombre es requerido').optional(),
+  lastName: z.string().min(1, 'El apellido es requerido').optional(),
+  maritalStatus: z.enum(['SINGLE', 'MARRIED', 'WIDOWED', 'DIVORCED']).optional(),
+  gender: z.enum(['MALE', 'FEMALE']).optional(),
+  birthDate: z.string().nonempty('La fecha de nacimiento es requerida').optional(),
+
+  businessName: z.string().min(1, 'El nombre del negocio es requerido').optional(),
+  ruc: z
+    .string()
+    .regex(/^\d{11}$/, 'El RUC debe contener 11 dígitos')
+    .optional(),
+  legalRepresentative: z.string().min(1, 'El representante legal es requerido').optional(),
+  taxAddress: z.string().min(1, 'El Domicilio Fiscal es requerida').optional(),
+
+  email: z.string().email('Debe ser un correo electrónico válido'),
+  phoneNumber: z.string().min(9, 'El número de teléfono debe tener al menos 9 dígitos'),
   representative: z
     .object({
       documentType: z.enum(['DNI', 'CE', 'PT']),
@@ -61,17 +77,7 @@ const registerFormSchema = z.object({
         })
       }
     }),
-  gender: z.enum(['MALE', 'FEMALE']),
-  maritalStatus: z.enum(['SINGLE', 'MARRIED', 'WIDOWED', 'DIVORCED']),
-  email: z.string().email('Debe ser un correo electrónico válido'),
-  birthDate: z.string().nonempty('La fecha de nacimiento es requerida'),
-  phoneNumber: z
-    .string()
-    .min(9, 'El número de teléfono debe tener al menos 10 dígitos'),
-  areConditionsAccepted: z
-    .boolean()
-    .refine((val) => val === true, 'Debe aceptar los términos y condiciones'),
-  personType: z.enum(['NATURAL_PERSON', 'JURIDIC_PERSON']),
+  areConditionsAccepted: z.boolean().refine(val => val === true, 'Debe aceptar los términos y condiciones'),
 })
 
 type RegisterForm = z.infer<typeof registerFormSchema>
@@ -89,17 +95,6 @@ const form = useForm({
     personType: 'NATURAL_PERSON',
   },
 })
-
-watch(form.values, (newValues) => {
-  // console.log('Form values:', newValues)
-  // console.log("status:", form.meta);
-  // console.log("allFieldsValid:", allFieldsValid);
-  // console.log('Attached Files:', newValues.attachedFiles)
-})
-
-// watch(form.errors, (newErrors) => {
-//   console.log('Errores actuales:', newErrors);
-// });
 
 const onSubmit = form.handleSubmit(async (values: RegisterForm) => {
   if (isSubmitting.value) return
@@ -131,6 +126,11 @@ const handleSignIn = async (values: any) => {
     isErrorDialogOpen.value = true
   }
 }
+
+const personType = computed(() => form.values.personType);
+const showNaturalPersonFields = computed(() => personType.value === 'NATURAL_PERSON');
+const showJuridicPersonFields = computed(() => personType.value === 'JURIDIC_PERSON');
+
 </script>
 
 <template>
@@ -170,37 +170,131 @@ const handleSignIn = async (values: any) => {
           </FormItem>
         </FormField>
 
-        <div class="grid grid-cols-2 gap-4">
-          <!-- Nombre -->
-          <FormField v-slot="{ componentField }" name="firstName">
+        <template v-if="showNaturalPersonFields">
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Nombre -->
+            <FormField v-slot="{ componentField }" name="firstName">
+              <FormItem>
+                <FormControl>
+                  <CustomInput type="text" label="Nombre" v-bind="componentField" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+            <!-- Apellido -->
+            <FormField v-slot="{ componentField }" name="lastName">
+              <FormItem>
+                <FormControl>
+                  <CustomInput type="text" label="Apellido" v-bind="componentField" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+            <!-- Estado Civil -->
+            <FormField v-slot="{ componentField }" name="maritalStatus">
+              <FormItem>
+                <FormControl>
+                  <CustomSelect
+                    :items="[
+                      { id: 'SINGLE', name: 'Soltero' },
+                      { id: 'MARRIED', name: 'Casado' },
+                      { id: 'WIDOWED', name: 'Viudo' },
+                      { id: 'DIVORCED', name: 'Divorciado' },
+                    ]"
+                    placeholder="Estado Civil"
+                    v-bind="componentField"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+            <!-- Sexo -->
+            <FormField v-slot="{ componentField }" name="gender">
+              <FormItem>
+                <FormControl>
+                  <CustomSelect
+                    :items="[
+                      { id: 'MALE', name: 'Masculino' },
+                      { id: 'FEMALE', name: 'Femenino' },
+                    ]"
+                    placeholder="Sexo"
+                    v-bind="componentField"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+            <!-- Fecha de Nacimiento -->
+            <FormField v-slot="{ componentField }" name="birthDate">
+              <FormItem>
+                <FormControl>
+                  <CustomInput type="date" label="Fecha de Nacimiento" v-bind="componentField" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+          </div>
+        </template>
+
+        <template v-if="showJuridicPersonFields">
+          <!-- Razón Social -->
+          <FormField v-slot="{ componentField }" name="businessName">
             <FormItem>
               <FormControl>
-                <CustomInput
-                  type="text"
-                  label="Nombre"
-                  v-bind="componentField"
-                />
+                <CustomInput type="text" label="Razón Social" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+          <!-- RUC -->
+          <FormField v-slot="{ componentField }" name="ruc">
+            <FormItem>
+              <FormControl>
+                <CustomInput type="text" label="RUC" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+          <!-- Representante Legal -->
+          <FormField v-slot="{ componentField }" name="legalRepresentative">
+            <FormItem>
+              <FormControl>
+                <CustomInput type="text" label="Representante Legal" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+          <!-- Dirección Fiscal -->
+          <FormField v-slot="{ componentField }" name="taxAddress">
+            <FormItem>
+              <FormControl>
+                <CustomInput type="text" label="Domicilio Fiscal" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+        </template>
+
+
+        <div class="grid grid-cols-2 gap-4">
+
+          <FormField v-slot="{ componentField }" name="phoneNumber">
+            <FormItem>
+              <FormControl>
+                <CustomInput type="tel" label="Número de Teléfono" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+          <FormField v-slot="{ componentField }" name="email">
+            <FormItem>
+              <FormControl>
+                <CustomInput type="email" label="Email" v-bind="componentField" />
               </FormControl>
               <FormMessage />
             </FormItem>
           </FormField>
 
-          <!-- Apellido -->
-          <FormField v-slot="{ componentField }" name="lastName">
-            <FormItem>
-              <FormControl>
-                <CustomInput
-                  type="text"
-                  label="Apellido"
-                  v-bind="componentField"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
           <!-- Tipo de Documento -->
           <FormField
             v-slot="{ componentField }"
@@ -240,87 +334,6 @@ const handleSignIn = async (values: any) => {
           </FormField>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
-          <div class="grid grid-cols-2 gap-2">
-            <!-- Sexo -->
-            <FormField v-slot="{ componentField }" name="gender">
-              <FormItem>
-                <FormControl>
-                  <CustomSelect
-                    :items="[
-                      { id: 'MALE', name: 'Masculino' },
-                      { id: 'FEMALE', name: 'Femenino' },
-                    ]"
-                    placeholder="Sexo"
-                    v-bind="componentField"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            </FormField>
-
-            <!-- Estado Civil -->
-            <FormField v-slot="{ componentField }" name="maritalStatus">
-              <FormItem>
-                <FormControl>
-                  <CustomSelect
-                    :items="[
-                      { id: 'SINGLE', name: 'Soltero' },
-                      { id: 'MARRIED', name: 'Casado' },
-                      { id: 'WIDOWED', name: 'Viudo' },
-                      { id: 'DIVORCED', name: 'Divorciado' },
-                    ]"
-                    placeholder="Estado Civil"
-                    v-bind="componentField"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            </FormField>
-          </div>
-          <!-- Fecha de Nacimiento -->
-          <FormField v-slot="{ componentField }" name="birthDate">
-            <FormItem>
-              <FormControl>
-                <CustomInput
-                  type="date"
-                  label="Fecha de Nacimiento"
-                  v-bind="componentField"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-          <!-- Número de Teléfono -->
-          <FormField v-slot="{ componentField }" name="phoneNumber">
-            <FormItem>
-              <FormControl>
-                <CustomInput
-                  type="tel"
-                  label="Número de Teléfono"
-                  v-bind="componentField"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-          <!-- Email -->
-          <FormField v-slot="{ componentField }" name="email">
-            <FormItem>
-              <FormControl>
-                <CustomInput
-                  type="email"
-                  label="Email"
-                  v-bind="componentField"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-        </div>
         <!-- Aceptación de Condiciones -->
         <FormField v-slot="{ componentField }" name="areConditionsAccepted">
           <FormItem class="flex items-center gap-2">
