@@ -1,7 +1,7 @@
 <template>
   <div>
     <Dialog :open="open" @update:open="closeDialog">
-      <DialogContent class="sm:max-w-[425px] rounded-lg">
+      <DialogContent class="sm:max-w-[460px] rounded-lg">
         <div class="flex flex-col items-center text-center">
           <div :class="[props.iconBgColor, 'rounded-full p-3 mb-4']">
             <slot name="icon" />

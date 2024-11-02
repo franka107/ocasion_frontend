@@ -1,23 +1,42 @@
 <script setup lang="ts">
-import dayjs from 'dayjs';
 import type { OfferListItem } from '~/types/Offer';
 import { getRemainingTime } from '@/utils/countDown'
 const props = defineProps<{ offer: OfferListItem }>()
 const { offer } = toRefs(props)
+const key = ref(0)
+const endMiliseconds = ref(getRemainingTime(offer.value.endTime)) 
+watch(offer,() => { 
+  key.value++
+  endMiliseconds.value = getRemainingTime(offer.value.endTime)
+})
+const cardClass = (totalSeconds: number, offer: OfferListItem) => {
+  const SHOW_ALERT_ON_SECOND = 120
+  const BID_WINNER_STATUS = 'WINNER'
 
-const endMiliseconds = getRemainingTime(offer.value.endTime)
-const SHOW_ALERT_ON_MINUTE = 18
-
+  if(totalSeconds <= 0) {
+    if(offer.bid?.status === BID_WINNER_STATUS) {
+      return 'border-2 border-green-400'
+    } else {
+      return 'border-2 border-black-600'
+    }
+  } else if(totalSeconds < SHOW_ALERT_ON_SECOND) {
+    return 'animate-twinkle-shadow'
+  }
+  return ''
+}
 </script>
 <template> 
   <Countdown
+    :key="key"
     :time="endMiliseconds"
-    v-slot="{ days, hours, minutes, seconds, totalHours }"
+    v-slot="{ days, hours, minutes, seconds, totalSeconds }"
   >
-    <div tabindex="0" :class="cn('w-[219px] h-[300px] flex flex-col box-content shadow-[0px_0px_4px_0px_#0000001A] cursor-pointer bg-white rounded-[8px] overflow-hidden border-box focus:border-2 border-transparent focus:border-[#414967]', totalHours === SHOW_ALERT_ON_MINUTE && ' animate-twinkle-shadow')">
+    <div
+      tabindex="0"
+      :class="cn(`w-[219px] h-[300px] flex flex-col box-content shadow-[0px_0px_4px_0px_#0000001A] cursor-pointer
+       bg-white rounded-[8px] overflow-hidden border-box focus:border-2 border-transparent focus:border-[#414967]`, cardClass(totalSeconds, offer))">
       <!-- Contador en cajitas -->
       <div class="text-[#FFFFFF] text-[14px] leading-[16.41px] font-[500] bg-[#C7E0F0] text-center py-[8px]">
-        {{ totalHours }}
         <div class="flex items-center space-x-2 justify-center text-[#152A3C] text-[10px] font-[600]">
           <div class="w-[36px] h-[20px] border border-[#152A3C] rounded-[8px] flex items-center justify-center">
             {{ days }}<span class="text-[#F6313C] ml-[3px]">d</span>
@@ -43,12 +62,12 @@ const SHOW_ALERT_ON_MINUTE = 18
         </div>  
         <p class="text-[#152A3C] text-[12px] font-[700] my-[12px] leading-[9px]">N°{{ offer.id }}</p>
         <h2 class="text-[#20445E] text-[14px] font-[600] leading-[16px] pb-[8px]">
-          {{ offer.description }}
+          {{ offer.title }}
         </h2>
         <p class="text-[#68686C] text-[12px] font-[600] text-center leading-[20px] mb-[8px] flex items-center justify-between">
             Valor actual 
             <CustomIcons name="Info" class="w-4 h-4 text-primary" />
-            <span class="font-[700] text-[14px] text-[#20445E] ">USD ${{ offer.appraisal }}</span>
+            <span class="font-[700] text-[14px] text-[#20445E] ">USD ${{ offer.bid?.amount || 0 }}</span>
         </p>
 
         <div class="flex justify-end">

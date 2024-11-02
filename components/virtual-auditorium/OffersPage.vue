@@ -1,18 +1,24 @@
 <script setup lang="ts">
-import { useWebSocket } from '@vueuse/core'
-// const { status, data, send, open, close } = useWebSocket('ws://websocketurl')
 import AuditoriumList from '~/components/virtual-auditorium/AuditoriumList.vue'
 import OfferDetailsItem from '~/components/virtual-auditorium/OfferDetailsItem.vue'
 import CustomPagination from '~/components/ui/custom-pagination/CustomPagination.vue'
 import type { OfferListItem } from '~/types/Offer';
 import type { IDataResponse } from '~/types/Common';
+const { socket } = useSocketIo()
+
+const onPlaceBid = ({ offerId, amount }: { offerId: string, amount: number }) => {
+    socket.emit('placeBid', { offerId, amount });
+}
+
 const OFFER_BASE_URL = '/offer-management'
 const options = ["Todos", "Finalizado", "Por vencer"];
+
+
 const { page, sortOptions, } = useOfferAPI()
 const filterOptions = ref('[]')
 const selectedOffer = ref<OfferListItem | undefined>(undefined)
-const { data: offerListData } = await 
-  useAPI<IDataResponse<OfferListItem>>(`${OFFER_BASE_URL}/find-offers-paginated-for-participant`, {
+const offerList = ref<OfferListItem[]>([])
+const { data: offerListData } = await useAPI<IDataResponse<OfferListItem>>(`${OFFER_BASE_URL}/find-offers-paginated-for-participant`, {
     query: {
       limit: 8,
       page,
@@ -20,11 +26,21 @@ const { data: offerListData } = await
       sortOptions,
     },
   } as any)
-const offerList = computed(() => offerListData.value.data || [])
+offerList.value = offerListData.value.data
 
-const onSelectOffer = (offer: OfferListItem) => {
-    selectedOffer.value = offer
-}
+socket.on('bidError', (data) => {
+    console.error('bidError',data)
+})
+socket.on('offerUpdated', (newOffer: OfferListItem) => {
+    const offerIndex = offerList.value.findIndex(offerItem => offerItem.id === newOffer.id)
+    if (offerIndex !== -1) {
+        console.log('offerUpdated', newOffer.appraisal);
+        offerList.value[offerIndex] = newOffer
+        if(selectedOffer.value?.id === offerList.value[offerIndex].id) {
+            selectedOffer.value = newOffer
+        }
+    }
+})
 </script>
 
 <template>
@@ -45,7 +61,7 @@ const onSelectOffer = (offer: OfferListItem) => {
                     </SelectContent>
                 </Select>
             </div>
-            <AuditoriumList :offerList="offerList" @onSelectOffer="onSelectOffer" />
+            <AuditoriumList :offerList="offerList" @onSelectOffer="(value) => { selectedOffer = value }" />
             <CustomPagination 
               class="mt-[32px]"
              :total="offerListData.count"
@@ -53,6 +69,6 @@ const onSelectOffer = (offer: OfferListItem) => {
              :limit="8"
             />
         </div>
-            <OfferDetailsItem  class="hidden xl:block" v-if="selectedOffer" :offer="selectedOffer" />
+            <OfferDetailsItem  class="hidden xl:block" v-if="selectedOffer" :offer="selectedOffer" :onPlaceBid="onPlaceBid" />
     </section>
 </template>

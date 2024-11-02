@@ -16,6 +16,7 @@ export interface OfferListItem {
   description: string
   address: Address
   appraisal: number
+  bid: Bid
   annexesFiles: AnnexesFile[]
   attachedFiles: AttachedFile[]
   status: OfferStatus
@@ -23,6 +24,16 @@ export interface OfferListItem {
   createdAt: string
   updatedAt: string
 }
+export interface Bid {
+  id: string
+  amount: number
+  status: string
+  createdAt: string
+  offerId: string
+  userId: string
+  __entity: string
+}
+
 
 export interface OfferDto {
   id: string
