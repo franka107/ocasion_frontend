@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import type { OfferListItem } from '~/types/Offer'
 import { getRemainingTime } from '@/utils/countDown'
 import ConfirmBidDialog from '~/components/virtual-auditorium/ConfirmBidDialog.vue'
+import BidHistory from './BidHistory.vue';
 
 const props = defineProps<{
   offer: OfferListItem
@@ -88,7 +89,7 @@ const onSubmitBid = () => {
     >
       <div class="grid mx-auto">
         <div
-          class="w-full max-w-[350px] max-h-[394px] flex flex-col shadow-[0px_0px_4px_0px_#0000001A] bg-white rounded-[8px] overflow-hidden"
+          class="w-full max-w-[350px] min-h-0-h-[394px] flex flex-col shadow-[0px_0px_4px_0px_#0000001A] bg-white rounded-[8px] overflow-hidden"
         >
           <!-- Contador en cajitas -->
           <div
@@ -123,11 +124,12 @@ const onSubmitBid = () => {
             </div>
           </div>
           <!-- Información de la tarjeta -->
-          <div class="px-[12px] pt-[20px] pb-[16px]">
+          <div class="px-3 py-5">
+            <div class="">
             <div
-              class="flex justify-between text-[#20445E] text-[12px] leading-[25px]"
+              class="flex justify-between mb-[16px] text-[#20445E] text-[12px] leading-[25px]"
             >
-              <p class="font-[600] mb-[16px]">Nombre evento</p>
+              <p class="font-[600">Nombre evento</p>
               <p class="font-[400]">00 ofertas</p>
             </div>
             <h2
@@ -215,31 +217,10 @@ const onSubmitBid = () => {
               </div>
             </div>
           </div>
-          <hr class="border-gray-100 border-[1.5px] my-4" />
-          <div class="text-primary-950 text-sm">
-            <p class="mb-4">
-              <span class="uppercase font-bold">Puja ganadora</span
-              ><span> USD $0.000,00</span>
-            </p>
-            <ul class="space-y-3">
-              <li class="uppercase font-bold">Puja anteriores</li>
-              <li>
-                <span>Nombre usuario</span
-                ><span class="float-right">USD $0.000,00</span>
-              </li>
-              <li>
-                <span>Nombre usuario</span
-                ><span class="float-right">USD $0.000,00</span>
-              </li>
-              <li>
-                <span>Nombre usuario</span
-                ><span class="float-right">USD $0.000,00</span>
-              </li>
-              <li>
-                <span>Nombre usuario</span
-                ><span class="float-right">USD $0.000,00</span>
-              </li>
-            </ul>
+          <template v-if="offer.bid.bidHistories?.length">
+            <hr class="border-gray-100 border-[1.5px] my-4" />
+            <BidHistory :bid-history="offer.bid.bidHistories" :winner-bid="offer.bid.status === 'WINNER' ? offer.bid.amount : undefined" />
+          </template>
           </div>
         </div>
       </div>
