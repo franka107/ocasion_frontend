@@ -27,6 +27,7 @@ module.exports = {
           foreground: "hsl(var(--primary-foreground))",
           700: "#225B82",
           600: "#2872A1",
+          950: "#152A3C",
         },
         blue: {
           DEFAULT: "#2563EB",
@@ -69,6 +70,17 @@ module.exports = {
         },
         borderPrimaryDark: "#0B3859",
         bluePrimary:"#20445E",
+        gray: {
+          100: "#E6E6E7",
+          200: "#F3F4F6",
+          300: "#E5E7EB",
+          400: "#D1D5DB",
+          500: "#9CA3AF",
+          600: "#6B7280",
+          700: "#4B5563",
+          800: "#374151",
+          900: "#1F2937",
+        }
       },
       borderRadius: {
       	xl: "calc(var(--radius) + 4px)",

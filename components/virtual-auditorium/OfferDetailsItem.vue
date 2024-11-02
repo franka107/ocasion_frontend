@@ -55,7 +55,7 @@ const onSubmitBid = () => {
             v-slot="{ days, hours, minutes, seconds, totalSeconds }"
         >
             <div class="grid grid-cols-1 mx-auto">
-                <div class="max-w-[350px] max-h-[394px] flex flex-col shadow-[0px_0px_4px_0px_#0000001A] bg-white rounded-[8px] overflow-hidden">
+                <div class="max-w-[350px] min-h-[394px] flex flex-col shadow-[0px_0px_4px_0px_#0000001A] bg-white rounded-[8px] overflow-hidden">
                     <!-- Contador en cajitas -->
                     <div class="text-[#FFFFFF] text-[14px] leading-[16.41px] font-[500] bg-[#C7E0F0] text-center py-[8px]">
                         <div class="flex items-center space-x-2 justify-center text-[#152A3C] text-[10px] font-[600]">
@@ -129,6 +129,17 @@ const onSubmitBid = () => {
                                 </div>
                             </div>
                         </div>
+                        <hr class="border-gray-100 border-[1.5px] my-4">
+                    <div class="text-primary-950 text-sm">
+                        <p class="mb-4"><span class="uppercase font-bold">Puja ganadora</span><span> USD $0.000,00</span></p>
+                        <ul class="space-y-3">
+                            <li class="uppercase font-bold">Puja anteriores</li>
+                            <li><span>Nombre usuario</span><span class="float-right">USD $0.000,00</span></li>
+                            <li><span>Nombre usuario</span><span class="float-right">USD $0.000,00</span></li>
+                            <li><span>Nombre usuario</span><span class="float-right">USD $0.000,00</span></li>
+                            <li><span>Nombre usuario</span><span class="float-right">USD $0.000,00</span></li>
+                        </ul>
+                    </div>
                     </div>
                 </div>
             </div>
