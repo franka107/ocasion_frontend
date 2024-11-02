@@ -47,6 +47,7 @@ export interface OfferDto {
   annexesFiles: AnnexesFile[]
   attachedFiles: AttachedFile[]
   status: OfferStatus
+  endTime?: string
   createdAt: string
   updatedAt: string
 }

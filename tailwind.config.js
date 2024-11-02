@@ -22,6 +22,9 @@ module.exports = {
         background: "hsl(var(--background))",
         bgtheme: "#F1F5F9",
         foreground: "hsl(var(--foreground))",
+        reminder: {
+          600: "#2463EB",
+        },
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -75,7 +78,7 @@ module.exports = {
           200: "#F3F4F6",
           300: "#E5E7EB",
           400: "#D1D5DB",
-          500: "#9CA3AF",
+          500: "#68686C",
           600: "#6B7280",
           700: "#4B5563",
           800: "#374151",
