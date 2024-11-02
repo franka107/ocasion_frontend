@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
+import DetailOfferAuditoriumItem from '@/components/virtual-auditorium/DetailOfferAuditoriumItem.vue'
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '~/components/ui/carousel'
 const router = useRouter();
 const route = useRoute();
+const activeTab = ref<string>('info');
 interface Image {
     src: string;
     alt: string;
@@ -35,9 +38,10 @@ const images = ref<Image[]>([
             <h1 class="text-[#86868A] hover:text-[#225B82] cursor-pointer">Mis ofertas/</h1>
             <h1 class="text-[#86868A] hover:text-[#225B82] cursor-pointer">Detalle de Oferta</h1>
         </div>
-        <section class="w-full max-w-[1324px] mx-auto">
+        <section class="w-full max-w-[1324px] mx-auto h-full">
             <div class="w-full mx-auto grid gap-[16px] mt-[16px] mb-[24px]">
-                <div class="bg-white border border-[#F3F8FC] rounded-lg px-[16px] pt-[24px] pb-[26px] w-full shadow-[0px_0px_4px_0px_#0000001A]">
+                <div
+                    class="bg-white border border-[#F3F8FC] rounded-lg px-[16px] pt-[24px] pb-[26px] w-full shadow-[0px_0px_4px_0px_#0000001A]">
                     <div class="flex flex-wrap justify-between items-center gap-y-[20px]">
                         <div>
                             <h3 class="font-[700] text-[#262F45] text-[20px] leading-[28px] mb-[16px]">{{
@@ -45,7 +49,8 @@ const images = ref<Image[]>([
                             </h3>
                             <div class="flex items-center">
                                 <CustomIcons name="calendar-today" class="mb-[1px]" />
-                                <h3 class="gap-x-[6px] text-[#68686C] text-[14px] leading-[20px] ml-[6px] mr-[4px] font-[400]">
+                                <h3
+                                    class="gap-x-[6px] text-[#68686C] text-[14px] leading-[20px] ml-[6px] mr-[4px] font-[400]">
                                     <span class="font-[700] text-[#20445E] mr-[4px]">Fecha y hora de cierre </span>
                                     {{ eventDetail.time }}
                                 </h3>
@@ -61,114 +66,85 @@ const images = ref<Image[]>([
                 </div>
             </div>
         </section>
-        <section class="w-full max-w-[1324px] mx-auto">
-            <!-- <div class="w-full mx-auto grid gap-[16px] mt-[32px] mb-[48px]"> -->
-                <div class="bg-white border border-[#F3F8FC] rounded-lg px-[16px] pt-[24px] pb-[26px] w-full shadow-[0px_0px_4px_0px_#0000001A]">
-                    <section class="flex justify-center max-w-[1440px] mx-[20px] md:mx-[80px] xl:mx-auto">
-            <div class="max-w-7xl">
-                <div class="grid grid-cols-1 md:grid-cols-[auto_2fr_1fr] gap-[24px] h-auto xl:h-[480px]">
-                    <!-- Columna Izquierda: Carrusel de imágenes -->
-                    <div class=" grid order-2 md:order-1 xl:order-1 flex flex-row md:flex-col justify-center md:justify-normal  items-center w-[81px] space-y-[8px] gap-x-[4px] md:gap-x-[0px] w-full bg-white border border-[#F3F8FC] rounded-lg px-[2px] py-[0px] md:py-[24px] max-w-[1280px]">
-                        <div class="hidden md:block flex relative h-full top-[36px]">
-                            <Carousel orientation="vertical" class="h-auto md:h-[52%] flex justify-center w-full" :opts="{
-                                align: 'start', loop: true
-                            }">
-                                <CarouselContent class="-mt-1 h-[200px] w-[81px]">
-                                    <CarouselItem v-for="(image, index) in images" :key="index"
-                                        class="w-full p-0 md:basis-1/4">
-                                        <div class="p-1">
-                                            <Card class="rounded-[0px]">
-                                                <CardContent class="flex items-center justify-center p-0">
-                                                    <img :src="image.src" :alt="image.alt"
-                                                        class="w-[65px] h-[50px] rounded-0" />
-                                                </CardContent>
-                                            </Card>
-                                        </div>
-                                    </CarouselItem>
-                                </CarouselContent>
-                                <CarouselPrevious />
-                                <CarouselNext />
-                            </Carousel>
-                        </div>
-                        <div class="block md:hidden flex justify-center md:w-full w-[62vw] mx-auto">
-                            <Carousel class="relative w-full max-w-xs h-auto md:h-[52%]" :opts="{
-                                align: 'start', loop: true
-                            }">
-                                <CarouselContent>
-                                    <CarouselItem v-for="(image, index) in images" :key="index"
-                                        class="basis-1/4 lg:basis-1/4">
-                                        <div class="p-1">
-                                            <Card class="rounded-[0px]">
-                                                <CardContent class=" p-0">
-                                                    <img :src="image.src" :alt="image.alt"
-                                                        class="max-w-[65px] max-h-[50px] rounded-0" />
-                                                </CardContent>
-                                            </Card>
-                                        </div>
-                                    </CarouselItem>
-                                </CarouselContent>
-                                <CarouselPrevious />
-                                <CarouselNext />
-                            </Carousel>
-                        </div>
+        <section class="w-full max-w-[1324px] h-full max-h-[625px] mx-auto">
+            <div
+                class="h-full md:h-[625px] bg-white border border-[#F3F8FC] rounded-lg px-[16px] pt-[24px] pb-[26px] w-full shadow-[0px_0px_4px_0px_#0000001A] mb-[24px]">
+                <section class="flex justify-center mx-auto max-w-[1116px]">
+                    <div class="max-w-7xl w-full">
+                        <div class="flex flex-col md:flex-row gap-[24px]">
+                            <!-- Columna Izquierda: Imagen grande -->
+                            <div class="flex flex-col justify-center w-full md:w-[63%]">
+                                <div class="w-full " style="max-width: 692px;">
+                                    <div class="w-full h-full max-w-[692px] max-h-[480px] rounded-2xl overflow-hidden">
+                                        <img src="/assets/img/car.png" alt="Imagen grande" class="w-full h-full" />
+                                    </div>
+                                </div>
+                                <div class="flex w-full items-center" style="max-width: 692px;">
+                                    <div class="flex justify-center md:w-full w-[62vw] mt-[16px] mx-auto">
+                                        <Carousel class="relative w-full max-w-xs h-auto md:h-[52%]" :opts="{
+                                            align: 'start', loop: true
+                                        }">
+                                            <CarouselContent>
+                                                <CarouselItem v-for="(image, index) in images" :key="index"
+                                                    class="basis-1/4 lg:basis-1/4">
+                                                    <div class="p-1">
+                                                        <Card class="rounded-[0px]">
+                                                            <CardContent class=" p-0">
+                                                                <img :src="image.src" :alt="image.alt"
+                                                                    class="max-w-[65px] max-h-[50px] rounded-0" />
+                                                            </CardContent>
+                                                        </Card>
+                                                    </div>
+                                                </CarouselItem>
+                                            </CarouselContent>
+                                            <CarouselPrevious />
+                                            <CarouselNext />
+                                        </Carousel>
+                                    </div>
+                                </div>
+                            </div>
 
-                    </div>
-                    <!-- Columna Central: Imagen grande y detalles del auto -->
-                    <div class="order-1 md:order-2">
-                        <div class=" rounded-2xl overflow-hidden">
-                            <img src="/assets/img/car.png" alt="Imagen grande" class="w-full h-full" />
-                        </div>
 
-                    </div>
-
-                    <!-- Columna Derecha: Cuenta regresiva y detalles adicionales -->
-                    <div class="order-3 md:order-3 flex flex-col shadow-[0px_0px_4px_0px_#0000001A]">
-                        <div
-                            class="text-[#FFFFFF] text-[14px] leading-[16.41px] font-[500] bg-[#20445E] rounded-t-[8px] text-center py-[23px]">
-                            <p class="pb-[16px]">Cierra en:</p>
-                            <!-- Contador en cajitas -->
-                            <div class="flex items-center space-x-2 justify-center">
+                            <!-- Columna Derecha: Información -->
+                            <div
+                                class="w-full h-full min-h-[478px] md:w-[37%] flex flex-col shadow-[0px_0px_4px_0px_#0000001A] p-[16px] rounded-[12px]">
+                                <!-- Tabs -->
                                 <div
-                                    class="w-[42px] md:w-[51px] h-[30px] md:h-[34px] border border-white rounded-[8px] flex items-center justify-center text-[14px] md:text-[16px] relative">
-                                    00<span class="text-[#F6313C] ml-[3px]">d</span>
-                                </div><span>:</span>
-                                <div
-                                    class="w-[42px] md:w-[51px] h-[30px] md:h-[34px] border border-white rounded-[8px] flex items-center justify-center text-[14px] md:text-[16px] relative">
-                                    00<span class="text-[#F6313C] ml-[3px]">h</span>
-                                </div><span>:</span>
-                                <div
-                                    class="w-[42px] md:w-[51px] h-[30px] md:h-[34px] border border-white rounded-[8px] flex items-center justify-center text-[14px] md:text-[16px] relative">
-                                    00<span class="text-[#F6313C] ml-[3px]">m</span>
-                                </div><span>:</span>
-                                <div
-                                    class="w-[42px] md:w-[51px] h-[30px] md:h-[34px] border border-white rounded-[8px] flex items-center justify-center text-[14px] md:text-[16px] relative">
-                                    00<span class="text-[#F6313C] ml-[3px]">s</span>
+                                    class="flex font-[500] text-[14px] md:text-[16px] gap-4 border-b-[2px] pt-[8px] pb-[16px] border-[#D0D0D1]">
+                                    <button :class="activeTab === 'info' ? 'text-bluePrimary' : 'text-[#D0D0D1]'"
+                                        @click="activeTab = 'info'"
+                                        class="hover:underline hover:underline-offset-[22px] hover:text-bluePrimary leading-[24px]">
+                                        Información
+                                    </button>
+                                    <button :class="activeTab === 'description' ? 'text-bluePrimary' : 'text-[#D0D0D1]'"
+                                        @click="activeTab = 'description'"
+                                        class="hover:underline hover:underline-offset-[22px] hover:text-bluePrimary leading-[24px]">
+                                        Descripción
+                                    </button>
+                                    <button :class="activeTab === 'annex' ? 'text-bluePrimary' : 'text-[#D0D0D1]'"
+                                        @click="activeTab = 'annex'"
+                                        class="hover:underline hover:underline-offset-[22px] hover:text-bluePrimary leading-[24px]">
+                                        Anexos
+                                    </button>
+                                </div>
+                                <div>
+                                    <div v-if="activeTab === 'info'">
+                                        <DetailOfferAuditoriumItem />
+                                    </div>
+                                    <div v-if="activeTab === 'description'">
+                                        <p class="my-[16px] text-[14px] text-[#000000] text-justify">Detalle de ofertas
+                                        </p>
+                                    </div>
+                                    <div v-if="activeTab === 'annex'">
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="px-[16px] pb-[16px]">
-                            <h2
-                                class="text-[#152A3C] text-[17px] md:text-[20px] font-[700] pb-[16px] uppercase tracking-tight">
-                                SEDAN - MARCA:KIA MODELO:SOLUTO 1.4 MT - LX FULL AÑO 2020 </h2>
-                            <div class="grid text-center gap-y-[8px] font-[400] text-[#152A3C] text-[14px] mt-4">
-                                <p class="leading-[24px] ">Última oferta:</p>
-                                <p class="font-[700] text-[22px] md:text-[24px] leading-[32px]">USD $0.000,00</p>
-                                <p class="leading-[20px]">Próxima oferta sugerida: <span class="font-bold">USD
-                                        $0.000,00</span></p>
-                                <button class="text-[#2872A1] font-[500] my-2">Estimar importes y comisiones</button>
-                            </div>
-                            <div class="flex justify-end rounded-[8px] pt-[32px]">
-                                <Button class="text-[14px] md:text-[16px] py-[15px] px-[24px]">
-                                    Haz tu pre oferta
-                                </Button>
-                            </div>
-                        </div>
                     </div>
-                </div>
+                </section>
+
             </div>
-        </section>
-                </div>
-            <!-- </div> -->
+
         </section>
     </ContentLayout>
 </template>
