@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { X } from 'lucide-vue-next'
-import AuditoriumList from '~/components/virtual-auditorium/AuditoriumList.vue'
+import OfferList from '~/components/virtual-auditorium/OfferList.vue'
 import OfferDetailsItem from '~/components/virtual-auditorium/OfferDetailsItem.vue'
 import CustomPagination from '~/components/ui/custom-pagination/CustomPagination.vue'
 import type { OfferListItem } from '~/types/Offer'
@@ -109,7 +109,7 @@ const closeModal = () => {
           Ver detalle
         </Button>
       </div>
-      <AuditoriumList
+      <OfferList
         :offer-list="offerList"
         @on-select-offer="
           (value) => {

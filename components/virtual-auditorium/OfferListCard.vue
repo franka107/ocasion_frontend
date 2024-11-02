@@ -25,8 +25,8 @@ const cardClass = (totalSeconds: number, offer: OfferListItem) => {
   return ''
 }
 const router = useRouter()
-const handleEventsDetail = async (offer: any) => {
-  router.push(`/dashboard/participant/virtual-auditorium/offers/offerdetail`)
+const handleEventsDetail = async (offerId: string) => {
+  router.push(`/dashboard/participant/virtual-auditorium/offers/${offerId}`)
 }
 </script>
 <template>
@@ -102,7 +102,7 @@ const handleEventsDetail = async (offer: any) => {
         <div class="flex justify-end">
           <button
             class="px-4 py-1 text-sm text-[#388EBF] font-medium hover:text-white hover:bg-bluePrimary rounded-md"
-            @click="handleEventsDetail"
+            @click="handleEventsDetail(offer.id)"
           >
             Ver detalle
           </button>
