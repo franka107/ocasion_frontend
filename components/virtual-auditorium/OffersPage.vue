@@ -66,7 +66,7 @@ const closeModal = () => {
 
 <template>
     <section class="flex gap-x-4 w-full max-w-[1324px]">
-        <div class="max-w-[901px]">
+        <div class="max-w-[901px] w-full">
           <div class="flex h-[56px] items-center text-[#152A3C] justify-end mb-[8px] gap-x-4 px-[8px]">
            <label class="font-semibold text-sm md:text-base leading-6">Ordenar por:</label>
               <Select>

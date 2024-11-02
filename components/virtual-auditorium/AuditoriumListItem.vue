@@ -37,7 +37,7 @@ const handleEventsDetail = async (offer: any) => {
   >
     <div
       tabindex="0"
-      :class="cn(`w-full flex flex-col box-content shadow-[0px_0px_4px_0px_#0000001A] cursor-pointer
+      :class="cn(`w-full flex flex-col box-content shadow-[0px_0px_4px_0px_#0000001A] cursor-pointer max-w-[238px]
        bg-white rounded-lg overflow-hidden border-box focus:border-2 border-transparent focus:border-[#414967]`, cardClass(totalSeconds, offer))">
       <!-- Contador en cajitas -->
       <div class="bg-[#C7E0F0] text-white text-sm font-medium text-center py-2">

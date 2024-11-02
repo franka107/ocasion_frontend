@@ -7,8 +7,8 @@ const emit = defineEmits(['onSelectOffer'])
 </script>
 <template>
   <section class="flex ">
-    <div class="flex flex-wrap gap-4 md:gap-2 w-full max-w-[901px] justify-center">
-        <AuditoriumListItem v-for="offer in props.offerList" :offer="offer" :key="offer.id" @click="emit('onSelectOffer', offer)" tabindex="0" class="flex-[1_1_200px] max-w-[220px]"  />
+    <div class="grid grid-cols-[repeat(auto-fill,_minmax(200px,_1fr))] justify-items-center gap-4 md:gap-2 max-w-[100%] w-full justify-center">
+        <AuditoriumListItem v-for="offer in props.offerList" :offer="offer" :key="offer.id" @click="emit('onSelectOffer', offer)" tabindex="0"   />
     </div>
   </section>
 </template>
