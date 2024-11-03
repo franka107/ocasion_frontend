@@ -1,7 +1,7 @@
 <template>
   <div class="flex items-center gap-4">
     <Popover>
-      <PopoverTrigger asChild>
+      <PopoverTrigger as-child>
         <Button
           variant="ghost"
           size="icon"
@@ -14,7 +14,7 @@
               v-if="status === 'success'"
               class="text-xs font-medium leading-4 text-white"
             >
-              {{ notifications.length }}
+              {{ notifications.count }}
             </p>
             <p v-else>⦿</p>
           </Badge>
@@ -40,10 +40,10 @@
               </div>
               <template v-else>
                 <NotificationItem
-                  v-for="(notification, index) in limitedNotifications"
+                  v-for="(notification, index) in notifications.data"
                   :key="index"
-                  @on-remove="refresh"
                   :notification="notification"
+                  @on-remove="refresh"
                 />
               </template>
             </div>
@@ -66,14 +66,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted } from 'vue'
+import { useWebNotification } from '@vueuse/core'
+import { useSound } from '@vueuse/sound'
 import {
   Popover,
   PopoverTrigger,
   PopoverContent,
-} from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+} from '@/components/ui/popover'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import {
   Card,
   CardHeader,
@@ -81,49 +83,51 @@ import {
   CardDescription,
   CardContent,
   CardFooter,
-} from "@/components/ui/card";
-import NotificationItem from "@/components/notifications/NotificationItem.vue";
-import type { Notification } from "~/types/Notification";
-import { useNotificationAPI } from "~/composables/useNotificationAPI";
+} from '@/components/ui/card'
+import NotificationItem from '@/components/notifications/NotificationItem.vue'
+import type { Notification } from '~/types/Notification'
+import { useNotificationAPI } from '~/composables/useNotificationAPI'
 import {
   domainEvents,
   type NotificationCreatedDomainEvent,
   type NotificationReadedDomainEvent,
-} from "~/types/DomainEvent";
-import { useWebNotification } from "@vueuse/core";
-import { useSound } from "@vueuse/sound";
-import notificationSound from "~/assets/sounds/notification.mp3";
+} from '~/types/DomainEvent'
+import notificationSound from '~/assets/sounds/notification.mp3'
 
-const { getNotReadedNotifications, listenDomainEvents, removeNotifications } =
-  useNotificationAPI();
+const { findNotificationsPaginated, listenDomainEvents, removeNotifications } =
+  useNotificationAPI()
 const {
   data: notifications,
   refresh,
   status,
-} = await getNotReadedNotifications();
-const limitedNotifications = computed(() => notifications.value.slice(0, 7));
+} = await findNotificationsPaginated({
+  limit: 15,
+  page: 1,
+  filterOptions: [],
+  sortOptions: [{ field: 'createdAt', order: 'desc' }],
+})
 
 const webNotification = useWebNotification({
-  title: "Nueva notificación",
-  lang: "es",
-  body: "Revisa tu historial de notificaciones",
-  icon: "/favicon.ico",
-});
+  title: 'Nueva notificación',
+  lang: 'es',
+  body: 'Revisa tu historial de notificaciones',
+  icon: '/favicon.ico',
+})
 const notificationCreatedListener =
   listenDomainEvents<NotificationCreatedDomainEvent>(
     domainEvents.notificationCreated,
-  );
+  )
 
-const { play, sound } = useSound(notificationSound);
+const { play, sound } = useSound(notificationSound)
 
 const onArchiveButtonPressed = async () => {
-  await removeNotifications(limitedNotifications.value.map((e) => e.id));
-  refresh();
-};
+  await removeNotifications(notifications.value.data.map((e) => e.id))
+  refresh()
+}
 
 watch(notificationCreatedListener.data, (value, oldValue) => {
-  play();
-  webNotification.show();
-  refresh();
-});
+  play()
+  webNotification.show()
+  refresh()
+})
 </script>

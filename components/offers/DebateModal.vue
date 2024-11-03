@@ -38,7 +38,7 @@ const onSubmit = form.handleSubmit((values: any) => {
 })
 const handleSubmit = async (values: any) => {
   openConfirmModal({
-    title: 'Enviar Oferta',
+    title: 'Enviar debate de oferta',
     message: '¿Estás seguro de que deseas enviar este debate de oferta?',
     callback: async () => {
       const { status, error }: any = await discussOffer(values)
@@ -46,7 +46,7 @@ const handleSubmit = async (values: any) => {
         emit('update:modelValue', false)
         props.refreshTable()
         updateConfirmModal({
-          title: 'Oferta enviada',
+          title: 'Debate de oferta enviado',
           message: 'El debate de oferta ha sido enviada exitosamente',
           type: 'success',
         })
@@ -80,11 +80,19 @@ const handleSubmit = async (values: any) => {
             >Debate de precios</AlertDialogTitle
           >
         </AlertDialogHeader>
+
+        <Alert variant="destructive">
+          <ExclamationTriangleIcon class="w-4 h-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            Your session has expired. Please log in again.
+          </AlertDescription>
+        </Alert>
         <div class="grid grid-cols-2 gap-3 px-6">
           <CustomInput
             class="h-14 w-full"
             type="string"
-            label="Nombre del evento"
+            label="Título de la oferta"
             :model-value="props.name"
             :disabled="true"
             label-offset
@@ -96,14 +104,15 @@ const handleSubmit = async (values: any) => {
             :model-value="props.appraisal"
             :disabled="true"
             label-offset
-          />
+          >
+          </CustomInput>
           <FormField v-slot="{ componentField }" name="counterProposalAmount">
             <FormItem>
               <FormControl>
                 <CustomInput
                   class="h-14 w-full"
                   type="number"
-                  label="Tasación"
+                  label="Contrapropuesta"
                   v-bind="componentField"
                   label-offset
                 />

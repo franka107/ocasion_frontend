@@ -125,7 +125,7 @@
                       () => {
                         openModalDebate = true
                         selectedDebateInfo = {
-                          name: eventDetail.name,
+                          name: row.title,
                           appraisal: row.appraisal,
                           id: row.id,
                         }
