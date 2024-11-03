@@ -51,19 +51,15 @@
                         :variant="'ghost'"
                         :class="
                           cn(
-                            `w-full justify-start h-10 mb-1 hover:bg-[#36576e] hover:text-white`,
-                            `${menu.active && 'bg-[#36576e]'} text-white `,
+                            `w-full justify-start h-10 mb-1 text-[#36576e] hover:bg-[#36576e] hover:text-white`,
+                            `${menu.active && 'bg-[#36576e] text-white'}`,
                           )
                         "
                       >
                         <div class="flex flew-row">
                           <span :class="isSidebarOpen === false ? '' : 'mr-4'">
                             <CustomIcons
-                              :class="`${
-                                menu.active
-                                  ? 'fill-white text-white'
-                                  : 'fill-[#a9b6c0]'
-                              }`"
+                            
                               :name="menu.icon"
                             />
                           </span>

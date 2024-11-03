@@ -50,9 +50,9 @@ export function getMenuList(
         submenus: [],
       },
       {
-        href: '/dashboard/participant/virtual-auditorium/offers',
+        href: '/dashboard/participant/virtual-auditorium',
         label: 'Auditorio Virtual',
-        active: pathname === '/dashboard/participant/virtual-auditorium/offers',
+        active: pathname === '/dashboard/participant/virtual-auditorium',
         icon: 'PC',
         submenus: [],
       },

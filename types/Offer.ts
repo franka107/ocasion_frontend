@@ -1,3 +1,5 @@
+import type { UserDto } from "./Administrators"
+
 export enum OfferStatus {
   Retired = 'RETIRED', // Retirado
   Confirmed = 'CONFIRMED', // Confirmado
@@ -30,10 +32,18 @@ export interface Bid {
   status: string
   createdAt: string
   offerId: string
+  bidHistories?: BidHistory[]
   userId: string
   __entity: string
 }
 
+export interface BidHistory {
+  initialAmount: number
+  modifiedAmount: number
+  createdAt: string
+  updatedAt: string
+  user: UserDto
+}
 
 export interface OfferDto {
   id: string
@@ -47,6 +57,7 @@ export interface OfferDto {
   annexesFiles: AnnexesFile[]
   attachedFiles: AttachedFile[]
   status: OfferStatus
+  endTime?: string
   createdAt: string
   updatedAt: string
 }
