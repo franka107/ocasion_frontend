@@ -127,6 +127,7 @@
                         selectedDebateInfo = {
                           name: row.title,
                           appraisal: row.appraisal,
+                          counterProposalAmount: row.counterProposalAmount,
                           id: row.id,
                         }
                       }
@@ -161,6 +162,7 @@
                         changeAppraisalForm = {
                           offerId: row.id,
                           offerName: row.title,
+                          counterProposalAmount: row.counterProposalAmount,
                           oldAppraisal: row.appraisal,
                           newAppraisal: row.appraisal,
                         }
@@ -211,11 +213,13 @@
           :id="selectedDebateInfo.id"
           v-model="openModalDebate"
           :name="selectedDebateInfo.name"
+          :counter-proposal-amount="selectedDebateInfo.counterProposalAmount"
           :appraisal="selectedDebateInfo.appraisal"
           :refresh-table="refreshOfferTable"
         ></DebateModal>
         <AppraisalOfferModal
           v-model="openModifyAppraisal"
+          :counter-proposal-amount="changeAppraisalForm.counterProposalAmount"
           :offer-id="changeAppraisalForm.offerId"
           :offer-title="changeAppraisalForm.offerName"
           :new-appraisal="changeAppraisalForm.newAppraisal"
@@ -292,12 +296,18 @@ const appraisalHistoryModal = ref<IAmountHistoryModal>({ offerId: '' })
 const changeAppraisalForm = ref<IChangeAppraisalForm>({
   offerId: '',
   offerName: '',
+  counterProposalAmount: null,
   oldAppraisal: 0,
   newAppraisal: 0,
 })
 const openModalOffer = ref(false)
 const openModalDebate = ref(false)
-const selectedDebateInfo = ref<IDebateForm>({ name: '', appraisal: 0, id: '' })
+const selectedDebateInfo = ref<IDebateForm>({
+  name: '',
+  appraisal: 0,
+  id: '',
+  counterProposalAmount: 0,
+})
 const selectedMultipleData = ref<{ type: string; ids: string[] }>({
   type: 'empty',
   ids: [],
@@ -439,7 +449,8 @@ const handleConfirmOffers = async (values: { type: string; ids: string[] }) => {
 
 const handleRetireOffers = async (values: { type: string; ids: string[] }) => {
   openConfirmModal({
-    title: 'Retirar Ofertas',
+    title: 'Retirar Oferta(s)',
+    icon: 'Trash',
     message: `¿Está seguro de retirar la(s) oferta(s) seleccionada(s)?`,
     callback: async () => {
       try {

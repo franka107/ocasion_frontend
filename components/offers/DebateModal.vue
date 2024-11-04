@@ -2,6 +2,11 @@
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import { z } from 'zod'
+import { ExclamationTriangleIcon } from '@radix-icons/vue'
+import Alert from '../ui/alert/Alert.vue'
+import AlertTitle from '../ui/alert/AlertTitle.vue'
+import AlertDescription from '../ui/alert/AlertDescription.vue'
+import PricePanel from '../common/PricePanel.vue'
 import {
   AlertDialog,
   AlertDialogContent,
@@ -14,6 +19,7 @@ const props = defineProps<{
   id: string
   name: string
   appraisal: number
+  counterProposalAmount: number | null
   modelValue: boolean
   refreshTable: () => void
 }>()
@@ -74,20 +80,22 @@ const handleSubmit = async (values: any) => {
   >
     <AlertDialogContent class="z-[98] max-w-[600px] px-0">
       <form class="flex flex-col gap-10 flex-grow" @submit="onSubmit">
-        <AlertDialogHeader class="border-b border-primary">
-          <AlertDialogTitle
-            class="text-xl tracking-[-0.5px] text-primary text-start mb-[18px] font-[600] px-6"
-            >Debate de precios</AlertDialogTitle
-          >
-        </AlertDialogHeader>
+        <div>
+          <AlertDialogHeader class="border-b border-primary">
+            <AlertDialogTitle
+              class="text-xl tracking-[-0.5px] text-primary text-start mb-[18px] font-[600] px-6"
+              >Debate de precios</AlertDialogTitle
+            >
+          </AlertDialogHeader>
 
-        <Alert variant="destructive">
-          <ExclamationTriangleIcon class="w-4 h-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>
-            Your session has expired. Please log in again.
-          </AlertDescription>
-        </Alert>
+          <PricePanel
+            v-if="props.counterProposalAmount"
+            class="mx-6 mt-6"
+            label="Valor de última contrapropuesta"
+            :price="props.counterProposalAmount"
+          />
+        </div>
+
         <div class="grid grid-cols-2 gap-3 px-6">
           <CustomInput
             class="h-14 w-full"

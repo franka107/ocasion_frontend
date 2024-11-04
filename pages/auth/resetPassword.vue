@@ -1,5 +1,5 @@
 <template>
-  <NuxtLayout logo-subtitle="Acceso Super Admin">
+  <NuxtLayout logo-subtitle="Acceso">
     <BaseForm
       title="Recuperar contraseña"
       subtitle="Hemos enviado un enlace de recuperación al correo del usuario ingresado. Si no lo encuentras en tu bandeja de entrada, recuerda revisar tu carpeta de Spam."

@@ -52,10 +52,7 @@ const isParticipant = userSession.user.value?.user.type === UserType.Participant
           </div>
         </Button>
       </div>
-      <Menu
-        v-model:is-sidebar-open="isSidebarOpen"
-        :show-toggle-button="false"
-      />
+      <Menu v-model:is-sidebar-open="sidebarOpen" :show-toggle-button="false" />
     </SheetContent>
   </Sheet>
 </template>

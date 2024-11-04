@@ -3,16 +3,16 @@
     <Collapsible
       v-if="isOpen"
       :open="isCollapsed"
-      @open-change="setIsCollapsed"
       class="w-full"
+      @open-change="setIsCollapsed"
     >
       <CollapsibleTrigger
         class="[&[data-state=open]>div>div>svg]:rotate-180 mb-1 w-full"
       >
         <Button
-          @click="setIsCollapsed(!isCollapsed)"
           :variant="'ghost'"
           class="w-full justify-start h-10 hover:bg-[#36576e]"
+          @click="setIsCollapsed(!isCollapsed)"
         >
           <div class="w-full items-center flex justify-between">
             <div class="flex items-center">
@@ -20,20 +20,20 @@
                 <CustomIcons
                   :class="
                     cn(
-                      `${isSubmenuActive ? 'fill-white text-white' : 'fill-[#a9b6c0]'}`,
+                      `${isSubmenuActive ? 'fill-white text-white [&>svg]:text-white' : 'fill-[#a9b6c0] [&>svg]:text-[#a6b4bf] '}`,
                     )
                   "
                   :name="icon"
                 />
               </span>
               <p
+                v-if="isOpen"
                 :class="[
                   'max-w-[150px] truncate text-[#a4b2be]',
                   isOpen
                     ? 'translate-x-0 opacity-100'
                     : '-translate-x-96 opacity-0',
                 ]"
-                v-if="isOpen"
               >
                 {{ label }}
               </p>
@@ -48,7 +48,7 @@
             >
               <ChevronDown
                 size="18"
-                class="transition-transform duration-200 text-[#a4b2be]"
+                class="transition-transform duration-200 text-[#a4b2be] [&>svg]:text-[#a6b4bf]"
               />
             </div>
           </div>
@@ -62,10 +62,12 @@
           :key="index"
           :variant="'ghost'"
           class="w-full justify-start h-10 mb-1 hover:bg-[#36576e]"
-          :class="cn(
-            `w-full justify-start h-10 mb-1 hover:bg-[#36576e] hover:text-white`,
-            `${submenu.active && 'bg-[#36576e] text-white'}`
-          )"
+          :class="
+            cn(
+              `w-full justify-start h-10 mb-1 hover:bg-[#36576e] hover:text-white`,
+              `${submenu.active && 'bg-[#36576e] text-white'}`,
+            )
+          "
           as-child
         >
           <NuxtLink :to="submenu.href" class="flex items-center">
@@ -103,18 +105,18 @@
                         :class="
                           cn(
                             ``,
-                            `${isSubmenuActive ? 'fill-white text-white' : 'fill-[#a9b6c0]'}`,
+                            `${isSubmenuActive ? 'fill-white text-white [&>svg]:text-white' : 'fill-[#a9b6c0] [&>svg]:text-[#a6b4bf]'}`,
                           )
                         "
                         :name="icon"
                       />
                     </span>
                     <p
+                      v-if="isOpen"
                       :class="[
                         'max-w-[200px] truncate',
                         isOpen === false ? 'opacity-0' : 'opacity-100',
                       ]"
-                      v-if="isOpen"
                     >
                       {{ label }}
                     </p>
@@ -145,10 +147,10 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import Collapsible from "~/components/ui/collapsible/Collapsible.vue";
-import { ChevronDown, Dot } from "lucide-vue-next";
-import { DropdownMenuArrow } from "radix-vue";
+import { ref } from 'vue'
+import { ChevronDown, Dot } from 'lucide-vue-next'
+import { DropdownMenuArrow } from 'radix-vue'
+import Collapsible from '~/components/ui/collapsible/Collapsible.vue'
 
 const props = defineProps({
   icon: String,
@@ -156,12 +158,12 @@ const props = defineProps({
   active: Boolean,
   submenus: Array,
   isOpen: Boolean,
-});
+})
 
-const isSubmenuActive = ref(props.submenus.some((submenu) => submenu.active));
-const isCollapsed = ref(isSubmenuActive.value);
+const isSubmenuActive = ref(props.submenus.some((submenu) => submenu.active))
+const isCollapsed = ref(isSubmenuActive.value)
 
 function setIsCollapsed(value) {
-  isCollapsed.value = value;
+  isCollapsed.value = value
 }
 </script>

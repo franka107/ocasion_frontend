@@ -1,4 +1,4 @@
-import type { UserDto } from "./Administrators"
+import type { UserDto } from './Administrators'
 
 export enum OfferStatus {
   Retired = 'RETIRED', // Retirado
@@ -110,6 +110,7 @@ export interface AttachedFile {
 export interface IDebateForm {
   id: string
   name: string
+  counterProposalAmount: number
   appraisal: number
 }
 
@@ -120,5 +121,6 @@ export interface IChangeAppraisalForm {
   offerId: string
   offerName: string
   oldAppraisal: number
+  counterProposalAmount: number | null
   newAppraisal: number
 }

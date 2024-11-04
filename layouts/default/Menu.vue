@@ -59,7 +59,7 @@
                         <div class="flex flew-row">
                           <span :class="isSidebarOpen === false ? '' : 'mr-4'">
                             <CustomIcons
-                            
+                              class="[&>svg]:text-[#a6b4bf]"
                               :name="menu.icon"
                             />
                           </span>
@@ -134,9 +134,7 @@ const props = defineProps<{
 }>()
 
 const userSession = useUserSession()
-console.log(`userSession type ${userSession.user.value?.user.type}`)
 const type = userSession.user.value?.user.type === UserType.Participant
-console.log(`userSession type ${type}`)
 
 const route = useRoute()
 const pathname = computed(() => route.path)

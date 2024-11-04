@@ -1,5 +1,5 @@
 <template>
-  <AuthForm logo-subtitle="Acceso Super Admin">
+  <AuthForm logo-subtitle="Acceso">
     <BaseForm
       v-if="!showForgotPassword"
       title="Bienvenido"

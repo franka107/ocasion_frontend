@@ -8,15 +8,15 @@
       <Tooltip :delay-duration="100">
         <TooltipTrigger as-child>
           <Button
-            @click="isSidebarOpen = !isSidebarOpen"
             variant="ghost"
             size="icon"
             class="hover:bg-transparent"
+            @click="isSidebarOpen = !isSidebarOpen"
           >
             <CustomIcons
               name="Arrow"
               :class="[
-                'h-6 w-6 fill-[#a6b4bf] transition-transform ease-in-out duration-700',
+                'h-6 w-6 fill-[#a6b4bf] [&>svg]:text-[#a6b4bf] transition-transform ease-in-out duration-700',
                 isSidebarOpen === true ? 'rotate-180' : 'rotate-0',
               ]"
             />
@@ -31,7 +31,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ChevronLeft } from "lucide-vue-next";
+import { ChevronLeft } from 'lucide-vue-next'
 
-const isSidebarOpen = defineModel<boolean>("isSidebarOpen", { required: true });
+const isSidebarOpen = defineModel<boolean>('isSidebarOpen', { required: true })
 </script>
