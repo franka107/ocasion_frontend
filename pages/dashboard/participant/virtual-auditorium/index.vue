@@ -15,10 +15,45 @@
               {{ tab.label }}
             </button>
           </div>
-          <button type="button" class="ml-[6px] pl-1.5 lg:pl-0 mb-[24px] w-[20px]"><CustomIcons name="Info_pin" class="w-full h-full text-primary" /></button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger as-child>
+                <Button variant="outline" class="border-none">
+                  <CustomIcons
+                    name="Info_pin"
+                    class="w-full h-full text-primary"
+                  />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent
+                side="left"
+                class="w-[273px] px-[13px] transform translate-y-1/2"
+              >
+                <ul class="text-[14px] text-[#68686C] leading-[20px]">
+                  <li>
+                    <strong>Ofertas:</strong> Son todas a las que puedes
+                    acceder.
+                  </li>
+                  <li>
+                    <strong>Garantizada:</strong> Ofertas con garantía de
+                    participación.
+                  </li>
+                  <li>
+                    <strong>Participando:</strong> Ofertas en las que estás
+                    participando.
+                  </li>
+                  <li>
+                    <strong>Ganas:</strong> Todas las ofertas que ganaste.
+                  </li>
+                  <li>
+                    <strong>Vencidas:</strong> Ofertas que caducaron o se
+                    terminaron.
+                  </li>
+                </ul>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
-
-        
         <div v-if="activeTab === 0">
           <OffersPage />
         </div>

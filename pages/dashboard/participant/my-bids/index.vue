@@ -8,6 +8,6 @@
   </ContentLayout>
 </template>
 <script setup lang="ts">
-import ParticipantBidTable from '~/components/events/ParticipantBidTable.vue';
+import ParticipantBidTable from '~/components/participant/bid/ParticipantBidTable.vue';
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
 </script>
