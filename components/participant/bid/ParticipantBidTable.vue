@@ -17,7 +17,7 @@
           "
         >
           <template #documents>
-            <Button variant="ghost">
+            <Button variant="ghost" @click="openModals">
               <CustomIcons
                 name="Doc-Transfer"
                 class="w-6 h-6 text-reminder-600"
@@ -28,6 +28,15 @@
             <div class="flex justify-center">
               <DropdownMenu>
                 <Button
+                  @click="
+                    () => {
+                      openModalCounterOffer = true
+                      selectedCounterOfferInfo = {
+                        currentAmount: row.bid.amount,
+                        id: row.bid.id,
+                      }
+                    }
+                  "
                   variant="ghost"
                   size="sm"
                   class="text-primary-950 underline h-8 data-[state=open]:bg-accent"
@@ -45,17 +54,26 @@
           </template>
         </CustomTable>
         <SheetContent
-          v-model:open="openAppraisalHistoryModal"
+          v-model:open="openTransferModal"
+          customWidth="510px"
           class="flex flex-col h-full"
           @pointer-down-outside="(e) => e.preventDefault()"
           @interact-outside="(e) => e.preventDefault()"
         >
-          <HistoryForm
-            :bids-id="bidsId"
-            :bid-id="appraisalHistoryModal.bidId"
-            :endpoint="findBidHistories"
-            title="Historial de pujas"
+          <GoodsTransferForm
+            :id="selectedId"
+            :personStatus="selectedPersonStatus"
+            :onSubmit="onSubmit"
           />
+        </SheetContent>
+        <SheetContent
+          v-model:open="openUploadModal"
+          customWidth="510px"
+          class="flex flex-col h-full"
+          @pointer-down-outside="(e) => e.preventDefault()"
+          @interact-outside="(e) => e.preventDefault()"
+        >
+          <UploadPaymentSupport :id="selectedId" :onSubmit="onSubmit" />
         </SheetContent>
         <CounterOfferBidModal
           :id="selectedCounterOfferInfo.id"
@@ -78,8 +96,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import dayjs from 'dayjs'
-import CounterOfferBidModal from '../bid/CounterOfferBidModal.vue'
+import CounterOfferBidModal from '../../bid/CounterOfferBidModal.vue'
 import CustomIcons from '@/components/ui/custom-icons/CustomIcons.vue'
 import CustomPagination from '@/components/ui/custom-pagination/CustomPagination.vue'
 import {
@@ -88,9 +105,19 @@ import {
   bidStatus,
 } from '@/constants/bids'
 import type { BidDto, OfferWithBidDto } from '~/types/Bids'
-import type { IAmountHistoryModal } from '~/types/Offer'
 import { GrantId } from '~/types/Grant'
-
+import dayjs from 'dayjs'
+import GoodsTransferForm from '~/components/participant/bid/GoodsTransferForm.vue'
+import UploadPaymentSupport from '~/components/participant/bid/UploadPaymentSupport.vue'
+const selectedId = ref('') // Define el id que necesitas pasar
+const selectedPersonStatus = ref<'single' | 'married' | 'legal'>('legal')
+const openTransferModal = ref(false)
+const openUploadModal = ref(false)
+const onSubmit = (values: any) => {}
+const openModals = () => {
+  openTransferModal.value = false
+  openUploadModal.value = true
+}
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const { rejectOfferBids, acceptOfferBids, page, sortOptions, onSort } =
   useBidAPI()
@@ -98,9 +125,6 @@ const findBidHistories = '/audit/find-bid-histories'
 const { getMyGrants } = useAuthManagement()
 const myGrants = await getMyGrants()
 const BID_BASE_URL = '/bid-management'
-const openModal = ref(false)
-const openAppraisalHistoryModal = ref(false)
-const appraisalHistoryModal = ref<IAmountHistoryModal>({ bidId: '' })
 const bidsId = ref<number | undefined>(undefined)
 const route = useRoute()
 const selectedMultipleData = ref<{ type: string; ids: string[] }>({

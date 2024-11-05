@@ -1,0 +1,134 @@
+<script setup lang="ts">
+import { useForm } from 'vee-validate'
+import { toTypedSchema } from '@vee-validate/zod'
+import * as z from 'zod'
+import { X } from "lucide-vue-next";
+import { SheetClose } from '@/components/ui/sheet'
+import InputFile from '@/components/common/file/Input.vue'
+
+const props = defineProps<{
+  onSubmit: (values: any) => void
+}>()
+
+const formSchema = toTypedSchema(
+  z.object({
+    paymentVoucher: z
+      .array(z.any())
+      .min(1, 'Debe subir al menos un archivo')
+      .max(1, 'Puede subir solo un archivo para el voucher de pago del bien'),
+    commissionVoucher: z
+      .array(z.any())
+      .min(1, 'Debe subir al menos un archivo')
+      .max(1, 'Puede subir solo un archivo para el voucher de pago de comisión')
+  })
+)
+
+const form = useForm({
+  validationSchema: formSchema,
+  initialValues: {
+    paymentVoucher: [],
+    commissionVoucher: []
+  }
+})
+
+const onSubmit = form.handleSubmit(async (values) => {
+  console.log('Valores del formulario:', values)
+  props.onSubmit(values)
+})
+
+const handlePaymentVoucherChange = (files: File[]) => {
+  form.values.paymentVoucher = files.map((file) => file.name)
+}
+
+const handleCommissionVoucherChange = (files: File[]) => {
+  form.values.commissionVoucher = files.map((file) => file.name)
+}
+</script>
+
+<template>
+  <SheetHeader class="flex justify-between">
+    <SheetTitle class="text-[16px] md:text-[20px] font-medium text-[#152A3C] leading-[28px] tracking-[-0.5px]">
+      Cargar sustento de abono
+    </SheetTitle>
+    <SheetClose class="rounded-full p-3 hover:bg-[#f1f5f9]">
+      <X class="w-4 h-4 text-muted-foreground" />
+    </SheetClose>
+  </SheetHeader>
+
+  <div class="flex-grow overflow-y-auto no-scrollbar flex flex-col">
+    <form class="flex flex-col h-full" @submit="onSubmit">
+      <section class="p-5 flex-grow">
+        <!-- Información de Pasos a Seguir -->
+        <div class="h-auto md:h-[234px] flex flex-col leading-[20px] justify-between mb-4 md:mb-6 text-[#20445E] bg-[#E6F0F8] rounded-[8px] p-4">
+          <div>
+            <h2 class="text-2 md:text-4 font-[700]">Pasos a seguir:</h2>
+            <ul class="text-[12px] md:text-[14px] tracking-[0.5px] font-[400]">
+              <li>1. Confirmar la continuación del proceso</li>
+              <li>2. Realizar el abono a [Organización] por concepto de pago de subasta</li>
+              <li>3. Realizar el abono por la comisión a DeOcasión</li>
+              <li>4. Enviar los sustentos a las entidades correspondientes</li>
+              <li>5. Firmar la documentación de transferencia de propiedad</li>
+              <li>6. Coordinar la entrega con la [Organización]</li>
+            </ul>
+          </div>
+          <p class="text-[12px] tracking-[0.5px]">
+            <span class="font-[700]">Nota:</span> Realizar la carga de documentos en un plazo de 2 días útiles.
+          </p>
+        </div>
+
+        <!-- Adjuntar Voucher de Pago de Bien -->
+        <div class="mb-6 leading-[20px]">
+          <div class="text-[#152A3C]">
+            <h2 class="text-sm font-[600] mb-2 md:mb-4 uppercase tracking-[0.5px]">Adjuntar voucher pago de bien</h2>
+          </div>
+          <FormField v-slot="{ componentField }" name="paymentVoucher">
+            <FormItem>
+              <FormControl>
+                <InputFile
+                  title="Arrastrar o abrir archivo"
+                  instructionsText="JPG, PNG, JPEG o PDF Tamaño máx 5MB"
+                  :limit-files="1"
+                  v-model="form.values.paymentVoucher"
+                  @update:value="handlePaymentVoucherChange"
+                  v-bind="componentField"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+        </div>
+
+        <!-- Adjuntar Voucher de Pago de Comisión -->
+        <div class="mb-6 leading-[20px]">
+          <div class="text-[#152A3C]">
+            <h2 class="text-sm font-[600] mb-2 md:mb-4 uppercase tracking-[0.5px]">Adjuntar voucher pago de comisión</h2>
+          </div>
+          <FormField v-slot="{ componentField }" name="commissionVoucher">
+            <FormItem>
+              <FormControl>
+                <InputFile
+                  title="Arrastrar o abrir archivo"
+                  instructionsText="JPG, PNG, JPEG o PDF Tamaño máx 5MB"
+                  :limit-files="1"
+                  v-model="form.values.commissionVoucher"
+                  @update:value="handleCommissionVoucherChange"
+                  v-bind="componentField"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+        </div>
+      </section>
+      <div class="mt-auto p-6">
+        <Button 
+          variant="default" 
+          :disabled="!form.meta.value.valid" 
+          type="submit"
+          class="w-full">
+          Cargar documentos
+        </Button>
+      </div>
+    </form>
+  </div>
+</template>
