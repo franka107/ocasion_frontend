@@ -54,21 +54,7 @@
             </Tooltip>
           </TooltipProvider>
         </div>
-        <div v-if="activeTab === 0">
-          <OffersPage />
-        </div>
-        <div v-else-if="activeTab === 1">
-          <p>Garantizadas - Aquí puedes agregar contenido específico de esta sección.</p>
-        </div>
-        <div v-else-if="activeTab === 2">
-          <p>Participando - Aquí puedes agregar contenido específico de esta sección.</p>
-        </div>
-        <div v-else-if="activeTab === 3">
-          <p>Ganadas - Aquí puedes agregar contenido específico de esta sección.</p>
-        </div>
-        <div v-else-if="activeTab === 4">
-          <p>Vencidas - Aquí puedes agregar contenido específico de esta sección.</p>
-        </div>
+        <OffersPage :api-url="currentApiUrl" />
       </div>
     </section>
   </ContentLayout>
@@ -78,12 +64,26 @@
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
 import OffersPage from '~/components/virtual-auditorium/OffersPage.vue'
 
+interface IOfferTypeCount {
+    inProgressCount: number
+    guarantedCount: number
+    participatingCount: number
+    wonCount: number
+    expiredCount: number
+}
+
+const { data } = await useAPI<IOfferTypeCount>(
+  () => `/offer-management/find-offers-type-count`,
+  {} as any,
+)
+
 const activeTab = ref(0);
+const currentApiUrl = computed(() => tabs[activeTab.value].apiUrl);
 const tabs = [
-  { label: 'Ofertas 00' },
-  { label: 'Garantizadas 00' },
-  { label: 'Participando 00' },
-  { label: 'Ganadas 00' },
-  { label: 'Vencidas 00' },
+  { label: `Ofertas ${data.value.inProgressCount}`, apiUrl: 'find-offers-paginated-for-participant' },
+  { label: `Garantizadas ${data.value.guarantedCount}`, apiUrl: 'find-offers-paginated-for-participant-guaranted' },
+  { label: `Participando ${data.value.participatingCount}`, apiUrl: 'find-offers-paginated-for-participant-participating' },
+  { label: `Ganadas ${data.value.wonCount}`, apiUrl: 'find-offers-paginated-for-participant-won' },
+  { label: `Vencidas ${data.value.expiredCount}`, apiUrl: 'find-offers-paginated-for-participant-expired' },
 ];
 </script>

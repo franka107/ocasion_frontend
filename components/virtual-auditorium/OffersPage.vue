@@ -28,13 +28,15 @@ const onPlaceBid = ({
 
 const OFFER_BASE_URL = '/offer-management'
 const options = ['Todos', 'Finalizado', 'Por vencer']
-
+const props = defineProps({
+  apiUrl: String,
+})
+const { apiUrl }= toRefs(props)
 const { page, sortOptions } = useOfferAPI()
 const filterOptions = ref('[]')
 const selectedOffer = ref<OfferListItem | undefined>(undefined)
-const offerList = ref<OfferListItem[]>([])
-const { data: offerListData } = await useAPI<IDataResponse<OfferListItem>>(
-  `${OFFER_BASE_URL}/find-offers-paginated-for-participant`,
+const { data: offerListData, refresh } = await useAPI<IDataResponse<OfferListItem>>(
+  () => `${OFFER_BASE_URL}/${apiUrl?.value}`,
   {
     query: {
       limit: 8,
@@ -44,7 +46,12 @@ const { data: offerListData } = await useAPI<IDataResponse<OfferListItem>>(
     },
   } as any,
 )
-offerList.value = offerListData.value.data
+const offerList = computed<OfferListItem[]>(() => offerListData.value.data)
+watch([apiUrl],() => {
+  page.value = 1
+  selectedOffer.value = undefined
+  refresh()
+})
 
 socket.on('bidError', (data) => {
   console.error('bidError', data)
