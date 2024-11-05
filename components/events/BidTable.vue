@@ -73,8 +73,8 @@
                         // appraisalHistoryModal = { offerId: row.id };
                         openModalCounterOffer = true
                         selectedCounterOfferInfo = {
-                          currentAmount: row.bid.amount,
-                          id: row.bid.id,
+                          currentAmount: row.amount,
+                          id: row.id,
                         }
                       }
                     "
@@ -116,7 +116,7 @@
         >
           <HistoryForm
             :bids-id="bidsId"
-            :offer-id="appraisalHistoryModal.offerId"
+            :bid-id="appraisalHistoryModal.offerId"
             :endpoint="findBidHistories"
             title="Historial de pujas"
           />

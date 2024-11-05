@@ -27,7 +27,11 @@ export function useConfirmModal() {
     confirmModalMessage.value = message
     confirmModalCallback.value = async () => {
       confirmIsSubmitting.value = true
-      await callback()
+      try {
+        await callback()
+      } catch (error) {
+        confirmIsSubmitting.value = false
+      }
       confirmIsSubmitting.value = false
     }
     cancelModalCallback.value = cancelCallback

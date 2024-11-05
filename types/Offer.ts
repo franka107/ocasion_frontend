@@ -115,7 +115,7 @@ export interface IDebateForm {
 }
 
 export interface IAmountHistoryModal {
-  offerId: string
+  bidId: string
 }
 export interface IChangeAppraisalForm {
   offerId: string

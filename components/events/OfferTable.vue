@@ -191,7 +191,7 @@
         >
           <HistoryForm
             :bids-id="bidsId"
-            :offer-id="appraisalHistoryModal.offerId"
+            :bid-id="appraisalHistoryModal.offerId"
             :endpoint="auditBidHistories"
             title="Historial de tasaciones"
           />

@@ -18,19 +18,22 @@
         >
           <template #documents>
             <Button variant="ghost">
-                <CustomIcons name="Doc-Transfer" class="w-6 h-6 text-reminder-600" />
+              <CustomIcons
+                name="Doc-Transfer"
+                class="w-6 h-6 text-reminder-600"
+              />
             </Button>
           </template>
           <template #actions="{ row }">
             <div class="flex justify-center">
               <DropdownMenu>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    class="text-primary-950 underline h-8 data-[state=open]:bg-accent"
-                  >
-                    <span>Ver contraoferta</span>
-                  </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  class="text-primary-950 underline h-8 data-[state=open]:bg-accent"
+                >
+                  <span>Ver contraoferta</span>
+                </Button>
               </DropdownMenu>
             </div>
           </template>
@@ -49,7 +52,7 @@
         >
           <HistoryForm
             :bids-id="bidsId"
-            :offer-id="appraisalHistoryModal.offerId"
+            :bid-id="appraisalHistoryModal.bidId"
             :endpoint="findBidHistories"
             title="Historial de pujas"
           />
@@ -75,14 +78,18 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import dayjs from 'dayjs'
 import CounterOfferBidModal from '../bid/CounterOfferBidModal.vue'
 import CustomIcons from '@/components/ui/custom-icons/CustomIcons.vue'
 import CustomPagination from '@/components/ui/custom-pagination/CustomPagination.vue'
-import { bidsParticipantHeader, bidsParticipantSearch, bidStatus } from '@/constants/bids'
+import {
+  bidsParticipantHeader,
+  bidsParticipantSearch,
+  bidStatus,
+} from '@/constants/bids'
 import type { BidDto, OfferWithBidDto } from '~/types/Bids'
 import type { IAmountHistoryModal } from '~/types/Offer'
 import { GrantId } from '~/types/Grant'
-import dayjs from 'dayjs'
 
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const { rejectOfferBids, acceptOfferBids, page, sortOptions, onSort } =
@@ -93,7 +100,7 @@ const myGrants = await getMyGrants()
 const BID_BASE_URL = '/bid-management'
 const openModal = ref(false)
 const openAppraisalHistoryModal = ref(false)
-const appraisalHistoryModal = ref<IAmountHistoryModal>({ offerId: '' })
+const appraisalHistoryModal = ref<IAmountHistoryModal>({ bidId: '' })
 const bidsId = ref<number | undefined>(undefined)
 const route = useRoute()
 const selectedMultipleData = ref<{ type: string; ids: string[] }>({
@@ -108,9 +115,7 @@ const disableMultipleSelect = computed(
 )
 const openModalCounterOffer = ref(false)
 const selectedCounterOfferInfo = ref({ currentAmount: 0, id: '' })
-const filterOptions = ref(
-  `[]`,
-)
+const filterOptions = ref(`[]`)
 const onSearch = (item: { [key: string]: string }) => {
   filterOptions.value = JSON.stringify([
     { field: 'offer.title', type: 'like', value: item.title || '' },
@@ -134,9 +139,11 @@ const bidsData = computed(
   () =>
     data.value?.data.map((item: BidDto, index: number) => ({
       code: item.offer.id,
-      offerEndTime: item.offer.endTime ? dayjs(item.offer.endTime).format('DD/MM/YYYY') : '-',
+      offerEndTime: item.offer.endTime
+        ? dayjs(item.offer.endTime).format('DD/MM/YYYY')
+        : '-',
       taxes: 200,
-      type: "-",
+      type: '-',
       total: item.amount + 200,
       ...item,
     })) || [],

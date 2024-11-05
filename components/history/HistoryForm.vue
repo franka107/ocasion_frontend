@@ -1,20 +1,21 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { X } from "lucide-vue-next";
-const props = defineProps<{ 
-  offerId: string;
-  endpoint: string; 
-  title: string;
-}>();
+import { ref } from 'vue'
+import { X } from 'lucide-vue-next'
+import { userType } from '~/constants/administrators'
+const props = defineProps<{
+  bidId: string
+  endpoint: string
+  title: string
+}>()
 const dateHistory = ref<
   Array<{
-    id: string;
-    user: { fullName: string };
-    initialAmount: number;
-    modifiedAmount: number;
-    createdAt: string;
+    id: string
+    user: { fullName: string }
+    initialAmount: number
+    modifiedAmount: number
+    createdAt: string
   }>
->([]);
+>([])
 
 const fetchBidHistory = async (offerId: string) => {
   try {
@@ -22,29 +23,29 @@ const fetchBidHistory = async (offerId: string) => {
       default: () => [],
       query: {
         filterOptions: JSON.stringify([
-          { field: "offer.id", type: "equal", value: offerId },
+          { field: 'bid.id', type: 'equal', value: offerId },
         ]),
       },
-    });
+    })
     dateHistory.value = data.value.map((item: any) => ({
       id: item.id,
       user: item.user,
       initialAmount: item.initialAmount,
       modifiedAmount: item.modifiedAmount,
-      createdAt: new Date(item.createdAt).toLocaleString("es-ES", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
+      createdAt: new Date(item.createdAt).toLocaleString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
         hour12: true,
       }),
-    }));
+    }))
   } catch (error) {
-    console.error("Error al cargar historial", error);
+    console.error('Error al cargar historial', error)
   }
-};
-await fetchBidHistory(props.offerId);
+}
+await fetchBidHistory(props.bidId)
 </script>
 
 <template>
@@ -69,13 +70,19 @@ await fetchBidHistory(props.offerId);
             <div
               class="border-l-2 border-dashed border-[#225B82] pl-3 ml-[4px]"
             >
-              <div class="flex items-center">
-                <div class="text-xs text-[#225B82] font-semibold pr-[8px]">
-                  USUARIO
+              <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                  <div class="text-xs text-[#225B82] font-semibold pr-[8px]">
+                    USUARIO
+                  </div>
+                  <div class="text-sm text-[#152A3C] font-[500]">
+                    {{ item.user.commonName }}
+                  </div>
                 </div>
-                <div class="text-sm text-[#152A3C] font-[500]">
-                  {{ item.user.fullName }}
-                </div>
+
+                <Badge class="text-[10px]">{{
+                  userType.get(item.user.type)
+                }}</Badge>
               </div>
               <div
                 class="flex justify-between text-xs text-[#225B82] font-[500]"
