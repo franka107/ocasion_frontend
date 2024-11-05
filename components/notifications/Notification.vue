@@ -10,10 +10,7 @@
           <Badge
             class="absolute -bottom-2 -right-2 flex items-center justify-center h-5 w-5 rounded-full bg-orange-500"
           >
-            <p
-              v-if="status === 'success'"
-              class="text-xs font-medium leading-4 text-white"
-            >
+            <p v-if="status === 'success'" class="text-xs font-medium leading-4 text-white">
               {{ notifications.count }}
             </p>
             <p v-else>⦿</p>
@@ -22,22 +19,15 @@
           <span class="sr-only">Notifications</span>
         </Button>
       </PopoverTrigger>
-      <!-- TODO: change background notification panel -->
-      <PopoverContent class="w-80 p-0 mr-4 bg-slate-800">
-        <Card
-          class="border-0 shadow-lg bg-slate-800 overflow-y-auto no-scrollbar"
-        >
-          <CardContent class="max-h-[900px] overflow-y-auto px-0 py-2">
-            <div class="space-y-4 py-2">
-              <div
-                v-if="status === 'pending'"
-                class="flex justify-center items-center h-full"
-              >
-                <img
-                  src="@/assets/icon/svg/icon-spinner.svg"
-                  class="animate-spin w-6 h-6"
-                />
-              </div>
+      <PopoverContent class="w-[360px] h-[700px] p-0 mr-4 bg-white border border-gray-300 shadow-lg rounded-lg">
+        <Card class="border-0">
+          <CardContent class="px-0 py-0 max-h-[640px] overflow-y-auto no-scrollbar">
+            <div class="space-y-1">
+              <template v-if="status === 'pending'">
+                <div class="flex justify-center items-center h-full">
+                  <img src="@/assets/icon/svg/icon-spinner.svg" class="animate-spin w-6 h-6" />
+                </div>
+              </template>
               <template v-else>
                 <NotificationItem
                   v-for="(notification, index) in notifications.data"
@@ -48,16 +38,52 @@
               </template>
             </div>
           </CardContent>
-          <CardFooter class="px-3 py-4">
+          <CardFooter class="px-3 py-3">
             <Button
               variant="ghost"
-              :onclick="onArchiveButtonPressed"
-              class="bg-[#06b6d4] rounded-full w-full text-[#062a44]"
+              @click="handleButtonClick"
+              :disabled="isAdmin && !notifications?.data?.length"
+              :class="buttonClasses"
             >
-              <div class="inline-flex items-center gap-2 text-sm font-medium">
-                Archivar
+              <div class="inline-flex items-center justify-center gap-2 text-sm font-medium">
+                {{ buttonText }}
+                <span v-if="isArchiving" class="animate-spin">
+                  <img
+                    src="@/assets/icon/svg/icon-spinner.svg"
+                    class="w-4 h-4"
+                    alt="Loading"
+                  />
+                </span>
               </div>
             </Button>
+
+            <Dialog v-model:open="showConfirmationDialog">
+              <DialogContent class="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle class="text-lg font-semibold text-gray-900">
+                    Confirm Archive
+                  </DialogTitle>
+                  <DialogDescription class="mt-2 text-sm text-gray-500">
+                    Are you sure you want to archive all notifications?
+                  </DialogDescription>
+                </DialogHeader>
+                <div class="mt-4 flex justify-end space-x-2">
+                  <Button
+                    variant="ghost"
+                    @click="showConfirmationDialog = false"
+                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    @click="confirmArchive"
+                    class="px-4 py-2 text-sm font-medium text-white bg-[#54c9dd] hover:bg-[#06B6D4] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#54c9dd]"
+                  >
+                    Confirm
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           </CardFooter>
         </Card>
       </PopoverContent>
@@ -66,7 +92,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useWebNotification } from '@vueuse/core'
 import { useSound } from '@vueuse/sound'
 import {
@@ -93,9 +120,36 @@ import {
   type NotificationReadedDomainEvent,
 } from '~/types/DomainEvent'
 import notificationSound from '~/assets/sounds/notification.mp3'
+import { UserType } from '~/types/Administrators'
 
-const { findNotificationsPaginated, listenDomainEvents, removeNotifications } =
-  useNotificationAPI()
+const router = useRouter()
+const userSession = useUserSession()
+const { findNotificationsPaginated, listenDomainEvents, removeNotifications } = useNotificationAPI()
+
+const isParticipant = computed(() =>
+  userSession.user.value?.user.type === UserType.Participant
+)
+
+const isArchiving = ref(false)
+const showConfirmationDialog = ref(false)
+
+const isAdmin = computed(() => {
+  const userType = userSession.user.value?.user.type
+  return userType === UserType.SuperAdmin ||
+         userType === UserType.PlatformAdmin ||
+         userType === UserType.OrganizationAdmin
+})
+
+const buttonText = computed(() =>
+  isParticipant.value ? 'View all notifications' : 'Archive'
+)
+
+const buttonClasses = computed(() =>
+  isAdmin.value
+    ? 'bg-[#54c9dd] hover:bg-[#06B6D4] rounded-full w-full text-[#072A44] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed'
+    : 'w-full h-10 border-t-2 text-center text-sm text-[#20445E] hover:bg-gray-100 mt-4 py-2 transition-colors duration-200'
+)
+
 const {
   data: notifications,
   refresh,
@@ -108,21 +162,45 @@ const {
 })
 
 const webNotification = useWebNotification({
-  title: 'Nueva notificación',
-  lang: 'es',
-  body: 'Revisa tu historial de notificaciones',
+  title: 'New Notification',
+  lang: 'en',
+  body: 'Check your notification history',
   icon: '/favicon.ico',
 })
-const notificationCreatedListener =
-  listenDomainEvents<NotificationCreatedDomainEvent>(
-    domainEvents.notificationCreated,
-  )
+
+const notificationCreatedListener = listenDomainEvents<NotificationCreatedDomainEvent>(
+  domainEvents.notificationCreated,
+)
 
 const { play, sound } = useSound(notificationSound)
 
-const onArchiveButtonPressed = async () => {
-  await removeNotifications(notifications.value.data.map((e) => e.id))
-  refresh()
+const handleButtonClick = () => {
+  if (isAdmin.value) {
+    showConfirmationDialog.value = true
+  } else {
+    router.push('/dashboard/nNotification')
+  }
+}
+
+const archiveNotifications = async () => {
+  try {
+    if (!notifications.value?.data?.length) return
+
+    isArchiving.value = true
+    await removeNotifications(notifications.value.data.map(notification => notification.id))
+    await refresh()
+
+  } catch (error) {
+    console.error('Error archiving notifications:', error)
+    
+  } finally {
+    isArchiving.value = false
+  }
+}
+
+const confirmArchive = async () => {
+  showConfirmationDialog.value = false
+  await archiveNotifications()
 }
 
 watch(notificationCreatedListener.data, (value, oldValue) => {

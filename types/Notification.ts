@@ -6,6 +6,7 @@ export interface Notification {
   id: string
   message: string
   tag: NotificationTag
+  isRead: boolean
   createdAt: string
 }
 
