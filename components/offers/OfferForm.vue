@@ -217,6 +217,12 @@ const handleFilesChange = (files: File[]) => {
               title="Fotos y videos"
               instructions-text="Cargar máximo 12 elementos(mp4, jpg, png)"
               :limit-files="12"
+              :accepted-file-types="[
+                'image/jpeg',
+                'image/png',
+                'image/jpg',
+                'video/mp4',
+              ]"
               v-bind="componentField"
               @update:value="handleFilesChange"
             />

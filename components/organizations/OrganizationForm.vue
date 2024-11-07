@@ -235,6 +235,7 @@ const handleFilesChange = (files: File[]) => {
                 title="Logo de la empresa"
                 instructions-text="Cargar máximo 1 elemento(jpg, png, jpeg)"
                 :limit-files="1"
+                :accepted-file-types="['image/jpeg', 'image/png', 'image/jpg']"
                 v-bind="componentField"
               />
             </FormControl>
@@ -276,7 +277,7 @@ const handleFilesChange = (files: File[]) => {
         </FormField>
 
         <!-- Actividad Económica -->
-        <FormField v-slot="{ componentField }" name="userId">
+        <FormField v-slot="{ componentField }" name="economicActivityId">
           <FormItem>
             <FormControl class="w-full">
               <CustomComboboxInput

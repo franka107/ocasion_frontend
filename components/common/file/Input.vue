@@ -32,6 +32,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  acceptedFileTypes: {
+    type: Array as () => string[],
+    default: () => ['.xlsx', '.docx', '.pdf'],
+  },
 })
 
 // const files = ref<File[]>([]);
@@ -138,6 +142,7 @@ onMounted(() => {
         type="file"
         multiple
         class="hidden"
+        :accept="props.acceptedFileTypes.join(',')"
         @change="handleFileChange"
       />
       <div
