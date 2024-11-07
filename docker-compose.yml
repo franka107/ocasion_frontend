@@ -1,4 +1,4 @@
-version: "3"
+version: '3'
 
 services:
   web1:
@@ -8,7 +8,7 @@ services:
     networks:
       - swarm-dev
     ports:
-      - "${PORTSALIDA}:${PORTDOCKER}"
+      - '${PORTSALIDA}:${PORTDOCKER}'
     deploy:
       mode: replicated
       replicas: 1
@@ -17,18 +17,18 @@ services:
       #     - node.labels.name == ${NODO}
       resources:
         reservations:
-          cpus: "0.1"
+          cpus: '0.1'
           memory: 200M # Set the memory reservation here
         limits:
-          cpus: "0.5"
+          cpus: '0.5'
           memory: 600M # Set the memory limit here
       labels:
-        - "traefik.enable=true"
-        - "traefik.http.routers.${SUBDOMINIO}-http.rule=Host(`${SUBDOMINIO}.${DOMINIO}`)"
-        - "traefik.http.routers.${SUBDOMINIO}.rule=Host(`${SUBDOMINIO}.${DOMINIO}`)"
-        - "traefik.http.routers.${SUBDOMINIO}.entrypoints=websecure"
-        - "traefik.http.routers.${SUBDOMINIO}.tls.certresolver=letsencryptresolver"
-        - "traefik.http.services.${SUBDOMINIO}.loadbalancer.server.port=3000"
+        - 'traefik.enable=true'
+        - 'traefik.http.routers.${SUBDOMINIO}-http.rule=Host(`${SUBDOMINIO}.${DOMINIO}`)'
+        - 'traefik.http.routers.${SUBDOMINIO}.rule=Host(`${SUBDOMINIO}.${DOMINIO}`)'
+        - 'traefik.http.routers.${SUBDOMINIO}.entrypoints=websecure'
+        - 'traefik.http.routers.${SUBDOMINIO}.tls.certresolver=letsencryptresolver'
+        - 'traefik.http.services.${SUBDOMINIO}.loadbalancer.server.port=3000'
 
         #NOTA LOS NAMES ROUTERS NO DEBEN TENER ., la uiltima Linea web1(nombre del servicio)
 
