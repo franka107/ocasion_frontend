@@ -18,24 +18,27 @@
       <div class="tabs-container">
         <!-- Tabs con scroll horizontal en móviles -->
         <div class="flex justify-between">
-          <div
-            class="flex border-b border-gray-300 mb-4 text-[#AFAFB1] gap-x-2 md:gap-x-4 overflow-x-auto whitespace-nowrap text-[12px] md:text-[16px]"
+          <ScrollArea
+            class="flex border-b border-gray-300 text-[#AFAFB1] gap-x-2 md:gap-x-4 whitespace-nowrap text-[12px] md:text-[16px]"
           >
-            <button
-              v-for="(tab, index) in tabs"
-              :key="index"
-              :class="[
-                'pt-[8px] pb-[16px] font-semibold px-2 sm:px-4',
-                {
-                  'text-[#20445E] border-b-2 border-[#20445E]':
-                    activeTab === index,
-                },
-              ]"
-              @click="activeTab = index"
-            >
-              {{ tab.label }}
-            </button>
-          </div>
+            <div class="flex gap-x-[16px]">
+              <button
+                v-for="(tab, index) in tabs"
+                :key="index"
+                :class="[
+                  'pt-[8px] pb-[16px] font-[500]',
+                  {
+                    'text-[#20445E] border-b-2 border-[#20445E]':
+                      activeTab === index,
+                  },
+                ]"
+                @click="activeTab = index"
+              >
+                {{ tab.label }}
+              </button>
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger as-child>
@@ -84,7 +87,7 @@
 <script setup lang="ts">
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
 import OffersPage from '~/components/virtual-auditorium/OffersPage.vue'
-
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 interface IOfferTypeCount {
   inProgressCount: number
   guarantedCount: number

@@ -2,9 +2,12 @@
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
 import DetailOfferAuditoriumItem from '@/components/virtual-auditorium/DetailOfferAuditoriumItem.vue'
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '~/components/ui/carousel'
+import type { OfferListItem } from '~/types/Offer'
+import type { IDataResponse } from '~/types/Common'
 const router = useRouter();
 const route = useRoute();
 const activeTab = ref<string>('info');
+const OFFER_BASE_URL = '/offer-management'
 interface Image {
     src: string;
     alt: string;
@@ -15,17 +18,14 @@ const eventDetail = ref<any>({
     closingTime: '18:00',
     time: '25/09/24 12:00 p.m',
 });
-// const { data: offerDetail } = await useAPI<any>(
-//     `/offer-management/get-offer-detail-for-participant?id=${route.params.offerId}`,
-//     {
-//         query: {
-//             filter: {
-                
-//             }
-//         },
-//         default: () => ({})
-//     }
-// );
+const { data: offerDetail } = await useAPI<any>(
+    `/offer-management/get-offer-detail-for-participant?id=${route.params.offerId}`,
+    {
+        query: {},
+        default: () => ({})
+    }
+);
+offerDetail.value = offerDetail.value;
 const images = ref<Image[]>([
     { src: '/assets/img/offer-detail1.png', alt: 'Imagen de auto 1' },
     { src: '/assets/img/offer-detail2.png', alt: 'Imagen de auto 2' },
@@ -35,7 +35,13 @@ const images = ref<Image[]>([
 ]);
 </script>
 <template>
-    <ContentLayout title="Mis Ofertas" subtitle="Detalle oferta" customClass="lg:px-[16px]">
+
+    <ContentLayout title="Detalle oferta" subtitle="Detalle oferta"  showArrow customClass="lg:px-[16px]">
+        <!-- <div class="h 10 w 10">
+            <Button variant="ghost" @click="router.back">
+                <CustomIcons name="BackArrow" class="w-6 h-6 text-primary" />
+            </Button>
+        </div> -->
         <div class="flex text-[12px] font-[400] mb-[16px]">
             <h1 class="text-[#86868A] hover:text-[#225B82] cursor-pointer">Auditorio Virtual/</h1>
             <h1 class="text-[#86868A] hover:text-[#225B82] cursor-pointer">Mis ofertas/</h1>
@@ -47,7 +53,8 @@ const images = ref<Image[]>([
                     class="bg-white border border-[#F3F8FC] rounded-lg px-[16px] pt-[24px] pb-[26px] w-full shadow-[0px_0px_4px_0px_#0000001A]">
                     <div class="flex flex-wrap justify-between items-center gap-y-[20px]">
                         <div>
-                            <h3 class="font-[700] text-[#262F45] text-[20px] leading-[28px] mb-[16px]">{{ eventDetail.name }}
+                            <h3 class="font-[700] text-[#262F45] text-[20px] leading-[28px] mb-[16px]">{{
+                                eventDetail.name }}
                             </h3>
                             <div class="flex items-center">
                                 <CustomIcons name="calendar-today" class="mb-[1px]" />
@@ -106,7 +113,6 @@ const images = ref<Image[]>([
                                 </div>
                             </div>
 
-
                             <!-- Columna Derecha: Información -->
                             <div
                                 class="w-full h-full min-h-[478px] md:w-[37%] flex flex-col shadow-[0px_0px_4px_0px_#0000001A] p-[16px] rounded-[12px]">
@@ -131,10 +137,11 @@ const images = ref<Image[]>([
                                 </div>
                                 <div>
                                     <div v-if="activeTab === 'info'">
-                                        <DetailOfferAuditoriumItem />
+                                        <DetailOfferAuditoriumItem :offerDetail="offerDetail" 
+                                        />
                                     </div>
                                     <div v-if="activeTab === 'description'">
-                                        <p class="my-[16px] text-[14px] text-[#000000] text-justify">Detalle de ofertas
+                                        <p class="my-[16px] text-[14px] text-[#000000] text-justify">{{ offerDetail.description }}
                                         </p>
                                     </div>
                                     <div v-if="activeTab === 'annex'">
@@ -144,9 +151,7 @@ const images = ref<Image[]>([
                         </div>
                     </div>
                 </section>
-
             </div>
-
         </section>
     </ContentLayout>
 </template>
