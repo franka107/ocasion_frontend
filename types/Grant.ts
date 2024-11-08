@@ -47,6 +47,7 @@ export enum GrantId {
   OrganizationOffersCanDiscuss = 'ORGANIZATION_OFFERS_CAN_DISCUSS',
   OrganizationBidCanCounterOffer = 'ORGANIZATION_BID_CAN_COUNTER_OFFER',
   OrganizationOffersCanConfirm = 'ORGANIZATION_OFFERS_CAN_CONFIRM',
+  OrganizationOffersCanReject = 'ORGANIZATION_OFFERS_CAN_REJECT',
   OrganizationPaymentManagement = 'ORGANIZATION_PAYMENT_MANAGEMENT',
   OrganizationPaymentCanConfirm = 'ORGANIZATION_PAYMENT_CAN_CONFIRM',
   OrganizationPaymentCanObserve = 'ORGANIZATION_PAYMENT_CAN_OBSERVE',

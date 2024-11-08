@@ -218,28 +218,27 @@ const handleRejectBid = async (values: { type: string; ids: string[] }) => {
     title: 'Rechazar puja',
     message: `¿Está seguro de rechazar la(s) puja(s) seleccionada(s)?`,
     callback: async () => {
-      try {
-        const { status } = await rejectOfferBids({
-          ...values,
-          eventId: String(route.params.eventId),
-        })
+      const { status, error } = await rejectOfferBids({
+        ...values,
+        eventId: String(route.params.eventId),
+      })
 
-        if (status.value === 'success') {
-          refresh()
-          resetMultipleSelect.value?.()
-          updateConfirmModal({
-            title: 'Puja(s) rechazada(s)',
-            message: 'La(s) puja(s) ha sido rechazada(s) exitosamente',
-            type: 'success',
-          })
-        } else {
-          throw new Error('Error al rechazar esta(s) puja(s)')
-        }
-      } catch (error) {
+      if (status.value === 'success') {
+        refresh()
+        resetMultipleSelect.value?.()
+        updateConfirmModal({
+          title: 'Puja(s) rechazada(s)',
+          message: 'La(s) puja(s) ha sido rechazada(s) exitosamente',
+          type: 'success',
+        })
+      } else {
+        const eMsg =
+          error.value.data?.errors?.[0].message ||
+          error.value.data.message ||
+          'No se pudo rechazar puja(s). Por favor, intente nuevamente.'
         updateConfirmModal({
           title: 'Error al rechazar puja(s)',
-          message:
-            'No se pudo rechazar puja(s). Por favor, intente nuevamente.',
+          message: eMsg,
           type: 'error',
         })
       }

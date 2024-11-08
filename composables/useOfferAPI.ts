@@ -1,5 +1,5 @@
-import type { OfferDto } from '~/types/Offer'
 import { useAPI } from './useAPI'
+import type { OfferDto } from '~/types/Offer'
 
 const EVENT_BASE_URL = '/offer-management'
 const EVENT_PUBLISH_URL = '/event-management'
@@ -88,6 +88,22 @@ export function useOfferAPI() {
     return { status, error }
   }
 
+  const rejectOffers = async (values: {
+    type: string
+    ids: string[]
+    eventId: string
+  }) => {
+    const { status, error }: any = await useAPI(
+      `${OFFER_BASE_URL}/reject-offers`,
+      {
+        method: 'POST',
+        body: values,
+      } as any,
+    )
+
+    return { status, error }
+  }
+
   const onSort = (sortObject: { [key: string]: string }[]) => {
     sortOptions.value = JSON.stringify(sortObject)
   }
@@ -117,6 +133,7 @@ export function useOfferAPI() {
     getOffer,
     discussOffer,
     confirmOffers,
+    rejectOffers,
     retireOffers,
   }
 }

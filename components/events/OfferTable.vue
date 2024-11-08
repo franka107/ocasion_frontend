@@ -19,6 +19,18 @@
           <template #action-button>
             <Button
               v-if="
+                myGrants.data.value.includes(
+                  GrantId.OrganizationOffersCanReject,
+                )
+              "
+              class="bg-white text-primary border border-primary hover:bg-accent"
+              variant="default"
+              :disabled="disableMultipleSelect"
+              @click="handleRejectOffers(selectedMultipleData)"
+              >Rechazar oferta
+            </Button>
+            <Button
+              v-if="
                 isOfferActionsVisible &&
                 myGrants.data.value.includes(
                   GrantId.OrganizationOffersCanConfirm,
@@ -268,6 +280,7 @@ const {
   createOffer,
   editOffer,
   confirmOffers,
+  rejectOffers,
   retireOffers,
 } = useOfferAPI()
 const OFFER_BASE_URL = '/offer-management'
@@ -416,30 +429,62 @@ const handleConfirmOffers = async (values: { type: string; ids: string[] }) => {
     title: 'Confirmar Ofertas',
     message: `¿Está seguro de aprobar la(s) oferta(s) seleccionada(s)?`,
     callback: async () => {
-      try {
-        const { type, ids } = values
-        const { status } = await confirmOffers({
-          type,
-          ids,
-          eventId: String(route.params.eventId),
-        })
-        if (status.value === 'success') {
-          refreshOfferTable()
-          resetMultipleSelect.value?.()
-          updateConfirmModal({
-            title: 'Oferta(s) confirmada(s)',
-            message: 'La(s) oferta(s) ha sido confirmada(s) exitosamente',
-            type: 'success',
-          })
-        } else {
-          throw new Error('Error al confirmar esta(s) oferta(s)')
-        }
-      } catch (error) {
-        console.log('error', error)
+      const { type, ids } = values
+      const { status, error } = await confirmOffers({
+        type,
+        ids,
+        eventId: String(route.params.eventId),
+      })
+      if (status.value === 'success') {
+        refreshOfferTable()
+        resetMultipleSelect.value?.()
         updateConfirmModal({
-          title: 'Error al confirmar Oferta(s)',
-          message:
-            'No se pudo confirmar oferta(s). Por favor, intente nuevamente.',
+          title: 'Oferta(s) confirmada(s)',
+          message: 'La(s) oferta(s) ha sido confirmada(s) exitosamente',
+          type: 'success',
+        })
+      } else {
+        const eMsg =
+          error.value.data?.errors?.[0].message ||
+          error.value.data.message ||
+          'No se pudo confirmar oferta(s). Por favor, intente nuevamente.'
+        updateConfirmModal({
+          title: 'Error al rechazar Oferta(s)',
+          message: eMsg,
+          type: 'error',
+        })
+      }
+    },
+  })
+}
+
+const handleRejectOffers = async (values: { type: string; ids: string[] }) => {
+  openConfirmModal({
+    title: 'Rechazar Ofertas',
+    message: `¿Está seguro de rechazar la(s) oferta(s) seleccionada(s)?`,
+    callback: async () => {
+      const { type, ids } = values
+      const { status, error } = await rejectOffers({
+        type,
+        ids,
+        eventId: String(route.params.eventId),
+      })
+      if (status.value === 'success') {
+        refreshOfferTable()
+        resetMultipleSelect.value?.()
+        updateConfirmModal({
+          title: 'Oferta(s) rechazada(s)',
+          message: 'La(s) oferta(s) ha(n) sido rechazadas(s) exitosamente',
+          type: 'success',
+        })
+      } else {
+        const eMsg =
+          error.value.data?.errors?.[0].message ||
+          error.value.data.message ||
+          'No se pudo rechazar oferta(s). Por favor, intente nuevamente.'
+        updateConfirmModal({
+          title: 'Error al rechazar Oferta(s)',
+          message: eMsg,
           type: 'error',
         })
       }
@@ -453,28 +498,27 @@ const handleRetireOffers = async (values: { type: string; ids: string[] }) => {
     icon: 'Trash',
     message: `¿Está seguro de retirar la(s) oferta(s) seleccionada(s)?`,
     callback: async () => {
-      try {
-        const { status } = await retireOffers({
-          ...values,
-          eventId: String(route.params.eventId),
-        })
+      const { status, error } = await retireOffers({
+        ...values,
+        eventId: String(route.params.eventId),
+      })
 
-        if (status.value === 'success') {
-          refreshOfferTable()
-          resetMultipleSelect.value?.()
-          updateConfirmModal({
-            title: 'Oferta(s) retirada(s)',
-            message: 'La(s) oferta(s) ha sido retirada(s) exitosamente',
-            type: 'success',
-          })
-        } else {
-          throw new Error('Error al retirar esta(s) oferta(s)')
-        }
-      } catch (error) {
+      if (status.value === 'success') {
+        refreshOfferTable()
+        resetMultipleSelect.value?.()
         updateConfirmModal({
-          title: 'Error al retirar Oferta(s)',
-          message:
-            'No se pudo retirar oferta(s). Por favor, intente nuevamente.',
+          title: 'Oferta(s) retirada(s)',
+          message: 'La(s) oferta(s) ha sido retirada(s) exitosamente',
+          type: 'success',
+        })
+      } else {
+        const eMsg =
+          error.value.data?.errors?.[0].message ||
+          error.value.data.message ||
+          'No se pudo retirar oferta(s). Por favor, intente nuevamente.'
+        updateConfirmModal({
+          title: 'Error al rechazar Oferta(s)',
+          message: eMsg,
           type: 'error',
         })
       }

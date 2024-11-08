@@ -63,7 +63,7 @@
                   align="start"
                   class="bg-primary text-white w-40"
                 >
-                  <DropdownMenuItem :disabled="row.status === 'CANCELLED'">
+                  <DropdownMenuItem>
                     <NuxtLink
                       class="flex justify-between w-full"
                       :to="
