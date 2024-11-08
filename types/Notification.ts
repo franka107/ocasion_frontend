@@ -1,7 +1,10 @@
 export enum NotificationTag {
   Event = 'EVENT',
   Offer = 'OFFER',
+  Delivery = 'DELIVERY',
+  Alert = 'ALERT'
 }
+
 export interface Notification {
   id: string
   message: string
@@ -11,6 +14,11 @@ export interface Notification {
 }
 
 export const NotiificationStringMap = {
-  [NotificationTag.Event]: 'EVENTO',
-  [NotificationTag.Offer]: 'OFERTA',
+  [NotificationTag.Event]: 'Evento',
+  [NotificationTag.Offer]: 'Oferta',
+  [NotificationTag.Delivery]: 'Sustento de entrega',
+  [NotificationTag.Alert]: 'Alerta'
 }
+
+
+

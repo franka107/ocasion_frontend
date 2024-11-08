@@ -2,7 +2,6 @@ import { useEventSource } from '@vueuse/core'
 import type { Notification } from '~/types/Notification'
 
 const NOTIFICATION_BASE_URL = '/notifications'
-
 export type QueryPaginatedParams = {
   limit: number
   page: number
@@ -30,6 +29,7 @@ export class Paginated<T> {
 
 export function useNotificationAPI() {
   const findNotificationsPaginated = async (query: QueryPaginatedParams) => {
+    console.log('Query params:', query)
     const { status, error, data, refresh } = await useAPI<
       Paginated<Notification>
     >(`${NOTIFICATION_BASE_URL}/find-notifications-paginated`, {
@@ -40,6 +40,8 @@ export function useNotificationAPI() {
         sortOptions: JSON.stringify(query.sortOptions),
       },
     } as any)
+    console.log('API Response:', { status: status.value, error: error.value, data: data.value })
+
     return { status, error, data, refresh }
   }
 

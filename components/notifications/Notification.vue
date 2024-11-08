@@ -11,7 +11,7 @@
             class="absolute -bottom-2 -right-2 flex items-center justify-center h-5 w-5 rounded-full bg-orange-500"
           >
             <p v-if="status === 'success'" class="text-xs font-medium leading-4 text-white">
-              {{ notifications.count }}
+              {{ notifications?.count }}
             </p>
             <p v-else>⦿</p>
           </Badge>
@@ -30,7 +30,7 @@
               </template>
               <template v-else>
                 <NotificationItem
-                  v-for="(notification, index) in notifications.data"
+                  v-for="(notification, index) in notifications?.data"
                   :key="index"
                   :notification="notification"
                   @on-remove="refresh"
@@ -38,14 +38,14 @@
               </template>
             </div>
           </CardContent>
-          <CardFooter class="px-3 py-3">
+          <CardFooter class="px-3 py-3 border boder-top-gray-700 ">
             <Button
               variant="ghost"
               @click="handleButtonClick"
               :disabled="isAdmin && !notifications?.data?.length"
               :class="buttonClasses"
             >
-              <div class="inline-flex items-center justify-center gap-2 text-sm font-medium">
+              <div class="inline-flex items-center justify-center  w-full border-gray-200 text-sm font-medium">
                 {{ buttonText }}
                 <span v-if="isArchiving" class="animate-spin">
                   <img
@@ -112,12 +112,10 @@ import {
   CardFooter,
 } from '@/components/ui/card'
 import NotificationItem from '@/components/notifications/NotificationItem.vue'
-import type { Notification } from '~/types/Notification'
 import { useNotificationAPI } from '~/composables/useNotificationAPI'
 import {
   domainEvents,
   type NotificationCreatedDomainEvent,
-  type NotificationReadedDomainEvent,
 } from '~/types/DomainEvent'
 import notificationSound from '~/assets/sounds/notification.mp3'
 import { UserType } from '~/types/Administrators'
@@ -141,13 +139,13 @@ const isAdmin = computed(() => {
 })
 
 const buttonText = computed(() =>
-  isParticipant.value ? 'View all notifications' : 'Archive'
+  isParticipant.value ? 'Ver todas las notificaciones' : 'Archivar'
 )
 
 const buttonClasses = computed(() =>
   isAdmin.value
-    ? 'bg-[#54c9dd] hover:bg-[#06B6D4] rounded-full w-full text-[#072A44] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed'
-    : 'w-full h-10 border-t-2 text-center text-sm text-[#20445E] hover:bg-gray-100 mt-4 py-2 transition-colors duration-200'
+    ? 'w-full h-10  text-center text-sm text-[#20445E] hover:bg-gray-100 mt-2  transition-colors duration-200 disabled:cursor-not-allowed'
+    : 'w-full h-10  text-center text-sm text-[#20445E] hover:bg-gray-100 mt-2  transition-colors duration-200  '
 )
 
 const {
@@ -178,7 +176,7 @@ const handleButtonClick = () => {
   if (isAdmin.value) {
     showConfirmationDialog.value = true
   } else {
-    router.push('/dashboard/nNotification')
+    router.push('/dashboard/participant/my-notifications/Notification')
   }
 }
 
@@ -192,7 +190,7 @@ const archiveNotifications = async () => {
 
   } catch (error) {
     console.error('Error archiving notifications:', error)
-    
+
   } finally {
     isArchiving.value = false
   }
