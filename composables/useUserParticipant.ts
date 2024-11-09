@@ -3,19 +3,6 @@ import { useAPI } from "./useAPI";
 const BASE_USER_URL = "/user-management";
 
 export function useUserParticipantAPI(){
-    const getParticipant = async (id: number | string) => {
-        const { status, error, data } = await useAPI(
-          `${BASE_USER_URL}/get-my-info`,
-          {
-            method: "GET",
-            query: {
-                id,
-            },
-          } as any
-        );
-      
-        return {  status, error, data };
-    };
     const editParticipant = async (values: any) => {
         const { status, error }: any = await useAPI(
           `${BASE_USER_URL}/update-participant`,
@@ -41,6 +28,6 @@ export function useUserParticipantAPI(){
     };
     
 
-      return { editParticipant, changeMyPassword, getParticipant}
+      return { editParticipant, changeMyPassword }
 }
 
