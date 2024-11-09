@@ -22,7 +22,6 @@ export default defineNuxtConfig({
     'shadcn-nuxt',
     'nuxt-auth-utils',
     // 'nuxt-svgo',
-    '@vueuse/sound/nuxt',
     [
       '@nuxtjs/google-fonts',
       {
@@ -32,8 +31,9 @@ export default defineNuxtConfig({
         },
       },
     ],
-    '@vueuse/nuxt',
+
     'nuxt-countdown',
+    '@vueuse/nuxt',
   ],
   shadcn: {
     /**

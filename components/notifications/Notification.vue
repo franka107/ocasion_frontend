@@ -10,7 +10,10 @@
           <Badge
             class="absolute -bottom-2 -right-2 flex items-center justify-center h-5 w-5 rounded-full bg-orange-500"
           >
-            <p v-if="status === 'success'" class="text-xs font-medium leading-4 text-white">
+            <p
+              v-if="status === 'success'"
+              class="text-xs font-medium leading-4 text-white"
+            >
               {{ notifications?.count }}
             </p>
             <p v-else>⦿</p>
@@ -19,13 +22,20 @@
           <span class="sr-only">Notifications</span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent class="w-[360px] h-[700px] p-0 mr-4 bg-white border border-gray-300 shadow-lg rounded-lg">
+      <PopoverContent
+        class="w-[360px] h-[700px] p-0 mr-4 bg-white border border-gray-300 shadow-lg rounded-lg"
+      >
         <Card class="border-0">
-          <CardContent class="px-0 py-0 max-h-[640px] overflow-y-auto no-scrollbar">
+          <CardContent
+            class="px-0 py-0 max-h-[640px] overflow-y-auto no-scrollbar"
+          >
             <div class="space-y-1">
               <template v-if="status === 'pending'">
                 <div class="flex justify-center items-center h-full">
-                  <img src="@/assets/icon/svg/icon-spinner.svg" class="animate-spin w-6 h-6" />
+                  <img
+                    src="@/assets/icon/svg/icon-spinner.svg"
+                    class="animate-spin w-6 h-6"
+                  />
                 </div>
               </template>
               <template v-else>
@@ -38,14 +48,16 @@
               </template>
             </div>
           </CardContent>
-          <CardFooter class="px-3 py-3 border boder-top-gray-700 ">
+          <CardFooter class="px-3 py-3 border boder-top-gray-700">
             <Button
               variant="ghost"
               @click="handleButtonClick"
               :disabled="isAdmin && !notifications?.data?.length"
               :class="buttonClasses"
             >
-              <div class="inline-flex items-center justify-center  w-full border-gray-200 text-sm font-medium">
+              <div
+                class="inline-flex items-center justify-center w-full border-gray-200 text-sm font-medium"
+              >
                 {{ buttonText }}
                 <span v-if="isArchiving" class="animate-spin">
                   <img
@@ -95,7 +107,7 @@
 import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useWebNotification } from '@vueuse/core'
-import { useSound } from '@vueuse/sound'
+//import { useSound } from '@vueuse/sound'
 import {
   Popover,
   PopoverTrigger,
@@ -122,10 +134,11 @@ import { UserType } from '~/types/Administrators'
 
 const router = useRouter()
 const userSession = useUserSession()
-const { findNotificationsPaginated, listenDomainEvents, removeNotifications } = useNotificationAPI()
+const { findNotificationsPaginated, listenDomainEvents, removeNotifications } =
+  useNotificationAPI()
 
-const isParticipant = computed(() =>
-  userSession.user.value?.user.type === UserType.Participant
+const isParticipant = computed(
+  () => userSession.user.value?.user.type === UserType.Participant,
 )
 
 const isArchiving = ref(false)
@@ -133,19 +146,21 @@ const showConfirmationDialog = ref(false)
 
 const isAdmin = computed(() => {
   const userType = userSession.user.value?.user.type
-  return userType === UserType.SuperAdmin ||
-         userType === UserType.PlatformAdmin ||
-         userType === UserType.OrganizationAdmin
+  return (
+    userType === UserType.SuperAdmin ||
+    userType === UserType.PlatformAdmin ||
+    userType === UserType.OrganizationAdmin
+  )
 })
 
 const buttonText = computed(() =>
-  isParticipant.value ? 'Ver todas las notificaciones' : 'Archivar'
+  isParticipant.value ? 'Ver todas las notificaciones' : 'Archivar',
 )
 
 const buttonClasses = computed(() =>
   isAdmin.value
     ? 'w-full h-10  text-center text-sm text-[#20445E] hover:bg-gray-100 mt-2  transition-colors duration-200 disabled:cursor-not-allowed'
-    : 'w-full h-10  text-center text-sm text-[#20445E] hover:bg-gray-100 mt-2  transition-colors duration-200  '
+    : 'w-full h-10  text-center text-sm text-[#20445E] hover:bg-gray-100 mt-2  transition-colors duration-200  ',
 )
 
 const {
@@ -166,11 +181,12 @@ const webNotification = useWebNotification({
   icon: '/favicon.ico',
 })
 
-const notificationCreatedListener = listenDomainEvents<NotificationCreatedDomainEvent>(
-  domainEvents.notificationCreated,
-)
+const notificationCreatedListener =
+  listenDomainEvents<NotificationCreatedDomainEvent>(
+    domainEvents.notificationCreated,
+  )
 
-const { play, sound } = useSound(notificationSound)
+//const { play, sound } = useSound(notificationSound)
 
 const handleButtonClick = () => {
   if (isAdmin.value) {
@@ -185,12 +201,12 @@ const archiveNotifications = async () => {
     if (!notifications.value?.data?.length) return
 
     isArchiving.value = true
-    await removeNotifications(notifications.value.data.map(notification => notification.id))
+    await removeNotifications(
+      notifications.value.data.map((notification) => notification.id),
+    )
     await refresh()
-
   } catch (error) {
     console.error('Error archiving notifications:', error)
-
   } finally {
     isArchiving.value = false
   }
@@ -202,7 +218,7 @@ const confirmArchive = async () => {
 }
 
 watch(notificationCreatedListener.data, (value, oldValue) => {
-  play()
+  //play()
   webNotification.show()
   refresh()
 })
