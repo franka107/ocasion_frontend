@@ -12,7 +12,7 @@
         <CustomTable
           :data="transactionHistoryData"
           :header="transactionHistoryHeader"
-          :search="purseSearch"
+          :search="transactionHistorySearch"
           class="border-2 border-[#5da9d3] rounded-lg"
           @on-sort="onSort"
           @on-search="onSearch"
@@ -58,7 +58,10 @@ import { format } from 'date-fns'
 import PurseDetails from '@/components/purse/PurseDetails.vue'
 import CustomTable from '@/components/ui/custom-table/CustomTable.vue'
 import CustomPagination from '@/components/ui/custom-pagination/CustomPagination.vue'
-import { transactionHistoryHeader, purseSearch } from '~/constants/purse'
+import {
+  transactionHistoryHeader,
+  transactionHistorySearch,
+} from '~/constants/purse'
 
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
 import type { BidDto } from '~/types/Bids'
@@ -79,7 +82,21 @@ console.log(myGrants)
 const filterOptions = ref(JSON.stringify([]))
 
 const onSearch = (item: { [key: string]: string }) => {
-  filterOptions.value = JSON.stringify([])
+  const filters = []
+  if (item.type) {
+    filters.push({ field: 'type', type: 'equal', value: item.type })
+  }
+  if (item.motive) {
+    filters.push({ field: 'motive', type: 'equal', value: item.motive })
+  }
+  if (item.createdAt) {
+    filters.push({
+      field: 'createdAt',
+      type: 'equal',
+      value: item.createdAt,
+    })
+  }
+  filterOptions.value = JSON.stringify(filters)
 }
 
 const BID_BASE_URL = '/bid-management'

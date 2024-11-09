@@ -194,6 +194,36 @@ const hasSelectedNotifications = computed(
   () => selectedNotifications.value.length > 0,
 )
 
+watch([filterType, sortType], async () => {
+  if (filterType.value === 'todas') {
+    filterOptions.value = JSON.stringify([])
+  } else {
+    filterOptions.value = JSON.stringify([
+      {
+        field: 'isRead',
+        type: 'equal',
+        value: filterType.value === 'leidas',
+      },
+    ])
+  }
+
+  if (sortType.value === 'reciente') {
+    sortOptions.value = JSON.stringify([
+      {
+        field: 'createdAt',
+        order: 'desc',
+      },
+    ])
+  } else {
+    sortOptions.value = JSON.stringify([
+      {
+        field: 'createdAt',
+        order: 'asc',
+      },
+    ])
+  }
+})
+
 // Reactive variables
 // const page = ref(1)
 // const limit = ref(15)

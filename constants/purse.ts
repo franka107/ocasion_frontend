@@ -2,14 +2,23 @@ import type {
   HeaderItem,
   SearchItem,
 } from '@/components/ui/custom-table/CustomTable.vue'
+import {
+  TransactionHistoryMotive,
+  transactionHistoryMotiveMap,
+  TransactionHistoryType,
+} from '~/types/TransactionHistory'
 
-export const purseSearch: SearchItem[] = [
+export const transactionHistorySearch: SearchItem[] = [
   {
-    key: 'typeOfMovement',
+    key: 'type',
     type: 'select',
     placeholder: 'Seleccionar',
     label: 'Tipo de Movimiento',
-    items: [{ text: 'Todos', value: ' ' }],
+    items: [
+      { text: 'Todos', value: ' ' },
+      { text: 'Ingreso', value: TransactionHistoryType.Charge },
+      { text: 'Egreso', value: TransactionHistoryType.Discharge },
+    ],
     elementClass: 'min-w-[250px]',
     position: 1,
   },
@@ -18,12 +27,31 @@ export const purseSearch: SearchItem[] = [
     type: 'select',
     placeholder: 'Seleccionar',
     label: 'Motivo',
-    items: [{ text: 'Todos', value: ' ' }],
+    items: [
+      { text: 'Todos', value: ' ' },
+      {
+        text: transactionHistoryMotiveMap[TransactionHistoryMotive.WalletTopUp]
+          .label,
+        value: TransactionHistoryMotive.WalletTopUp,
+      },
+      {
+        text: transactionHistoryMotiveMap[
+          TransactionHistoryMotive.BalanceWithdraw
+        ].label,
+        value: TransactionHistoryMotive.BalanceWithdraw,
+      },
+      {
+        text: transactionHistoryMotiveMap[
+          TransactionHistoryMotive.PenaltyDischarge
+        ].label,
+        value: TransactionHistoryMotive.PenaltyDischarge,
+      },
+    ],
     elementClass: 'min-w-[250px]',
     position: 2,
   },
   {
-    key: '',
+    key: 'createdAt',
     type: 'date',
     label: 'Fecha de operación',
     placeholder: 'Inicio',
