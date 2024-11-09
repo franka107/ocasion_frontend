@@ -13,8 +13,7 @@ const getInitialValues = () => ({
   documentType: props.userDetail.documentType as 'DNI' | 'CE' | 'PT' || '',
   documentIdentifier: props.userDetail.documentIdentifier || '',
   firstName: props.userDetail.firstName || '',
-  paternalSurname: props.userDetail.paternalSurname || '',
-  maternalSurname: props.userDetail.maternalSurname || '',
+  lastName: props.userDetail.lastName || '',
   gender: props.userDetail.gender as 'MALE'|'FEMALE' || '',
   maritalStatus: props.userDetail.maritalStatus as 'SINGLE' | 'MARRIED' | 'WIDOWED' | 'DIVORCED' || '',
   birthDate: props.userDetail.birthDate || '',
@@ -29,12 +28,14 @@ const formSchema = toTypedSchema(
       .regex(/^\d+$/, 'El documento debe contener solo dígitos.')
       .min(1, 'El documento del representante es requerido'),
     firstName: z.string().min(1, 'El nombre es requerido'),
-    paternalSurname: z.string().min(1, 'El apellido paterno es requerido'),
-    maternalSurname: z.string().min(1, 'El apellido materno es requerido'),
+    lastName: z.string().min(1, 'El apellido paterno es requerido'),
     gender: z.enum(['MALE', 'FEMALE']).optional(),
     maritalStatus: z.enum(['SINGLE', 'MARRIED', 'WIDOWED', 'DIVORCED']).optional(),
     birthDate: z.string().nonempty('La fecha de nacimiento es requerida').optional(),
-    phoneNumber: z.string().min(1, 'El número de teléfono es requerido'),
+    phoneNumber: z
+      .string()
+      .regex(/^\d+$/, 'El número de teléfono debe contener solo dígitos.')
+      .min(9, 'El número de teléfono debe tener al menos 9 dígitos'),
     email: z.string().email('El correo electrónico no es válido').optional().nullable(),
   })
 )
@@ -102,7 +103,7 @@ const calculateAge = (birthDate: string) => {
                     { id: 'DNI', name: 'DNI' },
                     { id: 'CE', name: 'CE' },
                     { id: 'PT', name: 'PT' },
-                  ]" placeholder="Tipo de Documento" :disabled="!isEditing" />
+                  ]"staticLabel placeholder="Tipo de Documento" disabled />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -111,7 +112,7 @@ const calculateAge = (birthDate: string) => {
             <FormField v-slot="{ componentField }" name="documentIdentifier">
               <FormItem class="w-full">
                 <FormControl>
-                  <CustomInput type="text" label="N° documento" v-bind="componentField" :disabled="!isEditing" />
+                  <CustomInput staticLabel type="text" label="N° documento" v-bind="componentField" disabled />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -121,29 +122,23 @@ const calculateAge = (birthDate: string) => {
           <FormField v-slot="{ componentField }" name="firstName">
             <FormItem>
               <FormControl>
-                <CustomInput type="text" label="Nombres" v-bind="componentField" :disabled="!isEditing" />
+                <CustomInput staticLabel type="text" label="Nombres" v-bind="componentField" disabled />
               </FormControl>
               <FormMessage />
             </FormItem>
           </FormField>
           <!-- Apellido paterno  -->
-          <FormField v-slot="{ componentField }" name="paternalSurname">
+          <FormField v-slot="{ componentField }" name="lastName">
             <FormItem>
               <FormControl>
-                <CustomInput type="text" label="Apellido paterno" v-bind="componentField" :disabled="!isEditing" />
+                <CustomInput staticLabel type="text" label="Apellidos" v-bind="componentField" disabled />
               </FormControl>
               <FormMessage />
             </FormItem>
           </FormField>
-          <!-- Apeliido materno -->
-          <FormField v-slot="{ componentField }" name="maternalSurname">
-            <FormItem>
-              <FormControl>
-                <CustomInput type="text" label="Apellido materno" v-bind="componentField" :disabled="!isEditing" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
+          
+          <div></div>
+
           <div class="flex gap-2">
             <!-- Sexo -->
             <FormField v-slot="{ componentField }" name="gender">
@@ -152,7 +147,7 @@ const calculateAge = (birthDate: string) => {
                   <CustomSelect :items="[
                     { id: 'MALE', name: 'Masculino' },
                     { id: 'FEMALE', name: 'Femenino' },
-                  ]" placeholder="Sexo" v-bind="componentField" :disabled="!isEditing" />
+                  ]"staticLabel placeholder="Sexo" v-bind="componentField" disabled />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -166,7 +161,7 @@ const calculateAge = (birthDate: string) => {
                     { id: 'MARRIED', name: 'Casado' },
                     { id: 'WIDOWED', name: 'Viudo' },
                     { id: 'DIVORCED', name: 'Divorciado' },
-                  ]" placeholder="Estado Civil" v-bind="componentField" :disabled="!isEditing" />
+                  ]"staticLabel placeholder="Estado Civil" v-bind="componentField" :disabled="!isEditing" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -177,7 +172,7 @@ const calculateAge = (birthDate: string) => {
             <FormField v-slot="{ componentField }" name="birthDate">
               <FormItem class="w-1/2">
                 <FormControl>
-                  <CustomInput type="date" label="Fecha de Nacimiento" v-bind="componentField" :disabled="!isEditing" />
+                  <CustomInput staticLabel type="date" label="Fecha de Nacimiento" v-bind="componentField" disabled />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -188,7 +183,7 @@ const calculateAge = (birthDate: string) => {
           <FormField v-slot="{ componentField }" name="phoneNumber">
             <FormItem>
               <FormControl>
-                <CustomInput type="tel" label="Número de Teléfono" v-bind="componentField" :disabled="!isEditing" />
+                <CustomInput staticLabel type="tel" label="Número de Teléfono" v-bind="componentField" :disabled="!isEditing" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -196,7 +191,7 @@ const calculateAge = (birthDate: string) => {
           <FormField v-slot="{ componentField }" name="email">
             <FormItem>
               <FormControl>
-                <CustomInput type="email" label="Correo" v-bind="componentField" :disabled="!isEditing" />
+                <CustomInput staticLabel type="email" label="Correo" v-bind="componentField" :disabled="!isEditing" />
               </FormControl>
               <FormMessage />
             </FormItem>

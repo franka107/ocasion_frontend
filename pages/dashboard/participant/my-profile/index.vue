@@ -18,6 +18,7 @@
             <PasswordForm 
             :userDetail="userDetail"
             :on-password="handleChangeMyPassword"
+            :on-restore="handleResetPassword"
             />
       </div>
     </section>
@@ -32,7 +33,9 @@ import LegalPersonForm from "~/components/profile/LegalPersonForm.vue";
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const { editParticipant, changeMyPassword } = useUserParticipantAPI()
 const openUserModal = ref(false)
-const UserId = ref<number | undefined>(undefined)
+const {
+  restoreUserPassword,
+} = useAdmins()
 const BASE_USER_URL = "/auth-management";
 const { data:userDetail , refresh }: any = await useAPI<any>(
   `${BASE_USER_URL}/get-my-info`,
@@ -92,6 +95,35 @@ const handleEdit = async (values: any) => {
           'El usuario no pudo cambiar la contraseña , intentalo más tarde'
         updateConfirmModal({
           title: 'Error al cambiar contraseña de usuario',
+          message: eMsg,
+          type: 'error',
+        })
+      }
+    },
+  })
+}
+const handleResetPassword = async (email: string) => {
+  openConfirmModal({
+    title: 'Restablecer contraseña de usuario',
+    message: '¿Estás seguro de que deseas restablecer contraseña de usuario?',
+    callback: async () => {
+      console.log('')
+      const { status, error }: any = await restoreUserPassword(email)
+      if (status.value === 'success') {
+        openUserModal.value = false
+        refresh()
+        updateConfirmModal({
+          title: 'Contraseña de usuario restablecida',
+          message: 'El usuario ha restablecido la contraseña exitosamente',
+          type: 'success',
+        })
+      } else {
+        const eMsg =
+          error.value.data?.errors?.[0].message ||
+          error.value.data.message ||
+          'El usuario no se pudo restablecer la contraseña de usuario, intentalo más tarde'
+        updateConfirmModal({
+          title: 'Error al restablecer contraseña de usuario',
           message: eMsg,
           type: 'error',
         })

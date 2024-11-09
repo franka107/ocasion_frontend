@@ -1,8 +1,18 @@
 <template>
-  <SelectRoot v-model:open="open">
+  <SelectRoot v-model:open="open" :disabled="props.disabled">
+    <label 
+        v-if="props.staticLabel"
+        :class="{
+        'text-[#0F172A] text-4 font-[500]': true,
+        'opacity-50 cursor-not-allowed': props.disabled
+      }"
+      >
+        {{ props.placeholder }}
+        <span class="text-[#F6313C] ml-1">*</span>
+      </label>
     <SelectTrigger class="border-[#0B3859] relative">
       <label
-        v-if="!!currentLabel"
+        v-if="!props.staticLabel && !!currentLabel"
         class="absolute text-[#64748B] bg-white text-xs top-[-8px] left-2 px-1 max-w-[calc(100%_-_12px)] whitespace-nowrap overflow-hidden text-ellipsis"
         >{{ props.placeholder }}</label
       >
@@ -45,11 +55,15 @@ interface Props {
   placeholder: string
   multiple?: boolean
   modelValue?: Item | string | undefined | string[]
+  staticLabel?: boolean
+  disabled?: boolean
 }
 const props = withDefaults(defineProps<Props>(), {
   items: () => [],
   placeholder: '',
   multiple: false,
+  staticLabel: false,
+  disabled: false,
 })
 const emit = defineEmits(['update:modelValue', 'update:open'])
 const open = ref(false)

@@ -4,21 +4,19 @@ import { useForm } from 'vee-validate'
 import * as z from 'zod'
 import { toTypedSchema } from '@vee-validate/zod'
 import type { UserItem } from '@/types/Profile'
-const showPassword = ref(false)
+const showCurrentPassword = ref(false)
+const showNewPassword = ref(false)
+const showConfirmPassword = ref(false)
 const props = defineProps<{
     userDetail: UserItem
     onPassword: (values: any) => void;
+    onRestore: (email: string) => void;
 }>()
 const isChange = ref(false)
 const formSchema = toTypedSchema(
     z.object({
         currentPassword: z.string().min(1, 'La contraseña actual es requerida'),
-        newPassword: z
-            .string()
-            .min(8, 'La nueva contraseña debe tener al menos 8 caracteres')
-            .regex(/[A-Z]/, 'Debe incluir una letra mayúscula')
-            .regex(/[a-z]/, 'Debe incluir una letra minúscula')
-            .regex(/[0-9]/, 'Debe incluir un número'),
+        newPassword:z.string().min(1, 'La contraseña nueva es requerida'),
         confirmPassword: z.string().min(1, 'La confirmación de la contraseña es requerida'),
     }).refine((data) => data.newPassword === data.confirmPassword, {
         message: 'Las contraseñas no coinciden',
@@ -46,6 +44,11 @@ const cancelEdit = () => {
     isChange.value = false;
     form.resetForm()
 };
+const handleRestorePasswordClick = () => {
+  if (props.userDetail?.email) {
+    props.onRestore(props.userDetail.email) // Pasar el email del usuario
+  }
+}
 </script>
 <template>
     <div class="w-full bg-white mt-4 px-[24px] pb-[32px]">
@@ -68,18 +71,29 @@ const cancelEdit = () => {
                     <FormField v-slot="{ componentField }" name="currentPassword">
                         <FormItem>
                             <FormControl>
-                                <CustomInput :type="showPassword ? 'text' : 'password'" label="Contraseña actual" v-bind="componentField"
+                                <CustomInput 
+                                    showTooltip 
+                                    tooltipContent="Crea una contraseña que cumpla con los siguientes criterios:
+                                                     • Al menos 8 caracteres
+                                                     • Al menos una mayúscula
+                                                     • Al menos una minúscula
+                                                     • Al menos un número (0-9)
+                                                     • Al menos un símbolo (@ , #, $, etc)" 
+                                    staticLabel 
+                                    :type="showCurrentPassword ? 'text' : 'password'" 
+                                    label="Contraseña actual" 
+                                    v-bind="componentField"
                                     :disabled="!isChange" />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
                     </FormField>
                         <span 
-                            class="absolute inset-y-0 right-4 flex items-center cursor-pointer"
-                            @click="showPassword = !showPassword"  
+                            class="absolute inset-y-0 right-4 flex items-end pb-2.5 cursor-pointer"
+                            @click="showCurrentPassword = !showCurrentPassword"  
                             >
-                            <CustomIcons :name="showPassword ? 'EyeIcon' : 'EyeIconClosed'" class="w-5 h-5 text-gray-400"  />
-                        </span>
+                            <CustomIcons :name="showCurrentPassword ? 'EyeIcon' : 'EyeIconClosed'" class="w-5 h-5 text-gray-400"  />
+                        </span>                      
                 </div>
                 <div></div>
                 <!-- Nueva contraseña -->
@@ -87,17 +101,28 @@ const cancelEdit = () => {
                     <FormField v-slot="{ componentField }" name="newPassword">
                         <FormItem>
                             <FormControl>
-                                <CustomInput type="text" label="Nueva contraseña" v-bind="componentField"
+                                <CustomInput 
+                                    showTooltip 
+                                    tooltipContent="Crea una contraseña que cumpla con los siguientes criterios:
+                                                     • Al menos 8 caracteres
+                                                     • Al menos una mayúscula
+                                                     • Al menos una minúscula
+                                                     • Al menos un número (0-9)
+                                                     • Al menos un símbolo (@ , #, $, etc)" 
+                                     staticLabel 
+                                     :type="showNewPassword ? 'text' : 'password'" 
+                                     label="Nueva contraseña"
+                                      v-bind="componentField"
                                     :disabled="!isChange" />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
                     </FormField>
                     <span 
-                         class="absolute inset-y-0 right-4 flex items-center cursor-pointer"
-                         @click="showPassword = !showPassword"  
+                         class="absolute inset-y-0 right-4 flex items-end pb-2.5 cursor-pointer"
+                         @click="showNewPassword = !showNewPassword"  
                           >
-                          <CustomIcons :name="showPassword ? 'EyeIcon' : 'EyeIconClosed'" class="w-5 h-5 text-gray-400"  />
+                          <CustomIcons :name="showNewPassword ? 'EyeIcon' : 'EyeIconClosed'" class="w-5 h-5 text-gray-400"  />
                     </span>
                 </div>
 
@@ -106,26 +131,37 @@ const cancelEdit = () => {
                     <FormField v-slot="{ componentField }" name="confirmPassword">
                         <FormItem>
                             <FormControl>
-                                <CustomInput type="text" label="Confirmar contraseña" v-bind="componentField"
+                                <CustomInput 
+                                    showTooltip 
+                                    tooltipContent="Crea una contraseña que cumpla con los siguientes criterios:
+                                                     • Al menos 8 caracteres
+                                                     • Al menos una mayúscula
+                                                     • Al menos una minúscula
+                                                     • Al menos un número (0-9)
+                                                     • Al menos un símbolo (@ , #, $, etc)" 
+                                     staticLabel 
+                                     :type="showConfirmPassword ? 'text' : 'password'" 
+                                     label="Confirmar contraseña" 
+                                     v-bind="componentField"
                                     :disabled="!isChange" />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
                     </FormField>
                     <span 
-                         class="absolute inset-y-0 right-4 flex items-center cursor-pointer"
-                         @click="showPassword = !showPassword"  
+                         class="absolute inset-y-0 right-4 flex items-end pb-2.5 cursor-pointer"
+                         @click="showConfirmPassword = !showConfirmPassword"  
                           >
-                         <CustomIcons :name="showPassword ? 'EyeIcon' : 'EyeIconClosed'" class="w-5 h-5 text-gray-400"  />
+                         <CustomIcons :name="showConfirmPassword ? 'EyeIcon' : 'EyeIconClosed'" class="w-5 h-5 text-gray-400"  />
                      </span>
                 </div>
             </div>
             <!-- Enlace para recuperar contraseña -->
-            <NuxtLink to="https://web.dev.deocasion.pe/auth/register" rel="noopener noreferrer">
-                <p class="mt-[24px] text-[#052339] text-[14px] font-[600]">He olvidado mi contraseña
+            <Button variant="link" class="p-0" @click.prevent="handleRestorePasswordClick" :disabled="!isChange"  >
+                <p class="mt-[8px] text-[#052339] text-[14px] font-[600]">He olvidado mi contraseña
                     actual
                 </p>
-            </NuxtLink>
+            </Button>
             <div v-if="isChange"
                 class="mt-4 px-6 flex flex-wrap md:flex-nowrap justify-center gap-y-[10px] gap-x-[10px] w-full ">
                 <Button @click.prevent="cancelEdit" type="button" size="xl"

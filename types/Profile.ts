@@ -4,8 +4,6 @@ export interface UserItem {
     password: string
     firstName: string
     lastName: string
-    paternalSurname:string
-    maternalSurname:string
     documentType: string
     documentIdentifier: string
     phoneNumber: string

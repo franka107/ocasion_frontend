@@ -15,6 +15,9 @@ const props = withDefaults(
     readonly?: boolean;
     disabled?: boolean;
     labelOffset?: boolean;
+    staticLabel?: boolean;
+    showTooltip?: boolean; 
+    tooltipContent?: string; 
   }>(),
   {
     size: "base",
@@ -22,6 +25,9 @@ const props = withDefaults(
     readonly: false,
     disabled: false,
     labelOffset: false,
+    staticLabel: false,
+    showTooltip: false, 
+    tooltipContent: "",
   },
 );
 
@@ -53,8 +59,48 @@ watch(
 </script>
 
 <template>
-  <div class="relative flex items-center">
+  <div :class="[
+      'relative',
+      { 'flex flex-col gap-y-1.5 ': props.staticLabel, 'flex items-center': !props.staticLabel }
+    ]">
+     <label
+      v-if="props.staticLabel"
+      for="staticLabel"
+      :class="[
+        'text-4 font-[500]',
+        props.disabled ? 'opacity-50 ' : 'text-[#0F172A]',
+        'flex items-center' // Para colocar el tooltip al lado del label
+      ]"
+    >
+      {{ label }}
+      <span class="text-[#F6313C] ml-1">*</span>
+      
+      <!-- Mostrar el tooltip solo si showTooltip es true -->
+      <div v-if="props.showTooltip && props.tooltipContent" class="ml-2">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger as-child>
+              <Button variant="outline" class="border-none p-0">
+                <CustomIcons name="info" class="w-4 h-4 text-[#2872A1]" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent
+              side="bottom"
+              align="start"
+              class="w-[414px] px-[13px] bg-[#F3F8FC] "
+            >
+              <ul class="text-[14px] text-[#152A3C] leading-[20px]">
+                <li v-for="(item, index) in tooltipContent.split('\n')" :key="index">
+                  {{ item.trim() }}
+                </li>
+              </ul>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+    </label>
     <label
+       v-else
       :for="label"
       :class="
         cn(

@@ -37,7 +37,10 @@ const formSchema = toTypedSchema(
             .regex(/^\d+$/, 'El documento debe contener solo dígitos.')
             .min(1, `El documento del representante es requerido`),
         taxAddress: z.string().min(1, 'El Domicilio Fiscal es requerida').optional(),
-        phoneNumber: z.string().min(9, 'El número de teléfono debe tener al menos 9 dígitos'),
+        phoneNumber: z
+            .string()
+            .regex(/^\d+$/, 'El número de teléfono debe contener solo dígitos.')
+            .min(9, 'El número de teléfono debe tener al menos 9 dígitos'),
         email: z.string().email('Debe ser un correo electrónico válido'),
     })
 )
@@ -90,7 +93,7 @@ const cancelEdit = () => {
                     <FormField v-slot="{ componentField }" name="businessName">
                         <FormItem>
                             <FormControl>
-                                <CustomInput type="text" label="Razón Social" v-bind="componentField" :disabled="!isEditing"/>
+                                <CustomInput staticLabel type="text" label="Razón Social" v-bind="componentField" disabled/>
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -99,7 +102,7 @@ const cancelEdit = () => {
                     <FormField v-slot="{ componentField }" name="ruc">
                         <FormItem>
                             <FormControl>
-                                <CustomInput type="text" label="RUC" v-bind="componentField" :disabled="!isEditing"/>
+                                <CustomInput staticLabel type="text" label="RUC" v-bind="componentField" disabled/>
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -108,7 +111,7 @@ const cancelEdit = () => {
                     <FormField v-slot="{ componentField }" name="legalRepresentative">
                         <FormItem>
                             <FormControl>
-                                <CustomInput type="text" label="Representante Legal" v-bind="componentField" :disabled="!isEditing"/>
+                                <CustomInput staticLabel type="text" label="Representante Legal" v-bind="componentField" :disabled="!isEditing"/>
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -122,8 +125,8 @@ const cancelEdit = () => {
                                         { id: 'DNI', name: 'DNI' },
                                         { id: 'CE', name: 'CE' },
                                         { id: 'PT', name: 'PT' },
-                                    ]" placeholder="Tipo de DOI" 
-                                    :disabled="!isEditing"/>
+                                    ]" staticLabel  placeholder="Tipo de DOI" 
+                                    disabled/>
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -132,7 +135,7 @@ const cancelEdit = () => {
                         <FormField v-slot="{ componentField }" name="documentIdentifier">
                             <FormItem class="w-full">
                                 <FormControl>
-                                    <CustomInput type="text" label="Número de Documento" v-bind="componentField" :disabled="!isEditing"/>
+                                    <CustomInput staticLabel type="text" label="Número de Documento" v-bind="componentField" disabled/>
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -143,7 +146,7 @@ const cancelEdit = () => {
                     <FormField v-slot="{ componentField }" name="taxAddress">
                         <FormItem>
                             <FormControl>
-                                <CustomInput type="text" label="Domicilio Fiscal" v-bind="componentField" :disabled="!isEditing"/>
+                                <CustomInput staticLabel type="text" label="Domicilio Fiscal" v-bind="componentField" :disabled="!isEditing"/>
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -151,7 +154,7 @@ const cancelEdit = () => {
                     <FormField v-slot="{ componentField }" name="phoneNumber">
                         <FormItem>
                             <FormControl>
-                                <CustomInput type="tel" label="Número de Teléfono" v-bind="componentField" :disabled="!isEditing"/>
+                                <CustomInput staticLabel type="tel" label="Número de Teléfono" v-bind="componentField" :disabled="!isEditing"/>
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -159,7 +162,7 @@ const cancelEdit = () => {
                     <FormField v-slot="{ componentField }" name="email">
                         <FormItem>
                             <FormControl>
-                                <CustomInput type="t" label="Email" v-bind="componentField" :disabled="!isEditing"/>
+                                <CustomInput staticLabel type="text" label="Email" v-bind="componentField" :disabled="!isEditing"/>
                             </FormControl>
                             <FormMessage />
                         </FormItem>
