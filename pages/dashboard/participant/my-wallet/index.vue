@@ -13,7 +13,7 @@
           :data="transactionHistoryData"
           :header="transactionHistoryHeader"
           :search="transactionHistorySearch"
-          class="border-2 border-[#5da9d3] rounded-lg"
+          class="rounded-lg"
           @on-sort="onSort"
           @on-search="onSearch"
         >
@@ -35,8 +35,8 @@
           <template #voucher>
             <Button variant="ghost">
               <CustomIcons
-                name="Doc-Transfer"
-                class="w-6 h-6 text-reminder-600"
+                name="fileSearch"
+                class="w-6 h-6 text-primary"
               />
             </Button>
           </template>
@@ -45,8 +45,8 @@
       <CustomPagination
         v-model:page="page"
         class="mt-5 mb-[19px]"
-        :total="1"
-        :limit="1"
+        :total="total"
+        :limit="limit"
       />
     </section>
   </ContentLayout>
@@ -77,7 +77,7 @@ const { page, sortOptions, onSort, createEvent, editEvent, cancelEvent } =
   useEvent()
 const { getMyGrants } = useAuthManagement()
 const myGrants = await getMyGrants()
-console.log(myGrants)
+const limit = ref(8)
 
 const filterOptions = ref(JSON.stringify([]))
 
@@ -92,7 +92,7 @@ const onSearch = (item: { [key: string]: string }) => {
   if (item.createdAt) {
     filters.push({
       field: 'createdAt',
-      type: 'equal',
+      type: 'between',
       value: item.createdAt,
     })
   }
@@ -105,7 +105,7 @@ const { data, refresh }: any = await useAPI(
   `user-management/get-my-transaction-histories`,
   {
     query: {
-      limit: 10,
+      limit,
       page,
       filterOptions,
       // relations: JSON.stringify(['bid']),
@@ -113,6 +113,7 @@ const { data, refresh }: any = await useAPI(
     },
   } as any,
 )
+const total = ref(data.value?.count || 0)
 const transactionHistoryData = computed(
   () =>
     data.value?.data.map((item: TransactionHistoryDto, index: number) => ({

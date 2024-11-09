@@ -5,6 +5,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiUrl: process.env.NUXT_API_URL,
+      termsAndConditionsUrl: process.env.NUXT_TERMS_AND_CONDITIONS_URL,
     },
   },
   sound: {

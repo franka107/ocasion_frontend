@@ -1,9 +1,10 @@
 <template>
   <div class="w-full">
-    <div class="w-full flex flex-row flex-wrap py-6 gap-4 justify-end">
+    <div class="w-full flex flex-row flex-wrap py-6 gap-4 justify-between">
+      <div class="flex flex-wrap justify-start gap-4">
       <template v-for="(item, i) in search" :index="i">
         <template v-if="item">
-          <div class="flex flex-col w-[200px]">
+          <div :class="cn('flex flex-col w-[200px]', item.width)">
             <label
               v-if="item.label"
               class="text-sm font-medium text-gray-700 mb-[6px]"
@@ -12,7 +13,7 @@
             </label>
             <template v-if="item.type === 'text'">
               <Input
-                v-model="searchValues[item.key]"
+                v-model="searchValues[item.key] as string | undefined"
                 type="string"
                 :class="item.elementClass"
                 :placeholder="item.placeholder"
@@ -21,7 +22,7 @@
             </template>
             <template v-else-if="item.type === 'select'">
               <Select
-                :model-value="searchValues[item.key]"
+                :model-value="searchValues[item.key] as string | undefined"
                 :class="item.elementClass"
                 @update:model-value="
                   (event) => {
@@ -50,7 +51,7 @@
                 :class="item.elementClass"
                 label="Fecha de creación"
                 format="DD/MM/YYYY"
-                :value="searchValues[item.key]"
+                :value="searchValues[item.key] as string | undefined"
                 @update:model-value="
                   (event) => {
                     searchValues[item.key] = event === ' ' ? undefined : event
@@ -58,19 +59,36 @@
                 "
               />
             </template>
+            <template v-else-if="item.type === 'date-range'">
+              <DateRangeInput
+                :model-value="searchValues[item.key] as string[]"
+                :class="item.elementClass"
+                label="Fecha de creación"
+                placeholder="Inicio - Fin"
+                :value="searchValues[item.key]"
+                @update:model-value="
+                  (event) => {
+                    searchValues[item.key] = event
+                  }
+                "
+              />
+            </template>
           </div>
         </template>
       </template>
+    </div>
+    <div>
       <slot name="action-button">
         <!-- Default button in case no prop is passed -->
       </slot>
     </div>
-    <div class="overflow-auto" :class="[props.class]">
+    </div>
+    <div class="overflow-auto rounded-lg border border-primary-400" :class="[props.class]">
       <table class="table w-full">
         <thead>
           <tr
             :class="[props.class]"
-            class="border-b-[1px] border-dotted border-primary font-bold text-sm text-primary"
+            class="border-b-[1px] border-dashed bg-primary-100 border-primary-400 font-bold text-sm text-primary"
           >
             <th v-if="props.multipleSelect" class="h-[54px]">
               <button @click="changeGeneralCheckbox">
@@ -174,6 +192,7 @@
 </template>
 <script setup lang="ts">
 import CustomIcons from '@/components/ui/custom-icons/CustomIcons.vue'
+import { cva } from 'class-variance-authority';
 
 export interface DataItem {
   [key: string]: any
@@ -183,10 +202,11 @@ interface SearchSelectItem {
   text: string
 }
 export interface SearchItem {
-  type: 'text' | 'select' | 'date' | 'number'
+  type: 'text' | 'select' | 'date' | 'number' | 'date-range'
   placeholder?: string
   position?: number
   items?: SearchSelectItem[]
+  width?: string
   key: string
   elementClass?: string
   label?: string
@@ -219,7 +239,7 @@ const getNestedProperty = (obj: any, key: string) => {
   return key.split('.').reduce((acc, part) => acc && acc[part], obj)
 }
 
-const searchValues = reactive<{ [key: string]: string | undefined }>({})
+const searchValues = reactive<{ [key: string]: string | string[] | undefined }>({})
 watch(
   () => searchValues,
   (value) => {

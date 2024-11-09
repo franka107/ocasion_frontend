@@ -10,6 +10,13 @@ import {
 
 export const transactionHistorySearch: SearchItem[] = [
   {
+    key: 'createdAt',
+    type: 'date-range',
+    label: 'Fecha de operación',
+    placeholder: 'Inicio',
+    width: 'w-auto',
+  },
+  {
     key: 'type',
     type: 'select',
     placeholder: 'Seleccionar',
@@ -20,7 +27,6 @@ export const transactionHistorySearch: SearchItem[] = [
       { text: 'Egreso', value: TransactionHistoryType.Discharge },
     ],
     elementClass: 'min-w-[250px]',
-    position: 1,
   },
   {
     key: 'motive',
@@ -48,22 +54,7 @@ export const transactionHistorySearch: SearchItem[] = [
       },
     ],
     elementClass: 'min-w-[250px]',
-    position: 2,
-  },
-  {
-    key: 'createdAt',
-    type: 'date',
-    label: 'Fecha de operación',
-    placeholder: 'Inicio',
-    position: 3,
-  },
-  {
-    key: '',
-    type: 'date',
-    label: '-',
-    placeholder: 'Inicio',
-    position: 4,
-  },
+  }
 ]
 export const transactionHistoryHeader: HeaderItem[] = [
   {
@@ -89,7 +80,7 @@ export const transactionHistoryHeader: HeaderItem[] = [
   {
     key: 'amount',
     label: 'Monto',
-    align: 'right',
+    align: 'left',
     sortable: true,
   },
   {

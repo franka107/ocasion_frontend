@@ -2,8 +2,10 @@
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
 import DetailOfferAuditoriumItem from '@/components/virtual-auditorium/DetailOfferAuditoriumItem.vue'
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '~/components/ui/carousel'
-import type { OfferListItem } from '~/types/Offer'
+import type { OfferListItem, OfferDto } from '~/types/Offer'
 import type { IDataResponse } from '~/types/Common'
+import dayjs from 'dayjs'
+const { termsAndConditionsUrl } = useRuntimeConfig().public;
 const router = useRouter();
 const route = useRoute();
 const activeTab = ref<string>('info');
@@ -18,14 +20,15 @@ const eventDetail = ref<any>({
     closingTime: '18:00',
     time: '25/09/24 12:00 p.m',
 });
-const { data: offerDetail } = await useAPI<any>(
+const { data: offerDetail } = await useAPI<OfferDto>(
     `/offer-management/get-offer-detail-for-participant?id=${route.params.offerId}`,
     {
         query: {},
         default: () => ({})
-    }
+    } as any
 );
 offerDetail.value = offerDetail.value;
+const eventEndDate = offerDetail.value.event ? `${dayjs(offerDetail.value.event.endDate).format('DD/MM/YY')} ${dayjs().hour(offerDetail.value.event.closingTime).minute(0).format('hh:mm a')}` : '' ;
 const images = ref<Image[]>([
     { src: '/assets/img/offer-detail1.png', alt: 'Imagen de auto 1' },
     { src: '/assets/img/offer-detail2.png', alt: 'Imagen de auto 2' },
@@ -54,22 +57,22 @@ const images = ref<Image[]>([
                     <div class="flex flex-wrap justify-between items-center gap-y-[20px]">
                         <div>
                             <h3 class="font-[700] text-[#262F45] text-[20px] leading-[28px] mb-[16px]">{{
-                                eventDetail.name }}
+                                offerDetail.event?.name }}
                             </h3>
                             <div class="flex items-center">
                                 <CustomIcons name="calendar-today" class="mb-[1px]" />
                                 <h3
                                     class="gap-x-[6px] text-[#68686C] text-[14px] leading-[20px] ml-[6px] mr-[4px] font-[400]">
                                     <span class="font-[700] text-[#20445E] mr-[4px]">Fecha y hora de cierre </span>
-                                    {{ eventDetail.time }}
+                                    {{ eventEndDate }}
                                 </h3>
                                 <CustomIcons name="time" class="mb-[1px] stroke-[#20445E]" />
                             </div>
                         </div>
                         <div class="flex flex-col md:flex-row gap-x-4 w-auto ">
-                            <Button type="button" @click="router.push('/terms-and-conditions')"
+                            <NuxtLink type="button" :href="termsAndConditionsUrl"
                                 class="font-[600] text-sm md:text-base text-[#F97316] bg-white px-4 py-2 rounded hover:bg-[#F97316] hover:text-white">Términos
-                                y condiciones</Button>
+                                y condiciones</NuxtLink>
                         </div>
                     </div>
                 </div>

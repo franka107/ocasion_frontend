@@ -1,4 +1,6 @@
+import type { Organization } from '~/models/organizations'
 import type { UserDto } from './Administrators'
+import type { IEventLItem } from './Event'
 
 export enum OfferStatus {
   Retired = 'RETIRED', // Retirado
@@ -54,12 +56,17 @@ export interface OfferDto {
   description: string
   address: Address
   appraisal: number
+  counterProposalAmount?: any
   annexesFiles: AnnexesFile[]
   attachedFiles: AttachedFile[]
   status: OfferStatus
   endTime?: string
   createdAt: string
   updatedAt: string
+  event?: IEventLItem
+  organization?: Organization
+  organizationId: string
+  eventId?: string
 }
 
 export interface Model {

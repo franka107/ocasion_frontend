@@ -1,6 +1,9 @@
-# Nuxt 3 Minimal Starter
-
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+# Ocasion FrontEnd
+Environment Variables:
+```bash
+NUXT_API_URL="YOUR API URL"
+NUXT_TERMS_AND_CONDITIONS_URL="TERM AND CONDITIONS URL"
+```
 
 ## Setup
 
