@@ -28,6 +28,9 @@
             <div class="flex justify-center">
               <DropdownMenu>
                 <Button
+                  variant="ghost"
+                  size="sm"
+                  class="text-primary-950 underline h-8 data-[state=open]:bg-accent"
                   @click="
                     () => {
                       openModalCounterOffer = true
@@ -37,9 +40,6 @@
                       }
                     }
                   "
-                  variant="ghost"
-                  size="sm"
-                  class="text-primary-950 underline h-8 data-[state=open]:bg-accent"
                 >
                   <span>Ver contraoferta</span>
                 </Button>
@@ -55,25 +55,25 @@
         </CustomTable>
         <SheetContent
           v-model:open="openTransferModal"
-          customWidth="510px"
+          custom-width="510px"
           class="flex flex-col h-full"
           @pointer-down-outside="(e) => e.preventDefault()"
           @interact-outside="(e) => e.preventDefault()"
         >
           <GoodsTransferForm
             :id="selectedId"
-            :personStatus="selectedPersonStatus"
-            :onSubmit="onSubmit"
+            :person-status="selectedPersonStatus"
+            :on-submit="onSubmit"
           />
         </SheetContent>
         <SheetContent
           v-model:open="openUploadModal"
-          customWidth="510px"
+          custom-width="510px"
           class="flex flex-col h-full"
           @pointer-down-outside="(e) => e.preventDefault()"
           @interact-outside="(e) => e.preventDefault()"
         >
-          <UploadPaymentSupport :id="selectedId" :onSubmit="onSubmit" />
+          <UploadPaymentSupport :id="selectedId" :on-submit="onSubmit" />
         </SheetContent>
         <CounterOfferBidModal
           :id="selectedCounterOfferInfo.id"
@@ -96,6 +96,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import dayjs from 'dayjs'
 import CounterOfferBidModal from '../../bid/CounterOfferBidModal.vue'
 import CustomIcons from '@/components/ui/custom-icons/CustomIcons.vue'
 import CustomPagination from '@/components/ui/custom-pagination/CustomPagination.vue'
@@ -106,7 +107,6 @@ import {
 } from '@/constants/bids'
 import type { BidDto, OfferWithBidDto } from '~/types/Bids'
 import { GrantId } from '~/types/Grant'
-import dayjs from 'dayjs'
 import GoodsTransferForm from '~/components/participant/bid/GoodsTransferForm.vue'
 import UploadPaymentSupport from '~/components/participant/bid/UploadPaymentSupport.vue'
 const selectedId = ref('') // Define el id que necesitas pasar

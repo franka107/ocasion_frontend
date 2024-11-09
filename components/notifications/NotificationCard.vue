@@ -1,21 +1,33 @@
 <template>
-  <div class="relative  rounded-lg hover:bg-gray-50 transition-colors duration-200">
+  <div
+    class="relative rounded-lg hover:bg-gray-50 transition-colors duration-200"
+  >
     <div class="flex items-start w-full border-t border-gray-200">
-
       <div class="ml-16 mt-12">
         <input
           type="checkbox"
           :checked="isSelected"
-          @change="toggleSelection"
           class="mr-4 form-checkbox h-5 w-5 text-[#09314F] border-2 gap-2 border-[#09314F] rounded focus:ring-[#09314F]"
+          @change="toggleSelection"
         />
       </div>
       <div class="flex-1 space-y-1 py-2 mt-6">
-        <p class="font-normal text-base leading-[20px] tracking-[0.5px] text-[#152A3C] break-words pr-8">
+        <p
+          class="font-normal text-base leading-[20px] tracking-[0.5px] text-[#152A3C] break-words pr-8"
+        >
           {{ notification.message }}
         </p>
-        <p class="font-normal text-sm leading-[20px] tracking-[0.25px] text-[#20445E] mt-1">
-          {{ notificationDf.format(parseAbsolute(notification.createdAt, getLocalTimeZone()).toDate()) }}
+        <p
+          class="font-normal text-sm leading-[20px] tracking-[0.25px] text-[#20445E] mt-1"
+        >
+          {{
+            notificationDf.format(
+              parseAbsolute(
+                notification.createdAt,
+                getLocalTimeZone(),
+              ).toDate(),
+            )
+          }}
         </p>
         <span
           class="inline-flex font-inter font-semibold items-center justify-center sm:px-7 w-[52px] rounded-3xl text-xs sm:text-sm whitespace-nowrap"
@@ -30,14 +42,8 @@
           v-if="!notification.isRead"
           class="w-2 h-2 rounded-full bg-[#20445E] mr-2"
         ></div>
-        <button
-          @click="toggleMenu"
-          class="focus:outline-none"
-        >
-          <img
-            src="@/assets/icon/svg/Button.svg"
-            class="w-5 h-5"
-          />
+        <button class="focus:outline-none" @click="toggleMenu">
+          <img src="@/assets/icon/svg/Button.svg" class="w-5 h-5" />
           <span class="sr-only">Open menu</span>
         </button>
 
@@ -48,14 +54,14 @@
         >
           <div class="py-1">
             <button
-              @click="markAsRead"
               class="w-full text-left px-4 py-2 text-sm text-[#20445E] hover:bg-gray-50 transition-colors duration-200"
+              @click="handleRead"
             >
               Marcar como leído
             </button>
             <button
-              @click="handleDelete"
               class="w-full text-left px-4 py-2 text-sm text-[#20445E] hover:bg-gray-50 transition-colors duration-200"
+              @click="handleDelete"
             >
               Eliminar notificación
             </button>
@@ -63,11 +69,7 @@
         </div>
       </div>
     </div>
-    <div
-      v-if="isOpen"
-      @click="closeMenu"
-      class="fixed inset-0 z-40"
-    ></div>
+    <div v-if="isOpen" class="fixed inset-0 z-40" @click="closeMenu"></div>
   </div>
 </template>
 
@@ -79,7 +81,8 @@ import {
   parseAbsolute,
 } from '@internationalized/date'
 import {
-  NotiificationStringMap,NotificationTag,
+  NotiificationStringMap,
+  NotificationTag,
   type Notification,
 } from '~/types/Notification'
 const props = defineProps<{
@@ -87,9 +90,8 @@ const props = defineProps<{
   isSelected?: boolean
 }>()
 
-const emit = defineEmits(['onRemove', 'onSelect'])
+const emit = defineEmits(['onRemove', 'onSelect', 'onReaded'])
 const isOpen = ref(false)
-
 
 const notificationDf = new DateFormatter('es', {
   hour: '2-digit',
@@ -98,7 +100,8 @@ const notificationDf = new DateFormatter('es', {
   month: 'long',
 })
 
-const { removeNotifications } = useNotificationAPI()
+const { removeNotifications, removeNotification, readNotification } =
+  useNotificationAPI()
 
 const toggleMenu = (event: Event) => {
   event.stopPropagation()
@@ -113,21 +116,33 @@ const toggleSelection = () => {
   emit('onSelect', props.notification.id, !props.isSelected)
 }
 
-const markAsRead = async () => {
-  console.log(`Marcando la notificación ${props.notification.id} como leída`)
-  props.notification.isRead = true
+const handleRead = async () => {
+  // console.log(`Marcando la notificación ${props.notification.id} como leída`)
+  // props.notification.isRead = true
+  // emit('onReaded')
+  // closeMenu()
+
+  try {
+    const { status } = await readNotification(props.notification.id)
+    if (status.value === 'success') {
+      emit('onReaded')
+      console.log('Notification eliminada')
+    }
+  } catch (error) {
+    console.error('Error al eliminar la notificación:', error)
+  }
   closeMenu()
 }
 
 const handleDelete = async () => {
   try {
-    const { status } = await removeNotifications([props.notification.id])
+    const { status } = await removeNotification(props.notification.id)
     if (status.value === 'success') {
       emit('onRemove')
-      console.log("Notification eliminada")
+      console.log('Notification eliminada')
     }
   } catch (error) {
-    console.error("Error al eliminar la notificación:", error)
+    console.error('Error al eliminar la notificación:', error)
   }
   closeMenu()
 }
@@ -135,6 +150,6 @@ const NotificationColorMap = {
   [NotificationTag.Event]: 'bg-[#EFF6FF] text-[#2563EB]',
   [NotificationTag.Offer]: 'bg-[#FDF2F8] text-[#DB2777]',
   [NotificationTag.Delivery]: 'bg-[#F0FDF4] text-[#16A34A]',
-  [NotificationTag.Alert]: 'bg-[#FEF3C7] text-[#B45309]'
+  [NotificationTag.Alert]: 'bg-[#FEF3C7] text-[#B45309]',
 }
 </script>

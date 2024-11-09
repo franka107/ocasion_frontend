@@ -23,7 +23,7 @@
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        class="w-[360px] h-[700px] p-0 mr-4 bg-white border border-gray-300 shadow-lg rounded-lg"
+        class="w-[360px] max-h-[700px] p-0 mr-4 bg-white border border-gray-300 shadow-lg rounded-lg"
       >
         <Card class="border-0">
           <CardContent
@@ -39,21 +39,28 @@
                 </div>
               </template>
               <template v-else>
-                <NotificationItem
-                  v-for="(notification, index) in notifications?.data"
-                  :key="index"
-                  :notification="notification"
-                  @on-remove="refresh"
-                />
+                <div v-if="notifications?.data?.length > 0">
+                  <NotificationItem
+                    v-for="(notification, index) in notifications?.data"
+                    :key="index"
+                    :notification="notification"
+                    @on-remove="refresh"
+                  />
+                </div>
+                <div v-else>
+                  <p class="text-center py-5 text-sm text-gray-500">
+                    No tienes notificaciones
+                  </p>
+                </div>
               </template>
             </div>
           </CardContent>
           <CardFooter class="px-3 py-3 border boder-top-gray-700">
             <Button
               variant="ghost"
-              @click="handleButtonClick"
               :disabled="isAdmin && !notifications?.data?.length"
               :class="buttonClasses"
+              @click="handleButtonClick"
             >
               <div
                 class="inline-flex items-center justify-center w-full border-gray-200 text-sm font-medium"
@@ -82,14 +89,14 @@
                 <div class="mt-4 flex justify-end space-x-2">
                   <Button
                     variant="ghost"
-                    @click="showConfirmationDialog = false"
                     class="px-4 py-2 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    @click="showConfirmationDialog = false"
                   >
                     Cancel
                   </Button>
                   <Button
-                    @click="confirmArchive"
                     class="px-4 py-2 text-sm font-medium text-white bg-[#54c9dd] hover:bg-[#06B6D4] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#54c9dd]"
+                    @click="confirmArchive"
                   >
                     Confirm
                   </Button>
@@ -107,7 +114,7 @@
 import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useWebNotification } from '@vueuse/core'
-//import { useSound } from '@vueuse/sound'
+// import { useSound } from '@vueuse/sound'
 import {
   Popover,
   PopoverTrigger,
@@ -186,7 +193,7 @@ const notificationCreatedListener =
     domainEvents.notificationCreated,
   )
 
-//const { play, sound } = useSound(notificationSound)
+// const { play, sound } = useSound(notificationSound)
 
 const handleButtonClick = () => {
   if (isAdmin.value) {
@@ -218,7 +225,7 @@ const confirmArchive = async () => {
 }
 
 watch(notificationCreatedListener.data, (value, oldValue) => {
-  //play()
+  // play()
   webNotification.show()
   refresh()
 })

@@ -7,12 +7,16 @@
     </h1>
     <div class="h 10 w 10">
       <Button
-        @click=""
         class="text-[16px] font-[600] bg-white text-primary border border-primary hover:bg-accent w-[97px] mr-[8px]"
+        @click=""
       >
         Retirar
       </Button>
-      <Button variant="default" @click="" class="w-[97px] text-[16px]">
+      <Button
+        variant="default"
+        class="w-[97px] text-[16px]"
+        @click="handleRecharge"
+      >
         Recargar
       </Button>
     </div>
@@ -35,8 +39,8 @@
           <!-- Mostrar botón solo en el card de "Saldo garantizado" -->
           <button
             v-if="card.amountKey === 'guaranteedBalance'"
-            @click="openModal"
             class="text-[#F97316] text-[14px] mb-[16px]"
+            @click="openModal"
           >
             Ver detalle
           </button>
@@ -72,16 +76,22 @@ import { ref } from 'vue'
 import PurseForm from '@/components/purse/PurseForm.vue' // Asegúrate de tener el formulario
 const purseId = ref<number | undefined>(undefined)
 const appraisalHistoryModal = ref<any>({ offerId: '' })
-const props = defineProps<{
-  purseDetail: {
-    availableBalance: number
-    guaranteedBalance: number
-    totalAmount: number
-    [key: string]: number
-  }
-}>()
 
 const openPurseDetailsModal = ref(false)
+const { rechargeMyWallet } = useUserParticipantAPI()
+
+const handleRecharge = async () => {
+  const { status, error } = await rechargeMyWallet({})
+  refresh()
+}
+
+const { data: purseDetail, refresh } = await useAPI<any>(
+  `/user-management/get-my-wallet`,
+  {
+    query: {},
+    default: () => ({}),
+  },
+)
 
 const cardsData = ref([
   {

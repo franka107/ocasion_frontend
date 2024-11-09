@@ -1,4 +1,5 @@
 import { useEventSource } from '@vueuse/core'
+import type { IDataResponse } from '~/types/Common'
 import type { Notification } from '~/types/Notification'
 
 const NOTIFICATION_BASE_URL = '/notifications'
@@ -28,10 +29,14 @@ export class Paginated<T> {
 }
 
 export function useNotificationAPI() {
+  const page = ref(1)
+  const sortOptions = ref('[]')
+  const onSort = (sortObject: { [key: string]: string }[]) => {
+    sortOptions.value = JSON.stringify(sortObject)
+  }
   const findNotificationsPaginated = async (query: QueryPaginatedParams) => {
-    console.log('Query params:', query)
     const { status, error, data, refresh } = await useAPI<
-      Paginated<Notification>
+      IDataResponse<Notification>
     >(`${NOTIFICATION_BASE_URL}/find-notifications-paginated`, {
       method: 'GET',
       query: {
@@ -40,7 +45,6 @@ export function useNotificationAPI() {
         sortOptions: JSON.stringify(query.sortOptions),
       },
     } as any)
-    console.log('API Response:', { status: status.value, error: error.value, data: data.value })
 
     return { status, error, data, refresh }
   }
@@ -59,7 +63,7 @@ export function useNotificationAPI() {
 
   const removeNotifications = async (ids: string[]) => {
     const { status, error, data, refresh } = await useAPI<void>(
-      `${NOTIFICATION_BASE_URL}/mark-notifications-as-read`,
+      `${NOTIFICATION_BASE_URL}/remove-notifications`,
       {
         method: 'POST',
         body: {
@@ -70,9 +74,40 @@ export function useNotificationAPI() {
     return { status, error, data, refresh }
   }
 
+  const removeNotification = async (id: string) => {
+    const { status, error, data, refresh } = await useAPI<void>(
+      `${NOTIFICATION_BASE_URL}/remove-notification`,
+      {
+        method: 'DELETE',
+        body: {
+          id,
+        },
+      } as any,
+    )
+    return { status, error, data, refresh }
+  }
+
+  const readNotification = async (id: string) => {
+    const { status, error, data, refresh } = await useAPI<void>(
+      `${NOTIFICATION_BASE_URL}/read-notification`,
+      {
+        method: 'POST',
+        body: {
+          id,
+        },
+      } as any,
+    )
+    return { status, error, data, refresh }
+  }
+
   return {
     findNotificationsPaginated,
     listenDomainEvents,
     removeNotifications,
+    removeNotification,
+    readNotification,
+    page,
+    sortOptions,
+    onSort,
   }
 }

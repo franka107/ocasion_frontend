@@ -1,33 +1,43 @@
-import { useAPI } from "./useAPI";
+import { useAPI } from './useAPI'
 
-const BASE_USER_URL = "/user-management";
+const BASE_USER_URL = '/user-management'
 
-export function useUserParticipantAPI(){
-    const editParticipant = async (values: any) => {
-        const { status, error }: any = await useAPI(
-          `${BASE_USER_URL}/update-participant`,
-          {
-            method: "POST",
-            body: values,
-          } as any
-        );
-      
-        return { status, error };
-    };
+export function useUserParticipantAPI() {
+  const editParticipant = async (values: any) => {
+    const { status, error }: any = await useAPI(
+      `${BASE_USER_URL}/update-participant`,
+      {
+        method: 'POST',
+        body: values,
+      } as any,
+    )
 
-    const changeMyPassword = async (values: any) => {
-        const { status, error }: any = await useAPI(
-          `${BASE_USER_URL}/change-my-password`,
-          {
-            method: "POST",
-            body: values,
-          } as any
-        );
-      
-        return { status, error };
-    };
-    
+    return { status, error }
+  }
 
-      return { editParticipant, changeMyPassword }
+  const changeMyPassword = async (values: any) => {
+    const { status, error }: any = await useAPI(
+      `${BASE_USER_URL}/change-my-password`,
+      {
+        method: 'POST',
+        body: values,
+      } as any,
+    )
+
+    return { status, error }
+  }
+
+  const rechargeMyWallet = async (values: any) => {
+    const { status, error }: any = await useAPI(
+      `${BASE_USER_URL}/recharge-my-wallet`,
+      {
+        method: 'POST',
+        body: values,
+      } as any,
+    )
+
+    return { status, error }
+  }
+
+  return { editParticipant, changeMyPassword, rechargeMyWallet }
 }
-
