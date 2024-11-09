@@ -1,11 +1,20 @@
 <template>
-  <div class="relative rounded-lg ">
-    <div class="flex items-start w-full border-t hover:bg-gray-50 transition-colors duration-200 border-gray-300 mt-4">
-      <div class="flex-1 ml-4 mt-2 space-y-1 py-2  ">
-        <p class="font-normal text-[14px] leading-[20px] tracking-[0.5px] text-[#152A3C] break-words pr-8">
+  <div class="relative  rounded-lg hover:bg-gray-50 transition-colors duration-200">
+    <div class="flex items-start w-full border-t border-gray-200">
+
+      <div class="ml-16 mt-12">
+        <input
+          type="checkbox"
+          :checked="isSelected"
+          @change="toggleSelection"
+          class="mr-4 form-checkbox h-5 w-5 text-[#09314F] border-2 gap-2 border-[#09314F] rounded focus:ring-[#09314F]"
+        />
+      </div>
+      <div class="flex-1 space-y-1 py-2 mt-6">
+        <p class="font-normal text-base leading-[20px] tracking-[0.5px] text-[#152A3C] break-words pr-8">
           {{ notification.message }}
         </p>
-        <p class="font-normal text-[14px] leading-[20px] tracking-[0.25px] text-[#20445E] mt-1">
+        <p class="font-normal text-sm leading-[20px] tracking-[0.25px] text-[#20445E] mt-1">
           {{ notificationDf.format(parseAbsolute(notification.createdAt, getLocalTimeZone()).toDate()) }}
         </p>
         <span
@@ -16,7 +25,7 @@
         </span>
       </div>
 
-      <div class="flex items-center relative mr-4 mt-4">
+      <div class="flex items-center mr-6 relative mt-10">
         <div
           v-if="!notification.isRead"
           class="w-2 h-2 rounded-full bg-[#20445E] mr-2"
@@ -73,13 +82,14 @@ import {
   NotiificationStringMap,NotificationTag,
   type Notification,
 } from '~/types/Notification'
-
-const emit = defineEmits(['onRemove'])
 const props = defineProps<{
   notification: Notification
+  isSelected?: boolean
 }>()
 
+const emit = defineEmits(['onRemove', 'onSelect'])
 const isOpen = ref(false)
+
 
 const notificationDf = new DateFormatter('es', {
   hour: '2-digit',
@@ -97,6 +107,10 @@ const toggleMenu = (event: Event) => {
 
 const closeMenu = () => {
   isOpen.value = false
+}
+
+const toggleSelection = () => {
+  emit('onSelect', props.notification.id, !props.isSelected)
 }
 
 const markAsRead = async () => {

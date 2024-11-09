@@ -5,7 +5,7 @@ module.exports = {
   darkMode: ["class"],
   safelist: ["dark"],
   prefix: "",
-  
+
   theme: {
     container: {
       center: true,
@@ -90,10 +90,10 @@ module.exports = {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
-        btn: "8px", 
+        btn: "8px",
       },
       fontFamily: {
-        sans: ['Roboto', 'Inter', 'sans-serif'], 
+        sans: ['Roboto', 'Inter', 'sans-serif'],
         inter: ['Inter', 'sans-serif'],
         roboto: ['Roboto', 'sans-serif'], // Añadir la fuente Roboto
       },

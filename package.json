@@ -29,6 +29,7 @@
     "embla-carousel-vue": "^8.3.1",
     "lucide-vue-next": "^0.424.0",
     "nuxt": "^3.13.2",
+    "nuxt-app": "file:",
     "nuxt-auth-utils": "^0.3.5",
     "nuxt-countdown": "^1.2.0",
     "nuxt-svgo": "^4.0.6",
