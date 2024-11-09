@@ -28,6 +28,8 @@ const router = useRouter()
 const handleEventsDetail = async (offerId: string) => {
   router.push(`/dashboard/participant/virtual-auditorium/offers/${offerId}`)
 }
+
+const offerImage = offer.value.attachedFiles[0].path
 </script>
 <template>
   <Countdown
@@ -79,7 +81,7 @@ const handleEventsDetail = async (offerId: string) => {
       <div class="px-2 py-2">
         <div class="h-24">
           <img
-            src="/assets/img/auto_card.png"
+            :src="offerImage"
             alt="Imagen del auto"
             class="w-full h-full object-cover rounded-md"
           />

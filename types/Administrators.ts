@@ -12,6 +12,7 @@ export interface UserDto {
   updatedAt: string
   organizations: Organization[]
   roles?: Roles[]
+  commonName: string
 }
 
 export interface Organization {

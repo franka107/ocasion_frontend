@@ -14,7 +14,7 @@
       <DropdownMenuLabel class="font-normal py-2">
         <div class="flex flex-col space-y-1">
           <p class="text-sm font-medium leading-none">
-            {{ user?.user.firstName }} {{ user?.user.lastName }}
+            {{ user?.user.commonName }}
           </p>
           <p class="text-xs leading-none text-muted-foreground">
             {{ user?.user.email }}
