@@ -2,24 +2,15 @@
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
 import DetailOfferAuditoriumItem from '@/components/virtual-auditorium/DetailOfferAuditoriumItem.vue'
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '~/components/ui/carousel'
-import type { OfferListItem, OfferDto } from '~/types/Offer'
-import type { IDataResponse } from '~/types/Common'
+import type { OfferDto } from '~/types/Offer'
 import dayjs from 'dayjs'
 const { termsAndConditionsUrl } = useRuntimeConfig().public;
-const router = useRouter();
 const route = useRoute();
 const activeTab = ref<string>('info');
-const OFFER_BASE_URL = '/offer-management'
 interface Image {
     src: string;
     alt: string;
 }
-const eventDetail = ref<any>({
-    id: '1',
-    name: 'Nombre del evento',
-    closingTime: '18:00',
-    time: '25/09/24 12:00 p.m',
-});
 const { data: offerDetail } = await useAPI<OfferDto>(
     `/offer-management/get-offer-detail-for-participant?id=${route.params.offerId}`,
     {
