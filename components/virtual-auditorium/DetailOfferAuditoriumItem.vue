@@ -19,7 +19,7 @@ const users = ref([
         <div class="grid gap-y-[8px] font-[400] text-[#454446] text-[14px]">
             <div class="flex gap-x-[8px]">
                 <CustomIcons name="home-work-detail" class="mb-[1px]" />
-                <p class="leading-[24px] ">Nombre organización</p>
+                <p class="leading-[24px] ">{{offerDetail.organization.name}}</p>
             </div>
             <div class="flex gap-x-[8px]">
                 <CustomIcons name="location" class="w-[16px] mb-[1px]" />

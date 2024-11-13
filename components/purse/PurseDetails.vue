@@ -36,7 +36,6 @@
           >
             {{ card.subtitle }}
           </h4>
-          <!-- Mostrar botón solo en el card de "Saldo garantizado" -->
           <button
             v-if="card.amountKey === 'guaranteedBalance'"
             class="text-[#F97316] text-[14px] mb-[16px]"
@@ -56,7 +55,6 @@
       </div>
     </div>
   </div>
-  <!-- Modal lateral para ver detalles del saldo garantizado -->
   <SheetContent
     v-model:open="openPurseDetailsModal"
     class="flex flex-col h-full"
@@ -73,7 +71,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import PurseForm from '@/components/purse/PurseForm.vue' // Asegúrate de tener el formulario
+import PurseForm from '@/components/purse/PurseForm.vue'
 const purseId = ref<number | undefined>(undefined)
 const appraisalHistoryModal = ref<any>({ offerId: '' })
 

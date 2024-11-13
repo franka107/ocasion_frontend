@@ -27,6 +27,7 @@ interface GoodFile {
 
 interface TermsAndConditionsFile {
   id: string;
+  name:string;
   path: string;
 }
 

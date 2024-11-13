@@ -17,7 +17,8 @@ const props = withDefaults(
     labelOffset?: boolean;
     staticLabel?: boolean;
     showTooltip?: boolean; 
-    tooltipContent?: string; 
+    tooltipContent?: string;
+    showPasswordIcon?: boolean; 
   }>(),
   {
     size: "base",
@@ -28,6 +29,7 @@ const props = withDefaults(
     staticLabel: false,
     showTooltip: false, 
     tooltipContent: "",
+    showPasswordIcon: false,
   },
 );
 
@@ -56,6 +58,11 @@ watch(
   },
   { immediate: true },
 );
+const showPassword = ref(false);
+const togglePasswordVisibility = () => {
+  showPassword.value = !showPassword.value;
+};
+
 </script>
 
 <template>
@@ -112,16 +119,27 @@ watch(
       "
       >{{ label }}</label
     >
+    <div class="relative">
     <input
       v-model="modelValue"
       :name="label"
       @focus="isFocus = true"
       @blur="isFocus = false"
-      :type="type"
+      :type="type === 'password' ? (showPassword ? 'text' : 'password') : type" 
       :readonly="readonly"
       :disabled="disabled"
       :class="cn(inputVariant({ size }), 'pr-10', props.class)"
-    />
+      class="relative"
+    >
+    <!-- Icono de ojo para contraseñas -->
+    <span
+        v-if="props.showPasswordIcon"
+        @click="togglePasswordVisibility"
+        class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
+      >
+        <CustomIcons :name="showPassword ? 'EyeIcon' : 'EyeIconClosed'" class="w-5 h-5 text-gray-400" />
+    </span>
+   
     <!-- Icono derecho -->
 
     <span
@@ -130,6 +148,7 @@ watch(
     >
       <slot name="iconRight"></slot>
     </span>
+  </div>
   </div>
   <!-- <div class="relative flex items-center"> -->
   <!--   <label :for="label" :class="cn(labelVariant({ size }), active  -->

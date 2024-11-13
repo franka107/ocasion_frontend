@@ -83,17 +83,12 @@ const handleRestorePasswordClick = () => {
                                     :type="showCurrentPassword ? 'text' : 'password'" 
                                     label="Contraseña actual" 
                                     v-bind="componentField"
-                                    :disabled="!isChange" />
+                                    :disabled="!isChange" 
+                                    showPasswordIcon/>
                             </FormControl>
                             <FormMessage />
                         </FormItem>
-                    </FormField>
-                        <span 
-                            class="absolute inset-y-0 right-4 flex items-end pb-2.5 cursor-pointer"
-                            @click="showCurrentPassword = !showCurrentPassword"  
-                            >
-                            <CustomIcons :name="showCurrentPassword ? 'EyeIcon' : 'EyeIconClosed'" class="w-5 h-5 text-gray-400"  />
-                        </span>                      
+                    </FormField>                  
                 </div>
                 <div></div>
                 <!-- Nueva contraseña -->
@@ -113,17 +108,12 @@ const handleRestorePasswordClick = () => {
                                      :type="showNewPassword ? 'text' : 'password'" 
                                      label="Nueva contraseña"
                                       v-bind="componentField"
-                                    :disabled="!isChange" />
+                                    :disabled="!isChange" 
+                                    showPasswordIcon/>
                             </FormControl>
                             <FormMessage />
                         </FormItem>
                     </FormField>
-                    <span 
-                         class="absolute inset-y-0 right-4 flex items-end pb-2.5 cursor-pointer"
-                         @click="showNewPassword = !showNewPassword"  
-                          >
-                          <CustomIcons :name="showNewPassword ? 'EyeIcon' : 'EyeIconClosed'" class="w-5 h-5 text-gray-400"  />
-                    </span>
                 </div>
 
                 <!-- Confirmar contraseña -->
@@ -140,20 +130,15 @@ const handleRestorePasswordClick = () => {
                                                      • Al menos un número (0-9)
                                                      • Al menos un símbolo (@ , #, $, etc)" 
                                      staticLabel 
-                                     :type="showConfirmPassword ? 'text' : 'password'" 
+                                     type="password" 
                                      label="Confirmar contraseña" 
                                      v-bind="componentField"
-                                    :disabled="!isChange" />
+                                    :disabled="!isChange"
+                                    showPasswordIcon/>
                             </FormControl>
                             <FormMessage />
                         </FormItem>
                     </FormField>
-                    <span 
-                         class="absolute inset-y-0 right-4 flex items-end pb-2.5 cursor-pointer"
-                         @click="showConfirmPassword = !showConfirmPassword"  
-                          >
-                         <CustomIcons :name="showConfirmPassword ? 'EyeIcon' : 'EyeIconClosed'" class="w-5 h-5 text-gray-400"  />
-                     </span>
                 </div>
             </div>
             <!-- Enlace para recuperar contraseña -->

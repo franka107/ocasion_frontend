@@ -105,13 +105,14 @@ export interface State {
 }
 
 export interface AnnexesFile {
-  id: string
-  path: string
+  id: string;
+  name: string;
+  path: string;
 }
-
 export interface AttachedFile {
   id: string
   path: string
+  name:string
 }
 
 export interface IDebateForm {

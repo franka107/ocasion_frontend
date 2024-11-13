@@ -383,7 +383,14 @@ const icons: Icon[] = [
             <path d="M10 0H2C0.9 0 0 0.9 0 2V18C0 19.1 0.89 20 1.99 20H14C15.1 20 16 19.1 16 18V6L10 0ZM14 18H2V2H9V7H14V18Z" fill="currentColor"/>
             <path d="M5.03 9.03C3.66 10.4 3.66 12.61 5.03 13.98C6.15 15.1 7.83 15.29 9.16 14.57L11.04 16.45L12.45 15.04L10.57 13.16C11.28 11.83 11.1 10.15 9.98 9.03C8.61 7.66 6.39 7.66 5.03 9.03ZM8.56 12.56C7.97 13.15 7.02 13.15 6.44 12.56C5.85 11.97 5.85 11.02 6.44 10.44C7.03 9.85 7.98 9.85 8.56 10.44C9.15 11.03 9.15 11.97 8.56 12.56Z" fill="currentColor"/>
           </svg>`,
-  }
+  },
+  {
+    name: "Download-white",
+    svg: `<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="28" height="28" rx="4" fill="white"/>
+          <path d="M20 17V20H8V17H6V20C6 21.1 6.9 22 8 22H20C21.1 22 22 21.1 22 20V17H20ZM19 13L17.59 11.59L15 14.17V6H13V14.17L10.41 11.59L9 13L14 18L19 13Z" fill="#86868A"/>
+          </svg>`,
+  },
 ]
 const currentIcon = computed(
   () => icons.find((icon) => icon.name === props.name)?.svg || '<span></span>',
