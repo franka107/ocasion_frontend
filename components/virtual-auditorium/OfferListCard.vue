@@ -92,14 +92,16 @@ const offerImage = offer.value.attachedFiles[0].path
         <h2 class="text-[#20445E] text-sm font-semibold leading-4 pb-2">
           {{ offer.title }}
         </h2>
-        <div class="flex items-center justify-between space-x-2 text-[#68686C] text-xs font-semibold mb-2">
+        <div
+          class="flex items-center justify-between space-x-2 text-[#68686C] text-xs font-semibold mb-2"
+        >
           <div class="flex items-center">
             <span>Valor actual</span>
             <CustomIcons name="Info" class="w-5 h-5 text-primary" />
           </div>
-            <span class="font-bold text-sm text-[#20445E]"
-              >USD ${{ offer.bid?.amount || offer.initialValue }}</span
-            >
+          <span class="font-bold text-sm text-[#20445E]"
+            >USD ${{ offer.bids[0].amount }}</span
+          >
         </div>
         <div class="flex justify-end">
           <button

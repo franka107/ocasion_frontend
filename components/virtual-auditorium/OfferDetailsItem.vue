@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import type { OfferListItem } from '~/types/Offer'
 import { getRemainingTime } from '@/utils/countDown'
 import ConfirmBidDialog from '~/components/virtual-auditorium/ConfirmBidDialog.vue'
-import BidHistory from './BidHistory.vue';
+import BidHistory from './BidHistory.vue'
 
 const props = defineProps<{
   offer: OfferListItem
@@ -24,7 +24,7 @@ const offerNewBid = () => {
   const bidValue = ref(0)
   const onFocusInput = ref(false)
   const invalidBidAmount = computed(
-    () => bidValue.value < (offer.value.bid?.amount || 0) + 50,
+    () => bidValue.value < (offer.value.bids[0].amount || 0) + 50,
   )
   const errorMessage = computed<string | undefined>(() =>
     onFocusInput.value && invalidBidAmount.value
@@ -39,7 +39,7 @@ const offerNewBid = () => {
     { label: '+ $ 250.00', value: 250 },
   ])
   const onQuickAction = (value: number) => {
-    bidValue.value = (offer.value.bid?.amount || 0) + value
+    bidValue.value = (offer.value.bids[0].amount || 0) + value
   }
   const isDisabledButton = (totalSeconds: number) =>
     totalSeconds === 0 ||
@@ -126,101 +126,103 @@ const onSubmitBid = () => {
           <!-- Información de la tarjeta -->
           <div class="px-3 py-5">
             <div class="">
-            <div
-              class="flex justify-between mb-[16px] text-[#20445E] text-[12px] leading-[25px]"
-            >
-              <p class="font-[600">Nombre evento</p>
-              <p class="font-[400]">00 ofertas</p>
+              <div
+                class="flex justify-between mb-[16px] text-[#20445E] text-[12px] leading-[25px]"
+              >
+                <p class="font-[600">Nombre evento</p>
+                <p class="font-[400]">00 ofertas</p>
+              </div>
+              <h2
+                class="text-[#152A3C] text-[16px] font-[600] leading-[24px] pb-[16px] uppercase"
+              >
+                {{ offer.title }}
+              </h2>
+              <div class="flex flex-col">
+                <div class="flex gap-x-[4px] leading-[16px]">
+                  <p
+                    class="text-[#68686C] text-[12px] font-[600] text-center mb-[5.5px] flex items-center"
+                  >
+                    Valor actual
+                  </p>
+                  <button type="button" class="mb-[4px]">
+                    <CustomIcons
+                      name="Info"
+                      class="mt-[1.5px] w-4 h-4 text-primary"
+                    />
+                  </button>
+                </div>
+                <p class="font-[700] text-[14px] text-[#20445E] mb-4">
+                  USD ${{ offer.bids[0]?.amount || offer.initialValue }}
+                </p>
+              </div>
             </div>
-            <h2
-              class="text-[#152A3C] text-[16px] font-[600] leading-[24px] pb-[16px] uppercase"
-            >
-              {{ offer.title }}
-            </h2>
+            <div class="mb-4">
+              <div class="flex justify-between space-x-[10px] mb-1">
+                <div class="flex">
+                  <Input
+                    v-model="bidValue"
+                    type="number"
+                    placeholder="0.00"
+                    class="focus-visible:ring-transparent rounded-[6px_0_0_6px]"
+                    @focus="onFocusInput = true"
+                  />
+                  <div
+                    class="w-10 flex justify-center items-center bg-[#E6E6E7] rounded-[0_6px_6px_0]"
+                  >
+                    <img src="@/assets/icon/svg/arrow_up.svg" alt="" />
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  variant="default"
+                  class="py-[10px] px-[24px]"
+                  @click="onSubmitBid"
+                >
+                  Ofertar
+                </Button>
+              </div>
+              <p
+                v-if="errorMessage"
+                class="text-[#F6313C] text-[12px] font-[400]"
+              >
+                {{ errorMessage }}
+              </p>
+            </div>
             <div class="flex flex-col">
               <div class="flex gap-x-[4px] leading-[16px]">
                 <p
-                  class="text-[#68686C] text-[12px] font-[600] text-center mb-[5.5px] flex items-center"
+                  class="text-[#68686C] text-[14px] font-[600] text-center mb-[8px] flex items-center"
                 >
-                  Valor actual
+                  Acciones rápidas
                 </p>
-                <button type="button" class="mb-[4px]">
-                  <CustomIcons
-                    name="Info"
-                    class="mt-[1.5px] w-4 h-4 text-primary"
-                  />
-                </button>
-              </div>
-              <p class="font-[700] text-[14px] text-[#20445E] mb-4">
-                USD ${{ offer.bid?.amount || offer.initialValue }}
-              </p>
-            </div>
-          </div>
-          <div class="mb-4">
-            <div class="flex justify-between space-x-[10px] mb-1">
-              <div class="flex">
-                <Input
-                  v-model="bidValue"
-                  type="number"
-                  placeholder="0.00"
-                  class="focus-visible:ring-transparent rounded-[6px_0_0_6px]"
-                  @focus="onFocusInput = true"
+                <CustomIcons
+                  name="Info"
+                  class="mt-[1.5px] w-4 h-4 text-primary"
                 />
+              </div>
+              <div class="flex flex-col items-center">
                 <div
-                  class="w-10 flex justify-center items-center bg-[#E6E6E7] rounded-[0_6px_6px_0]"
+                  class="flex flex-wrap justify-center gap-y-[8px] gap-x-[16px] px-[22px]"
                 >
-                  <img src="@/assets/icon/svg/arrow_up.svg" alt="" />
+                  <Button
+                    v-for="(action, index) in quickActions"
+                    :key="index"
+                    type="button"
+                    class="w-[83px] h-[34px] px-4 py-1 text-[14px] border border-bluePrimary text-bluePrimary font-[600] hover:text-white hover:bg-bluePrimary rounded-[8px] bg-white"
+                    @click="onQuickAction(action.value)"
+                  >
+                    {{ action.label }}
+                  </Button>
                 </div>
               </div>
-              <Button
-                type="button"
-                variant="default"
-                :disabled="isDisabledButton(totalSeconds)"
-                class="py-[10px] px-[24px]"
-                @click="onSubmitBid"
-              >
-                Ofertar
-              </Button>
             </div>
-            <p
-              v-if="errorMessage"
-              class="text-[#F6313C] text-[12px] font-[400]"
-            >
-              {{ errorMessage }}
-            </p>
-          </div>
-          <div class="flex flex-col">
-            <div class="flex gap-x-[4px] leading-[16px]">
-              <p
-                class="text-[#68686C] text-[14px] font-[600] text-center mb-[8px] flex items-center"
-              >
-                Acciones rápidas
-              </p>
-              <CustomIcons
-                name="Info"
-                class="mt-[1.5px] w-4 h-4 text-primary"
+            <template v-if="offer.bidHistories?.length">
+              <hr class="border-gray-100 border-[1.5px] my-4" />
+              <BidHistory
+                :bid-history="offer.bids"
+                "
               />
-            </div>
-            <div class="flex flex-col items-center">
-              <div
-                class="flex flex-wrap justify-center gap-y-[8px] gap-x-[16px] px-[22px]"
-              >
-                <Button
-                  v-for="(action, index) in quickActions"
-                  :key="index"
-                  type="button"
-                  class="w-[83px] h-[34px] px-4 py-1 text-[14px] border border-bluePrimary text-bluePrimary font-[600] hover:text-white hover:bg-bluePrimary rounded-[8px] bg-white"
-                  @click="onQuickAction(action.value)"
-                >
-                  {{ action.label }}
-                </Button>
-              </div>
-            </div>
-          </div>
-          <template v-if="offer.bid.bidHistories?.length">
-            <hr class="border-gray-100 border-[1.5px] my-4" />
-            <BidHistory :bid-history="offer.bid.bidHistories" :winner-bid="offer.bid.status === 'WINNER' ? offer.bid.amount : undefined" />
-          </template>
+            </template>
           </div>
         </div>
       </div>

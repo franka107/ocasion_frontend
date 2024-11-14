@@ -20,7 +20,8 @@ export interface OfferListItem {
   description: string
   address: Address
   appraisal: number
-  bid: Bid
+  bids: Bid[]
+  bidHistories: BidHistory[]
   annexesFiles: AnnexesFile[]
   attachedFiles: AttachedFile[]
   status: OfferStatus
@@ -34,8 +35,8 @@ export interface Bid {
   status: string
   createdAt: string
   offerId: string
-  bidHistories?: BidHistory[]
   userId: string
+  user: UserDto
   __entity: string
 }
 
@@ -105,14 +106,14 @@ export interface State {
 }
 
 export interface AnnexesFile {
-  id: string;
-  name: string;
-  path: string;
+  id: string
+  name: string
+  path: string
 }
 export interface AttachedFile {
   id: string
   path: string
-  name:string
+  name: string
 }
 
 export interface IDebateForm {
