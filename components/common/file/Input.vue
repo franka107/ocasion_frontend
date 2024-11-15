@@ -43,6 +43,7 @@ const files = ref<{ id: string; path: string; name: string }[]>([])
 const fileInputRef = ref<HTMLInputElement | null>(null)
 const isLoading = ref(false)
 const emit = defineEmits(['update:modelValue'])
+const { uploadApiUrl } = useRuntimeConfig().public
 
 // const uploadFile = async (file: File): Promise<string> => {
 const uploadFile = async (
@@ -52,7 +53,7 @@ const uploadFile = async (
     const formData = new FormData()
     formData.append('file', file)
 
-    const { status, data }: any = await useAPI('/files/upload', {
+    const { status, data }: any = await useAPI(uploadApiUrl, {
       method: 'POST',
       body: formData,
     } as any)
