@@ -119,36 +119,58 @@ const togglePasswordVisibility = () => {
       "
       >{{ label }}</label
     >
-    <div class="relative">
-    <input
-      v-model="modelValue"
-      :name="label"
-      @focus="isFocus = true"
-      @blur="isFocus = false"
-      :type="type === 'password' ? (showPassword ? 'text' : 'password') : type" 
-      :readonly="readonly"
-      :disabled="disabled"
-      :class="cn(inputVariant({ size }), 'pr-10', props.class)"
-      class="relative"
-    >
-    <!-- Icono de ojo para contraseñas -->
-    <span
-        v-if="props.showPasswordIcon"
-        @click="togglePasswordVisibility"
-        class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
-      >
-        <CustomIcons :name="showPassword ? 'EyeIcon' : 'EyeIconClosed'" class="w-5 h-5 text-gray-400" />
-    </span>
-   
-    <!-- Icono derecho -->
+    <template v-if="props.showPasswordIcon">
+      <div class="relative">
+        <input
+          v-model="modelValue"
+          :name="label"
+          @focus="isFocus = true"
+          @blur="isFocus = false"
+          :type="type === 'password' ? (showPassword ? 'text' : 'password') : type"
+          :readonly="readonly"
+          :disabled="disabled"
+          :class="cn(inputVariant({ size }), 'pr-10', props.class)"
+        >
 
-    <span
-      v-if="$slots.iconRight"
-      class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500"
-    >
-      <slot name="iconRight"></slot>
-    </span>
-  </div>
+        <!-- Icono de ojo para contraseñas -->
+        <span
+          @click="togglePasswordVisibility"
+          class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
+        >
+          <CustomIcons :name="showPassword ? 'EyeIcon' : 'EyeIconClosed'" class="w-5 h-5 text-gray-400" />
+        </span>
+
+        <!-- Icono derecho -->
+        <span
+          v-if="$slots.iconRight"
+          class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500"
+        >
+          <slot name="iconRight"></slot>
+        </span>
+      </div>
+    </template>
+
+    <!-- Si no se muestra showPasswordIcon, renderizar input directamente -->
+    <template v-else>
+      <input
+        v-model="modelValue"
+        :name="label"
+        @focus="isFocus = true"
+        @blur="isFocus = false"
+        :type="type"
+        :readonly="readonly"
+        :disabled="disabled"
+        :class="cn(inputVariant({ size }), props.class)"
+      >
+
+      <!-- Icono derecho si está presente -->
+      <span
+        v-if="$slots.iconRight"
+        class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500"
+      >
+        <slot name="iconRight"></slot>
+      </span>
+    </template>
   </div>
   <!-- <div class="relative flex items-center"> -->
   <!--   <label :for="label" :class="cn(labelVariant({ size }), active  -->
