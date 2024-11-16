@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, onMounted, nextTick,watch } from 'vue'
 import Chart, { Legend, plugins } from 'chart.js/auto'
 import ChartModal from './ChartModal.vue'
 import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue'
 import { useEventManagementAPI } from '~/composables/useEventManagementAPI'
+import { useRevenueManagementAPI } from '~/composables/useRevenueManagementAPI'
 import type { EventChartData } from '~/composables/useEventManagementAPI'
+import ChartMetrics from '~/layouts/default/ChartMetrics.vue'
 
 const {
   monthlyEvents,
@@ -12,8 +14,20 @@ const {
   error,
   getMonthlyEvents,
   pendingActivities,
+  totalEvents,
   getEventsPendingActivities,
 } = useEventManagementAPI()
+const {
+  monthlyRevenue,
+  totalAmount,
+  pendingAmount,
+  getMonthlyRevenue
+} = useRevenueManagementAPI()
+watch(monthlyRevenue, (newValue) => {
+  console.log('monthlyRevenue changed:', newValue)
+  console.log('Labels:', newValue.labels)
+  console.log('Datasets:', newValue.datasets)
+})
 
 const getDateRange = () => {
   const endDate = new Date()
@@ -41,20 +55,17 @@ const chartConfigs: ChartConfig[] = [
     id: 'eventsChart',
     title: 'Eventos por mes',
     createConfig: () => {
-      const datasets =
-        monthlyEvents.value.datasets?.map((dataset) => ({
-          ...dataset,
-          stack: 'Stack 0',
-          data: dataset.data,
-        })) || []
 
       return {
         type: 'bar',
         data: {
-          labels: monthlyEvents.value.labels || [],
-          datasets,
-        },
-        options: {
+        labels: monthlyEvents.value.labels || [],
+        datasets: monthlyEvents.value.datasets?.map((dataset) => ({
+          ...dataset,
+          stack: 'Stack 0',
+        })) || [],
+      },
+      options: {
           responsive: true,
           maintainAspectRatio: false,
           scales: {
@@ -215,15 +226,25 @@ const chartConfigs: ChartConfig[] = [
     title: 'Monto recaudado por mes',
     createConfig: () => ({
       type: 'line',
-      data: '',
+      data: {
+      labels: monthlyRevenue.value.labels || [],
+      datasets: monthlyRevenue.value.datasets?.map((dataset) => ({
+        ...dataset,
+        stack: 'Stack 0',
+        borderColor: dataset.borderColor,
+        backgroundColor: dataset.backgroundColor,
+      })) || [],
+    },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
           y: {
-            min: 0,
-            max: 100,
+            stacked: true,
+              beginAtZero: true,
             ticks: {
+                stepSize: 1,
+                precision: 0,
               callback: function (value) {
                 return '$ ' + value
               },
@@ -334,35 +355,73 @@ const updateCharts = () => {
       if (existingChart) {
         existingChart.destroy()
       }
-      new Chart(ctx, config.createConfig(null))
+
+      // Determinar los datos a pasar según el gráfico
+      let updatedConfig;
+      if (config.id === 'eventsChart') {
+        updatedConfig = config.createConfig({
+          datasets: monthlyEvents.value.datasets,
+          labels: monthlyEvents.value.labels,
+        })
+      } else if (config.id === 'amountChart') {
+        updatedConfig = config.createConfig({
+          datasets: monthlyRevenue.value.datasets,
+          labels: monthlyRevenue.value.labels,
+        })
+      } else {
+        updatedConfig = config.createConfig(null)
+      }
+
+      // Crear el gráfico con la configuración actualizada
+      new Chart(ctx, updatedConfig)
     }
   })
 }
-watch(
-  monthlyEvents,
-  () => {
-    updateCharts()
-  },
-  { deep: true },
-)
+  watch([totalEvents, monthlyEvents], () => {
+    updateCharts();
+  }, { immediate: true });
 
-onMounted(async () => {
+  onMounted(async () => {
   try {
-    // Obtener el rango de fechas
     const { startDate, endDate } = getDateRange()
-
-    // Cargar datos iniciales
     await Promise.all([
       getEventsPendingActivities(),
       getMonthlyEvents(startDate, endDate),
+      getMonthlyRevenue(startDate,endDate)
     ])
-
-    // Inicializar los gráficos
     updateCharts()
   } catch (e) {
     console.error('Error loading initial data:', e)
   }
 })
+
+const getMetricsForChart = (index: number) => {
+  switch (index) {
+    case 0:
+      return totalEvents !== undefined ? [
+        {
+          label: 'Total de eventos',
+          value: totalEvents
+        }
+      ] : undefined;
+    case 1:
+      return [
+        {
+          label: 'Monto total',
+          value: totalAmount,
+          prefix: '$ '
+        },
+        {
+          label: 'Monto pendiente',
+          value: pendingAmount,
+          prefix: '$ '
+        }
+      ];
+    default:
+      return undefined;
+  }
+};
+
 </script>
 <template>
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -377,6 +436,8 @@ onMounted(async () => {
           <CustomIcons name="icon-vector" class="w-4 h-4" />
         </button>
       </div>
+      <ChartMetrics :metrics="getMetricsForChart(index)" />
+
       <div class="w-full h-64 sm:h-80">
         <canvas :id="config.id"></canvas>
       </div>
@@ -385,10 +446,9 @@ onMounted(async () => {
 
   <ChartModal
     :is-open="isModalOpen"
-    :title="
-      selectedChartIndex !== null ? chartConfigs[selectedChartIndex].title : ''
-    "
+    :title="selectedChartIndex !== null ? chartConfigs[selectedChartIndex].title : ''"
     :modal-chart-id="modalChartId"
+    :chart-metrics="selectedChartIndex !== null ? getMetricsForChart(selectedChartIndex) : undefined"
     @close="closeModal"
   />
 </template>

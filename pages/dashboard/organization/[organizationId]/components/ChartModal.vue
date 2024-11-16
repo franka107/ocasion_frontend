@@ -9,11 +9,18 @@ import {
   DialogClose,
 } from 'radix-vue'
 import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue'
+import ChartMetrics from '~/layouts/default/ChartMetrics.vue';
 
 interface Props {
   isOpen: boolean
   title: string
   modalChartId: string
+  chartMetrics?: {
+    label: string;
+    value: number | string;
+    prefix?: string;
+    suffix?: string;
+  }[];
 }
 
 const props = defineProps<Props>()
@@ -59,9 +66,11 @@ const handleClose = () => {
             <span class="sr-only">Cerrar</span>
           </DialogClose>
         </div>
+        <ChartMetric :metrics="chartMetrics" />
         <div class="w-full h-[250px] sm:h-[300px] md:h-[350px] lg:h-[427px]">
           <canvas :id="modalChartId"></canvas>
         </div>
+
       </DialogContent>
     </DialogPortal>
   </DialogRoot>
