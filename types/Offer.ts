@@ -15,6 +15,7 @@ export interface OfferListItem {
   id: string
   title: string
   carModel: Model
+  carBrand: Brand
   year: number
   initialValue: number
   description: string
@@ -52,6 +53,7 @@ export interface OfferDto {
   id: string
   title: string
   carModel: Model
+  carBrand: Brand
   year: number
   initialValue: number
   description: string
@@ -73,7 +75,7 @@ export interface OfferDto {
 export interface Model {
   id: string
   name: string
-  brand: Brand
+  carBrand: Brand
 }
 
 export interface Brand {

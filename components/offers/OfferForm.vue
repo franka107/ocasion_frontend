@@ -89,7 +89,7 @@ if (props.id) {
   offerData.province = offerData.address.district.city.id
   offerData.districtId = offerData.address.district.id
   offerData.addressLine1 = offerData.address.addressLine1
-  offerData.brandId = offerData.carModel.brand.id
+  offerData.brandId = offerData.carBrand.id
   offerData.model = offerData.carModel.id
 
   initialAuctionAmount.value =
