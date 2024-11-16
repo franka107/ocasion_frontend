@@ -66,7 +66,7 @@ const handleClose = () => {
             <span class="sr-only">Cerrar</span>
           </DialogClose>
         </div>
-        <ChartMetric :metrics="chartMetrics" />
+        <ChartMetrics :metrics="chartMetrics" />
         <div class="w-full h-[250px] sm:h-[300px] md:h-[350px] lg:h-[427px]">
           <canvas :id="modalChartId"></canvas>
         </div>
