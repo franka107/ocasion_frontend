@@ -1,28 +1,28 @@
 import { ref } from 'vue'
 
 export interface EventDataset {
-  label: string;
-  data: number[];
-  backgroundColor: string;
+  label: string
+  data: number[]
+  backgroundColor: string
 }
 
 export interface EventChartData {
-  labels: string[];
-  datasets: EventDataset[];
+  labels: string[]
+  datasets: EventDataset[]
 }
 
-const EVENT_BASE_URL = "/event-management"
+const EVENT_BASE_URL = '/event-management'
 
 export function useEventManagementAPI() {
   const pendingActivities = ref({
     eventsInDebate: 0,
     pendingDepositReviewOffers: 0,
-    pendingDeliveryOffers: 0
+    pendingDeliveryOffers: 0,
   })
 
   const monthlyEvents = ref<EventChartData>({
     labels: [],
-    datasets: []
+    datasets: [],
   })
 
   const isLoading = ref(false)
@@ -34,9 +34,9 @@ export function useEventManagementAPI() {
       const { data, error }: any = await useAPI(
         `${EVENT_BASE_URL}/get-events-pending-activities`,
         {
-          method: "GET",
-          default: () => {}
-        }
+          method: 'GET',
+          default: () => {},
+        },
       )
 
       if (data) {
@@ -60,23 +60,22 @@ export function useEventManagementAPI() {
       // Filtrar opciones para la API
       const filterOptions = [
         {
-          field: "finishedAt",
-          type: "between",
-          value: [startDate, endDate]
-        }
+          field: 'finishedAt',
+          type: 'between',
+          value: [startDate, endDate],
+        },
       ]
 
       const params = new URLSearchParams({
-        filterOptions: JSON.stringify(filterOptions)
+        filterOptions: JSON.stringify(filterOptions),
       })
-
 
       const { data, error: apiError }: any = await useAPI(
         `${EVENT_BASE_URL}/get-monthly-events?${params.toString()}`,
         {
-          method: "GET",
-          default: () => ({ labels: [], datasets: [] })
-        }
+          method: 'GET',
+          default: () => ({ labels: [], datasets: [] }),
+        },
       )
 
       if (data.value && Array.isArray(data.value.datasets)) {
@@ -85,16 +84,18 @@ export function useEventManagementAPI() {
           datasets: data.value.datasets.map((dataset: any) => ({
             label: dataset.label,
             data: dataset.data,
-            backgroundColor: dataset.backgroundColor
-          }))
+            backgroundColor: dataset.backgroundColor,
+          })),
         }
-        console.log('Datos mensuales cargados:', JSON.parse(JSON.stringify(data.value)))
+        console.log(
+          'Datos mensuales cargados:',
+          JSON.parse(JSON.stringify(data.value)),
+        )
       } else {
-        error.value = 'Datos de eventos mensuales no disponibles o mal formateados.'
+        error.value =
+          'Datos de eventos mensuales no disponibles o mal formateados.'
         console.error('Datos de eventos mensuales no disponibles:', data.value)
       }
-
-
 
       if (apiError) {
         error.value = apiError
@@ -116,6 +117,6 @@ export function useEventManagementAPI() {
     monthlyEvents,
     isLoading,
     error,
-    getMonthlyEvents
+    getMonthlyEvents,
   }
 }
