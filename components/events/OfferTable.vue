@@ -354,7 +354,7 @@ const [
 ])
 const offerData = computed(() =>
   data.value.data.map((item: OfferListItem) => ({
-    brandName: item.carModel.brand.name,
+    brandName: item.carBrand.name,
     modelName: item.carModel.name,
     addressCity: item.address.district.city.name,
     ...item,

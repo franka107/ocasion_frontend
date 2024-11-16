@@ -1,3 +1,4 @@
-import { io } from "socket.io-client";
+import { io } from 'socket.io-client'
 
-export const socket = io("https://pango.dev");
+const { socketApiUrl } = useRuntimeConfig().public
+export const socket = io(socketApiUrl)

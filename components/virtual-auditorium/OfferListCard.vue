@@ -100,7 +100,7 @@ const offerImage = offer.value.attachedFiles[0].path
             <CustomIcons name="Info" class="w-5 h-5 text-primary" />
           </div>
           <span class="font-bold text-sm text-[#20445E]"
-            >USD ${{ offer.bids[0].amount }}</span
+            >USD ${{ offer.bids[0]?.amount }}</span
           >
         </div>
         <div class="flex justify-end">
