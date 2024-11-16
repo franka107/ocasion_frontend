@@ -73,14 +73,17 @@ import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue';
 interface ActivitiesCardProps {
   title: string
   icon1: string
+  icon1Alt: string
   value1: string | number
   label1: string
   onClick1?: () => void
   icon2: string
+  icon2Alt: string
   value2: string | number
   label2: string
   onClick2?: () => void
   icon3: string
+  icon3Alt: string
   value3: string | number
   label3: string
   onClick3?: () => void

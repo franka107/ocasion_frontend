@@ -3,171 +3,28 @@ import { ref, onMounted, nextTick } from 'vue'
 import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue';
 import Chart, { Legend, plugins } from 'chart.js/auto'
 import ChartModal from './ChartModal.vue';
+import { useEventManagementAPI } from '~/composables/useEventManagementAPI';
+import type { EventChartData } from '~/composables/useEventManagementAPI';
 
-interface MonthlyData {
-  month: string;
-  published: number;
-  inProgress: number;
-  cancelled: number;
-  finished: number;
-  completed: number;
-  eventAmount: number;
-  searchAmount: number;
+const {
+  monthlyEvents,
+  isLoading,
+  error,
+  getMonthlyEvents,
+  pendingActivities,
+  getEventsPendingActivities
+} = useEventManagementAPI()
+
+const getDateRange = () => {
+  const endDate = new Date()
+  const startDate = new Date()
+  startDate.setMonth(startDate.getMonth() - 11)
+  return {
+    startDate: startDate.toISOString().split('T')[0],
+    endDate: endDate.toISOString().split('T')[0]
+  }
 }
 
-
-const monthlyData = ref<MonthlyData[]>([
-  {
-    month: 'January',
-    published: -20,
-    inProgress: -30,
-    cancelled: 40,
-    finished: 30,
-    completed: 20,
-    eventAmount: 65,
-    searchAmount: 90
-  },
-  {
-    month: 'February',
-    published: 0,
-    inProgress: 20,
-    cancelled: 0,
-    finished: 60,
-    completed: 40,
-    eventAmount: 60,
-    searchAmount: 70
-  },
-  {
-    month: 'March',
-    published: 10,
-    inProgress: 30,
-    cancelled: 5,
-    finished: 50,
-    completed: 45,
-    eventAmount: 80,
-    searchAmount: 85
-  },
-  {
-    month: 'April',
-    published: 20,
-    inProgress: 10,
-    cancelled: 10,
-    finished: 70,
-    completed: 60,
-    eventAmount: 90,
-    searchAmount: 100
-  },
-  {
-    month: 'May',
-    published: -10,
-    inProgress: 5,
-    cancelled: 15,
-    finished: 40,
-    completed: 30,
-    eventAmount: 75,
-    searchAmount: 80
-  },
-  {
-    month: 'June',
-    published: 5,
-    inProgress: 10,
-    cancelled: 0,
-    finished: 65,
-    completed: 55,
-    eventAmount: 85,
-    searchAmount: 90
-  },
-  {
-    month: 'July',
-    published: 15,
-    inProgress: 20,
-    cancelled: 10,
-    finished: 80,
-    completed: 70,
-    eventAmount: 95,
-    searchAmount: 110
-  },
-  {
-    month: 'August',
-    published: 0,
-    inProgress: 25,
-    cancelled: 5,
-    finished: 90,
-    completed: 75,
-    eventAmount: 100,
-    searchAmount: 120
-  },
-  {
-    month: 'September',
-    published: 10,
-    inProgress: 30,
-    cancelled: 0,
-    finished: 85,
-    completed: 65,
-    eventAmount: 110,
-    searchAmount: 130
-  },
-  {
-    month: 'October',
-    published: -5,
-    inProgress: 15,
-    cancelled: 10,
-    finished: 60,
-    completed: 50,
-    eventAmount: 95,
-    searchAmount: 115
-  },
-  {
-    month: 'November',
-    published: 5,
-    inProgress: 20,
-    cancelled: 0,
-    finished: 75,
-    completed: 65,
-    eventAmount: 105,
-    searchAmount: 125
-  },
-  {
-    month: 'December',
-    published: 0,
-    inProgress: 10,
-    cancelled: 5,
-    finished: 80,
-    completed: 70,
-    eventAmount: 110,
-    searchAmount: 140
-  }
-]);
-
-const topAssets = ref([
-  { month: 'January', marca1: 80, marca2: 0, marca3: 0, marca4: 0, marca5: -20 },
-  { month: 'February', marca1: 0, marca2: 60, marca3: 0, marca4: -40, marca5: -30 },
-  { month: 'March', marca1: -30, marca2: 40, marca3: 0, marca4: 0, marca5: 0 },
-  { month: 'April', marca1: 50, marca2: 20, marca3: 10, marca4: 0, marca5: -10 },
-  { month: 'May', marca1: 60, marca2: -20, marca3: 30, marca4: 0, marca5: -5 },
-  { month: 'June', marca1: 40, marca2: 50, marca3: 0, marca4: -10, marca5: 20 },
-  { month: 'July', marca1: 30, marca2: 60, marca3: -10, marca4: 10, marca5: 0 },
-  { month: 'August', marca1: 20, marca2: 50, marca3: 10, marca4: 20, marca5: 0 },
-  { month: 'September', marca1: 70, marca2: -10, marca3: 30, marca4: 0, marca5: 10 },
-  { month: 'October', marca1: 10, marca2: 40, marca3: 20, marca4: 0, marca5: 30 },
-  { month: 'November', marca1: 80, marca2: 10, marca3: 0, marca4: -20, marca5: 5 },
-  { month: 'December', marca1: 90, marca2: 30, marca3: 0, marca4: 0, marca5: -10 }
-]);
-
-const avgOffers = ref([
-  { month: 'January', confirmedAvg: 70, totalAvg: 60 },
-  { month: 'February', confirmedAvg: 60, totalAvg: 40 },
-  { month: 'March', confirmedAvg: 50, totalAvg: 45 },
-  { month: 'April', confirmedAvg: 65, totalAvg: 55 },
-  { month: 'May', confirmedAvg: 55, totalAvg: 50 },
-  { month: 'June', confirmedAvg: 60, totalAvg: 57 },
-  { month: 'July', confirmedAvg: 70, totalAvg: 65 },
-  { month: 'August', confirmedAvg: 75, totalAvg: 68 },
-  { month: 'September', confirmedAvg: 80, totalAvg: 72 },
-  { month: 'October', confirmedAvg: 60, totalAvg: 55 },
-  { month: 'November', confirmedAvg: 85, totalAvg: 77 },
-  { month: 'December', confirmedAvg: 90, totalAvg: 80 }
-]);
 
 // Variables para el modal
 const isModalOpen = ref(false)
@@ -175,97 +32,181 @@ const selectedChartIndex = ref<number | null>(null)
 const modalChartId = 'modal-chart'
 let modalChart: Chart | null = null
 
+
 interface ChartConfig {
   id: string
   title: string
   createConfig: (data: any) => Chart.ChartConfiguration
 }
 const chartConfigs: ChartConfig[] = [
-  {
+{
     id: 'eventsChart',
     title: 'Eventos por mes',
-    createConfig: () => ({
-      type: 'bar',
-      data: {
-        labels: monthlyData.value.map(data => data.month),
-        datasets: [
-          {
-            label: 'Publicado',
-            data: monthlyData.value.map(data => data.published),
-            backgroundColor: '#FFC8CB',
-            borderColor: '#F6313C',
-            stack: 'Stack 0',
-          },
-          {
-            label: 'En curso',
-            data: monthlyData.value.map(data => data.inProgress),
-            backgroundColor: '#60A5FA',
-            borderColor: '#388EBF',
-            stack: 'Stack 0',
-          },
-          {
-            label: 'Cancelado',
-            data: monthlyData.value.map(data => data.cancelled),
-            backgroundColor: '#00BB8E',
-            stack: 'Stack 0',
-          },
-          {
-            label: 'Finalizado',
-            data: monthlyData.value.map(data => data.finished),
-            backgroundColor: '#FBBF24',
-            stack: 'Stack 0',
-          },
-          {
-            label: 'Culminado',
-            data: monthlyData.value.map(data => data.completed),
-            backgroundColor: '#788EB9',
-            stack: 'Stack 0',
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
+    createConfig: () => {
+      const datasets = monthlyEvents.value.datasets?.map(dataset => ({
+        ...dataset,
+        stack: 'Stack 0',
+        data: dataset.data
+      })) || []
 
-        scales: {
-          y: {
-            min: -100,
-            max: 150,
-            stacked: true
+      return {
+        type: 'bar',
+        data: {
+          labels: monthlyEvents.value.labels || [],
+          datasets
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              stacked: true,
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1,
+                precision: 0
+              },
+              suggestedMax: (context) => {
+                const maxValue = Math.max(
+                  ...context.chart.data.datasets.flatMap(d => d.data)
+                );
+                return maxValue + 1;
+              },
+              grid: {
+                drawBorder: false
+              }
+            },
+            x: {
+              stacked: true,
+              grid: {
+                display: true,
+                drawBorder: false
+              }
+            }
           },
-          x: {
-            stacked: true
+          plugins: {
+            tooltip: {
+              enabled: true,
+              position: 'nearest',
+              external: function(context) {
+                const tooltipEl = document.getElementById('chartjs-tooltip');
+                if (!context.tooltip.opacity) {
+                  if (tooltipEl) {
+                    tooltipEl.style.opacity = '0';
+                  }
+                  return;
+                }
+
+                const position = context.chart.canvas.getBoundingClientRect();
+                if (!tooltipEl) {
+                  const newTooltip = document.createElement('div');
+                  newTooltip.id = 'chartjs-tooltip';
+                  newTooltip.style.background = 'rgba(0, 0, 0, 0.7)';
+                  newTooltip.style.borderRadius = '3px';
+                  newTooltip.style.color = 'white';
+                  newTooltip.style.padding = '6px';
+                  newTooltip.style.position = 'absolute';
+                  newTooltip.style.pointerEvents = 'none';
+                  document.body.appendChild(newTooltip);
+                }
+
+                const tooltipRoot = document.getElementById('chartjs-tooltip');
+                if (tooltipRoot) {
+                  tooltipRoot.style.opacity = '1';
+                  tooltipRoot.style.left = position.left + context.tooltip.caretX + 'px';
+                  tooltipRoot.style.top = position.top + context.tooltip.caretY + 'px';
+                  tooltipRoot.style.transform = 'translate(-50%, -100%)';
+                  tooltipRoot.innerHTML = context.tooltip.body[0].lines[0];
+                }
+              }
+            },
+            legend: {
+              position: 'top',
+              align: 'center',
+              labels: {
+                boxWidth: 16,
+                boxHeight: 10,
+                padding: 8,
+                usePointStyle: false,
+              },
+              onClick: function(e, legendItem, legend) {
+                const chart = legend.chart;
+                const index = legendItem.datasetIndex;
+
+                // Si todos están ocultos o solo el actual está visible, mostrar todos
+                const allHiddenOrOnlyCurrentVisible = chart.data.datasets.every((dataset, i) =>
+                  i === index ? !dataset.hidden : dataset.hidden
+                );
+
+                if (allHiddenOrOnlyCurrentVisible) {
+                  // Mostrar todos los datasets
+                  chart.data.datasets.forEach(dataset => {
+                    dataset.hidden = false;
+                  });
+                } else {
+                  // Ocultar todos excepto el seleccionado
+                  chart.data.datasets.forEach((dataset, i) => {
+                    dataset.hidden = (i !== index);
+                  });
+                }
+
+                chart.update();
+              },
+              onHover: function(event, legendItem, legend) {
+                const index = legendItem.datasetIndex;
+                const dataset = legend.chart.data.datasets[index];
+
+                const mesesConDatos = dataset.data.map((valor, idx) => ({
+                  mes: legend.chart.data.labels[idx],
+                  valor: valor,
+                  index: idx
+                })).filter(item => item.valor > 0);
+
+                if (mesesConDatos.length > 0) {
+                  const tooltipContent = mesesConDatos.map(mes => {
+                    return {
+                      label: `${legendItem.text} (${mes.mes}): ${mes.valor}`,
+                      datasetIndex: index,
+                      index: mes.index
+                    };
+                  });
+
+                  const tooltip = legend.chart.tooltip;
+                  tooltip.setActiveElements([{
+                    datasetIndex: index,
+                    index: mesesConDatos[0].index
+                  }], {
+                    x: event.x,
+                    y: event.y
+                  });
+
+                  const tooltipModel = {
+                    dataPoints: tooltipContent,
+                    caretX: event.x,
+                    caretY: event.y - 10
+                  };
+
+                  tooltip._active = tooltipModel.dataPoints;
+                  tooltip.update(true);
+                  legend.chart.update();
+                }
+              },
+              onLeave: function(event, legendItem, legend) {
+                legend.chart.tooltip.setActiveElements([], {});
+                legend.chart.update();
+              }
+            }
           }
         }
       }
-    })
-  },
+    }
+},
   {
     id: 'amountChart',
     title: 'Monto recaudado por mes',
     createConfig: () => ({
       type: 'line',
-      data: {
-        labels: monthlyData.value.map(data => data.month),
-        datasets: [
-          {
-            label: 'Suma de Montos por evento',
-            data: monthlyData.value.map(data => data.eventAmount),
-            borderColor: '#F6313C',
-            backgroundColor: '#FFC8CB',
-            tension: 0.4,
-            fill: false
-          },
-          {
-            label: 'Suma de Montos de buscadores de eventos',
-            data: monthlyData.value.map(data => data.searchAmount),
-            borderColor: '#60A5FA',
-            backgroundColor: '#C7E0F0',
-            tension: 0.4,
-            fill: false
-          }
-        ]
-      },
+      data:"",
       options: {
         responsive: true,
         maintainAspectRatio: false,
@@ -288,46 +229,7 @@ const chartConfigs: ChartConfig[] = [
     title: 'Top 5 sub tipo de bienes',
     createConfig: () => ({
       type: 'bar',
-      data: {
-        labels: topAssets.value.map(asset => asset.month),
-        datasets: [
-          {
-            label: 'Marca 1',
-            data: topAssets.value.map(asset => asset.marca1),
-            backgroundColor: '#FFC8CB',
-            borderColor: '#F6313C',
-            borderWidth: 2
-          },
-          {
-            label: 'Marca 2',
-            data: topAssets.value.map(asset => asset.marca2),
-            backgroundColor: '#C7E0F0',
-            borderColor: '#60A5FA',
-            borderWidth: 2
-          },
-          {
-            label: 'Marca 3',
-            data: topAssets.value.map(asset => asset.marca3),
-            backgroundColor: '#A0FAD9',
-            borderColor: '#00BB8E',
-            borderWidth: 2
-          },
-          {
-            label: 'Marca 4',
-            data: topAssets.value.map(asset => asset.marca4),
-            backgroundColor: '#FEF484',
-            borderColor: '#FBBF24',
-            borderWidth: 2
-          },
-          {
-            label: 'Marca 5',
-            data: topAssets.value.map(asset => asset.marca5),
-            backgroundColor: '#D7DFEB',
-            borderColor: '#788EB9',
-            borderWidth: 2
-          }
-        ]
-      },
+      data: "",
       options: {
         indexAxis: 'y',
         responsive: true,
@@ -350,25 +252,7 @@ const chartConfigs: ChartConfig[] = [
     title: 'Valor promedio de ofertas',
     createConfig: () => ({
       type: 'line',
-      data: {
-        labels: avgOffers.value.map(data => data.month),
-        datasets: [
-          {
-            label: 'Promedio de montos de oferta en estado Abono confirmado',
-            data: avgOffers.value.map(data => data.confirmedAvg),
-            borderColor: '#F6313C',
-            tension: 0.4,
-            yAxisID: 'y'
-          },
-          {
-            label: 'Sumatoria de ofertas con estado Abono confirmado',
-            data: avgOffers.value.map(data => data.totalAvg),
-            borderColor: '#60A5FA',
-            tension: 0.4,
-            yAxisID: 'y1'
-          }
-        ]
-      },
+      data: "",
       options: {
         responsive: true,
         maintainAspectRatio: false,
@@ -433,18 +317,42 @@ const closeModal = () => {
     modalChart = null
   }
 }
-onMounted(() => {
-  // Inicializar los gráficos originales
+const updateCharts = () => {
   chartConfigs.forEach((config) => {
     const ctx = document.getElementById(config.id) as HTMLCanvasElement
     if (ctx) {
+      const existingChart = Chart.getChart(ctx)
+      if (existingChart) {
+        existingChart.destroy()
+      }
       new Chart(ctx, config.createConfig(null))
     }
   })
+}
+watch(monthlyEvents, () => {
+  updateCharts()
+}, { deep: true })
+
+onMounted(async () => {
+  try {
+    // Obtener el rango de fechas
+    const { startDate, endDate } = getDateRange()
+
+    // Cargar datos iniciales
+    await Promise.all([
+      getEventsPendingActivities(),
+      getMonthlyEvents(startDate, endDate)
+    ])
+
+    // Inicializar los gráficos
+    updateCharts()
+  } catch (e) {
+    console.error('Error loading initial data:', e)
+  }
 })
 </script>
 <template>
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
     <div
       v-for="(config, index) in chartConfigs"
       :key="config.id"
