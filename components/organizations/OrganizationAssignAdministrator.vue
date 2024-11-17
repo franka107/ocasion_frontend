@@ -6,6 +6,8 @@ import * as z from 'zod'
 import { X } from 'lucide-vue-next'
 import { Textarea } from '@/components/ui/textarea'
 import InputFile from '@/components/common/file/Input.vue'
+import type { FilterOption } from '~/composables/useNotificationAPI'
+import { UserType } from '~/types/Administrators'
 
 const props = defineProps<{
   organizationId: string
@@ -23,9 +25,22 @@ const users = ref<Array<{ id: string; firstName: string; lastName: string }>>(
   [],
 )
 
-const fetchEconomicActivities = async () => {
+const fetchOrganizationUsers = async () => {
+  const userTypeFilter: FilterOption = {
+    type: 'equal',
+    value: UserType.OrganizationUser,
+    field: 'type',
+  }
+  const organizationFilter: FilterOption = {
+    type: 'equal',
+    value: props.organizationId,
+    field: 'organizations.id',
+  }
   try {
     const { data } = await useAPI('/user-management/find-administrators', {
+      query: {
+        filterOptions: JSON.stringify([userTypeFilter]),
+      },
       default: () => [],
     })
     users.value = data.value
@@ -34,7 +49,7 @@ const fetchEconomicActivities = async () => {
   }
 }
 
-await fetchEconomicActivities()
+await fetchOrganizationUsers()
 
 const onSubmit = form.handleSubmit((values: any) => {
   const formattedValues = {

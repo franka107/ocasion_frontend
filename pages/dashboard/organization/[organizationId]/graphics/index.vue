@@ -64,11 +64,9 @@ const onSubmit = (newValues: FilterFormSchema) => {
     newValues.rangeEnd,
   )
   isSheetOpen.value = false
-  console.log(`index onSubmit ${JSON.stringify(newValues)}`)
 }
 const { pendingActivities, getEventsPendingActivities } =
   useEventManagementAPI()
 
-//
 onMounted(async () => {})
 </script>

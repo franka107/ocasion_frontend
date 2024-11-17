@@ -1,11 +1,5 @@
 <template>
-  <ContentLayout title="Usuarios">
-    <CustomSimpleCard
-      title="Panel administrador"
-      class="mb-6"
-      sub-title="Gestiona eventos usuarios y reportes"
-    />
-
+  <ContentLayout title="Administradores">
     <div class="w-full flex flex-col">
       <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
         <CustomTable
@@ -97,6 +91,29 @@
             <span class="whitespace-nowrap">{{
               userType.get(row.type) || ''
             }}</span>
+          </template>
+          <template #organizations="{ row }">
+            <div v-if="row.organizations.length === 0">
+              <span class="whitespace-nowrap">-</span>
+            </div>
+            <div v-else-if="row.organizations.length === 1">
+              <Badge> {{ row.organizations[0].name }} </Badge>
+            </div>
+            <div v-else>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Badge> {{ row.organizations[0].name }} </Badge>
+                    <Badge variant="outline" class="ml-1"> ... </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <div v-for="org in row.organizations" :key="org.id">
+                      <p>{{ org.name }}</p>
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           </template>
           <template #actions="{ row }">
             <div class="flex justify-center">
@@ -231,12 +248,14 @@ const onSearch = (item: { [key: string]: string }) => {
   ]
   item.status &&
     filters.push({ field: 'status', type: 'equal', value: item.status || '' })
-  item.createdAt &&
+
+  if (item.createdAt) {
     filters.push({
       field: 'createdAt',
-      type: 'equal',
-      value: item.createdAt || '',
+      type: 'between',
+      value: item.createdAt,
     })
+  }
   filterOptions.value = JSON.stringify(filters)
 }
 
