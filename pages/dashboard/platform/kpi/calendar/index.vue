@@ -1,150 +1,161 @@
 <template>
   <ContentLayout title="Gráficos">
-    <div class="flex flex-col lg:flex-row min-h-screen bg-background">
-      <!-- Sidebar -->
-      <div class="w-full lg:w-64 border-b lg:border-r p-4">
-        <div class="mb-6">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold">Octubre</h2>
-            <div class="flex gap-2">
-              <button class="p-2 rounded-md hover:bg-gray-100">
-                <ChevronLeft class="h-4 w-4" />
-              </button>
-              <button class="p-2 rounded-md hover:bg-gray-100">
-                <ChevronRight class="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-
-          <!-- Calendar Grid -->
-          <div class="grid grid-cols-7 gap-1 text-center text-sm">
-            <div
-              v-for="day in days"
-              :key="day"
-              class="p-2 text-muted-foreground"
-            >
-              {{ day }}
-            </div>
-            <button
-              v-for="(date, index) in flatDates"
-              :key="index"
-              :class="[
-                'p-2 rounded-md',
-                date === selectedDate
-                  ? 'bg-primary text-primary-foreground'
-                  : 'hover:bg-gray-100',
-                date > 31 ? 'text-muted-foreground' : '',
-              ]"
-              @click="setSelectedDate(date)"
-            >
-              {{ date }}
-            </button>
-          </div>
+    <div class="flex flex-col lg:flex-row min-h-screen bg-background rounded-lg">
+      <div class="lg:w-80 border-b lg:border-r p-4">
+        <div>
+          <SimpleCalendar
+            v-slot="{ date, grid, weekDays }"
+             v-model="selectedDate"
+            class="p-3 rounded-md border"
+          >
+           
+          </SimpleCalendar>
         </div>
 
-        <!-- Events Section -->
-        <div class="space-y-4">
-          <h2 class="font-semibold">Eventos</h2>
+        <div class="space-y-4 mt-4">
+        <div>
+          <h1 class="text-lg font-sans font-bold">Eventos</h1>
           <div class="space-y-2">
-            <div class="flex items-center gap-2">
-              <div class="h-2 w-2 rounded-full bg-blue-500"></div>
+            <div class="flex items-center gap-2 text-sm">
+              <CustomIcons name="calendartoday" class="h-4 w-4"></CustomIcons>
               <span>Hoy</span>
+            </div>
+            <div class="flex items-center gap-2 text-sm">
+              <div class="w-2 h-2 rounded-full bg-[#2463EB]"></div>
+              <span class="text-[#2463EB]">En curso</span>
               <span class="ml-auto">5</span>
             </div>
-            <div class="flex items-center gap-2">
-              <div class="h-2 w-2 rounded-full bg-rose-500"></div>
-              <span>Finaliza</span>
+            <div class="flex items-center gap-2 text-sm">
+              <div class="w-2 h-2 rounded-full bg-[#DB2777]"></div>
+              <span class="text-[#DB2777]">Finaliza</span>
               <span class="ml-auto">4</span>
             </div>
           </div>
-
-          <h3 class="font-semibold">Próximamente</h3>
+        </div>
+        <div>
+          <h1 class="text-lg font-inter font-bold text-gray-400">Proximamente</h1>
           <div class="space-y-2">
-            <div class="flex items-center gap-2">
-              <div class="h-2 w-2 rounded-full bg-gray-500"></div>
-              <span>Inicia</span>
-              <span class="ml-auto">5</span>
+            <div class="flex items-center gap-2 text-sm">
+              <div class="w-2 h-2 rounded-full bg-gray-400"></div>
+              <span class="text-gray-400">En curso</span>
+              <span class="ml-auto text-gray-400">5</span>
             </div>
-            <div class="flex items-center gap-2">
-              <div class="h-2 w-2 rounded-full bg-gray-500"></div>
-              <span>Finaliza</span>
-              <span class="ml-auto">4</span>
+            <div class="flex items-center gap-2 text-sm">
+              <div class="w-2 h-2 rounded-full bg-gray-400"></div>
+              <span class="text-gray-400">Finaliza</span>
+              <span class="ml-auto text-gray-400">4</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Main Content -->
+      </div>
       <div class="flex-1 p-4">
         <div class="mb-6 flex items-center justify-between">
           <div class="flex items-center gap-4">
-            <button
-              class="p-2 rounded-md hover:bg-gray-100 lg:hidden"
-              @click="toggleSidebar"
-            >
-              <Menu class="h-4 w-4" />
-            </button>
-            <button class="p-2 rounded-md hover:bg-gray-100">
-              <ChevronLeft class="h-4 w-4" />
-            </button>
-            <h1 class="text-xl lg:text-2xl font-bold">10 OCTUBRE 2024</h1>
-            <button class="p-2 rounded-md hover:bg-gray-100">
-              <ChevronRight class="h-4 w-4" />
-            </button>
+            <Button variant="outline" size="icon" class="lg:hidden" @click="toggleSidebar">
+              <CustomIcons name="icon"  class="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="icon" @click="navigatePrevious">
+              <CustomIcons name="ArrowRight" class="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="icon" @click="navigateNext">
+              <CustomIcons name="ArrowLeft" class="h-4 w-4" />
+            </Button>
+            <h1 class="text-2xl font-bold">{{ selectedDateFormatted }}</h1>
           </div>
-          <button class="p-2 rounded-md hover:bg-gray-100 hidden lg:block">
-            <Menu class="h-4 w-4" />
-          </button>
+          <Button variant="outline" size="icon" class="hidden lg:flex border-black ">
+            <CustomIcons name="icon" class="h-4 w-4" />
+          </Button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Card 
+            v-for="i in 5" 
+            :key="i" 
+            class="bg-gray-100 shadow-md rounded-lg border border-gray-200 hover:shadow-lg transition-shadow duration-300 ease-in-out">
+            <CardContent>
+              <div class="flex text-xs gap-2 pt-3">
+                <span class="ml-auto font-semibold text-gray-700">Termina:</span>
+                <span class="font-semibold text-gray-800">02:00:00</span>
+              </div>
+            </CardContent>
+            <CardHeader>
+              <CardTitle class="text-[#20445E] font-semibold text-lg">Código del evento</CardTitle>
+              <CardDescription class="text-sm text-gray-500">Organización</CardDescription>
+            </CardHeader>
+
+            <CardFooter>
+              <Button variant="link" class="text-[#F97316] p-0 h-auto hover:underline font-semibold">
+                Ir al evento
+              </Button>
+            </CardFooter>
+          </Card>
         </div>
 
-        <!-- Event Cards Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div
-            v-for="i in 5"
-            :key="i"
-            class="p-4 space-y-4 bg-gray-50 rounded-lg shadow"
-          >
-            <div class="flex justify-between text-sm">
-              <span>Termina:</span>
-              <span>02:00:00</span>
-            </div>
-            <div>
-              <h3 class="text-lg font-semibold mb-1">Código del evento</h3>
-              <p class="text-sm text-muted-foreground">Organización</p>
-            </div>
-            <button class="text-orange-500 p-0 h-auto hover:underline">
-              Ir al evento
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   </ContentLayout>
 </template>
 
-<script setup>
-import { ChevronLeft, ChevronRight, Menu } from 'lucide-vue-next'
+<script lang="ts" setup>
+import { ref, computed } from 'vue'
+import { ChevronsLeft, ChevronsRight, Menu as MenuIcon } from 'lucide-vue-next'
+import { useDateFormatter, useForwardPropsEmits } from 'radix-vue'
+import { createDecade, createYear, toDate } from 'radix-vue/date'
+import { DateValue, getLocalTimeZone, today } from '@internationalized/date'
+
+import Button from '~/components/ui/button/Button.vue'
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
+import Card from '~/components/ui/card/Card.vue'
+import CardHeader from '~/components/ui/card/CardHeader.vue'
+import CardTitle from '~/components/ui/card/CardTitle.vue'
+import CardDescription from '~/components/ui/card/CardDescription.vue'
+import CardContent from '~/components/ui/card/CardContent.vue'
+import CardFooter from '~/components/ui/card/CardFooter.vue'
+import { 
+   CalendarHeader, CalendarHeading, CalendarGrid, 
+  CalendarGridHead, CalendarGridBody, CalendarGridRow, 
+  CalendarHeadCell, CalendarCell, CalendarCellTrigger 
+} from '~/components/ui/calendar'
+import { 
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue 
+} from '~/components/ui/select'
+import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue'
+import SimpleCalendar from '~/components/ui/calendar/SimpleCalendar.vue'
 
-const selectedDate = ref(10)
+const selectedDate = ref<DateValue>(today(getLocalTimeZone()))
 
-// Calendar data
-const days = ['DO', 'LU', 'MA', 'MI', 'JU', 'VI', 'SA']
-const dates = [
-  [1, 2, 3, 4, 5, 6, 7],
-  [8, 9, 10, 11, 12, 13, 14],
-  [15, 16, 17, 18, 19, 20, 21],
-  [22, 23, 24, 25, 26, 27, 28],
-  [29, 30, 31, 1, 2, 3, 4],
-]
+const formatter = useDateFormatter('es')
 
-const flatDates = dates.flat()
+const selectedDateFormatted = computed<string>(() => {
+  return toDate(selectedDate.value).toLocaleDateString('es-ES', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).toUpperCase()
+})
 
-const setSelectedDate = (date) => {
-  selectedDate.value = date
+const updateMonth = (v: string) => {
+  if (!v || !selectedDate.value) return
+  if (Number(v) === selectedDate.value.month) return
+  selectedDate.value = selectedDate.value.set({ month: Number(v) })
+}
+
+const updateYear = (v: string) => {
+  if (!v || !selectedDate.value) return
+  if (Number(v) === selectedDate.value.year) return
+  selectedDate.value = selectedDate.value.set({ year: Number(v) })
+}
+
+const navigatePrevious = () => {
+  selectedDate.value = selectedDate.value.subtract({ days: 1 })
+}
+
+const navigateNext = () => {
+  selectedDate.value = selectedDate.value.add({ days: 1 })
+}
+
+const toggleSidebar = () => {
+  console.log('Toggle sidebar')
 }
 </script>
-
-<style scoped>
-/* Add your page-specific styles here */
-</style>
