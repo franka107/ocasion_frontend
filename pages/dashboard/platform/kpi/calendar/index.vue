@@ -17,7 +17,7 @@
           <h1 class="text-lg font-sans font-bold">Eventos</h1>
           <div class="space-y-2">
             <div class="flex items-center gap-2 text-sm">
-              <CustomIcons name="calendartoday" class="h-4 w-4"></CustomIcons>
+              <CustomIcons name="calendar-today" class="h-4 w-4"></CustomIcons>
               <span>Hoy</span>
             </div>
             <div class="flex items-center gap-2 text-sm">
