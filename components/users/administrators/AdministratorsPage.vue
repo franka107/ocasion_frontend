@@ -208,6 +208,9 @@ import ContentLayout from '~/layouts/default/ContentLayout.vue'
 import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
 import { GrantId } from '~/types/Grant'
 
+const user = useUserSession()
+const myId = user.user.value?.user.id
+
 const props = defineProps<{ organizationId: string | null }>()
 const { getMyGrants } = useAuthManagement()
 const myGrants = await getMyGrants()

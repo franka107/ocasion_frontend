@@ -82,6 +82,19 @@ export function useAdmins() {
     return { status, error }
   }
 
+  const recoveryUserPassword = async (email: string) => {
+    const { status, error }: any = await useAPI(
+      `auth-management/recovery-user-password`,
+      {
+        method: 'POST',
+        body: {
+          email,
+        },
+      } as any,
+    )
+    return { status, error }
+  }
+
   const getUser = async (id: number | string) => {
     const { status, error, data } = await useAPI<IAdminsLItem>(
       `${BASE_ADM_URL}/get-user-detail`,

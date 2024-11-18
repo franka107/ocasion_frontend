@@ -47,7 +47,12 @@ const administratorFormSchema = z
       .string()
       .regex(/^\d+$/, 'El documento debe contener solo dígitos.')
       .min(1, `El documento del representante es requerido`),
-    phoneNumber: z.string().min(1, 'El número de celular es requerido'),
+    phoneNumber: z
+      .string()
+      .max(10, 'No puede superar los 10 digitos')
+      .regex(/^\d+$/, 'El número de teléfono debe contener solo dígitos.')
+      .optional()
+      .nullable(),
     email: z
       .string()
       .email('El correo electrónico no es válido')
@@ -131,21 +136,9 @@ const rolesFiltered = computed(() =>
   roles.value.filter((role) => role.id !== 'SUPER_ADMIN'),
 )
 
-// Function to fetch organizations and roles
-const fetchData = async (
-  url: string,
-  target: typeof organizations | typeof roles,
-) => {
-  try {
-    const { data } = await useAPI(url, { default: () => [] })
-    target.value = data.value
-  } catch (error) {
-    console.error(`Error al cargar datos de ${url}:`, error)
-  }
-}
-
 const userSession = useUserSession()
 const loggedUserType = userSession.user.value?.user.type
+
 const type =
   loggedUserType &&
   [UserType.SuperAdmin, UserType.PlatformUser, UserType.PlatformAdmin].includes(
@@ -153,6 +146,23 @@ const type =
   )
     ? 'platform'
     : 'organization'
+
+// Function to fetch organizations and roles
+const fetchData = async (
+  url: string,
+  target: typeof organizations | typeof roles,
+) => {
+  try {
+    const filters: FilterOption[] = []
+    if (type === 'platform') {
+      filters.push({ value: '', type: 'not', field: 'type' })
+    }
+    const { data } = await useAPI(url, { default: () => [] })
+    target.value = data.value
+  } catch (error) {
+    console.error(`Error al cargar datos de ${url}:`, error)
+  }
+}
 
 // Fetch organizations and roles
 
@@ -344,6 +354,11 @@ const onSubmit = form.handleSubmit((values: any) => {
           <FormControl>
             <CustomSelect
               v-bind="componentField"
+              :disabled="
+                [UserType.PlatformAdmin, UserType.OrganizationAdmin].includes(
+                  loggedUserType,
+                )
+              "
               :items="
                 userTypesOptions.filter(
                   (userType) => userType.id != 'SUPER_ADMIN',
