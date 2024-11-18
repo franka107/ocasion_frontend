@@ -1,8 +1,8 @@
 <template>
   <ContentLayout title="Gráficos">
-    <div class="flex min-h-screen bg-background">
+    <div class="flex flex-col lg:flex-row min-h-screen bg-background">
       <!-- Sidebar -->
-      <div class="w-64 border-r p-4">
+      <div class="w-full lg:w-64 border-b lg:border-r p-4">
         <div class="mb-6">
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold">Octubre</h2>
@@ -78,15 +78,21 @@
       <div class="flex-1 p-4">
         <div class="mb-6 flex items-center justify-between">
           <div class="flex items-center gap-4">
+            <button
+              class="p-2 rounded-md hover:bg-gray-100 lg:hidden"
+              @click="toggleSidebar"
+            >
+              <Menu class="h-4 w-4" />
+            </button>
             <button class="p-2 rounded-md hover:bg-gray-100">
               <ChevronLeft class="h-4 w-4" />
             </button>
-            <h1 class="text-2xl font-bold">10 OCTUBRE 2024</h1>
+            <h1 class="text-xl lg:text-2xl font-bold">10 OCTUBRE 2024</h1>
             <button class="p-2 rounded-md hover:bg-gray-100">
               <ChevronRight class="h-4 w-4" />
             </button>
           </div>
-          <button class="p-2 rounded-md hover:bg-gray-100">
+          <button class="p-2 rounded-md hover:bg-gray-100 hidden lg:block">
             <Menu class="h-4 w-4" />
           </button>
         </div>
