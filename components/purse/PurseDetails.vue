@@ -8,14 +8,17 @@
     <div class="h 10 w 10">
       <Button
         class="text-[16px] font-[600] bg-white text-primary border border-primary hover:bg-accent w-[97px] mr-[8px]"
-        @click=""
-      >
+        @click="
+        () => { isWithdrawModalOpen = true}
+          ">
         Retirar
       </Button>
       <Button
         variant="default"
         class="w-[97px] text-[16px]"
-        @click="handleRecharge"
+        @click="
+        () => { isRechargeModalOpen = true}
+          "
       >
         Recargar
       </Button>
@@ -67,16 +70,26 @@
       title="Detalle de saldo garantizado"
     />
   </SheetContent>
+  <WithdrawCashModal
+    v-model="isWithdrawModalOpen"
+  />
+  <RechargeBalanceModal
+    v-model="isRechargeModalOpen"
+  />
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import PurseForm from '@/components/purse/PurseForm.vue'
+import RechargeBalanceModal from '@/components/purse/RechargeBalanceModal.vue'
+import WithdrawCashModal from '@/components/purse/WithdrawCashModal.vue'
 const purseId = ref<number | undefined>(undefined)
 const appraisalHistoryModal = ref<any>({ offerId: '' })
 
 const openPurseDetailsModal = ref(false)
 const { rechargeMyWallet } = useUserParticipantAPI()
+const isWithdrawModalOpen = ref(false)
+const isRechargeModalOpen = ref(false)
 
 const handleRecharge = async () => {
   const { status, error } = await rechargeMyWallet({})
