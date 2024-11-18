@@ -171,18 +171,18 @@ const isLooping = computed(() => attachedMedia.value.length >= 4)
                         >
                           <div class="p-1" @click="selectMedia(media)">
                             <Card class="rounded-[0px]">
-                              <CardContent class="p-0">
+                              <CardContent class=" p-0">
                                 <template v-if="media.isVideo">
                                   <video
                                     :src="media.src"
-                                    class="w-full h-full max-w-[65px] max-h-[50px] rounded-0"
+                                    class="w-full h-full object-cover max-w-[65px] max-h-[50px] rounded-0"
                                   ></video>
                                 </template>
                                 <template v-else>
                                   <img
                                     :src="media.src"
                                     :alt="media.alt"
-                                    class="w-full h-full rounded-0"
+                                    class="w-[65px] h-[50px] object-cover rounded-0"
                                   />
                                 </template>
                               </CardContent>
