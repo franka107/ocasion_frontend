@@ -26,6 +26,11 @@ export enum GrantId {
   PlatformPaymentCanConfirm = 'PLATFORM_PAYMENT_CAN_CONFIRM',
   PlatformPaymentCanObserve = 'PLATFORM_PAYMENT_CAN_OBSERVE',
   PlatformTransferenceMangement = 'PLATFORM_TRANSFERENCE_MANAGEMENT',
+  PlatformAttentionManagement = 'PLATFORM_ATTENTION_MANAGEMENT',
+  PlatformAttentionCanViewRechargeRequest = 'PLATFORM_ATTENTION_CAN_VIEW_RECHARGE_REQUEST',
+  PlatformAttentionCanViewAccountValidation = 'PLATFORM_ATTENTION_CAN_VIEW_ACCOUNT_VALIDATION',
+  PlatformAttentionCanViewWithDrawalRequest = 'PLATFORM_ATTENTION_CAN_VIEW_WITHDRAWAL_REQUEST',
+  PlatformAttentionCanViewDisbursementLots = 'PLATFORM_ATTENTION_CAN_VIEW_DISBURSEMENT_LOTS',
   /* Organization */
   OrganizationKpisManagement = 'ORGANIZATION_KPIS_MANAGEMENT',
   OrganizationEventsManagement = 'ORGANIZATION_EVENTS_MANAGEMENT',

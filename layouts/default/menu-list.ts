@@ -194,7 +194,53 @@ export function getMenuList(
             },
           ]
         : []),
-
+      ...(grants.includes(GrantId.PlatformAttentionManagement)
+        ? [
+            {
+              label: 'Bandeja de atención',
+              active: pathname.includes('/attention-tray'),
+              icon: 'Tray',
+              submenus: [
+                ...(grants.includes(GrantId.PlatformAttentionCanViewRechargeRequest)
+                  ? [
+                      {
+                        href: '/dashboard/platform/attention-tray/top-up-requests',
+                        label: 'Solicitudes de recargas',
+                        active: pathname.includes('/attention-tray/top-up-requests'),
+                      },
+                    ]
+                  : []),
+                  ...(grants.includes(GrantId.PlatformAttentionCanViewAccountValidation)
+                  ? [
+                      {
+                        href: '/dashboard/platform/attention-tray/account-validation',
+                        label: 'Validación de cuentas',
+                        active: pathname.includes('/attention-tray/account-validation'),
+                      },
+                    ]
+                  : []),
+                  ...(grants.includes(GrantId.PlatformAttentionCanViewWithDrawalRequest)
+                  ? [
+                      {
+                        href: '/dashboard/platform/attention-tray/withdrawal-requests',
+                        label: 'Solicitudes de retiros',
+                        active: pathname.includes('/attention-tray/withdrawal-requests'),
+                      },
+                    ]
+                  : []),
+                  ...(grants.includes(GrantId.PlatformAttentionCanViewDisbursementLots)
+                  ? [
+                      {
+                        href: '/dashboard/platform/attention-tray/disbursement-lots',
+                        label: 'Lotes de desembolso',
+                        active: pathname.includes('/attention-tray/disbursement-lots'),
+                      },
+                    ]
+                  : []),
+              ],
+            },
+          ]
+        : []),
       ...(grants.includes(GrantId.OrganizationKpisManagement)
         ? [
             {
