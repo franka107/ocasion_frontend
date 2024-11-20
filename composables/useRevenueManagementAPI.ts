@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+import type { KpiPlatformParamsDto } from '~/types/Kpi'
 
 export interface RevenueDataset {
   label: string
@@ -34,37 +35,23 @@ export function useRevenueManagementAPI() {
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 
-  const getMonthlyRevenue = async (startDate: string, endDate: string) => {
+  const getMonthlyRevenue = async (params: KpiPlatformParamsDto) => {
     isLoading.value = true
     error.value = null
 
     try {
-      const filterOptions = [
-        {
-          field: 'finishedAt',
-          type: 'between',
-          value: [startDate, endDate],
-        },
-      ]
-
-      const params = new URLSearchParams({
-        filterOptions: JSON.stringify(filterOptions),
+      const response = await useAPI(`${EVENT_BASE_URL}/get-monthly-revenue`, {
+        method: 'POST',
+        body: params,
+        default: () => ({
+          offersTotalAmount: 0,
+          pendingToCollect: 0,
+          chart: {
+            labels: [],
+            datasets: [],
+          },
+        }),
       })
-
-      const response = await useAPI(
-        `${EVENT_BASE_URL}/get-monthly-revenue?${params.toString()}`,
-        {
-          method: 'GET',
-          default: () => ({
-            offersTotalAmount: 0,
-            pendingToCollect: 0,
-            chart: {
-              labels: [],
-              datasets: []
-            }
-          }),
-        },
-      )
 
       const { data, error: apiError } = response
       const rawData = data?.value || data
@@ -85,11 +72,15 @@ export function useRevenueManagementAPI() {
         console.log('Datos de ingresos cargados:', {
           totalAmount: totalAmount.value,
           pendingAmount: pendingAmount.value,
-          monthlyRevenue: monthlyRevenue.value
+          monthlyRevenue: monthlyRevenue.value,
         })
       } else {
-        error.value = 'Datos de ingresos mensuales no disponibles o mal formateados.'
-        console.error('Datos de ingresos mensuales no disponibles - Raw:', rawData)
+        error.value =
+          'Datos de ingresos mensuales no disponibles o mal formateados.'
+        console.error(
+          'Datos de ingresos mensuales no disponibles - Raw:',
+          rawData,
+        )
       }
 
       if (apiError) {

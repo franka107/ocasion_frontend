@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 bg-white">
+  <div class="p-6 bg-white shadow-md rounded-lg">
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-xl font-semibold text-gray-900">Módulo de comparación</h2>
       <div class="flex gap-2">
@@ -12,88 +12,40 @@
       </div>
     </div>
 
-    <div class="overflow-hidden border border-gray-200 rounded-lg">
-      <table class="min-w-full divide-y divide-gray-200">
+    <div class="overflow-hidden border border-[#2E7AB8] rounded-lg">
+      <table class="min-w-full divide-y divide-[#2E7AB8]">
         <thead class="bg-[#2E7AB8] text-white">
           <tr>
             <th class="px-4 py-3 text-left text-sm font-medium">
               <!-- Empty header for organization column -->
             </th>
-            <th class="px-4 py-3 text-center text-sm font-medium">
-              Nº eventos
-            </th>
-            <th class="px-4 py-3 text-center text-sm font-medium">
-              Nº ofertas
-            </th>
             <th
+              v-for="column in visibleColumns"
+              :key="column.key"
               class="px-4 py-3 text-center text-sm font-medium whitespace-nowrap"
             >
-              Pujas prom. ofertas
-            </th>
-            <th
-              class="px-4 py-3 text-center text-sm font-medium whitespace-nowrap"
-            >
-              Nº participantes únicos al mes
-            </th>
-            <th class="px-4 py-3 text-center text-sm font-medium">
-              Monto recaudado
-            </th>
-            <th class="px-4 py-3 text-center text-sm font-medium">
-              Comisiones recaudadas
+              {{ column.label }}
             </th>
           </tr>
         </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr
-            v-for="(org, index) in organizations"
-            :key="index"
-            :class="index % 2 === 0 ? 'bg-white' : 'bg-gray-50'"
-          >
+        <tbody :key="index" class="bg-white divide divide-y divide-[#2E7AB8]">
+          <tr v-for="(org, index) in organizations">
             <td class="px-4 py-3 text-sm font-medium text-gray-900">
               {{ org.name }}
             </td>
-            <td class="px-4 py-3 text-center">
-              <div class="flex flex-col items-center">
-                <span class="text-sm text-gray-900">{{ org.events }}</span>
-                <PercentageChange :value="org.eventsChange" />
-              </div>
-            </td>
-            <td class="px-4 py-3 text-center">
-              <div class="flex flex-col items-center">
-                <span class="text-sm text-gray-900">{{ org.offers }}</span>
-                <PercentageChange :value="org.offersChange" />
-              </div>
-            </td>
-            <td class="px-4 py-3 text-center">
-              <div class="flex flex-col items-center">
-                <span class="text-sm text-gray-900">{{ org.avgBids }}</span>
-                <PercentageChange :value="org.avgBidsChange" />
-              </div>
-            </td>
-            <td class="px-4 py-3 text-center">
-              <div class="flex flex-col items-center">
-                <span class="text-sm text-gray-900">{{
-                  formatCurrency(org.participants)
+            <td
+              v-for="column in visibleColumns"
+              :key="column.key"
+              class="py-3 text-center"
+            >
+              <div class="divide divide-y w-full divide-[#c8c8c9 ]items-center">
+                <span class="text-sm text-gray-900 font-bold">{{
+                  org[column.key].value
                 }}</span>
-                <PercentageChange :value="org.participantsChange" />
-              </div>
-            </td>
-            <td class="px-4 py-3 text-center">
-              <div class="flex flex-col items-center">
-                <span class="text-sm text-gray-900">{{
-                  formatCurrency(org.amount)
-                }}</span>
-                <span class="text-sm text-gray-500"
-                  >{{ org.amountChange }}%</span
-                >
-              </div>
-            </td>
-            <td class="px-4 py-3 text-center">
-              <div class="flex flex-col items-center">
-                <span class="text-sm text-gray-900">{{
-                  formatCurrency(org.commission)
-                }}</span>
-                <PercentageChange :value="org.commissionChange" />
+
+                <KpisComponentsPercentageChange
+                  :value="org[column.key].percentage"
+                />
               </div>
             </td>
           </tr>
@@ -106,76 +58,114 @@
 <script setup lang="ts" tsx>
 import { Settings, Maximize2, ArrowUp, ArrowDown } from 'lucide-vue-next'
 
-// Percentage Change Component
-const PercentageChange = defineComponent({
-  props: {
-    value: {
-      type: Number,
-      required: true,
-    },
-  },
-  setup(props) {
-    const isPositive = computed(() => props.value >= 0)
-    const color = computed(() =>
-      isPositive.value ? 'text-green-500' : 'text-red-500',
-    )
-    const Icon = computed(() => (isPositive.value ? ArrowUp : ArrowDown))
+// // Column definitions
+const columns = ref([
+  { key: 'events', label: 'Nº eventos', visible: true },
+  { key: 'offers', label: 'Nº ofertas', visible: true },
+  { key: 'averageTicketOffers', label: 'Ticket prom. ofertas', visible: true },
+  { key: 'averageBidOffers', label: 'Pujas prom. ofertas', visible: true },
+])
 
-    return () => (
-      <div class={`flex items-center gap-1 ${color.value} text-xs`}>
-        <Icon.value class="w-3 h-3" />
-        <span>{Math.abs(props.value)}%</span>
-      </div>
-    )
-  },
-})
+// Compute visible columns
+const visibleColumns = computed(() =>
+  columns.value.filter((column) => column.visible),
+)
+
+// Toggle column visibility
+const toggleColumn = (key) => {
+  const column = columns.value.find((col) => col.key === key)
+  if (column) {
+    column.visible = !column.visible
+  }
+}
 
 // Sample data
 const organizations = ref([
   {
     name: 'Organización 1',
-    events: '00',
-    eventsChange: -0,
-    offers: '00',
-    offersChange: 0,
-    avgBids: '00',
-    avgBidsChange: -0,
-    participants: 1000.0,
-    participantsChange: 0,
-    amount: 1000.0,
-    amountChange: 0,
-    commission: 1000.0,
-    commissionChange: -0,
+    events: {
+      value: 1,
+      percentage: 50,
+    },
+    offers: {
+      value: 1,
+      percentage: -50,
+    },
+    averageTicketOffers: {
+      value: 1,
+      percentage: -50,
+    },
+    averageBidOffers: {
+      value: 1,
+      percentage: -50,
+    },
+    uniqueMonthlyParticipants: {
+      value: 1,
+      percentage: -50,
+    },
+    amountRaised: {
+      value: 1,
+      percentage: -50,
+    },
+    commissionsCollected: {
+      value: 1,
+      percentage: -50,
+    },
+    penalties: {
+      value: 1,
+      percentage: -50,
+    },
+    cancelledOffers: {
+      value: 1,
+      percentage: -50,
+    },
+    averageOfferTime: {
+      value: 1,
+      percentage: -50,
+    },
   },
   {
     name: 'Organización 2',
-    events: '00',
-    eventsChange: -0,
-    offers: '00',
-    offersChange: 0,
-    avgBids: '00',
-    avgBidsChange: -0,
-    participants: 1000.0,
-    participantsChange: 0,
-    amount: 1000.0,
-    amountChange: 0,
-    commission: 1000.0,
-    commissionChange: -0,
-  },
-  {
-    name: 'Organización 3',
-    events: '00',
-    eventsChange: -0,
-    offers: '00',
-    offersChange: 0,
-    avgBids: '00',
-    avgBidsChange: -0,
-    participants: 1000.0,
-    participantsChange: 0,
-    amount: 1000.0,
-    amountChange: 0,
-    commission: 1000.0,
-    commissionChange: -0,
+    events: {
+      value: 1,
+      percentage: 50,
+    },
+    offers: {
+      value: 1,
+      percentage: -50,
+    },
+    averageTicketOffers: {
+      value: 1,
+      percentage: -50,
+    },
+    averageBidOffers: {
+      value: 1,
+      percentage: -50,
+    },
+    uniqueMonthlyParticipants: {
+      value: 1,
+      percentage: -50,
+    },
+    amountRaised: {
+      value: 1,
+      percentage: -50,
+    },
+    commissionsCollected: {
+      value: 1,
+      percentage: -50,
+    },
+    penalties: {
+      value: 1,
+      percentage: -50,
+    },
+    cancelledOffers: {
+      value: 1,
+      percentage: -50,
+    },
+    averageOfferTime: {
+      value: 1,
+      percentage: -50,
+    },
   },
 ])
 

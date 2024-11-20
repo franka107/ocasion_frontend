@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+import type { KpiPlatformParamsDto } from '~/types/Kpi'
 
 export interface EventDataset {
   label: string
@@ -60,45 +61,30 @@ export function useEventManagementAPI() {
   }
 
   // Obtener los eventos mensuales para llenar el gráfico
-  const getMonthlyEvents = async (startDate: string, endDate: string) => {
+  const getMonthlyEvents = async (params: KpiPlatformParamsDto) => {
     isLoading.value = true
     error.value = null
 
     try {
-      const filterOptions = [
-        {
-          field: 'finishedAt',
-          type: 'between',
-          value: [startDate, endDate],
-        },
-      ]
-
-      const params = new URLSearchParams({
-        filterOptions: JSON.stringify(filterOptions),
+      const response = await useAPI(`${EVENT_BASE_URL}/get-monthly-events`, {
+        method: 'POST',
+        body: params,
+        default: () => ({
+          totalEvents: 0,
+          chart: {
+            labels: [],
+            datasets: [],
+          },
+        }),
       })
 
-      const response = await useAPI(
-        `${EVENT_BASE_URL}/get-monthly-events?${params.toString()}`,
-        {
-          method: 'GET',
-          default: () => ({
-            totalEvents: 0,
-            chart: {
-              labels: [],
-              datasets: []
-            }
-          }),
-        },
-      )
-
-
       // Extraer los datos de la respuesta
-        const { data, error: apiError } = response;
+      const { data, error: apiError } = response
 
-        // Log para ver la respuesta
-        console.log('Respuesta de la API:', data);
+      // Log para ver la respuesta
+      console.log('Respuesta de la API:', data)
 
-        const rawData = data?.value || data;
+      const rawData = data?.value || data
 
       if (rawData && rawData.chart) {
         // Actualizar los valores usando .value para las referencias reactivas
@@ -113,12 +99,15 @@ export function useEventManagementAPI() {
         }
         console.log('Datos mensuales cargados:', {
           totalEvents: totalEvents.value,
-          monthlyEvents: monthlyEvents.value
+          monthlyEvents: monthlyEvents.value,
         })
-        
       } else {
-        error.value = 'Datos de eventos mensuales no disponibles o mal formateados.'
-        console.error('Datos de eventos mensuales no disponibles - Raw:', rawData)
+        error.value =
+          'Datos de eventos mensuales no disponibles o mal formateados.'
+        console.error(
+          'Datos de eventos mensuales no disponibles - Raw:',
+          rawData,
+        )
       }
 
       if (apiError) {
@@ -140,7 +129,8 @@ export function useEventManagementAPI() {
           })),
         }
       } else {
-        error.value = 'Los datos del gráfico están vacíos o no se encontraron eventos.'
+        error.value =
+          'Los datos del gráfico están vacíos o no se encontraron eventos.'
         console.error('Datos del gráfico no encontrados:', rawData)
       }
 

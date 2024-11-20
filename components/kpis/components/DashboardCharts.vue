@@ -1,12 +1,17 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick,watch } from 'vue'
+import { ref, onMounted, nextTick, watch } from 'vue'
 import Chart, { Legend, plugins } from 'chart.js/auto'
+import { JsxEmit, transform } from 'typescript'
+import { parse } from 'date-fns'
 import ChartModal from './ChartModal.vue'
+import type { FilterFormSchema } from './filter-form-schema'
 import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue'
 import { useEventManagementAPI } from '~/composables/useEventManagementAPI'
 import { useRevenueManagementAPI } from '~/composables/useRevenueManagementAPI'
 import type { EventChartData } from '~/composables/useEventManagementAPI'
 import ChartMetrics from '~/layouts/default/ChartMetrics.vue'
+import type { KpiPlatformParamsDto } from '~/types/Kpi'
+import { GlobalType } from '~/types/Common'
 
 const {
   monthlyEvents,
@@ -17,17 +22,24 @@ const {
   totalEvents,
   getEventsPendingActivities,
 } = useEventManagementAPI()
+
 const {
-  monthlyRevenue,
-  totalAmount,
-  pendingAmount,
-  getMonthlyRevenue
-} = useRevenueManagementAPI()
-watch(monthlyRevenue, (newValue) => {
-  console.log('monthlyRevenue changed:', newValue)
-  console.log('Labels:', newValue.labels)
-  console.log('Datasets:', newValue.datasets)
-})
+  getMonthlyTopGoods,
+  monthlyTopGoods,
+  getMonthlyAverageOffers,
+  offersTotalAmount,
+  monthlyAverageOffers,
+} = useKpi()
+
+const { monthlyRevenue, totalAmount, pendingAmount, getMonthlyRevenue } =
+  useRevenueManagementAPI()
+watch(monthlyRevenue, (newValue) => {})
+
+const { globalType } = useUserSessionExtended()
+
+const props = defineProps<{
+  filterFormValues: FilterFormSchema
+}>()
 
 const getDateRange = () => {
   const endDate = new Date()
@@ -55,17 +67,17 @@ const chartConfigs: ChartConfig[] = [
     id: 'eventsChart',
     title: 'Eventos por mes',
     createConfig: () => {
-
       return {
         type: 'bar',
         data: {
-        labels: monthlyEvents.value.labels || [],
-        datasets: monthlyEvents.value.datasets?.map((dataset) => ({
-          ...dataset,
-          stack: 'Stack 0',
-        })) || [],
-      },
-      options: {
+          labels: monthlyEvents.value.labels || [],
+          datasets:
+            monthlyEvents.value.datasets?.map((dataset) => ({
+              ...dataset,
+              stack: 'Stack 0',
+            })) || [],
+        },
+        options: {
           responsive: true,
           maintainAspectRatio: false,
           scales: {
@@ -221,68 +233,114 @@ const chartConfigs: ChartConfig[] = [
       }
     },
   },
-  {
-    id: 'amountChart',
-    title: 'Monto recaudado por mes',
-    createConfig: () => ({
-      type: 'line',
-      data: {
-      labels: monthlyRevenue.value.labels || [],
-      datasets: monthlyRevenue.value.datasets?.map((dataset) => ({
-        ...dataset,
-        stack: 'Stack 0',
-        borderColor: dataset.borderColor,
-        backgroundColor: dataset.backgroundColor,
-      })) || [],
-    },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: {
-            stacked: true,
-              beginAtZero: true,
-            ticks: {
-                stepSize: 1,
-                precision: 0,
-              callback: function (value) {
-                return '$ ' + value
+  ...(globalType === GlobalType.Organization
+    ? [
+        {
+          id: 'amountChart',
+          title: 'Monto recaudado por mes',
+          createConfig: () => ({
+            type: 'line',
+            data: {
+              labels: monthlyRevenue.value.labels || [],
+              datasets:
+                monthlyRevenue.value.datasets?.map((dataset) => ({
+                  ...dataset,
+                  stack: 'Stack 0',
+                  borderColor: dataset.borderColor,
+                  backgroundColor: dataset.backgroundColor,
+                })) || [],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                y: {
+                  stacked: true,
+                  beginAtZero: true,
+                  ticks: {
+                    stepSize: 1,
+                    precision: 0,
+                    callback: function (value) {
+                      return '$ ' + value
+                    },
+                  },
+                },
               },
             },
-          },
+          }),
         },
-      },
-    }),
-  },
-  {
-    id: 'assetsChart',
-    title: 'Top 5 sub tipo de bienes',
-    createConfig: () => ({
-      type: 'bar',
-      data: '',
-      options: {
-        indexAxis: 'y',
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          x: {
-            min: -60,
-            max: 100,
-            stacked: true,
-          },
-          y: {
-            stacked: true,
-          },
+
+        {
+          id: 'assetsChart',
+          title: 'Top 5 sub tipo de bienes',
+          // createConfig: () => ({
+          //   type: 'bar',
+          //   data: '',
+          //   options: {
+          //     indexAxis: 'y',
+          //     responsive: true,
+          //     maintainAspectRatio: false,
+          //     scales: {
+          //       x: {
+          //         min: -60,
+          //         max: 100,
+          //         stacked: true,
+          //       },
+          //       y: {
+          //         stacked: true,
+          //       },
+          //     },
+          //   },
+          // }),
+          createConfig: () => ({
+            type: 'line',
+            data: {
+              labels: monthlyTopGoods.value.labels || [],
+              datasets:
+                monthlyTopGoods.value.datasets?.map((dataset) => ({
+                  ...dataset,
+                  stack: 'Stack 0',
+                  borderColor: dataset.borderColor,
+                  backgroundColor: dataset.backgroundColor,
+                })) || [],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                y: {
+                  stacked: true,
+                  beginAtZero: true,
+                  ticks: {
+                    stepSize: 1,
+                    precision: 0,
+                    callback: function (value) {
+                      return '$ ' + value
+                    },
+                  },
+                },
+              },
+            },
+          }),
         },
-      },
-    }),
-  },
+      ]
+    : []),
+
   {
     id: 'avgOffersChart',
     title: 'Valor promedio de ofertas',
     createConfig: () => ({
       type: 'line',
-      data: '',
+      data: {
+        labels: monthlyAverageOffers.value.labels || [],
+        datasets:
+          monthlyAverageOffers.value.datasets?.map((dataset) => ({
+            ...dataset,
+            // stack: 'Stack 0',
+            // borderColor: dataset.borderColor,
+            // backgroundColor: dataset.backgroundColor,
+          })) || [],
+      },
       options: {
         responsive: true,
         maintainAspectRatio: false,
@@ -302,7 +360,6 @@ const chartConfigs: ChartConfig[] = [
             type: 'linear',
             position: 'left',
             min: 0,
-            max: 100,
             ticks: {
               callback: function (value) {
                 return '$ ' + value
@@ -357,7 +414,7 @@ const updateCharts = () => {
       }
 
       // Determinar los datos a pasar según el gráfico
-      let updatedConfig;
+      let updatedConfig
       if (config.id === 'eventsChart') {
         updatedConfig = config.createConfig({
           datasets: monthlyEvents.value.datasets,
@@ -377,18 +434,59 @@ const updateCharts = () => {
     }
   })
 }
-  watch([totalEvents, monthlyEvents], () => {
-    updateCharts();
-  }, { immediate: true });
+watch(
+  [totalEvents, monthlyEvents],
+  () => {
+    updateCharts()
+  },
+  { immediate: true },
+)
 
-  onMounted(async () => {
-  try {
-    const { startDate, endDate } = getDateRange()
-    await Promise.all([
+const kpiPlatformParamsDto = computed(() => {
+  const formatString = 'yyyy-MM-dd'
+  console.log('filterFormValues:', JSON.stringify(props.filterFormValues))
+  const transformed: KpiPlatformParamsDto = {
+    startDate: parse(
+      props.filterFormValues.rangeStart,
+      formatString,
+      new Date(),
+    ),
+    endDate: parse(props.filterFormValues.rangeEnd, formatString, new Date()),
+    organizationIds: props.filterFormValues.organizations,
+  }
+  return transformed
+})
+
+watch(
+  kpiPlatformParamsDto,
+  async () => {
+    const kpis = [
       getEventsPendingActivities(),
-      getMonthlyEvents(startDate, endDate),
-      getMonthlyRevenue(startDate,endDate)
-    ])
+      getMonthlyEvents(kpiPlatformParamsDto.value),
+      getMonthlyAverageOffers(kpiPlatformParamsDto.value),
+    ]
+    if (globalType === GlobalType.Organization) {
+      kpis.push(getMonthlyRevenue(kpiPlatformParamsDto.value))
+      kpis.push(getMonthlyTopGoods(kpiPlatformParamsDto.value))
+    }
+    await Promise.all(kpis)
+    updateCharts()
+  },
+  { immediate: true },
+)
+
+onMounted(async () => {
+  try {
+    const kpis = [
+      getEventsPendingActivities(),
+      getMonthlyEvents(kpiPlatformParamsDto.value),
+      getMonthlyAverageOffers(kpiPlatformParamsDto.value),
+    ]
+    if (globalType === GlobalType.Organization) {
+      kpis.push(getMonthlyRevenue(kpiPlatformParamsDto.value))
+      kpis.push(getMonthlyTopGoods(kpiPlatformParamsDto.value))
+    }
+    await Promise.all(kpis)
     updateCharts()
   } catch (e) {
     console.error('Error loading initial data:', e)
@@ -398,30 +496,31 @@ const updateCharts = () => {
 const getMetricsForChart = (index: number) => {
   switch (index) {
     case 0:
-      return totalEvents !== undefined ? [
-        {
-          label: 'Total de eventos',
-          value: totalEvents
-        }
-      ] : undefined;
+      return totalEvents !== undefined
+        ? [
+            {
+              label: 'Total de eventos',
+              value: totalEvents,
+            },
+          ]
+        : undefined
     case 1:
       return [
         {
           label: 'Monto total',
-          value: totalAmount,
-          prefix: '$ '
+          value: offersTotalAmount.value.toFixed(2),
+          prefix: '$ ',
         },
         {
           label: 'Monto pendiente',
           value: pendingAmount,
-          prefix: '$ '
-        }
-      ];
+          prefix: '$ ',
+        },
+      ]
     default:
-      return undefined;
+      return undefined
   }
-};
-
+}
 </script>
 <template>
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -446,9 +545,15 @@ const getMetricsForChart = (index: number) => {
 
   <ChartModal
     :is-open="isModalOpen"
-    :title="selectedChartIndex !== null ? chartConfigs[selectedChartIndex].title : ''"
+    :title="
+      selectedChartIndex !== null ? chartConfigs[selectedChartIndex].title : ''
+    "
     :modal-chart-id="modalChartId"
-    :chart-metrics="selectedChartIndex !== null ? getMetricsForChart(selectedChartIndex) : undefined"
+    :chart-metrics="
+      selectedChartIndex !== null
+        ? getMetricsForChart(selectedChartIndex)
+        : undefined
+    "
     @close="closeModal"
   />
 </template>

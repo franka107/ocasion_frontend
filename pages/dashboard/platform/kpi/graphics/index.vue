@@ -1,7 +1,5 @@
 <template>
-  <ContentLayout title="Dashboard">
-    <div>Graficos Kpi's de Plataforma</div>
-  </ContentLayout>
+  <KpisGraphicsPage />
 </template>
 
 <script setup>
