@@ -128,7 +128,7 @@ const calculateAge = (birthDate: string) => {
               <FormMessage />
             </FormItem>
           </FormField>
-          <!-- Apellido paterno  -->
+          <!-- Apellidos  -->
           <FormField v-slot="{ componentField }" name="lastName">
             <FormItem>
               <FormControl>
