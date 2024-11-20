@@ -3,18 +3,17 @@
     <div
       class="flex flex-col lg:flex-row min-h-screen bg-background rounded-lg"
     >
-      <div class="lg:w-80 border-b lg:border-r p-4">
+      <div class=" border-b lg:border-r p-4">
         <div>
           <SimpleCalendar
-            v-slot="{ date, grid, weekDays }"
+            v-slot="{ }"
             v-model="selectedDate"
             class="p-3 rounded-md border"
           >
           </SimpleCalendar>
         </div>
 
-        <div class="space-y-4 mt-4">
-          <div>
+        <div class="space-y-4 mt-4 ml-4">
             <h1 class="text-lg font-sans font-bold">Eventos</h1>
             <div class="space-y-2">
               <div class="flex items-center gap-2 text-sm">
@@ -22,34 +21,54 @@
                   name="calendar-today"
                   class="h-4 w-4"
                 ></CustomIcons>
-                <span>Hoy</span>
+                <span class="text-[#1F4E6D] text-base font-bold">Hoy</span>
               </div>
               <div class="flex items-center gap-2 text-sm">
                 <div class="w-2 h-2 rounded-full bg-[#2463EB]"></div>
                 <span class="text-[#2463EB]">En curso</span>
-                <span class="ml-auto">3</span>
+                <span class="ml-auto">{{ eventCounts.today.inProgressCount }}</span>
               </div>
               <div class="flex items-center gap-2 text-sm">
                 <div class="w-2 h-2 rounded-full bg-[#DB2777]"></div>
                 <span class="text-[#DB2777]">Finaliza</span>
-                <span class="ml-auto">0</span>
+                <span class="ml-auto">{{ eventCounts.today.finishedCount }}</span>
               </div>
             </div>
-          </div>
+
+            <div class="space-y-2">
+              <div class="flex items-center gap-2 text-sm">
+                <CustomIcons
+                  name="calendar-today"
+                  class="h-4 w-4"
+                ></CustomIcons>
+                <span class="text-[#1F4E6D] font-inter text-base font-extrabold" >Mañana</span>
+              </div>
+              <div class="flex items-center gap-2 text-sm">
+                <div class="w-2 h-2 rounded-full bg-[#16A34A]"></div>
+                <span class="text-[#16A34A]">Inicia</span>
+                <span class="ml-auto">{{ eventCounts.tomorrow.inProgressCount }}</span>
+              </div>
+              <div class="flex items-center gap-2 text-sm">
+                <div class="w-2 h-2 rounded-full bg-[#DB2777]"></div>
+                <span class="text-[#DB2777]">Finaliza</span>
+                <span class="ml-auto">{{ eventCounts.tomorrow.finishedCount }}</span>
+              </div>
+            </div>
+
           <div>
-            <h1 class="text-lg font-inter font-bold text-gray-400">
+            <h1 class="text-lg font-inter font-bold text-[#68686C]">
               Proximamente
             </h1>
             <div class="space-y-2">
               <div class="flex items-center gap-2 text-sm">
                 <div class="w-2 h-2 rounded-full bg-gray-400"></div>
-                <span class="text-gray-400">En curso</span>
-                <span class="ml-auto text-gray-400">5</span>
+                <span class="text-[#86868A]">En curso</span>
+                <span class="ml-auto text-gray-400">{{ eventCounts.soon.inProgressCount }}</span>
               </div>
               <div class="flex items-center gap-2 text-sm">
                 <div class="w-2 h-2 rounded-full bg-gray-400"></div>
-                <span class="text-gray-400">Finaliza</span>
-                <span class="ml-auto text-gray-400">4</span>
+                <span class="text-[#86868A]">Finaliza</span>
+                <span class="ml-auto text-gray-400">{{ eventCounts.soon.finishedCount }}</span>
               </div>
             </div>
           </div>
@@ -91,7 +110,7 @@
             <Card
               v-for="event in events"
               :key="event.id"
-              class="bg-gray-100 shadow-md rounded-lg border border-gray-200 hover:shadow-lg transition-shadow duration-300 ease-in-out"
+              class=" w-[270px] h-[184px] bg-[#F3F8FC] shadow-md rounded-lg border border-gray-100 hover:shadow-lg transition-shadow duration-300 ease-in-out"
             >
               <CardContent>
                 <div class="flex text-xs gap-2 pt-3">
@@ -99,8 +118,8 @@
                     >Termina:</span
                   >
                   <Countdown
-                    v-slot="{ days, hours, minutes, seconds, totalSeconds }"
-                    :time="getRemainingTime(event.finishedAt)"
+                    v-slot="{  hours, minutes, seconds }"
+                    :time="getRemainingTimes(event.finishedAt)"
                   >
                     <span class="font-semibold text-gray-800"
                       >{{ hours }}:{{ minutes }}:{{ seconds }}</span
@@ -112,7 +131,7 @@
                 <CardTitle class="text-[#20445E] font-semibold text-lg">{{
                   event.id
                 }}</CardTitle>
-                <CardDescription class="text-sm text-gray-500">{{
+                <CardDescription class="text-sm text-[#68686C]">{{
                   event.organization.name
                 }}</CardDescription>
               </CardHeader>
@@ -176,23 +195,101 @@ import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue'
 import SimpleCalendar from '~/components/ui/calendar/SimpleCalendar.vue'
 import type { Event } from '~/types/Payment'
 import type { Organization } from '~/models/organizations'
+import { parseISO,isEqual, formatDistanceToNow, differenceInSeconds } from 'date-fns'
+
 
 const selectedDate = ref<DateValue>(today(getLocalTimeZone()))
 const events = ref<any[] | null>(null)
+const allEvents = ref<any[]>([])
+
 const selectedOrganizations = ref<Organization[]>([])
 
-const fetchEvents = async (selectedDate: Date) => {
+const eventCounts = ref({
+
+  today: {
+    inProgressCount: 0,
+    finishedCount: 0
+  },
+  tomorrow: {
+    inProgressCount: 0,
+    finishedCount: 0
+  },
+  soon: {
+    inProgressCount: 0,
+    finishedCount: 0
+  }
+})
+const getRemainingTimes = (finishedAtString) => {
+  const finishedAt = parseISO(finishedAtString)
+  const now = new Date()
+
+  const totalSecondsRemaining = Math.floor((finishedAt - now) / 1000)
+
+  if (totalSecondsRemaining <= 0) {
+    return 0
+  }
+
+  const days = Math.floor(totalSecondsRemaining / (24 * 60 * 60))
+  const hours = Math.floor((totalSecondsRemaining % (24 * 60 * 60)) / (60 * 60))
+  const minutes = Math.floor((totalSecondsRemaining % (60 * 60)) / 60)
+  const seconds = totalSecondsRemaining % 60
+
+  return {
+    days,
+    hours,
+    minutes,
+    seconds,
+    totalSeconds: totalSecondsRemaining
+  }
+}
+
+const fetchEventCounts = async () => {
+  console.log("Iniciando la solicitud al endpoint /event-management/get-events-count-for-calendar");
+
+  const { data } = await useAPI('/event-management/get-events-count-for-calendar', {
+    method: 'POST',
+    body: {
+      organizationIds: selectedOrganizations.value.map((e) => e.id),
+    },
+    default: () => ({
+      today: { inProgressCount: 0, finishedCount: 0 },
+      tomorrow: { inProgressCount: 0, finishedCount: 0 },
+      soon: { inProgressCount: 0, finishedCount: 0 }
+    }),
+  })
+
+  console.log("Respuesta recibida del endpoint:", data);
+
+  if (data.value) {
+    eventCounts.value = data.value
+    console.log("eventCounts actualizado:", eventCounts.value);
+  } else {
+    console.warn("No se recibieron datos válidos del endpoint.");
+  }
+}
+const fetchEvents = async (selectedDate?: Date) => {
   const { data } = await useAPI('/event-management/get-events-for-calendar', {
     method: 'POST',
     body: {
-      selectedDate,
+      selectedDate: selectedDate ? selectedDate : null,
       organizationIds: selectedOrganizations.value.map((e) => e.id),
     },
-    default: () => ({}),
+    default: () => ([]),
   })
-  events.value = data.value as any
-}
 
+  if (data?.value && Array.isArray(data.value)) {
+    if (selectedDate) {
+      events.value = data.value.filter(event =>
+        isEqual(parseISO(event.startDate), selectedDate)
+      )
+    } else {
+      events.value = data.value
+    }
+  } else {
+    events.value = []
+    console.warn('No se encontraron eventos o los datos no son válidos')
+  }
+}
 const fetchOrganizations = async () => {
   const { data } = await useAPI('/organization-management/find-organizations', {
     method: 'GET',
@@ -201,46 +298,75 @@ const fetchOrganizations = async () => {
   selectedOrganizations.value = data.value as any
 }
 
-await fetchOrganizations()
-await fetchEvents(selectedDate.value.toDate(getLocalTimeZone()))
+onMounted(async () => {
+  await fetchOrganizations()
+  await fetchEvents()
+  await fetchEventCounts()
+})
 
 watch(selectedDate, (newDate) => {
-  fetchEvents(selectedDate.value.toDate(getLocalTimeZone()))
+  fetchEvents(toDate(newDate))
+})
+const displayAllEvents = computed(() => {
+  return allEvents.value
 })
 
 const formatter = useDateFormatter('es')
 
 const selectedDateFormatted = computed<string>(() => {
-  return toDate(selectedDate.value)
-    .toLocaleDateString('es-ES', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    })
-    .toUpperCase()
+  const date = toDate(selectedDate.value)
+  return formatter.custom(date, {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).replace(/^\w/, (c) => c.toUpperCase())
 })
-
 const updateMonth = (v: string) => {
   if (!v || !selectedDate.value) return
-  if (Number(v) === selectedDate.value.month) return
-  selectedDate.value = selectedDate.value.set({ month: Number(v) })
+
+  const newMonth = Number(v)
+  if (newMonth < 1 || newMonth > 12) {
+    console.warn('Mes inválido')
+    return
+  }
+
+  if (newMonth === selectedDate.value.month) return
+  selectedDate.value = selectedDate.value.set({ month: newMonth })
 }
 
 const updateYear = (v: string) => {
   if (!v || !selectedDate.value) return
-  if (Number(v) === selectedDate.value.year) return
-  selectedDate.value = selectedDate.value.set({ year: Number(v) })
+
+  const newYear = Number(v)
+  if (newYear < 1900 || newYear > 2100) {
+    console.warn('Año inválido')
+    return
+  }
+
+  if (newYear === selectedDate.value.year) return
+  selectedDate.value = selectedDate.value.set({ year: newYear })
 }
 
 const navigatePrevious = () => {
-  selectedDate.value = selectedDate.value.subtract({ days: 1 })
+  const newDate = selectedDate.value.subtract({ days: 1 })
+  if (newDate < today(getLocalTimeZone())) {
+    console.warn('No puedes navegar a una fecha pasada')
+    return
+  }
+  selectedDate.value = newDate
 }
 
 const navigateNext = () => {
-  selectedDate.value = selectedDate.value.add({ days: 1 })
+  const newDate = selectedDate.value.add({ days: 1 })
+  if (newDate > new Date('2100-12-31')) {
+    console.warn('No puedes navegar a una fecha futura fuera de rango')
+    return
+  }
+  selectedDate.value = newDate
 }
-
 const toggleSidebar = () => {
   console.log('Toggle sidebar')
 }
+
+
 </script>
