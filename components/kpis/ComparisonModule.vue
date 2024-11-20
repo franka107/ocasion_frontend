@@ -64,6 +64,25 @@ const columns = ref([
   { key: 'offers', label: 'Nº ofertas', visible: true },
   { key: 'averageTicketOffers', label: 'Ticket prom. ofertas', visible: true },
   { key: 'averageBidOffers', label: 'Pujas prom. ofertas', visible: true },
+  {
+    key: 'uniqueMonthlyParticipants',
+    label: 'N° participantes únicos al mes',
+    visible: true,
+  },
+  { key: 'amountRaised', label: 'Monto recaudado', visible: true },
+  {
+    key: 'commissionsCollected',
+    label: 'Comisiones recaudadas',
+    visible: true,
+  },
+  { key: 'penalties', label: 'Penalidades', visible: true },
+  {
+    key: 'cancelledOffers',
+
+    label: 'N° ofertas canceladas',
+    visible: true,
+  },
+  { key: 'averageOfferTime', label: 'Tiempo prom. de oferta', visible: true },
 ])
 
 // Compute visible columns
@@ -78,95 +97,62 @@ const toggleColumn = (key) => {
     column.visible = !column.visible
   }
 }
+const generateRandomMockedData = (organizationName: string) => {
+  const getRandomValue = (min: number, max: number) =>
+    Math.floor(Math.random() * (max - min + 1)) + min
+
+  const getRandomPercentage = () => Math.floor(Math.random() * 201) - 100 // Genera un número entre -100 y 100
+
+  return {
+    name: organizationName,
+    events: {
+      value: getRandomValue(1, 100),
+      percentage: getRandomPercentage(),
+    },
+    offers: {
+      value: getRandomValue(1, 100),
+      percentage: getRandomPercentage(),
+    },
+    averageTicketOffers: {
+      value: getRandomValue(1, 10000),
+      percentage: getRandomPercentage(),
+    },
+    averageBidOffers: {
+      value: getRandomValue(1, 10000),
+      percentage: getRandomPercentage(),
+    },
+    uniqueMonthlyParticipants: {
+      value: getRandomValue(1, 1000),
+      percentage: getRandomPercentage(),
+    },
+    amountRaised: {
+      value: getRandomValue(1000, 1000000),
+      percentage: getRandomPercentage(),
+    },
+    commissionsCollected: {
+      value: getRandomValue(100, 100000),
+      percentage: getRandomPercentage(),
+    },
+    penalties: {
+      value: getRandomValue(0, 10),
+      percentage: getRandomPercentage(),
+    },
+    cancelledOffers: {
+      value: getRandomValue(0, 10),
+      percentage: getRandomPercentage(),
+    },
+    averageOfferTime: {
+      value: getRandomValue(1, 30),
+      percentage: getRandomPercentage(),
+    },
+  }
+}
 
 // Sample data
 const organizations = ref([
-  {
-    name: 'Organización 1',
-    events: {
-      value: 1,
-      percentage: 50,
-    },
-    offers: {
-      value: 1,
-      percentage: -50,
-    },
-    averageTicketOffers: {
-      value: 1,
-      percentage: -50,
-    },
-    averageBidOffers: {
-      value: 1,
-      percentage: -50,
-    },
-    uniqueMonthlyParticipants: {
-      value: 1,
-      percentage: -50,
-    },
-    amountRaised: {
-      value: 1,
-      percentage: -50,
-    },
-    commissionsCollected: {
-      value: 1,
-      percentage: -50,
-    },
-    penalties: {
-      value: 1,
-      percentage: -50,
-    },
-    cancelledOffers: {
-      value: 1,
-      percentage: -50,
-    },
-    averageOfferTime: {
-      value: 1,
-      percentage: -50,
-    },
-  },
-  {
-    name: 'Organización 2',
-    events: {
-      value: 1,
-      percentage: 50,
-    },
-    offers: {
-      value: 1,
-      percentage: -50,
-    },
-    averageTicketOffers: {
-      value: 1,
-      percentage: -50,
-    },
-    averageBidOffers: {
-      value: 1,
-      percentage: -50,
-    },
-    uniqueMonthlyParticipants: {
-      value: 1,
-      percentage: -50,
-    },
-    amountRaised: {
-      value: 1,
-      percentage: -50,
-    },
-    commissionsCollected: {
-      value: 1,
-      percentage: -50,
-    },
-    penalties: {
-      value: 1,
-      percentage: -50,
-    },
-    cancelledOffers: {
-      value: 1,
-      percentage: -50,
-    },
-    averageOfferTime: {
-      value: 1,
-      percentage: -50,
-    },
-  },
+  generateRandomMockedData('OnlyDevs'),
+  generateRandomMockedData('OnlyDevs2'),
+  generateRandomMockedData('MAPFRE'),
 ])
 
 // Currency formatter
