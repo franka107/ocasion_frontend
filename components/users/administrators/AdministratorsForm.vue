@@ -20,18 +20,11 @@ const BASE_ORG_URL = '/organization-management'
 const BASE_ROLE_URL = '/role-configuration'
 
 const props = defineProps<{
-  id: number | undefined
+  id: string | undefined
   onSubmit: (values: any) => void
 }>()
 
 const { getUser } = useAdmins()
-
-// const userTypesOptions = Array.from(userType)
-//   .map(([id, name]) => ({
-//     id,
-//     name,
-//   }))
-//   .filter((item) => item.id !== UserType.SuperAdmin)
 
 const { data: userTypesOptions } = await useAPI<any[]>(
   `${BASE_ADM_URL}/get-user-types`,
@@ -137,8 +130,9 @@ const rolesFiltered = computed(() =>
   roles.value.filter((role) => role.id !== 'SUPER_ADMIN'),
 )
 
-const userSession = useUserSession()
-const loggedUserType = userSession.user.value?.user.type
+const { user } = useUserSessionExtended()
+const loggedUser = user
+const loggedUserType = user.type
 
 const type =
   loggedUserType &&
@@ -148,7 +142,7 @@ const type =
     ? 'platform'
     : 'organization'
 
-const globalType = userTypeToGlobal(loggedUserType || UserType.PlatformUser)
+const globalType = userTypeToGlobal(loggedUserType || UserType.OrganizationUser)
 
 // Function to fetch organizations and roles
 const fetchData = async (
@@ -207,7 +201,7 @@ if (type === 'platform') {
     fetchData(`${BASE_ORG_URL}/find-organizations`, organizations),
   ])
 } else {
-  const availableOrganizations = userSession.user.value?.user.organizations
+  const availableOrganizations = user.organizations
   if (availableOrganizations) {
     organizations.value = availableOrganizations
     form.setFieldValue('organizations', availableOrganizations[0].id) // Set the role automatically
@@ -229,19 +223,6 @@ watch(form.values, (newValues) => {
   console.log('Form values:', newValues)
 })
 
-// Watcher to auto-select the role when the user type changes
-watch(
-  () => form.values.type,
-  (newType) => {
-    if (newType) {
-      const matchingRole = roles.value.find((role) => role.id === newType)
-      if (matchingRole) {
-        form.setFieldValue('roles', [matchingRole.id]) // Set the role automatically
-      }
-    }
-  },
-)
-
 // Submit handler
 const onSubmit = form.handleSubmit((values: any) => {
   const { organizations, roles, ...restValues } = values
@@ -262,12 +243,49 @@ const onSubmit = form.handleSubmit((values: any) => {
   props.onSubmit(formattedValues)
 })
 
-const handleUserTypeChange = (userType: UserType) => {
-  // if ([UserType.OrganizationUser, UserType.PlatformUser].includes(userType)) {
+const handleUserTypeChange = async (userType: UserType) => {
   roles.value = []
   const type: GlobalType = userTypeToGlobal(userType)
-  fetchRoles([{ field: 'type', value: type, type: 'equal' }])
-  // }
+
+  form.setFieldValue(
+    'organizations',
+    isOrgSimpleSelect.value ? '' : organizations.value.map((org) => org.id),
+  )
+
+  if (
+    [UserType.OrganizationUser, UserType.OrganizationAdmin].includes(
+      userType,
+    ) &&
+    globalType === GlobalType.Organization
+  ) {
+    form.setFieldValue('organizations', user.organizations[0].id)
+  }
+
+  if (
+    globalType === GlobalType.Organization &&
+    typeof form.values.organizations === 'string'
+  ) {
+    await fetchRoles([
+      // { field: 'type', value: GlobalType.Organization, type: 'equal' },
+      {
+        field: 'organizations.id',
+        value: form.values.organizations,
+        type: 'equal',
+      },
+    ])
+
+    const matchingRole = roles.value.find((role) => role.id === userType)
+    if (matchingRole) {
+      form.setFieldValue('roles', [matchingRole.id]) // Set the role automatically
+    }
+  } else {
+    await fetchRoles([{ field: 'type', value: type, type: 'equal' }])
+    const matchingRole = roles.value.find((role) => role.id === userType)
+
+    if (matchingRole) {
+      form.setFieldValue('roles', [matchingRole.id]) // Set the role automatically
+    }
+  }
 }
 
 const handleOrganizationChange = (organizationId: any) => {
@@ -406,13 +424,10 @@ const handleOrganizationChange = (organizationId: any) => {
                   (userType) => userType.id != 'SUPER_ADMIN',
                 )
               "
+              :disabled="loggedUser.id === props.id"
               placeholder="Tipo de Usuario"
               @update:model-value="
                 (value) => {
-                  form.setFieldValue(
-                    'organizations',
-                    isOrgSimpleSelect ? '' : organizations.map((org) => org.id),
-                  )
                   handleUserTypeChange(value)
                 }
               "
@@ -432,6 +447,7 @@ const handleOrganizationChange = (organizationId: any) => {
               :options="formattedOrganizations"
               :multiple="!isOrgSimpleSelect"
               :value="componentField.modelValue"
+              :disabled="globalType === GlobalType.Organization"
               @update:model-value="
                 (value) => {
                   componentField.onChange(value)

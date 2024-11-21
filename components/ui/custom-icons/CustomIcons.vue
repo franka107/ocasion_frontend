@@ -177,7 +177,7 @@ const icons: Icon[] = [
     name: 'Checkbox-Indeterminate',
     svg: `<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="11" y="11" width="18" height="18" rx="2" fill="#09314F"/>
-                <path fill="currentColor" d="M15 21V19H25V21H15Z" fill="white"/>
+                <path d="M15 21V19H25V21H15Z" fill="white"/>
             </svg>`,
   },
   {

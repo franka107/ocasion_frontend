@@ -12,9 +12,10 @@
           :data="withdrawalRequeststData"
           :header="withdrawalRequeststHeader"
           :search="withdrawalRequestsSearch"
+          class="mb-4"
+          multiple-select
           @on-sort="onSort"
           @on-search="onSearch"
-          multiple-select
           @on-multiple-select="
             ({ ids, type, resetMultipleSelect: onResetMultipleSelect }) => {
               selectedMultipleData = { ids, type }
@@ -38,35 +39,28 @@
                   align="start"
                   class="bg-primary text-white"
                 >
-                  <DropdownMenuItem 
-                      @click="openWithdrawalDetails(row.id)"
-                    >
-                      Detalle solicitud
-                      <CustomIcons name="EyeIcon" class="ml-auto" />
-                  </DropdownMenuItem>               
+                  <DropdownMenuItem @click="openWithdrawalDetails(row.id)">
+                    Detalle solicitud
+                    <CustomIcons name="EyeIcon" class="ml-auto" />
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                    <DropdownMenuItem @click="openParticipant(row.id)">
-                      Detalle participante
-                      <CustomIcons name="EyeIcon" class="ml-[10px]" />
-                    </DropdownMenuItem>
+                  <DropdownMenuItem @click="openParticipant(row.id)">
+                    Detalle participante
+                    <CustomIcons name="EyeIcon" class="ml-[10px]" />
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
           </template>
           <template #livelihood="{ row }">
-            <div
-              class="flex items-center justify-center"
-              @click=""
-            >
-              <CustomIcons
-                name="Doc-Loupe"
-              />
+            <div class="flex items-center justify-center" @click="">
+              <CustomIcons name="Doc-Loupe" />
             </div>
           </template>
           <template #status="{ row }">
             <CustomChip
-            :text="rechargeStatus.get(row.status)?.name || ''"
-            :variant="rechargeStatus.get(row.status)?.color as any"
+              :text="rechargeStatus.get(row.status)?.name || ''"
+              :variant="rechargeStatus.get(row.status)?.color as any"
             ></CustomChip>
           </template>
         </CustomTable>
@@ -77,9 +71,9 @@
           @pointer-down-outside="(e) => e.preventDefault()"
           @interact-outside="(e) => e.preventDefault()"
         >
-        <WithdrawalDetailsForm
-            @submit="onWithdrawalDetailsSubmit"
+          <WithdrawalDetailsForm
             v-model="openWithdrawalDetailsModal"
+            @submit="onWithdrawalDetailsSubmit"
           />
         </SheetContent>
         <SheetContent
@@ -89,10 +83,10 @@
           @pointer-down-outside="(e) => e.preventDefault()"
           @interact-outside="(e) => e.preventDefault()"
         >
-        <ParticipantDetailEditForm
-          @submit="onParticipantSubmit"
-          v-model="openParticipantModal"
-        />
+          <ParticipantDetailEditForm
+            v-model="openParticipantModal"
+            @submit="onParticipantSubmit"
+          />
         </SheetContent>
       </div>
       <CustomPagination
@@ -105,21 +99,21 @@
   </ContentLayout>
 </template>
 <script setup lang="ts">
+import { ref } from 'vue'
 import CustomTable from '~/components/ui/custom-table/CustomTable.vue'
 import CustomChip from '~/components/ui/custom-chip/CustomChip.vue'
 import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue'
 import CustomPagination from '~/components/ui/custom-pagination/CustomPagination.vue'
 import type { OrganizationItem } from '~/types/Order.ts'
 import {
-    rechargeStatus,
-    withdrawalRequeststHeader,
-    withdrawalRequestsSearch,
+  rechargeStatus,
+  withdrawalRequeststHeader,
+  withdrawalRequestsSearch,
 } from '~/constants/attention-tray'
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
 import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
-import ParticipantDetailEditForm from '~/components/attention-tray/withdrawal-requests/ParticipantDetailEditForm.vue';
-import WithdrawalDetailsForm from '~/components/attention-tray/withdrawal-requests/WithdrawalDetailsForm.vue';
-import { ref } from 'vue' 
+import ParticipantDetailEditForm from '~/components/attention-tray/withdrawal-requests/ParticipantDetailEditForm.vue'
+import WithdrawalDetailsForm from '~/components/attention-tray/withdrawal-requests/WithdrawalDetailsForm.vue'
 
 const selectedMultipleData = ref<{ type: string; ids: string[] }>({
   type: 'empty',
@@ -131,13 +125,9 @@ const disableMultipleSelect = computed(
     selectedMultipleData.value.type === 'empty' &&
     selectedMultipleData.value.ids.length === 0,
 )
-const openApplicationModal = ref(false); 
-const openParticipantModal = ref(false); 
-const {
-  page,
-  onSort,
-  onSearch,
-} = useTopUpRequests()
+const openApplicationModal = ref(false)
+const openParticipantModal = ref(false)
+const { page, onSort, onSearch } = useTopUpRequests()
 const selectedRequestId = ref<string | null>(null)
 const openWithdrawalDetailsModal = ref(false)
 const openWithdrawalDetails = (requestId: string) => {
@@ -148,42 +138,40 @@ const onWithdrawalDetailsSubmit = (formData: any) => {
   console.log('Detalle de solicitud enviado:', formData)
   openWithdrawalDetailsModal.value = false
 }
-const selectedParticipantId = ref<string | null>(null);
+const selectedParticipantId = ref<string | null>(null)
 const openParticipant = (participantId: string) => {
-  selectedParticipantId.value = participantId;
-  openParticipantModal.value = true;
-};
+  selectedParticipantId.value = participantId
+  openParticipantModal.value = true
+}
 
 const onParticipantSubmit = (formData: any) => {
-  console.log('Detalle del participante enviado:', formData);
-  openParticipantModal.value = false;
-};
+  console.log('Detalle del participante enviado:', formData)
+  openParticipantModal.value = false
+}
 const rechargeId = ref<number | undefined>(undefined)
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const rechargeModal = ref<any>({ offerId: '' })
 const data = [
-{
-  id: '000',
-  dateOfRequest: '2024-11-01',
-  fullName: 'Rossi Ferrari Lombardi',
-  transfer: '2024-11-10',
-  amount: '$ 1’000.00',
-  status: 'EARRING',
-  actions: '',
-},
-{
-  id: '000',
-  dateOfRequest: '2024-10-25',
-  fullName: 'Martini Lombardi Lombardi',
-  contractStartDate: '2024-11-01',
-  operation: '98765',
-  transfer: '2024-10-30',
-  amount: '$ 1’000.00',
-  status: 'EARRING',
-  actions: '',
-},
-];
-const withdrawalRequeststData = computed(() => data);
-
-
+  {
+    id: '000',
+    dateOfRequest: '2024-11-01',
+    fullName: 'Rossi Ferrari Lombardi',
+    transfer: '2024-11-10',
+    amount: '$ 1’000.00',
+    status: 'EARRING',
+    actions: '',
+  },
+  {
+    id: '000',
+    dateOfRequest: '2024-10-25',
+    fullName: 'Martini Lombardi Lombardi',
+    contractStartDate: '2024-11-01',
+    operation: '98765',
+    transfer: '2024-10-30',
+    amount: '$ 1’000.00',
+    status: 'EARRING',
+    actions: '',
+  },
+]
+const withdrawalRequeststData = computed(() => data)
 </script>

@@ -7,6 +7,7 @@
       <div class="w-full flex flex-col mt-5">
         <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
           <CustomTable
+            class="mb-4"
             :data="paymentsData"
             :header="paymentsHeader(props.type)"
             :search="paymentsSearch"

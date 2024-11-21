@@ -13,7 +13,7 @@
           :data="transactionHistoryData"
           :header="transactionHistoryHeader"
           :search="transactionHistorySearch"
-          class="rounded-lg"
+          class="mb-4"
           @on-sort="onSort"
           @on-search="onSearch"
         >
@@ -34,10 +34,7 @@
 
           <template #voucher>
             <Button variant="ghost">
-              <CustomIcons
-                name="fileSearch"
-                class="w-6 h-6 text-primary"
-              />
+              <CustomIcons name="fileSearch" class="w-6 h-6 text-primary" />
             </Button>
           </template>
         </CustomTable>

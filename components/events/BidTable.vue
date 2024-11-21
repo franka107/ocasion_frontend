@@ -5,6 +5,7 @@
         <CustomTable
           :data="bidsData"
           :header="bidsHeader"
+          class="rounded-lg mb-4"
           :search="bidsSearch"
           multiple-select
           @on-sort="onSort"

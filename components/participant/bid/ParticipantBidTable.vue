@@ -4,6 +4,7 @@
       <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto mt-6">
         <CustomTable
           :data="bidsData"
+          class="mb-4"
           :header="bidsParticipantHeader"
           :search="bidsParticipantSearch"
           multiple-select

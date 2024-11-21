@@ -4,6 +4,7 @@
       <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
         <CustomTable
           :data="adminsData"
+          class="mb-4"
           multiple-select
           :header="
             administratorsHeader(
@@ -25,67 +26,58 @@
           "
         >
           <template #action-button>
-            <Button
-              v-if="
-                myGrants.data.value.includes(GrantId.PlatformUsersCanSuspend) ||
-                myGrants.data.value.includes(
-                  GrantId.OrganizationUsersCanSuspend,
-                )
-              "
-              class="bg-white text-primary border border-primary hover:bg-accent"
-              variant="default"
-              :disabled="disableMultipleSelect"
-              @click="handleSuspendUsers(selectedMultipleData)"
-              >Suspender usuarios
-            </Button>
-            <!-- <Button -->
-            <!--   v-if=" -->
-            <!--     myGrants.data.value.includes( -->
-            <!--       GrantId.PlatformUsersCanExportAdministrators, -->
-            <!--     ) || -->
-            <!--     myGrants.data.value.includes( -->
-            <!--       GrantId.OrganizationUsersCanExportAdministrators, -->
-            <!--     ) -->
-            <!--   " -->
-            <!--   as="a" -->
-            <!--   variant="default" -->
-            <!--   href="http://localhost:4000/api/v1/user-management/export-users" -->
-            <!--   class="bg-white text-primary border border-[#052339]" -->
-            <!-- > -->
-            <!--   <CustomIcons name="Download" class="ml-auto" /> -->
-            <!--   Exportar -->
-            <!-- </Button> -->
-            <Button
-              v-if="
-                myGrants.data.value.includes(
-                  GrantId.PlatformUsersCanExportAdministrators,
-                ) ||
-                myGrants.data.value.includes(
-                  GrantId.OrganizationUsersCanExportAdministrators,
-                )
-              "
-              variant="default"
-              class="bg-white text-primary border border-[#052339]"
-              :disabled="!disableMultipleSelect"
-              @click="handleExport"
-            >
-              <CustomIcons name="Download" class="ml-auto" />
-              Exportar
-            </Button>
-            <Button
-              v-if="
-                myGrants.data.value.includes(GrantId.PlatformUsersCanCreate) ||
-                myGrants.data.value.includes(GrantId.OrganizationUsersCanCreate)
-              "
-              variant="default"
-              @click="
-                () => {
-                  admsUserId = undefined
-                  openModal = true
-                }
-              "
-              >Agregar</Button
-            >
+            <div class="flex flex-row space-x-2">
+              <Button
+                v-if="
+                  (myGrants.data.value.includes(
+                    GrantId.PlatformUsersCanSuspend,
+                  ) ||
+                    myGrants.data.value.includes(
+                      GrantId.OrganizationUsersCanSuspend,
+                    )) &&
+                  !disableMultipleSelect
+                "
+                class="bg-white text-primary border border-primary hover:bg-accent"
+                variant="default"
+                @click="handleSuspendUsers(selectedMultipleData)"
+                >Suspender usuarios
+              </Button>
+              <Button
+                v-if="
+                  myGrants.data.value.includes(
+                    GrantId.PlatformUsersCanExportAdministrators,
+                  ) ||
+                  myGrants.data.value.includes(
+                    GrantId.OrganizationUsersCanExportAdministrators,
+                  )
+                "
+                variant="default"
+                class="bg-white text-primary border border-[#052339]"
+                :disabled="!disableMultipleSelect"
+                @click="handleExport"
+              >
+                <CustomIcons name="Download" class="ml-auto" />
+                Exportar
+              </Button>
+              <Button
+                v-if="
+                  myGrants.data.value.includes(
+                    GrantId.PlatformUsersCanCreate,
+                  ) ||
+                  myGrants.data.value.includes(
+                    GrantId.OrganizationUsersCanCreate,
+                  )
+                "
+                variant="default"
+                @click="
+                  () => {
+                    admsUserId = undefined
+                    openModal = true
+                  }
+                "
+                >Agregar</Button
+              >
+            </div>
           </template>
           <template #type="{ row }">
             <span class="whitespace-nowrap">{{
@@ -154,7 +146,12 @@
                     <CustomIcons name="Reload" class="ml-auto" />
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem @click="handleUpdateForm(row)">
+                  <DropdownMenuItem
+                    :disabled="
+                      !isHigherOrEqualUserType(row.type, loggedUser.type)
+                    "
+                    @click="handleUpdateForm(row)"
+                  >
                     Actualizar datos
                     <CustomIcons name="ArrowLeft" class="ml-auto" />
                   </DropdownMenuItem>
@@ -227,11 +224,8 @@ const {
 } = useAdmins()
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const filterOptions = ref('[]')
-// const filterOptions = ref(
-//   props.organizationId
-//     ? `[{"field":"type","type":"equal","value": "PARTICIPANT"},{ "field": "organizations.id", "type": "equal", "value": "${props.organizationId}" }]`
-//     : `[{"field":"type","type":"not","value": "PARTICIPANT"}]`,
-// )
+
+const { user: loggedUser } = useUserSessionExtended()
 
 const openModal = ref(false)
 const admsUserId = ref<number | undefined>(undefined)
@@ -291,29 +285,27 @@ const handleSuspendUsers = async (values: { type: string; ids: string[] }) => {
     title: 'Suspender usuarios',
     message: `¿Está seguro de suspender a lo(s) usuario(s) seleccionado(s)?`,
     callback: async () => {
-      try {
-        const { type, ids } = values
-        const { status } = await suspendUsers({
-          type,
-          ids,
+      const { type, ids } = values
+      const { status, error } = await suspendUsers({
+        type,
+        ids,
+      })
+      if (status.value === 'success') {
+        refresh()
+        resetMultipleSelect.value?.()
+        updateConfirmModal({
+          title: 'Usuario(s) suspendidos(s)',
+          message: 'Lo(s) usuarios(s) ha sido suspendido(s) exitosamente',
+          type: 'success',
         })
-        if (status.value === 'success') {
-          refresh()
-          resetMultipleSelect.value?.()
-          updateConfirmModal({
-            title: 'Usuario(s) suspendidos(s)',
-            message: 'Lo(s) usuarios(s) ha sido suspendido(s) exitosamente',
-            type: 'success',
-          })
-        } else {
-          throw new Error('Error al suspender estos usuari(s)')
-        }
-      } catch (error) {
-        console.log('error', error)
+      } else {
+        const eMsg =
+          error.value.data?.errors?.[0].message ||
+          error.value.data.message ||
+          'No se pudo suspender usuario(s). Por favor, intente nuevamente.'
         updateConfirmModal({
           title: 'Error al suspender Usuario(s)',
-          message:
-            'No se pudo suspender usuario(s). Por favor, intente nuevamente.',
+          message: eMsg,
           type: 'error',
         })
       }

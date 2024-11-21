@@ -34,12 +34,12 @@ const fetchOrganizationUsers = async () => {
   const organizationFilter: FilterOption = {
     type: 'equal',
     value: props.organizationId,
-    field: 'organizations.id',
+    field: 'organization.id',
   }
   try {
     const { data } = await useAPI('/user-management/find-administrators', {
       query: {
-        filterOptions: JSON.stringify([userTypeFilter]),
+        filterOptions: JSON.stringify([userTypeFilter, organizationFilter]),
       },
       default: () => [],
     })
