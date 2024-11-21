@@ -17,68 +17,71 @@
           "
         >
           <template #action-button>
-            <Button
-              v-if="
-                myGrants.data.value.includes(
-                  GrantId.OrganizationOffersCanReject,
-                )
-              "
-              class="bg-white text-primary border border-primary hover:bg-accent"
-              variant="default"
-              :disabled="disableMultipleSelect"
-              @click="handleRejectOffers(selectedMultipleData)"
-              >Rechazar oferta
-            </Button>
-            <Button
-              v-if="
-                isOfferActionsVisible &&
-                myGrants.data.value.includes(
-                  GrantId.OrganizationOffersCanConfirm,
-                )
-              "
-              class="bg-white text-primary border border-primary hover:bg-accent"
-              variant="default"
-              :disabled="disableMultipleSelect"
-              @click="handleConfirmOffers(selectedMultipleData)"
-              >Confirmar oferta
-            </Button>
-            <Button
-              v-if="
-                isOfferActionsVisible &&
-                myGrants.data.value.includes(GrantId.PlatformOfferCanRetire)
-              "
-              class="bg-white text-primary border border-primary hover:bg-accent"
-              variant="default"
-              :disabled="disableMultipleSelect"
-              @click="handleRetireOffers(selectedMultipleData)"
-              >Retirar oferta
-            </Button>
-            <div
-              v-if="
-                myGrants.data.value.includes(GrantId.PlatformOfferCanCreate)
-              "
-            >
+            <div class="flex flex-row space-x-2">
               <Button
-                v-if="eventDetail?.status !== EventStatus.Published"
-                variant="default"
-                @click="
-                  () => {
-                    offerId = undefined
-                    openModalOffer = true
-                  }
+                v-if="
+                  myGrants.data.value.includes(
+                    GrantId.OrganizationOffersCanReject,
+                  )
                 "
-                >Crear oferta
+                class="bg-white text-primary border border-primary hover:bg-accent"
+                variant="default"
+                :disabled="disableMultipleSelect"
+                @click="handleRejectOffers(selectedMultipleData)"
+                >Rechazar oferta
+              </Button>
+              <Button
+                v-if="
+                  isOfferActionsVisible &&
+                  myGrants.data.value.includes(
+                    GrantId.OrganizationOffersCanConfirm,
+                  )
+                "
+                class="bg-white text-primary border border-primary hover:bg-accent"
+                variant="default"
+                :disabled="disableMultipleSelect"
+                @click="handleConfirmOffers(selectedMultipleData)"
+                >Confirmar oferta
+              </Button>
+              <Button
+                v-if="
+                  isOfferActionsVisible &&
+                  myGrants.data.value.includes(GrantId.PlatformOfferCanRetire)
+                "
+                class="bg-white text-primary border border-primary hover:bg-accent"
+                variant="default"
+                :disabled="disableMultipleSelect"
+                @click="handleRetireOffers(selectedMultipleData)"
+                >Retirar oferta
+              </Button>
+              <div
+                v-if="
+                  myGrants.data.value.includes(GrantId.PlatformOfferCanCreate)
+                "
+              >
+                <Button
+                  v-if="eventDetail?.status !== EventStatus.Published"
+                  variant="default"
+                  @click="
+                    () => {
+                      offerId = undefined
+                      openModalOffer = true
+                    }
+                  "
+                  >Crear oferta
+                </Button>
+              </div>
+              <Button
+                v-if="
+                  myGrants.data.value.includes(
+                    GrantId.OrganizationBidCanView,
+                  ) || myGrants.data.value.includes(GrantId.PlatformBidCanView)
+                "
+                variant="default"
+                @click="handleViewBids"
+                >Ver pujas
               </Button>
             </div>
-            <Button
-              v-if="
-                myGrants.data.value.includes(GrantId.OrganizationBidCanView) ||
-                myGrants.data.value.includes(GrantId.PlatformBidCanView)
-              "
-              variant="default"
-              @click="handleViewBids"
-              >Ver pujas
-            </Button>
           </template>
           <template #attachedFiles>
             <div
