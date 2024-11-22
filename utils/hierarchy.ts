@@ -19,12 +19,12 @@ export const isHigherOrEqualUserType = (
   )
 }
 
-export const isHigherUserType = (
+export const isHigherFlow = (
   userType: UserType,
   comparedUserType: UserType,
 ): boolean => {
   return (
-    userTypeHierarchy.indexOf(userType) >=
+    userTypeHierarchy.indexOf(userType) >
     userTypeHierarchy.indexOf(comparedUserType)
   )
 }

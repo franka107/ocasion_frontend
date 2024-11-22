@@ -1,29 +1,16 @@
 <template>
-  <ContentLayout title="Eventos">
+  <ContentLayout title="Pujas">
     <section>
-      <EventDetails :event-detail="eventDetail">
-        <template #default>
-          <Button
-            v-if="
-              isEventNotPublished &&
-              myGrants.data.value.includes(GrantId.PlatformEventsCanPublish)
-            "
-            variant="default"
-            class="bg-white text-primary border border-primary hover:bg-accent"
-            @click="handlePublishEvent"
-          >
-            Publicar Evento
-          </Button>
-        </template>
-      </EventDetails>
+      <EventDetails :event-detail="eventDetail"> </EventDetails>
 
       <div>
-        <OfferTable />
+        <BidTable />
       </div>
     </section>
   </ContentLayout>
 </template>
 <script setup lang="ts">
+import BidTable from '../events/BidTable.vue'
 import EventDetails from '~/components/events/EventDetails.vue'
 import OfferTable from '@/components/events/OfferTable.vue'
 import ContentLayout from '~/layouts/default/ContentLayout.vue'

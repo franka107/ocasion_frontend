@@ -147,8 +147,8 @@ import CounterOfferBidModal from '../bid/CounterOfferBidModal.vue'
 import CustomIcons from '@/components/ui/custom-icons/CustomIcons.vue'
 import CustomPagination from '@/components/ui/custom-pagination/CustomPagination.vue'
 import { bidsHeader, bidsSearch, bidStatus } from '@/constants/bids'
-import type { BidDto, OfferWithBidDto } from '~/types/Bids'
-import type { IAmountHistoryModal } from '~/types/Offer'
+import { BidStatus, type BidDto, type OfferWithBidDto } from '~/types/Bids'
+import { OfferStatus, type IAmountHistoryModal } from '~/types/Offer'
 import { GrantId } from '~/types/Grant'
 
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
@@ -176,7 +176,10 @@ const disableMultipleSelect = computed(
 const openModalCounterOffer = ref(false)
 const selectedCounterOfferInfo = ref({ currentAmount: 0, id: '' })
 const filterOptions = ref(
-  `[{ "field": "event.id", "type": "equal", "value": "${route.params.eventId}" }]`,
+  `[
+    { "field": "event.id", "type": "equal", "value": "${route.params.eventId}" },
+    { "field": "status", "type": "equal", "value": "${BidStatus.Winner}" }
+  ]`,
 )
 const onSearch = (item: { [key: string]: string }) => {
   filterOptions.value = JSON.stringify([
