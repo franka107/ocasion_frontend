@@ -31,23 +31,22 @@ const options = ['Todos', 'Finalizado', 'Por vencer']
 const props = defineProps({
   apiUrl: String,
 })
-const { apiUrl }= toRefs(props)
+const { apiUrl } = toRefs(props)
 const { page, sortOptions } = useOfferAPI()
 const filterOptions = ref('[]')
 const selectedOffer = ref<OfferListItem | undefined>(undefined)
-const { data: offerListData, refresh } = await useAPI<IDataResponse<OfferListItem>>(
-  () => `${OFFER_BASE_URL}/${apiUrl?.value}`,
-  {
-    query: {
-      limit: 8,
-      page,
-      filterOptions,
-      sortOptions,
-    },
-  } as any,
-)
+const { data: offerListData, refresh } = await useAPI<
+  IDataResponse<OfferListItem>
+>(() => `${OFFER_BASE_URL}/${apiUrl?.value}`, {
+  query: {
+    limit: 8,
+    page,
+    filterOptions,
+    sortOptions,
+  },
+} as any)
 const offerList = computed<OfferListItem[]>(() => offerListData.value.data)
-watch([apiUrl],() => {
+watch([apiUrl], () => {
   page.value = 1
   selectedOffer.value = undefined
   refresh()
@@ -60,8 +59,8 @@ socket.on('offerUpdated', (newOffer: OfferListItem) => {
   const offerIndex = offerList.value.findIndex(
     (offerItem) => offerItem.id === newOffer.id,
   )
+  console.log(newOffer)
   if (offerIndex !== -1) {
-    console.log('offerUpdated', newOffer.appraisal)
     offerList.value[offerIndex] = newOffer
     if (selectedOffer.value?.id === offerList.value[offerIndex].id) {
       selectedOffer.value = newOffer
@@ -137,6 +136,7 @@ const closeModal = () => {
       :offer="selectedOffer"
       :on-place-bid="onPlaceBid"
     />
+
     <!-- Modal OfferDetailItem móvil -->
     <AlertDialog :open="isModalOpen" class="z-[30]" @update:open="closeModal">
       <AlertDialogContent class="z-[98] max-w-[400px] px-0 py-4">

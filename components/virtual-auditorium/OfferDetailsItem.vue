@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, watch, toRefs } from 'vue'
+import BidHistory from './BidHistory.vue'
 import type { OfferListItem } from '~/types/Offer'
 import { getRemainingTime } from '@/utils/countDown'
 import ConfirmBidDialog from '~/components/virtual-auditorium/ConfirmBidDialog.vue'
-import BidHistory from './BidHistory.vue'
 
 const props = defineProps<{
   offer: OfferListItem
@@ -13,7 +13,7 @@ const { offer } = toRefs(props)
 const useCountDown = (offer: Ref<OfferListItem>) => {
   const endMiliseconds = computed(() => getRemainingTime(offer.value.endTime))
   const countDownkey = ref(0)
-  watch(offer, (newVal) => {
+  watch(offer, () => {
     countDownkey.value += 1
   })
   return { countDownkey, endMiliseconds }
@@ -41,10 +41,6 @@ const offerNewBid = () => {
   const onQuickAction = (value: number) => {
     bidValue.value = (offer.value.bids[0].amount || 0) + value
   }
-  const isDisabledButton = (totalSeconds: number) =>
-    totalSeconds === 0 ||
-    invalidBidAmount.value ||
-    offer.value.status === 'DEBATED'
 
   return {
     bidValue,
@@ -52,7 +48,6 @@ const offerNewBid = () => {
     quickActions,
     onQuickAction,
     invalidBidAmount,
-    isDisabledButton,
     onFocusInput,
   }
 }
@@ -61,7 +56,6 @@ const {
   errorMessage,
   quickActions,
   onQuickAction,
-  isDisabledButton,
   onFocusInput,
   invalidBidAmount,
 } = offerNewBid()
@@ -70,7 +64,6 @@ const showModal = ref(false)
 const onSubmitBid = () => {
   if (!invalidBidAmount.value) {
     showModal.value = true
-    console.log('Oferta realizada')
   }
 }
 </script>
@@ -216,12 +209,9 @@ const onSubmitBid = () => {
                 </div>
               </div>
             </div>
-            <template v-if="offer.bidHistories?.length">
+            <template v-if="offer.bids.length">
               <hr class="border-gray-100 border-[1.5px] my-4" />
-              <BidHistory
-                :bid-history="offer.bids"
-                "
-              />
+              <BidHistory :bids="offer.bids" />
             </template>
           </div>
         </div>

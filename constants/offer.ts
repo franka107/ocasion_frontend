@@ -89,26 +89,6 @@ export const offerStatusRecord: Record<
     flowPosition: 16,
   },
 }
-// export const offerStatus: Record<OfferStatus, { name: string; color: string } > = new Map<string, { name: string; color: string }>([
-//   ['CREATED', { name: 'Nuevo', color: 'purple' }], // Nuevo
-//   ['DEBATED', { name: 'Debatido', color: 'orange' }], // Debatido
-//   ['CONFIRMED', { name: 'Confirmado', color: 'green' }], // Confirmado
-//   ['RETIRED', { name: 'Retirado', color: 'red' }], // Retirado
-//   ['IN_PROGRESS', { name: 'En curso', color: 'purple' }], // En curso (usando color de 'Nuevo')
-//   ['CANCELLED', { name: 'Cancelado', color: 'brown' }], // Cancelado
-//   ['IN_REVIEW', { name: 'En revisión', color: 'orange' }], // En revisión (usando color de 'Debatido')
-//   ['REJECTED', { name: 'Rechazado', color: 'red' }], // Rechazado
-//   ['IN_DEPOSIT_REVIEW', { name: 'En revisión de depósito', color: 'red' }], // Rechazado (similar)
-//   ['PENDING_DEPOSIT', { name: 'Abono pendiente', color: 'blue' }], // Abono pendiente (usando color de 'Pendiente de pago')
-//   ['OBSERVED_DEPOSIT', { name: 'Abono observado', color: 'orange' }], // Abono observado (similar a 'Debatido')
-//   ['CONFIRMED_DEPOSIT', { name: 'Depósito confirmado', color: 'green' }], // Depósito confirmado (usando color de 'Confirmado')
-//   [
-//     'IN_TRANSFER_OF_GOOD',
-//     { name: 'En transferencia de bienes', color: 'purple' },
-//   ], // En transferencia de bienes (similar a 'Nuevo')
-//   ['DELIVERED', { name: 'Entregado', color: 'green' }], // Entregado (similar a 'Confirmado')
-//   ['CONCRETED', { name: 'Concretado', color: 'green' }], // Concretado (similar a 'Confirmado')
-// ])
 
 export const offerSearch: SearchItem[] = [
   {
