@@ -1,22 +1,23 @@
 <template>
-  <section v-if="!showBids">
-    <div class="w-full flex flex-col">
-      <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto mt-6">
-        <CustomTable
-          :data="offerData"
-          :header="offerHeader"
-          :search="offerSearch"
-          multiple-select
-          @on-sort="onSort"
-          @on-search="onSearch"
-          @on-multiple-select="
-            ({ ids, type, resetMultipleSelect: onResetMultipleSelect }) => {
-              selectedMultipleData = { ids, type }
-              resetMultipleSelect = onResetMultipleSelect
-            }
-          "
-        >
-          <template #action-button>
+  <div class="w-full flex flex-col">
+    <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto mt-6">
+      <CustomTable
+        :data="offerData"
+        :header="offerHeader"
+        :search="offerSearch"
+        multiple-select
+        class="mb-6"
+        @on-sort="onSort"
+        @on-search="onSearch"
+        @on-multiple-select="
+          ({ ids, type, resetMultipleSelect: onResetMultipleSelect }) => {
+            selectedMultipleData = { ids, type }
+            resetMultipleSelect = onResetMultipleSelect
+          }
+        "
+      >
+        <template #action-button>
+          <div class="flex flex-row space-x-2">
             <Button
               v-if="
                 myGrants.data.value.includes(
@@ -59,7 +60,7 @@
               "
             >
               <Button
-                v-if="eventDetail?.status !== EventStatus.Published"
+                v-if="eventDetail?.status === EventStatus.Created"
                 variant="default"
                 @click="
                   () => {
@@ -70,190 +71,200 @@
                 >Crear oferta
               </Button>
             </div>
-            <Button
-              v-if="
-                myGrants.data.value.includes(GrantId.OrganizationBidCanView) ||
-                myGrants.data.value.includes(GrantId.PlatformBidCanView)
+            <NuxtLink
+              :href="
+                globalType === GlobalType.Platform
+                  ? `/dashboard/platform/events/${route.params.eventId}/bids`
+                  : `/dashboard/organization/${route.params.organizationId}/events/${route.params.eventId}/bids`
               "
-              variant="default"
-              @click="handleViewBids"
-              >Ver pujas
-            </Button>
-          </template>
-          <template #attachedFiles>
-            <div
-              class="w-10 h-10 flex items-center justify-center rounded-full bg-[#0B38590A]"
             >
-              <CustomIcons name="Clip" />
-            </div>
-          </template>
-          <template #actions="{ row }">
-            <div class="flex justify-center">
-              <DropdownMenu>
-                <DropdownMenuTrigger as-child>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    class="h-8 data-[state=open]:bg-accent"
-                  >
-                    <CustomIcons name="VerticalDots" class="w-6 h-6" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="start"
-                  class="bg-primary text-white"
+              <Button
+                v-if="
+                  myGrants.data.value.includes(
+                    GrantId.OrganizationBidCanView,
+                  ) || myGrants.data.value.includes(GrantId.PlatformBidCanView)
+                "
+                variant="default"
+                >Ver pujas
+              </Button>
+            </NuxtLink>
+          </div>
+        </template>
+        <template #attachedFiles>
+          <div
+            class="w-10 h-10 flex items-center justify-center rounded-full bg-[#0B38590A]"
+          >
+            <CustomIcons name="Clip" />
+          </div>
+        </template>
+        <template #actions="{ row }">
+          <div class="flex justify-center">
+            <DropdownMenu>
+              <DropdownMenuTrigger as-child>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  class="h-8 data-[state=open]:bg-accent"
                 >
-                  <div
-                    v-if="
-                      myGrants.data.value.includes(
-                        GrantId.PlatformOfferCanUpdate,
-                      )
-                    "
-                  >
-                    <DropdownMenuItem
-                      :disabled="
-                        row.status === OfferStatus.Confirmed ||
-                        eventDetail?.status === EventStatus.Published
-                      "
-                      @click="
-                        () => {
-                          offerId = row.id
-                          openModalOffer = true
-                        }
-                      "
-                    >
-                      Editar
-                      <CustomIcons name="Pen" class="ml-auto" />
-                    </DropdownMenuItem>
-                  </div>
-
+                  <CustomIcons name="VerticalDots" class="w-6 h-6" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" class="bg-primary text-white">
+                <div
+                  v-if="
+                    myGrants.data.value.includes(GrantId.PlatformOfferCanUpdate)
+                  "
+                >
                   <DropdownMenuItem
-                    v-if="
-                      myGrants.data.value.includes(
-                        GrantId.OrganizationOffersCanDiscuss,
-                      )
+                    :disabled="
+                      row.status === OfferStatus.Confirmed ||
+                      eventDetail?.status === EventStatus.Published
                     "
                     @click="
                       () => {
-                        openModalDebate = true
-                        selectedDebateInfo = {
-                          name: row.title,
-                          appraisal: row.appraisal,
-                          counterProposalAmount: row.counterProposalAmount,
-                          id: row.id,
-                        }
+                        offerId = row.id
+                        openModalOffer = true
                       }
                     "
                   >
-                    Debatir
-                    <CustomIcons name="Mallet" class="ml-auto" />
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    @click="
-                      () => {
-                        bidsId = row.id
-                        openAppraisalHistoryModal = true
-                        appraisalHistoryModal = { offerId: row.id }
-                      }
-                    "
-                  >
-                    <div class="flex items-center space-x-2">
-                      <span>Historial tasaciones</span>
-                      <CustomIcons name="Clock-Timer" class="ml-auto" />
-                    </div>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    v-if="
-                      myGrants.data.value.includes(
-                        GrantId.PlatformOfferCanUpdateAppraisal,
-                      )
-                    "
-                    @click="
-                      () => {
-                        openModifyAppraisal = true
-                        changeAppraisalForm = {
-                          offerId: row.id,
-                          offerName: row.title,
-                          counterProposalAmount: row.counterProposalAmount,
-                          oldAppraisal: row.appraisal,
-                          newAppraisal: row.appraisal,
-                        }
-                      }
-                    "
-                  >
-                    Modificar tasación
+                    Editar
                     <CustomIcons name="Pen" class="ml-auto" />
                   </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </template>
-          <template #status="{ row }">
-            <CustomChip
-              :text="offerStatus.get(row.status)?.name || ''"
-              :variant="offerStatus.get(row.status)?.color as any"
-            ></CustomChip>
-          </template>
-        </CustomTable>
-        <SheetContent
-          v-model:open="openAppraisalHistoryModal"
-          class="flex flex-col h-full"
-          @pointer-down-outside="(e) => e.preventDefault()"
-          @interact-outside="(e) => e.preventDefault()"
-        >
-          <HistoryForm
-            :bids-id="bidsId"
-            :bid-id="appraisalHistoryModal.offerId"
-            :endpoint="auditBidHistories"
-            title="Historial de tasaciones"
-          />
-        </SheetContent>
-        <SheetContent
-          v-model:open="openModalOffer"
-          class="flex flex-col h-full"
-          @pointer-down-outside="(e) => e.preventDefault()"
-          @interact-outside="(e) => e.preventDefault()"
-        >
-          <OfferForm
-            :id="offerId"
-            :event-id="String(route.params.eventId)"
-            :organization-id="String(route.params.organizationId)"
-            :onsubmit="offerId !== undefined ? handleEdit : handleCreate"
-          />
-        </SheetContent>
-        <DebateModal
-          :id="selectedDebateInfo.id"
-          v-model="openModalDebate"
-          :name="selectedDebateInfo.name"
-          :counter-proposal-amount="selectedDebateInfo.counterProposalAmount"
-          :appraisal="selectedDebateInfo.appraisal"
-          :refresh-table="refreshOfferTable"
-        ></DebateModal>
-        <AppraisalOfferModal
-          v-model="openModifyAppraisal"
-          :counter-proposal-amount="changeAppraisalForm.counterProposalAmount"
-          :offer-id="changeAppraisalForm.offerId"
-          :offer-title="changeAppraisalForm.offerName"
-          :new-appraisal="changeAppraisalForm.newAppraisal"
-          :old-appraisal="changeAppraisalForm.oldAppraisal"
-          :refresh-table="refreshOfferTable"
-        ></AppraisalOfferModal>
-      </div>
-      <CustomPagination
-        v-model:page="page"
-        class="mt-5 mb-[19px]"
-        :total="data.count"
-        :limit="data.limit"
-      />
+                </div>
+
+                <DropdownMenuItem
+                  v-if="
+                    myGrants.data.value.includes(
+                      GrantId.OrganizationOffersCanDiscuss,
+                    )
+                  "
+                  @click="
+                    () => {
+                      openModalDebate = true
+                      selectedDebateInfo = {
+                        name: row.title,
+                        appraisal: row.appraisal,
+                        counterProposalAmount: row.counterProposalAmount,
+                        id: row.id,
+                      }
+                    }
+                  "
+                >
+                  Debatir
+                  <CustomIcons name="Mallet" class="ml-auto" />
+                </DropdownMenuItem>
+
+                <NuxtLink
+                  :href="`/dashboard/platform/events/${route.params.eventId}/offers/${row.id}/bids`"
+                >
+                  <DropdownMenuItem>
+                    Ver pujas
+                    <CustomIcons name="ArrowLeft" class="ml-auto" />
+                  </DropdownMenuItem>
+                </NuxtLink>
+
+                <DropdownMenuItem
+                  @click="
+                    () => {
+                      bidsId = row.id
+                      openAppraisalHistoryModal = true
+                      appraisalHistoryModal = { offerId: row.id }
+                    }
+                  "
+                >
+                  <div class="flex items-center space-x-2">
+                    <span>Historial de tasaciones</span>
+                    <CustomIcons name="Clock-Timer" class="ml-auto" />
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  v-if="
+                    myGrants.data.value.includes(
+                      GrantId.PlatformOfferCanUpdateAppraisal,
+                    )
+                  "
+                  @click="
+                    () => {
+                      openModifyAppraisal = true
+                      changeAppraisalForm = {
+                        offerId: row.id,
+                        offerName: row.title,
+                        counterProposalAmount: row.counterProposalAmount,
+                        oldAppraisal: row.appraisal,
+                        newAppraisal: row.appraisal,
+                      }
+                    }
+                  "
+                >
+                  Modificar tasación
+                  <CustomIcons name="Pen" class="ml-auto" />
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </template>
+        <template #status="{ row }">
+          <CustomChip
+            :text="offerStatusRecord[row.status].name || ''"
+            :variant="offerStatusRecord[row.status].color as any"
+          ></CustomChip>
+        </template>
+      </CustomTable>
+      <SheetContent
+        v-model:open="openAppraisalHistoryModal"
+        class="flex flex-col h-full"
+        @pointer-down-outside="(e) => e.preventDefault()"
+        @interact-outside="(e) => e.preventDefault()"
+      >
+        <HistoryForm
+          :bids-id="bidsId"
+          :bid-id="appraisalHistoryModal.offerId"
+          :endpoint="auditBidHistories"
+          title="Historial de tasaciones"
+        />
+      </SheetContent>
+      <SheetContent
+        v-model:open="openModalOffer"
+        class="flex flex-col h-full"
+        @pointer-down-outside="(e) => e.preventDefault()"
+        @interact-outside="(e) => e.preventDefault()"
+      >
+        <OfferForm
+          :id="offerId"
+          :event-id="String(route.params.eventId)"
+          :organization-id="String(route.params.organizationId)"
+          :onsubmit="offerId !== undefined ? handleEdit : handleCreate"
+        />
+      </SheetContent>
+      <DebateModal
+        :id="selectedDebateInfo.id"
+        v-model="openModalDebate"
+        :name="selectedDebateInfo.name"
+        :counter-proposal-amount="selectedDebateInfo.counterProposalAmount"
+        :appraisal="selectedDebateInfo.appraisal"
+        :refresh-table="refreshOfferTable"
+      ></DebateModal>
+      <AppraisalOfferModal
+        v-model="openModifyAppraisal"
+        :counter-proposal-amount="changeAppraisalForm.counterProposalAmount"
+        :offer-id="changeAppraisalForm.offerId"
+        :offer-title="changeAppraisalForm.offerName"
+        :new-appraisal="changeAppraisalForm.newAppraisal"
+        :old-appraisal="changeAppraisalForm.oldAppraisal"
+        :refresh-table="refreshOfferTable"
+      ></AppraisalOfferModal>
     </div>
-  </section>
-  <section v-else>
-    <BidTable />
-  </section>
+    <CustomPagination
+      v-model:page="page"
+      class="mt-5 mb-[19px]"
+      :total="data.count"
+      :limit="data.limit"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
-import { offerHeader, offerStatus, offerSearch } from '@/constants/offer'
+import { offerHeader, offerStatusRecord, offerSearch } from '@/constants/offer'
 import {
   type OfferListItem,
   type IDebateForm,
@@ -268,9 +279,11 @@ import BidTable from '@/components/events/BidTable.vue'
 import AppraisalOfferModal from '~/components/offers/AppraisalOfferModal.vue'
 import { GrantId } from '~/types/Grant'
 import { EventStatus } from '~/types/Event'
+import { GlobalType } from '~/types/Common'
 
 const { getMyGrants } = useAuthManagement()
 const myGrants = await getMyGrants()
+const { user, globalType } = useUserSessionExtended()
 const auditBidHistories = '/audit/find-audit-histories'
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const {

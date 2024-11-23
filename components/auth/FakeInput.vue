@@ -1,20 +1,21 @@
 <template>
   <div class="relative" :class="{ 'mb-6': !readField }">
     <div class="relative">
-      <input
+      <div
         :id="id"
         :type="inputType"
         :value="modelValue"
         :readonly="readField"
-        class="peer w-full min-w-24 h-[56px] px-4 pr-10 text-gray-900 placeholder-transparent border rounded focus:outline-none focus:border-primary focus:border-2 transition-colors duration-300 ease-in-out"
+        class="peer flex flex-col justify-center w-full min-w-24 h-[56px] px-4 pr-10 text-gray-900 placeholder-transparent border rounded focus:outline-none focus:border-primary focus:border-2 transition-colors duration-300 ease-in-out"
         :placeholder="label"
         :class="{
           'border-red-500': error,
           'border-primary focus:border cursor-default': readField,
         }"
         @input="$emit('update:modelValue', $event.target.value)"
-      />
-      <slot name="icon-right" />
+      >
+        <slot />
+      </div>
     </div>
     <label
       :for="id"

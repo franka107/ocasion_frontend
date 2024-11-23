@@ -1,14 +1,25 @@
-import type { Organization } from '~/models/organizations'
 import type { UserDto } from './Administrators'
 import type { IEventLItem } from './Event'
+import type { Organization } from '~/models/organizations'
 
 export enum OfferStatus {
-  Retired = 'RETIRED', // Retirado
-  Confirmed = 'CONFIRMED', // Confirmado
-  New = 'NEW', // Nuevo
+  Created = 'CREATED', // Nuevo
   Debated = 'DEBATED', // Debadito
+  Confirmed = 'CONFIRMED', // Confirmado
+  Retired = 'RETIRED', // Retirado
+  InProgress = 'IN_PROGRESS', // En curso
   Cancelled = 'CANCELLED', // Cancelado
+  InReview = 'IN_REVIEW', // En revision
   Rejected = 'REJECTED', // Rechazado
+  InDepositReview = 'IN_DEPOSIT_REVIEW', // Rechazado
+  PendingDeposit = 'PENDING_DEPOSIT', // Abono pendiente
+  ObservedDeposit = 'OBSERVED_DEPOSIT', // Abono observado
+  ConfirmedDeposit = 'CONFIRMED_DEPOSIT', // Deposito confirmado
+  InTransferOfGood = 'IN_TRANSFER_OF_GOOD', // En transferencia de bienes
+  Delivered = 'DELIVERED', // Enviado
+  Concreted = 'CONCRETED', // Concreatedo
+  // -----------------
+  PendingOfDelivery = 'PENDING_OF_DELIVERY', // Pendiente de entrega
 }
 
 export interface OfferListItem {

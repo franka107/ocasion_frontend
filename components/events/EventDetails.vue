@@ -15,6 +15,7 @@
         Evento - {{ params.eventId }}
       </h1>
     </div>
+
     <div class="ml-auto">
       <slot></slot>
     </div>
@@ -55,6 +56,12 @@
             label="Tipo de bien"
             :model-value="goodType.get(eventDetail.goodType)"
           />
+          <FakeInput read-field label="Estado">
+            <CustomChip
+              :text="eventStatus.get(eventDetail.status)?.name || ''"
+              :variant="eventStatus.get(eventStatus.status)?.color as any"
+            ></CustomChip>
+          </FakeInput>
           <InputWithLabel
             read-field
             label="Horario de cierre"
@@ -81,17 +88,19 @@
   </div>
 </template>
 <script setup lang="ts">
+import FakeInput from '../auth/FakeInput.vue'
 import InputWithLabel from '~/components/auth/inputWithLabel.vue'
 import InputFile from '@/components/common/file/Input.vue'
 import type { IEventLItem } from '@/types/Event'
-import { eventType, goodType, eventTimes } from '@/constants/events'
+import {
+  eventType,
+  goodType,
+  eventTimes,
+  eventStatus,
+} from '@/constants/events'
 
 const { params } = useRoute()
 const router = useRouter()
 const props = defineProps<{ eventDetail: IEventLItem }>()
 const { eventDetail } = toRefs(props)
-const attachedFiles = [
-  { id: '5404523e-bb7d-4927-8fd7-512ff7eb09fb', path: 'asda/asdad.svg' },
-  { id: '5404523e-bb7d-4927-8fd7-512ff7eb09fb', path: 'asda/asdad.svg' },
-]
 </script>

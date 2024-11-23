@@ -5,7 +5,14 @@ import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
 import Holidays from 'date-holidays'
 import { X } from 'lucide-vue-next'
-import { addDays, eachDayOfInterval, isBefore, isWeekend } from 'date-fns'
+import {
+  addDays,
+  eachDayOfInterval,
+  isBefore,
+  isWeekend,
+  parse,
+  setHours,
+} from 'date-fns'
 import {
   CalendarDate,
   startOfMonth,
@@ -196,8 +203,13 @@ watch(form.values, (newValues) => {
 const onSubmit = form.handleSubmit((values: any) => {
   const { ...restValues } = values
 
+  const startedAt = parse(values.startDate, 'yyyy-MM-dd', new Date())
+  const endDate = parse(values.endDate, 'yyyy-MM-dd', new Date())
+  const finalEndDate = setHours(endDate, values.closingTime)
+
   const formattedValues = {
     ...restValues,
+    finishedAt: finalEndDate,
     organization: {
       id: props.orgid,
     },
