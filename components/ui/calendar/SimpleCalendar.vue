@@ -25,37 +25,64 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
 
 const formatter = useDateFormatter('es')
 const placeholder = ref(today(getLocalTimeZone()))
-
 const isDateAllowed = (date: CalendarDate): boolean => {
-  const today = new Date()
-  const startValidDate = new Date(today.getFullYear(), 10, 20) 
-  const nextYear = today.getFullYear() + 1
-  const endValidDate = new Date(nextYear, 0, 31)
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth();
+  const currentDay = today.getDate();
+
+  const dateToValidate = new Date(date.year, date.month - 1, date.day);
 
 
-  const dateToValidate = new Date(date.year, date.month - 1, date.day)
+  if (currentMonth === 10 && currentDay >= 22) {
+    const startDate = new Date(currentYear, 10, 22);
+    const endDate = new Date(currentYear + 1, 0, 31);
+    return dateToValidate >= startDate && dateToValidate <= endDate;
+  }
 
-  return dateToValidate >= startValidDate && dateToValidate <= endValidDate
-}
+  const startMonth = Math.floor(currentMonth / 2) * 2;
+  let startYear = currentYear;
+  let endYear = currentYear;
 
+  if (startMonth === 10) {
+    endYear = currentYear + 1;
+  }
+
+  const startDate = new Date(startYear, startMonth, 1);
+  const endDate = new Date(endYear, startMonth + 2, 0);
+
+  return dateToValidate >= startDate && dateToValidate <= endDate;
+};
 
 const isDateDisabled = (date: CalendarDate): boolean => {
   return !isDateAllowed(date);
 };
 
+const handlePlaceholderChange = (date: CalendarDate) => {
+  placeholder.value = date
+  handleDateChange(date)
+}
+
+const handleDateChange = (selectedDate: CalendarDate) => {
+  if (isDateAllowed(selectedDate)) {
+    emits('update:modelValue', selectedDate)
+  } else {
+    console.warn("Fecha seleccionada no permitida:", selectedDate)
+  }
+}
 
 const getDateCellClass = (date: CalendarDate): string => {
   return isDateDisabled(date)
     ? 'opacity-50 pointer-events-none text-gray-400'
     : '';
 };
-
 </script>
 
 <template>
   <CalendarRoot
     v-slot="{ grid, }"
     v-model:placeholder="placeholder"
+    @update:placeholder="handlePlaceholderChange"
     v-bind="forwarded"
      class="p-4 w-full max-w-4xl mx-auto bg-white "
   >

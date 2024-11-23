@@ -81,7 +81,7 @@
               variant="outline"
               size="icon"
               class="lg:hidden"
-              @click="toggleSidebar"
+               @click="openModal"
             >
               <CustomIcons name="icon" class="h-4 w-4" />
             </Button>
@@ -97,6 +97,7 @@
             variant="outline"
             size="icon"
             class="hidden lg:flex border-black"
+            @click="openModal"
           >
             <CustomIcons name="icon" class="h-4 w-4" />
           </Button>
@@ -148,22 +149,50 @@
               </CardFooter>
             </Card>
           </div>
-          <div v-else>No hay eventos en este dia</div>
+          <div class="flex items-center  justify-center h-screen font-semibold" v-else>No hay eventos en este dia</div>
         </div>
         <div v-else>
-          <p>Cargando...</p>
+          <p class="flex items-center  justify-center h-screen font-semibold">Cargando...</p>
         </div>
       </div>
     </div>
+     <!-- Sheet para el filtro -->
+     <SheetContent
+      v-model:open="isSheetOpen"
+      side="right"
+      class="flex flex-col h-full"
+      @pointer-down-outside="(e) => e.preventDefault()"
+      @interact-outside="(e) => e.preventDefault()"
+    >
+      <SheetHeader>
+        <SheetClose class="mr-4 rounded-full p-3 hover:bg-[#f1f5f9]">
+          <X class="w-4 h-4 text-muted-foreground" />
+        </SheetClose>
+        <SheetTitle class="text-xl font-medium text-[#64748B]">
+          Filtro
+        </SheetTitle>
+      </SheetHeader>
+      <FilterCalendar
+        v-model:open="isSheetOpen"
+        :organizations="allOrganizations"
+        :initial-form-values="filterFormValues"
+        :on-submit="onSubmit"
+      />
+    </SheetContent>
+
   </ContentLayout>
 </template>
 
 <script lang="ts" setup>
 import { ref, computed } from 'vue'
-import { ChevronsLeft, ChevronsRight, Menu as MenuIcon } from 'lucide-vue-next'
+import { ChevronsLeft, ChevronsRight, Menu as MenuIcon, X } from 'lucide-vue-next'
 import { useDateFormatter, useForwardPropsEmits } from 'radix-vue'
 import { createDecade, createYear, toDate } from 'radix-vue/date'
 import { DateValue, getLocalTimeZone, today } from '@internationalized/date'
+
+import type { FilterFormSchema } from './components/filter-form-schema'
+import type { Organization } from '~/models/organizations'
+import { GlobalType } from '~/types/Common'
 
 import Button from '~/components/ui/button/Button.vue'
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
@@ -194,13 +223,65 @@ import {
 import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue'
 import SimpleCalendar from '~/components/ui/calendar/SimpleCalendar.vue'
 import type { Event } from '~/types/Payment'
-import type { Organization } from '~/models/organizations'
 import { parseISO,isEqual, formatDistanceToNow, differenceInSeconds } from 'date-fns'
+import FilterCalendar from './FilterCalendar.vue'
+import { getCalculatedFilterFormSchema } from './month-select'
+import { MonthSelect } from './month-select'
 
+const allOrganizations = ref<Organization[]>([])
+const fetchOrganizations = async () => {
+  const { data } = await useAPI('/organization-management/find-organizations', {
+    method: 'GET',
+    default: () => [],
+  })
+  allOrganizations.value = data.value as any
+}
 
+const userSessionExtended = useUserSessionExtended()
+
+if (userSessionExtended.globalType === GlobalType.Platform) {
+  await fetchOrganizations()
+}
+
+const filterFormValues = ref<FilterFormSchema>({
+  ...getCalculatedFilterFormSchema(MonthSelect.ThisMonth),
+  organizations:
+    userSessionExtended.globalType === GlobalType.Platform
+      ? allOrganizations.value.map((org) => org.id)
+      : undefined,
+})
+const isSheetOpen = ref(false)
+const openModal = () => {
+  isSheetOpen.value = true
+}
+
+const onSubmit = async (newValues) => {
+  // Actualizar los valores del formulario de filtro
+  filterFormValues.value = {
+    ...getCalculatedFilterFormSchema(
+      newValues.monthSelect,
+      newValues.rangeStart,
+      newValues.rangeEnd,
+    ),
+    organizations: newValues.organizations,
+  }
+
+  // Actualizar las organizaciones seleccionadas
+  if (newValues.organizations?.length) {
+    selectedOrganizations.value = allOrganizations.value.filter(org =>
+      newValues.organizations.includes(org.id)
+    )
+  }
+
+  // Recargar los eventos con los nuevos filtros
+  //await fetchEvents()
+  //await fetchEventCounts()
+
+  // Cerrar el modal de filtros
+  isSheetOpen.value = false
+}
 const selectedDate = ref<DateValue>(today(getLocalTimeZone()))
 const events = ref<any[] | null>(null)
-const allEvents = ref<any[]>([])
 
 const selectedOrganizations = ref<Organization[]>([])
 
@@ -267,48 +348,48 @@ const fetchEventCounts = async () => {
     console.warn("No se recibieron datos válidos del endpoint.");
   }
 }
-const fetchEvents = async (selectedDate?: Date) => {
+const fetchEvents = async (selectedDate?: Date | null) => {
+  events.value = null // Mostrar estado de carga
+
   const { data } = await useAPI('/event-management/get-events-for-calendar', {
     method: 'POST',
     body: {
-      selectedDate: selectedDate ? selectedDate : null,
-      organizationIds: selectedOrganizations.value.map((e) => e.id),
+      selectedDate: selectedDate || null,
+      organizationIds: filterFormValues.value.organizations,
+      rangeStart: filterFormValues.value.rangeStart,
+      rangeEnd: filterFormValues.value.rangeEnd
     },
     default: () => ([]),
   })
 
   if (data?.value && Array.isArray(data.value)) {
-    if (selectedDate) {
-      events.value = data.value.filter(event =>
-        isEqual(parseISO(event.startDate), selectedDate)
-      )
-    } else {
-      events.value = data.value
-    }
+    events.value = data.value
   } else {
     events.value = []
     console.warn('No se encontraron eventos o los datos no son válidos')
   }
 }
-const fetchOrganizations = async () => {
-  const { data } = await useAPI('/organization-management/find-organizations', {
-    method: 'GET',
-    default: () => [],
-  })
-  selectedOrganizations.value = data.value as any
-}
+
+// Agregar un watcher para los cambios en los filtros
+watch(
+  () => filterFormValues.value,
+  async (newValues) => {
+    if (newValues) {
+      await fetchEvents()
+      await fetchEventCounts()
+    }
+  },
+  { deep: true }
+)
 
 onMounted(async () => {
   await fetchOrganizations()
-  await fetchEvents()
   await fetchEventCounts()
+  //await fetchEvents()
 })
 
 watch(selectedDate, (newDate) => {
   fetchEvents(toDate(newDate))
-})
-const displayAllEvents = computed(() => {
-  return allEvents.value
 })
 
 const formatter = useDateFormatter('es')
@@ -357,11 +438,20 @@ const navigatePrevious = () => {
 }
 
 const navigateNext = () => {
+  const today = new Date()
+  const startValidDate = new Date(today.getFullYear(), 10, 20) // 20 de noviembre
+  const nextYear = today.getFullYear() + 1
+  const endValidDate = new Date(nextYear, 0, 31) // 31 de enero
+
   const newDate = selectedDate.value.add({ days: 1 })
-  if (newDate > new Date('2100-12-31')) {
-    console.warn('No puedes navegar a una fecha futura fuera de rango')
+
+  // Verificar si la nueva fecha está dentro del rango
+  if (newDate > endValidDate) {
+    console.warn('No puedes avanzar más allá del 31 de enero')
     return
   }
+
+
   selectedDate.value = newDate
 }
 const toggleSidebar = () => {
