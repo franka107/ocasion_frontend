@@ -1,4 +1,5 @@
 import type { UserDto } from './Administrators'
+import type { BidDto } from './Bids'
 import type { IEventLItem } from './Event'
 import type { Organization } from '~/models/organizations'
 
@@ -78,7 +79,8 @@ export interface OfferDto {
   createdAt: string
   updatedAt: string
   event?: IEventLItem
-  organization?: Organization
+  organization: Organization
+  bids: BidDto[]
   organizationId: string
   eventId?: string
 }

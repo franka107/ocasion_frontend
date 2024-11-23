@@ -174,10 +174,16 @@ const fetchRoles = async (filters: FilterOption[]) => {
     console.error('Error al cargar roles:', error)
   }
 }
-// Fetch organizations and roles
 
-// await fetchData(`${BASE_ROLE_URL}/find-roles`, roles)
-await fetchRoles([{ field: 'type', value: globalType, type: 'equal' }])
+if (props.id) {
+  const user = await getUser(props.id)
+  const userType = userTypeToGlobal(
+    user.data.value.type || UserType.OrganizationUser,
+  )
+  await fetchRoles([{ field: 'type', value: userType, type: 'equal' }])
+} else {
+  await fetchRoles([{ field: 'type', value: globalType, type: 'equal' }])
+}
 
 const form = useForm({
   validationSchema: formSchema,
@@ -219,9 +225,7 @@ const formattedOrganizations = computed(() => {
   }))
 })
 
-watch(form.values, (newValues) => {
-  console.log('Form values:', newValues)
-})
+watch(form.values, (newValues) => {})
 
 // Submit handler
 const onSubmit = form.handleSubmit((values: any) => {
@@ -276,6 +280,7 @@ const handleUserTypeChange = async (userType: UserType) => {
 
     const matchingRole = roles.value.find((role) => role.id === userType)
     if (matchingRole) {
+      // QUACK
       form.setFieldValue('roles', [matchingRole.id]) // Set the role automatically
     }
   } else {
@@ -289,18 +294,14 @@ const handleUserTypeChange = async (userType: UserType) => {
 }
 
 const handleOrganizationChange = (organizationId: any) => {
-  roles.value = []
   const currentUserType: UserType = form.values.type
   const globalType: GlobalType = userTypeToGlobal(currentUserType)
-  const filters: FilterOption[] = []
 
   if (
     globalType === GlobalType.Organization &&
     typeof organizationId === 'string'
   ) {
     fetchRoles([
-      // { field: 'type', value: GlobalType.Organization, type: 'equal' },
-
       {
         field: 'organizations.id',
         value: organizationId,
