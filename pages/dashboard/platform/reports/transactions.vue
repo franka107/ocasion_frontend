@@ -1,20 +1,39 @@
 <template>
-    <ContentLayout title="Recargas">
-      <CustomSimpleCard
-        title="Listado de recargas"
-        class="mb-6"
-        sub-title="Vizualización de las recargas realizadas por los participantes"
-      />
-  
+    <ContentLayout title="Reporte de transacciones (Global)">
+      <TransactionsDetails />
       <div class="w-full flex flex-col">
         <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
           <CustomTable
-            :data="rechargeData"
-            :header="rechargeHeader"
-            :search="rechargeSearch"
+            :data="transactionsData"
+            :header="transactionsHeader"
+            :search="transactionsSearch"
             @on-sort="onSort"
             @on-search="onSearch"
           >
+          <template #action-button>
+            <div class="flex">
+                <Button
+                variant="default"
+                class="text-[#F97316] bg-white hover:text-white hover:bg-[#F97316] mr-[8px]"
+                @click="
+                    () => {
+                    
+                    }
+                "
+                >Mas filtros</Button>
+                <Button
+                variant="default"
+                @click="
+                    () => {
+                    
+                    }
+                "
+                >
+                <CustomIcons name="Download" class="ml-auto" />
+                Exportar
+                </Button>
+            </div>
+          </template>
             <template #actions="{ row }">
               <div class="flex justify-center">
                 <DropdownMenu>
@@ -31,25 +50,15 @@
                     align="start"
                     class="bg-primary text-white"
                   >
-                    <DropdownMenuItem 
-                        @click="openModal(true)"
-                      >
-                        Detalle solicitud
-                        <CustomIcons name="EyeIcon" class="ml-auto" />
+                    <DropdownMenuItem>
+                       <NuxtLink
+                        class="flex justify-between w-full"
+                        :to="`/dashboard/platform/events/${row.id}`"
+                        >
+                        Estado de cuenta
+                        <CustomIcons name="EyeIcon" class="ml-[14px]" />
+                      </NuxtLink>
                     </DropdownMenuItem>               
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                        :disabled="row.status === 'ACTIVE'"
-                        @click="openModal(false)"
-                      >
-                       Editar solicitud
-                        <CustomIcons name="Pen" class="ml-auto" />
-                      </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                      <DropdownMenuItem @click="openParticipantDetail(row)">
-                        Detalle participante
-                        <CustomIcons name="EyeIcon" class="ml-[10px]" />
-                      </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -66,8 +75,8 @@
             </template>
             <template #status="{ row }">
               <CustomChip
-              :text="rechargeStatus.get(row.status)?.name || ''"
-              :variant="rechargeStatus.get(row.status)?.color as any"
+              :text="transactionsStatus.get(row.status)?.name || ''"
+              :variant="transactionsStatus.get(row.status)?.color as any"
               ></CustomChip>
             </template>
           </CustomTable>
@@ -92,7 +101,6 @@
             @interact-outside="(e) => e.preventDefault()"
           >
             <ParticipantDetailForm 
-            :firstName="participantInfo.firstName"
             :onSubmit="onParticipantSubmit" 
             />
           </SheetContent>
@@ -100,8 +108,8 @@
         <CustomPagination
           v-model:page="page"
           class="mt-5 mb-[19px]"
-          :total="data.count"
-          :limit="data.limit"
+          :total="1"
+          :limit="1"
         />
       </div>
     </ContentLayout>
@@ -111,26 +119,24 @@
   import CustomChip from '~/components/ui/custom-chip/CustomChip.vue'
   import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue'
   import CustomPagination from '~/components/ui/custom-pagination/CustomPagination.vue'
-  import type { IRecharge , Participant } from '~/types/Recharge'
+  import type { OrganizationItem } from '~/types/Order.ts'
   import {
-    rechargeStatus,
-    rechargeHeader,
-    rechargeSearch,
-  } from '~/constants/attention-tray'
+    transactionsStatus,
+    transactionsHeader,
+    transactionsSearch,
+  } from '~/constants/reports'
   import ContentLayout from '~/layouts/default/ContentLayout.vue'
   import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
   import ApplicationForm from '~/components/attention-tray/top-up-requests/ApplicationForm.vue'
   import ParticipantDetailForm from '~/components/attention-tray/top-up-requests/ParticipantDetailForm.vue'
   import { ref } from 'vue' 
-  import dayjs from 'dayjs'
+  import TransactionsDetails from '~/components/reports/transactions/TransactionsDetails.vue'
   const openApplicationModal = ref(false); 
   const openParticipantModal = ref(false); 
   const {
     page,
     onSort,
     onSearch,
-    filterOptions,
-    sortOptions,
   } = useTopUpRequests()
   const onSubmit = (formData: any) => {
     console.log("Formulario enviado:", formData);
@@ -143,46 +149,37 @@
   const rechargeId = ref<number | undefined>(undefined)
   const { openConfirmModal, updateConfirmModal } = useConfirmModal()
   const rechargeModal = ref<any>({ offerId: '' })
-  const BASE_RECHAR_URL = '/finance/recharge-request-management'
-  const { data, refresh }: any = await useAPI(
-    `${BASE_RECHAR_URL}/view-paginated-recharge-requests`,
-    {
-      query: {
-        limit: 8,
-        page,
-        filterOptions,
-        sortOptions,
-      },
-    } as any,
-  )
-  const rechargeData = computed(() =>
-    data.value?.data.map((item: any) => ({
-      fullName:item.participant.commonName,
-      ...item,
-      transferedAt:dayjs(item.transferedAt).format('YYYY-MM-DD'),
-      updatedAt:dayjs(item.updatedAt).format('YYYY-MM-DD'),
-    })),
-  )
-  const isEditing = ref(false); 
-  const openModal = (editMode: boolean) => {
-    isEditing.value = editMode;
-    openApplicationModal.value = true;
-  };
-  const openParticipantDetail = (row: any) => {
-    console.log('Abriendo detalle del participante:', row);
-    openParticipantModal.value = true;
-  };
-  const participantInfo = ref<any>({
-    firstName: '',
-    lastName:'',
-    documentType: '',
-    documentIdentifier:'',
-    phoneNumber:'',
-    email:'',
-    gender:'',
-    maritalStatus:'',
-    birthDate:'',
-    status:'',
-  })
+  const data = [
+  {
+    id: '000',
+    fullName:'Jose Perez Perez',
+    document:'DNI 87654321',
+    typeOfOperation:'Recarga de monedero',
+    dateOfOperation: '2024-11-01',
+    amount: '$ 1’000.00',
+    status: 'AUTHORIZED',
+    actions: '',
+  },
+  {
+    id: '000',
+    fullName:'Rosi Ferri Lombardi',
+    document:'DNI 43544321',
+    typeOfOperation:'Retiro de saldo',
+    dateOfOperation: '2024-12-01',
+    amount: '$ 1’000.00',
+    status: 'ABANDONED',
+    actions: '',
+  },
+];
+const transactionsData = computed(() => data);
+const isEditing = ref(false); 
+const openModal = (editMode: boolean) => {
+  isEditing.value = editMode;
+  openApplicationModal.value = true;
+};
+const openParticipantDetail = (row: any) => {
+  console.log('Abriendo detalle del participante:', row);
+  openParticipantModal.value = true;
+};
   </script>
   

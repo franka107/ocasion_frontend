@@ -7,6 +7,7 @@ import { useForm } from 'vee-validate';
 import InputFile from '@/components/common/file/Input.vue';
 
 const props = defineProps<{
+  firstName:string
   onSubmit: (values: any) => void;
 }>();
 
@@ -14,7 +15,7 @@ const emit = defineEmits(['update:modelValue']);
 
 const formSchema = toTypedSchema(
   z.object({
-    name: z
+    firstName: z
       .string()
       .min(1, 'El nombre del evento es requerido.')
       .max(200, 'El nombre del evento no puede superar los 200 caracteres'),
@@ -67,11 +68,24 @@ const onSubmit = form.handleSubmit((values) => {
                     <FormField v-slot="{ componentField }" name="firstName">
                         <FormItem>
                         <FormControl>
-                            <CustomInput type="text" label="Nombres" v-bind="componentField" disabled />
+                            <CustomInput 
+                            type="text" 
+                            label="Nombres" 
+                            :model-value="props.firstName"
+                            disabled />
                         </FormControl>
                         <FormMessage />
                         </FormItem>
                     </FormField>
+                    <CustomInput
+                        class="h-14 w-full"
+                        type="number"
+                        label="Tasación"
+                        :model-value="props.firstName"
+                        :disabled="true"
+                        label-offset
+                    >
+                    </CustomInput>
                     <!-- Apellidos  -->
                     <FormField v-slot="{ componentField }" name="lastName">
                         <FormItem>

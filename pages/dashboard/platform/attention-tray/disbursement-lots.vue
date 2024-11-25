@@ -14,14 +14,19 @@
           :search="disbursementSearch"
           @on-sort="onSort"
           @on-search="onSearch"
-          multiple-select
-          @on-multiple-select="
-            ({ ids, type, resetMultipleSelect: onResetMultipleSelect }) => {
-              selectedMultipleData = { ids, type }
-              resetMultipleSelect = onResetMultipleSelect
-            }
-          "
         >
+        <template #action-button>
+            <Button
+              variant="default"
+              @click="
+                () => {
+                  openModalGenerate = true
+                  
+                }
+              "
+              >Generar lote</Button
+            >
+          </template>
           <template #actions="{ row }">
             <div class="flex justify-center">
               <DropdownMenu>
@@ -39,7 +44,14 @@
                   class="bg-primary text-white"
                 >
                   <DropdownMenuItem 
-                      @click="openModal(true)"
+                      @click=" () => {
+                        openModalConfirm = true
+                        confirmModalInfo = {
+                          paymentSupportFile: row.paymentSupportFile,
+                          disbursedAt: row.disbursedAt,
+                          id: row.id,
+                        }
+                        }"
                     >
                      Confirmar lote
                       <CustomIcons name="Check" class="ml-4" />
@@ -47,13 +59,13 @@
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                       :disabled="row.status === 'ACTIVE'"
-                      @click="openModal(false)"
+                      @click="handleAnnul(row)"
                     >
                      Anular lote
                       <CustomIcons name="X" class="ml-auto" />
                     </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                    <DropdownMenuItem @click="openParticipantDetail(row)">
+                    <DropdownMenuItem @click="openParticipantDetail(row.id)">
                       Detalle 
                       <CustomIcons name="EyeIcon" class="ml-auto" />
                     </DropdownMenuItem>
@@ -73,24 +85,11 @@
           </template>
           <template #status="{ row }">
             <CustomChip
-            :text="rechargeStatus.get(row.status)?.name || ''"
-            :variant="rechargeStatus.get(row.status)?.color as any"
+            :text="disbursementStatus.get(row.status)?.name || ''"
+            :variant="disbursementStatus.get(row.status)?.color as any"
             ></CustomChip>
           </template>
         </CustomTable>
-        <SheetContent
-          v-model:open="openApplicationModal"
-          class="flex flex-col h-full"
-          custom-width="510px"
-          @pointer-down-outside="(e) => e.preventDefault()"
-          @interact-outside="(e) => e.preventDefault()"
-          >
-          <ApplicationForm
-          :isEditing="!isEditing" 
-          :title="isEditing ? 'Editar solicitud' : 'Detalle solicitud'"
-          :on-submit="onSubmit"
-          />
-        </SheetContent>
         <SheetContent
           v-model:open="openParticipantModal"
           class="flex flex-col h-full"
@@ -102,12 +101,26 @@
           :onSubmit="onParticipantSubmit" 
           />
         </SheetContent>
+        <GenerateDisbursementBatchModal
+          :id="generateDisbursementForm.id"
+          v-model="openModalGenerate"
+          :bank="generateDisbursementForm.bank"
+          @onsubmit="handleGenerateDisbursement"
+          :refresh-table="refresh"
+        />
+        <ConfirmDisbursementModal
+          :id="confirmModalInfo.id"
+          v-model="openModalConfirm"
+          :payment-support-file="confirmModalInfo.paymentSupportFile"
+          :disbursed-at="confirmModalInfo.disbursedAt"
+          :refresh-table="refresh"
+        />
       </div>
       <CustomPagination
         v-model:page="page"
         class="mt-5 mb-[19px]"
-        :total="1"
-        :limit="1"
+        :total="data.count"
+        :limit="data.limit"
       />
     </div>
   </ContentLayout>
@@ -117,16 +130,18 @@ import CustomTable from '~/components/ui/custom-table/CustomTable.vue'
 import CustomChip from '~/components/ui/custom-chip/CustomChip.vue'
 import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue'
 import CustomPagination from '~/components/ui/custom-pagination/CustomPagination.vue'
-import type { OrganizationItem } from '~/types/Order.ts'
+import type { IGenerateForm } from '~/types/Disbursement'
 import {
-    rechargeStatus,
+    disbursementStatus,
     disbursementHeader,
     disbursementSearch,
 } from '~/constants/attention-tray'
+import dayjs from 'dayjs'
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
 import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
-import ApplicationForm from '~/components/attention-tray/top-up-requests/ApplicationForm.vue'
 import ParticipantDetailForm from '~/components/attention-tray/top-up-requests/ParticipantDetailForm.vue'
+import GenerateDisbursementBatchModal from '~/components/attention-tray/disbursement-lots/GenerateDisbursementBatchModal.vue'
+import ConfirmDisbursementModal from '~/components/attention-tray/disbursement-lots/ConfirmDisbursementModal.vue'
 import { ref } from 'vue' 
 const openApplicationModal = ref(false); 
 const openParticipantModal = ref(false); 
@@ -134,17 +149,14 @@ const {
   page,
   onSort,
   onSearch,
-} = useTopUpRequests()
-const selectedMultipleData = ref<{ type: string; ids: string[] }>({
-  type: 'empty',
-  ids: [],
-})
-const resetMultipleSelect = ref<Function | undefined>(undefined)
-const disableMultipleSelect = computed(
-  () =>
-    selectedMultipleData.value.type === 'empty' &&
-    selectedMultipleData.value.ids.length === 0,
-)
+  filterOptions,
+  sortOptions,
+  annulDisbursement,
+  confirmDisbursement, 
+} = useDisbursement()
+const openModalGenerate= ref(false)
+const openModalConfirm = ref(false)
+const openAnnulModal = ref(false)
 const onSubmit = (formData: any) => {
   console.log("Formulario enviado:", formData);
   openApplicationModal.value = false; 
@@ -155,35 +167,71 @@ const onParticipantSubmit = (formData: any) => {
 };
 const rechargeId = ref<number | undefined>(undefined)
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
-const rechargeModal = ref<any>({ offerId: '' })
-const data = [
-{
-  lotCode: '000',
-  fullName: 'Santin D’Agostini',
-  dateOfRegistration: '2024-12-01',
-  amount: '$ 1’000.00',
-  bank: 'Banco de crédito',
-  status: 'EARRING',
-  actions: '',
-},
-{
-  lotCode: '000',
-  fullName: 'Franceschi De Biasio',
-  dateOfRegistration: '2024-12-01',
-  amount: '$ 1’000.00',
-  bank: 'Banco de crédito',
-  status: 'EARRING',
-  actions: '',
-},
-];
-const disbursementData = computed(() => data);
-const isEditing = ref(false); 
-const openModal = (editMode: boolean) => {
-isEditing.value = editMode;
-openApplicationModal.value = true;
+const BASE_DIS_URL = '/finance/disbursement-management'
+const { data, refresh }: any = await useAPI(
+  `${BASE_DIS_URL}/view-paginated-disbursement-lots`,
+  {
+    query: {
+      limit: 8,
+      page,
+      filterOptions,
+      sortOptions,
+    },
+  } as any,
+)
+
+const disbursementData = computed(() =>
+  data.value?.data.map((item: any) => ({   
+    ...item,
+  })),
+)
+const confirmModalInfo = ref<any>({
+  id: '',
+  paymentSupportFile: {},
+  disbursedAt:{}
+})
+const generateDisbursementForm = ref<any>({
+  id: '',
+  paymentMethod: '',
+  currency: '',
+  bank: '',
+  chargeAccount: '',
+  paymentMedium: '',
+})
+const handleGenerateDisbursement = (formData: any) => {
+  console.log('Lote generado con los datos:', formData);
+  openModalGenerate.value = false;
 };
 const openParticipantDetail = (row: any) => {
 console.log('Abriendo detalle del participante:', row);
 openParticipantModal.value = true;
 };
+const handleAnnul = async (values: any) => {
+  openConfirmModal({
+    title: 'Anular lote de desembolso',
+    message: '¿Está seguro que desea anular el lote de desembolso?',
+    callback: async () => {
+      const { status, error }: any = await annulDisbursement(values)
+      if (status.value === 'success') {
+        openAnnulModal.value = false
+        refresh()
+        updateConfirmModal({
+          title: 'Desembolso anulado',
+          message: 'Se ha anulado el lote de desembolso',
+          type: 'success',
+        })
+      } else {
+        const eMsg =
+          error.value.data?.errors?.[0].message ||
+          error.value.data.message ||
+          'El desembolso no se pudo anular, intentalo más tarde'
+        updateConfirmModal({
+          title: 'Error al anular el desembolso',
+          message: eMsg,
+          type: 'error',
+        })
+      }
+    },
+  })
+}
 </script>
