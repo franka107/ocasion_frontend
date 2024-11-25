@@ -89,6 +89,44 @@ export const offerStatusRecord: Record<
     flowPosition: 16,
   },
 }
+export enum ComparisonOperator {
+  Greater = 'greater',
+  Less = 'less',
+  Equal = 'equal',
+  GreaterOrEqual = 'greaterOrEqual',
+  LessOrEqual = 'lessOrEqual',
+}
+
+const getSortedOfferStatus = (): OfferStatus[] => {
+  return Object.entries(offerStatusRecord)
+    .sort(([, a], [, b]) => a.flowPosition - b.flowPosition) // Ordenar por flowPosition
+    .map(([status]) => status as OfferStatus) // Obtener solo las claves como OfferStatus
+}
+
+export const offerStatusCheckPosition = (
+  offerStatus: OfferStatus,
+  comparedOfferStatus: OfferStatus,
+  operator: ComparisonOperator,
+): boolean => {
+  const offerStatusFlowPositions = getSortedOfferStatus()
+  const position1 = offerStatusFlowPositions.indexOf(offerStatus)
+  const position2 = offerStatusFlowPositions.indexOf(comparedOfferStatus)
+
+  switch (operator) {
+    case ComparisonOperator.Greater:
+      return position1 > position2
+    case ComparisonOperator.Less:
+      return position1 < position2
+    case ComparisonOperator.Equal:
+      return position1 === position2
+    case ComparisonOperator.GreaterOrEqual:
+      return position1 >= position2
+    case ComparisonOperator.LessOrEqual:
+      return position1 <= position2
+    default:
+      throw new Error(`Unsupported operator: ${operator}`)
+  }
+}
 
 export const offerSearch: SearchItem[] = [
   {

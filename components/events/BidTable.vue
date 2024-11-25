@@ -65,6 +65,11 @@
                     v-if="
                       myGrants.data.value.includes(
                         GrantId.OrganizationBidCanCounterOffer,
+                      ) &&
+                      offerStatusCheckPosition(
+                        row.offer.status,
+                        OfferStatus.Concreted,
+                        ComparisonOperator.Less,
                       )
                     "
                     @click="
@@ -89,7 +94,7 @@
                       () => {
                         bidsId = row.id
                         openAppraisalHistoryModal = true
-                        appraisalHistoryModal = { offerId: row.id }
+                        appraisalHistoryModal = { offerId: row.offer.id }
                       }
                     "
                   >
@@ -150,6 +155,7 @@ import { bidsHeader, bidsSearch, bidStatus } from '@/constants/bids'
 import { BidStatus, type BidDto, type OfferWithBidDto } from '~/types/Bids'
 import { OfferStatus, type IAmountHistoryModal } from '~/types/Offer'
 import { GrantId } from '~/types/Grant'
+import { ComparisonOperator, offerStatusCheckPosition } from '~/constants/offer'
 
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const { rejectOfferBids, acceptOfferBids, page, sortOptions, onSort } =

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { X } from 'lucide-vue-next'
+import { format } from 'date-fns'
+import { es } from 'date-fns/locale'
 import { userType } from '~/constants/administrators'
 const props = defineProps<{
   bidId: string
@@ -23,23 +25,17 @@ const fetchBidHistory = async (offerId: string) => {
       default: () => [],
       query: {
         filterOptions: JSON.stringify([
-          { field: 'bid.id', type: 'equal', value: offerId },
+          { field: 'offer.id', type: 'equal', value: offerId },
         ]),
       },
     })
     dateHistory.value = data.value.map((item: any) => ({
-      id: item.id,
-      user: item.user,
-      initialAmount: item.initialAmount,
-      modifiedAmount: item.modifiedAmount,
-      createdAt: new Date(item.createdAt).toLocaleString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true,
-      }),
+      // id: item.id,
+      // user: item.user,
+      // initialAmount: item.initialAmount,
+      // modifiedAmount: item.modifiedAmount,
+      ...item,
+      createdAt: format(item.createdAt, 'dd/MM/yyyy, hh:mm a', { locale: es }),
     }))
   } catch (error) {
     console.error('Error al cargar historial', error)
@@ -76,12 +72,12 @@ await fetchBidHistory(props.bidId)
                     USUARIO
                   </div>
                   <div class="text-sm text-[#152A3C] font-[500]">
-                    {{ item.user.commonName }}
+                    {{ item.newBid.user.commonName }}
                   </div>
                 </div>
 
                 <Badge class="text-[10px]">{{
-                  userType.get(item.user.type)
+                  userType.get(item.newBid.user.type)
                 }}</Badge>
               </div>
               <div
@@ -92,10 +88,10 @@ await fetchBidHistory(props.bidId)
               </div>
               <div class="flex justify-between">
                 <div class="text-[#152A3C] font-[500]">
-                  $ {{ item.initialAmount.toLocaleString() }}
+                  $ {{ item.pastBid.amount.toLocaleString() }}
                 </div>
                 <div class="text-[#152A3C] font-[500]">
-                  $ {{ item.modifiedAmount.toLocaleString() }}
+                  $ {{ item.newBid.amount.toLocaleString() }}
                 </div>
               </div>
             </div>

@@ -9,6 +9,7 @@ export const userType = new Map<string, string>([
   ['ORGANIZATION_ADMIN', 'Administrador de organizacion'],
   ['SUPER_ADMIN', 'Super administrador'],
   ['ORGANIZATION_USER', 'Usuario de organizacion'],
+  ['PARTICIPANT', 'Participante'],
 ])
 
 export const administratorsSearch = (viewType: ViewType): SearchItem[] => [

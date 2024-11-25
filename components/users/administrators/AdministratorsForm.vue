@@ -485,13 +485,14 @@ const handleOrganizationChange = (organizationId: any) => {
               v-bind="componentField"
               multiple
               :items="rolesFiltered"
+              placeholder="Rol Usuario"
               :disabled="
                 [UserType.PlatformAdmin, UserType.OrganizationAdmin].includes(
                   form.values.type,
                 )
               "
-              placeholder="Rol Usuario"
-            />
+            >
+            </CustomSelect>
           </FormControl>
           <FormMessage />
         </FormItem>
