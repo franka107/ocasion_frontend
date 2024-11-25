@@ -143,6 +143,7 @@ import ParticipantDetailForm from '~/components/attention-tray/top-up-requests/P
 import GenerateDisbursementBatchModal from '~/components/attention-tray/disbursement-lots/GenerateDisbursementBatchModal.vue'
 import ConfirmDisbursementModal from '~/components/attention-tray/disbursement-lots/ConfirmDisbursementModal.vue'
 import { ref } from 'vue' 
+import { useDisbursement } from '@/composables/useDisbursement'
 const openApplicationModal = ref(false); 
 const openParticipantModal = ref(false); 
 const {
@@ -152,7 +153,6 @@ const {
   filterOptions,
   sortOptions,
   annulDisbursement,
-  confirmDisbursement, 
 } = useDisbursement()
 const openModalGenerate= ref(false)
 const openModalConfirm = ref(false)

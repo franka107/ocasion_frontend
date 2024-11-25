@@ -7,8 +7,6 @@ import { useForm } from 'vee-validate';
 import InputFile from '@/components/common/file/Input.vue';
 
 const props = defineProps<{
-  firstName:string
-  onSubmit: (values: any) => void;
 }>();
 
 const emit = defineEmits(['update:modelValue']);
@@ -61,7 +59,7 @@ const onSubmit = form.handleSubmit((values) => {
     </SheetHeader>
 
     <div class="flex-grow overflow-y-auto no-scrollbar flex flex-col">
-        <form class="flex flex-col gap-6 flex-grow pb-[32px] pt-[40px] px-6 gap-y-[24px]" @submit="onSubmit">
+        <form class="flex flex-col gap-6 flex-grow pb-[32px] pt-[40px] px-6 gap-y-[24px]" >
             <section class="flex-grow">
                 <div class="grid grid-cols-1 gap-4 mb-[24px]">
                     <!-- Nombre  -->
@@ -71,21 +69,12 @@ const onSubmit = form.handleSubmit((values) => {
                             <CustomInput 
                             type="text" 
                             label="Nombres" 
-                            :model-value="props.firstName"
+                            v-bind="componentField"
                             disabled />
                         </FormControl>
                         <FormMessage />
                         </FormItem>
                     </FormField>
-                    <CustomInput
-                        class="h-14 w-full"
-                        type="number"
-                        label="Tasación"
-                        :model-value="props.firstName"
-                        :disabled="true"
-                        label-offset
-                    >
-                    </CustomInput>
                     <!-- Apellidos  -->
                     <FormField v-slot="{ componentField }" name="lastName">
                         <FormItem>

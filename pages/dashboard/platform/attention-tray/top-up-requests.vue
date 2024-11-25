@@ -46,7 +46,8 @@
                         <CustomIcons name="Pen" class="ml-auto" />
                       </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                      <DropdownMenuItem @click="openParticipantDetail(row)">
+                      <DropdownMenuItem 
+                      @click="openParticipantDetail(row)">
                         Detalle participante
                         <CustomIcons name="EyeIcon" class="ml-[10px]" />
                       </DropdownMenuItem>
@@ -92,8 +93,7 @@
             @interact-outside="(e) => e.preventDefault()"
           >
             <ParticipantDetailForm 
-            :firstName="participantInfo.firstName"
-            :onSubmit="onParticipantSubmit" 
+            :id="rechargeId"
             />
           </SheetContent>
         </div>
@@ -169,6 +169,7 @@
     openApplicationModal.value = true;
   };
   const openParticipantDetail = (row: any) => {
+    rechargeId.value = row.id
     console.log('Abriendo detalle del participante:', row);
     openParticipantModal.value = true;
   };
