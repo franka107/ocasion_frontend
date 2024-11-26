@@ -82,14 +82,36 @@ export function getMenuList(
       ...(grants.includes(GrantId.PlatformKpisManagement)
         ? [
             {
-              href: '/dashboard/platform/graphics',
+              // href: '/dashboard/platform/graphics',
               label: 'Dashboard',
-              active: pathname === '/dashboard/platform/graphics',
+              active: pathname === '/dashboard/platform/kpi',
               icon: 'Dashboard',
-              submenus: [],
+              submenus: [
+                ...(grants.includes(GrantId.PlatformKpisManagement)
+                  ? [
+                      {
+                        href: '/dashboard/platform/kpi/graphics',
+                        label: 'Gráficos',
+                        active: pathname.includes('/platform/kpi/graphics'),
+                        // active: pathname === "/users/administrators",
+                      },
+                    ]
+                  : []),
+                ...(grants.includes(GrantId.PlatformKpisManagement)
+                  ? [
+                      {
+                        href: '/dashboard/platform/kpi/calendar',
+                        label: 'Calendario de programaciones',
+                        active: pathname.includes('/platform//kpi/calendar'),
+                        // active: pathname === "/users/participants",
+                      },
+                    ]
+                  : []),
+              ],
             },
           ]
         : []),
+
       ...(grants.includes(GrantId.PlatformOrganizationsManagement)
         ? [
             {

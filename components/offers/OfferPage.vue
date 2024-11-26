@@ -16,6 +16,7 @@
           </Button>
         </template>
       </EventDetails>
+
       <div>
         <OfferTable />
       </div>
@@ -28,6 +29,7 @@ import OfferTable from '@/components/events/OfferTable.vue'
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
 import { EventStatus } from '~/types/Event'
 import { GrantId } from '~/types/Grant'
+import { eventStatus } from '~/constants/events'
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const { publishEvent } = useEvent()
 

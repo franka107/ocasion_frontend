@@ -18,38 +18,45 @@ export const administratorsSearch = (viewType: ViewType): SearchItem[] => [
         {
           key: 'organizationName',
           type: 'text' as any,
-          placeholder: 'Buscar por organización',
+          label: 'Buscar por organización',
           position: 1,
         },
       ]),
   {
     key: 'fullName',
     type: 'text',
-    placeholder: 'Buscar por nombre y apellidos',
+    label: 'Nombres y apellidos',
     position: 1,
   },
   {
     key: 'email',
     type: 'text',
-    placeholder: 'Buscar por email',
+    label: 'Buscar por email',
     position: 1,
   },
   {
     key: 'phoneNumber',
     type: 'text',
-    placeholder: 'N. Celular',
+    label: 'N. Celular',
     position: 1,
   },
+  // {
+  //   key: 'createdAt',
+  //   type: 'date',
+  //   placeholder: 'Fecha de creación',
+  //   position: 1,
+  // },
   {
     key: 'createdAt',
-    type: 'date',
-    placeholder: 'Fecha de creación',
-    position: 1,
+    type: 'date-range',
+    label: 'Fecha de creación',
+    placeholder: 'Inicio',
+    width: 'w-auto',
   },
   {
     key: 'status',
     type: 'select',
-    placeholder: 'Filtrar estados',
+    label: 'Filtrar estados',
     items: [
       { text: 'Activo', value: 'ACTIVE' },
       { text: 'Suspendido', value: 'SUSPENDED' },
@@ -65,8 +72,8 @@ export const administratorsHeader = (viewType: ViewType): HeaderItem[] => [
     ? []
     : [
         {
-          key: 'organization',
-          label: 'Organización',
+          key: 'organizations',
+          label: 'Organización/es',
           sortable: true,
         },
       ]),

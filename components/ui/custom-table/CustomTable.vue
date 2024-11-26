@@ -2,88 +2,91 @@
   <div class="w-full">
     <div class="w-full flex flex-row flex-wrap py-6 gap-4 justify-between">
       <div class="flex flex-wrap justify-start gap-4">
-      <template v-for="(item, i) in search" :index="i">
-        <template v-if="item">
-          <div :class="cn('flex flex-col w-[200px]', item.width)">
-            <label
-              v-if="item.label"
-              class="text-sm font-medium text-gray-700 mb-[6px]"
-            >
-              {{ item.label }}
-            </label>
-            <template v-if="item.type === 'text'">
-              <Input
-                v-model="searchValues[item.key] as string | undefined"
-                type="string"
-                :class="item.elementClass"
-                :placeholder="item.placeholder"
-                class="w-[200px]"
-              />
-            </template>
-            <template v-else-if="item.type === 'select'">
-              <Select
-                :model-value="searchValues[item.key] as string | undefined"
-                :class="item.elementClass"
-                @update:model-value="
-                  (event) => {
-                    searchValues[item.key] = event === ' ' ? undefined : event
-                  }
-                "
+        <template v-for="(item, i) in search" :index="i">
+          <template v-if="item">
+            <div :class="cn('flex flex-col w-[200px]', item.width)">
+              <label
+                v-if="item.label"
+                class="text-sm font-medium text-gray-700 mb-[6px]"
               >
-                <SelectTrigger class="w-[180px]">
-                  <SelectValue :placeholder="item.placeholder" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem
-                      v-for="selectItem in item.items"
-                      :value="selectItem.value"
-                    >
-                      {{ selectItem.text }}
-                    </SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </template>
-            <template v-else-if="item.type === 'date'">
-              <DateInput
-                :model-value="searchValues[item.key]"
-                :class="item.elementClass"
-                label="Fecha de creación"
-                format="DD/MM/YYYY"
-                :value="searchValues[item.key] as string | undefined"
-                @update:model-value="
-                  (event) => {
-                    searchValues[item.key] = event === ' ' ? undefined : event
-                  }
-                "
-              />
-            </template>
-            <template v-else-if="item.type === 'date-range'">
-              <DateRangeInput
-                :model-value="searchValues[item.key] as string[]"
-                :class="item.elementClass"
-                label="Fecha de creación"
-                placeholder="Inicio - Fin"
-                :value="searchValues[item.key]"
-                @update:model-value="
-                  (event) => {
-                    searchValues[item.key] = event
-                  }
-                "
-              />
-            </template>
-          </div>
+                {{ item.label }}
+              </label>
+              <template v-if="item.type === 'text'">
+                <Input
+                  v-model="searchValues[item.key] as string | undefined"
+                  type="string"
+                  :class="item.elementClass"
+                  :placeholder="item.placeholder"
+                  class="w-[200px]"
+                />
+              </template>
+              <template v-else-if="item.type === 'select'">
+                <Select
+                  :model-value="searchValues[item.key] as string | undefined"
+                  :class="item.elementClass"
+                  @update:model-value="
+                    (event) => {
+                      searchValues[item.key] = event === ' ' ? undefined : event
+                    }
+                  "
+                >
+                  <SelectTrigger class="w-[180px]">
+                    <SelectValue :placeholder="item.placeholder" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem
+                        v-for="selectItem in item.items"
+                        :value="selectItem.value"
+                      >
+                        {{ selectItem.text }}
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </template>
+              <template v-else-if="item.type === 'date'">
+                <DateInput
+                  :model-value="searchValues[item.key]"
+                  :class="item.elementClass"
+                  label="Fecha de creación"
+                  format="DD/MM/YYYY"
+                  :value="searchValues[item.key] as string | undefined"
+                  @update:model-value="
+                    (event) => {
+                      searchValues[item.key] = event === ' ' ? undefined : event
+                    }
+                  "
+                />
+              </template>
+              <template v-else-if="item.type === 'date-range'">
+                <DateRangeInput
+                  :model-value="searchValues[item.key] as string[]"
+                  :class="item.elementClass"
+                  label="Fecha de creación"
+                  placeholder="Inicio - Fin"
+                  :value="searchValues[item.key]"
+                  @update:model-value="
+                    (event) => {
+                      searchValues[item.key] = event
+                    }
+                  "
+                />
+              </template>
+            </div>
+          </template>
         </template>
-      </template>
+      </div>
+      <div>
+        <slot name="action-button">
+          <!-- Default button in case no prop is passed -->
+        </slot>
+      </div>
     </div>
-    <div>
-      <slot name="action-button">
-        <!-- Default button in case no prop is passed -->
-      </slot>
-    </div>
-    </div>
-    <div class="overflow-auto rounded-lg border border-primary-400" :class="[props.class]">
+    <div
+      class="overflow-auto rounded-lg border border-primary-400"
+      :class="[props.class]"
+    >
       <table class="table w-full">
         <thead>
           <tr
@@ -191,8 +194,8 @@
   </div>
 </template>
 <script setup lang="ts">
+import { cva } from 'class-variance-authority'
 import CustomIcons from '@/components/ui/custom-icons/CustomIcons.vue'
-import { cva } from 'class-variance-authority';
 
 export interface DataItem {
   [key: string]: any
@@ -239,7 +242,9 @@ const getNestedProperty = (obj: any, key: string) => {
   return key.split('.').reduce((acc, part) => acc && acc[part], obj)
 }
 
-const searchValues = reactive<{ [key: string]: string | string[] | undefined }>({})
+const searchValues = reactive<{ [key: string]: string | string[] | undefined }>(
+  {},
+)
 watch(
   () => searchValues,
   (value) => {

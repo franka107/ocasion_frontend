@@ -6,13 +6,13 @@
         :type="inputType"
         :value="modelValue"
         :readonly="readField"
-        @input="$emit('update:modelValue', $event.target.value)"
         class="peer w-full min-w-24 h-[56px] px-4 pr-10 text-gray-900 placeholder-transparent border rounded focus:outline-none focus:border-primary focus:border-2 transition-colors duration-300 ease-in-out"
         :placeholder="label"
         :class="{
           'border-red-500': error,
           'border-primary focus:border cursor-default': readField,
         }"
+        @input="$emit('update:modelValue', $event.target.value)"
       />
       <slot name="icon-right" />
     </div>
@@ -28,7 +28,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed } from 'vue'
 
 const props = defineProps({
   id: {
@@ -37,7 +37,7 @@ const props = defineProps({
   },
   type: {
     type: String,
-    default: "text",
+    default: 'text',
   },
   label: {
     type: String,
@@ -45,20 +45,20 @@ const props = defineProps({
   },
   modelValue: {
     type: [String, Number],
-    default: "",
+    default: '',
   },
   error: {
     type: String,
-    default: "",
+    default: '',
   },
   readField: {
     type: Boolean,
     default: false,
   },
-});
+})
 
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(['update:modelValue'])
 const inputType = computed(() => {
-  return props.type;
-});
+  return props.type
+})
 </script>

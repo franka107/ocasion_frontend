@@ -1,17 +1,20 @@
 import { useEventSource } from '@vueuse/core'
+import type { FilterEnum } from 'zod'
 import type { IDataResponse } from '~/types/Common'
 import type { Notification } from '~/types/Notification'
 
 const NOTIFICATION_BASE_URL = '/notifications'
+export type FilterOption = {
+  field: string
+  type: 'like' | 'equal' | 'between' | 'in' | 'not-in' | 'not'
+  value: any
+}
+
 export type QueryPaginatedParams = {
   limit: number
   page: number
   sortOptions: { field: string; order: 'asc' | 'desc' }[]
-  filterOptions: {
-    field: string
-    type: 'like' | 'equal' | 'between' | 'in' | 'not-in' | 'not'
-    value: any
-  }[]
+  filterOptions: FilterOption[]
 }
 
 export class Paginated<T> {

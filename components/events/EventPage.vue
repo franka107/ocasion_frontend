@@ -5,8 +5,9 @@
         v-if="organizationSummary"
         :data="organizationSummary"
       />
-      <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto mt-4">
+      <div class="shadow-md rounded-lg px-6 bg-white flex-grow mt-4 pb-4">
         <CustomTable
+          class="mb-4"
           :data="eventsData"
           :header="
             eventListHeaders(props.organizationId ? 'organization' : 'platform')

@@ -5,6 +5,7 @@
         <Button
           variant="outline"
           role="combobox"
+          :disabled="props.disabled"
           :aria-expanded="open"
           :class="[
             'w-full justify-between text-left font-normal border-[#0B3859]',
@@ -75,6 +76,7 @@ const props = withDefaults(
     options: { value: string; label: any }[]
     value: undefined | string | number | Item | (string | number)[]
     multiple?: boolean
+    disabled?: boolean
   }>(),
   {
     class: '',

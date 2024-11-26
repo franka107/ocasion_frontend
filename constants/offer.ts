@@ -2,27 +2,93 @@ import type {
   HeaderItem,
   SearchItem,
 } from '@/components/ui/custom-table/CustomTable.vue'
+import { OfferStatus } from '~/types/Offer'
 
-export const offerStatus = new Map<string, { name: string; color: string }>([
-  ['CREATED', { name: 'Nuevo', color: 'purple' }], // Nuevo
-  ['DEBATED', { name: 'Debatido', color: 'orange' }], // Debatido
-  ['CONFIRMED', { name: 'Confirmado', color: 'green' }], // Confirmado
-  ['RETIRED', { name: 'Retirado', color: 'red' }], // Retirado
-  ['IN_PROGRESS', { name: 'En curso', color: 'purple' }], // En curso (usando color de 'Nuevo')
-  ['CANCELLED', { name: 'Cancelado', color: 'brown' }], // Cancelado
-  ['IN_REVIEW', { name: 'En revisión', color: 'orange' }], // En revisión (usando color de 'Debatido')
-  ['REJECTED', { name: 'Rechazado', color: 'red' }], // Rechazado
-  ['IN_DEPOSIT_REVIEW', { name: 'En revisión de depósito', color: 'red' }], // Rechazado (similar)
-  ['PENDING_DEPOSIT', { name: 'Abono pendiente', color: 'blue' }], // Abono pendiente (usando color de 'Pendiente de pago')
-  ['OBSERVED_DEPOSIT', { name: 'Abono observado', color: 'orange' }], // Abono observado (similar a 'Debatido')
-  ['CONFIRMED_DEPOSIT', { name: 'Depósito confirmado', color: 'green' }], // Depósito confirmado (usando color de 'Confirmado')
-  [
-    'IN_TRANSFER_OF_GOOD',
-    { name: 'En transferencia de bienes', color: 'purple' },
-  ], // En transferencia de bienes (similar a 'Nuevo')
-  ['DELIVERED', { name: 'Entregado', color: 'green' }], // Entregado (similar a 'Confirmado')
-  ['CONCRETED', { name: 'Concretado', color: 'green' }], // Concretado (similar a 'Confirmado')
-])
+export const offerStatusRecord: Record<
+  OfferStatus,
+  { name: string; color: string; flowPosition: number }
+> = {
+  [OfferStatus.Created]: {
+    name: 'Nuevo',
+    color: 'purple',
+    flowPosition: 1,
+  },
+  [OfferStatus.Debated]: {
+    name: 'Debatido',
+    color: 'orange',
+    flowPosition: 2,
+  },
+  [OfferStatus.Confirmed]: {
+    name: 'Confirmado',
+    color: 'green',
+    flowPosition: 3,
+  },
+  [OfferStatus.Retired]: {
+    name: 'Retirado',
+    color: 'red',
+    flowPosition: 4,
+  },
+  [OfferStatus.InProgress]: {
+    name: 'En curso',
+    color: 'purple',
+    flowPosition: 4,
+  },
+  [OfferStatus.Cancelled]: {
+    name: 'Cancelado',
+    color: 'brown',
+    flowPosition: 6,
+  },
+  [OfferStatus.InReview]: {
+    name: 'En revisión',
+    color: 'orange',
+    flowPosition: 7,
+  },
+  [OfferStatus.Rejected]: {
+    name: 'Rechazado',
+    color: 'red',
+    flowPosition: 8,
+  },
+  [OfferStatus.InDepositReview]: {
+    name: 'En revisión de depósito',
+    color: 'red',
+    flowPosition: 9,
+  },
+  [OfferStatus.PendingDeposit]: {
+    name: 'Abono pendiente',
+    color: 'blue',
+    flowPosition: 10,
+  },
+  [OfferStatus.ObservedDeposit]: {
+    name: 'Abono observado',
+    color: 'orange',
+    flowPosition: 11,
+  },
+  [OfferStatus.ConfirmedDeposit]: {
+    name: 'Abono confirmado',
+    color: 'green',
+    flowPosition: 12,
+  },
+  [OfferStatus.InTransferOfGood]: {
+    name: 'En transferencia de bienes',
+    color: 'purple',
+    flowPosition: 13,
+  },
+  [OfferStatus.PendingOfDelivery]: {
+    name: 'Pendiente de entrega',
+    color: 'red',
+    flowPosition: 14,
+  },
+  [OfferStatus.Delivered]: {
+    name: 'Entregado',
+    color: 'green',
+    flowPosition: 15,
+  },
+  [OfferStatus.Concreted]: {
+    name: 'Contretado',
+    color: 'green',
+    flowPosition: 16,
+  },
+}
 
 export const offerSearch: SearchItem[] = [
   {

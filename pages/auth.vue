@@ -1,8 +1,8 @@
 <template>
-    <NuxtPage></NuxtPage>    
+  <NuxtPage></NuxtPage>
 </template>
-  <script setup lang="ts">
-    definePageMeta({
-        layout: 'public',
-    });
-  </script>
+<script setup lang="ts">
+definePageMeta({
+  layout: 'public',
+})
+</script>

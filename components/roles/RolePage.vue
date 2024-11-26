@@ -4,6 +4,7 @@
       <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
         <CustomTable
           :data="roleData"
+          class="mb-4"
           :header="
             roleHeader(props.organizationId ? 'organization' : 'platform')
           "

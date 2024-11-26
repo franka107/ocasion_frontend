@@ -25,15 +25,15 @@ export const eventSearch: SearchItem[] = [
   },
 ]
 export const roleHeader = (viewType: ViewType): HeaderItem[] => [
-  ...(viewType === 'organization'
-    ? []
-    : [
-        {
-          key: 'organizationName',
-          label: 'Organización',
-          sortable: true,
-        },
-      ]),
+  // ...(viewType === 'organization'
+  //   ? []
+  //   : [
+  //       {
+  //         key: 'organizationName',
+  //         label: 'Organización',
+  //         sortable: true,
+  //       },
+  //     ]),
   {
     key: 'name',
     label: 'Nombre',

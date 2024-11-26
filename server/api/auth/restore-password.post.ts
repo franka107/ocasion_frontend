@@ -1,23 +1,23 @@
 export default defineEventHandler(async (event) => {
-  const { apiUrl } = useRuntimeConfig(event).public;
-  const body = await readBody(event);
+  const { apiUrl } = useRuntimeConfig(event).public
+  const body = await readBody(event)
   try {
     const user: any = await $fetch(
-      apiUrl + "/auth-management/restore-user-password",
+      apiUrl + '/auth-management/recovery-user-password',
       {
-        method: "POST",
+        method: 'POST',
         body,
         headers: {
-          "Content-Type": "application/json",
-          accept: "application/json",
+          'Content-Type': 'application/json',
+          accept: 'application/json',
         },
       },
-    );
-    return user;
+    )
+    return user
   } catch (error: any) {
-    console.log(error);
+    console.log(error)
     throw createError({
       data: error.data,
-    });
+    })
   }
-});
+})

@@ -9,6 +9,7 @@
     <div class="w-full flex flex-col">
       <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
         <CustomTable
+          class="mb-4"
           :data="orderData"
           :header="organizationHeader"
           :search="organizationSearch"
