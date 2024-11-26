@@ -1,24 +1,93 @@
+import { ComparisonOperator } from './offer'
 import type {
   HeaderItem,
   SearchItem,
 } from '@/components/ui/custom-table/CustomTable.vue'
-import { EventType } from '~/types/Event'
+import { EventStatus, EventType } from '~/types/Event'
 import type { ViewType } from '~/utils/view-types'
 
 export const eventType = new Map<string, string>([
   ['HAND_OVER', 'Puesta en mano'],
   ['AUCTION', 'Subasta'],
 ])
-export const eventStatus = new Map<string, { name: string; color: string }>([
-  ['PUBLISHED', { name: 'Publicado', color: 'blue' }],
-  ['COMPLETED', { name: 'Completado', color: 'blue' }],
-  ['CANCELLED', { name: 'Cancelado', color: 'red' }],
-  ['CREATED', { name: 'Creado', color: 'purple' }],
-  ['FINISHED', { name: 'Finalizado', color: 'brown' }],
-  ['IN_DEBATE', { name: 'En debate', color: 'orange' }],
-  ['IN_PROGRESS', { name: 'En progreso', color: 'orange' }],
-  ['READY_TO_PUBLISH', { name: 'Listo para publicar', color: 'green' }],
-])
+export const eventStatusRecord: Record<
+  EventStatus,
+  { name: string; color: string; flowPosition: number }
+> = {
+  [EventStatus.Created]: {
+    name: 'Creado',
+    color: 'purple',
+    flowPosition: 0,
+  },
+  [EventStatus.InDebate]: {
+    name: 'En debate',
+    color: 'orange',
+    flowPosition: 1,
+  },
+  [EventStatus.ReadyToPublish]: {
+    name: 'Listo para publicar',
+    color: 'green',
+    flowPosition: 2,
+  },
+  [EventStatus.Published]: {
+    name: 'Publicado',
+    color: 'blue',
+    flowPosition: 3,
+  },
+  [EventStatus.InProgress]: {
+    name: 'En progreso',
+    color: 'orange',
+    flowPosition: 4,
+  },
+  [EventStatus.Cancelled]: {
+    name: 'Cancelado',
+    color: 'red',
+    flowPosition: 5,
+  },
+
+  [EventStatus.Finished]: {
+    name: 'Finalizado',
+    color: 'brown',
+    flowPosition: 6,
+  },
+  [EventStatus.Completed]: {
+    name: 'Completado',
+    color: 'blue',
+    flowPosition: 7,
+  },
+}
+
+const getSortedEventStatus = (): EventStatus[] => {
+  return Object.entries(eventStatusRecord)
+    .sort(([, a], [, b]) => a.flowPosition - b.flowPosition) // Ordenar por flowPosition
+    .map(([status]) => status as EventStatus) // Obtener solo las claves como OfferStatus
+}
+
+export const eventStatusCheckPosition = (
+  eventStatus: EventStatus,
+  comparedEventStatus: EventStatus,
+  operator: ComparisonOperator,
+): boolean => {
+  const eventStatusFlowPositions = getSortedEventStatus()
+  const position1 = eventStatusFlowPositions.indexOf(eventStatus)
+  const position2 = eventStatusFlowPositions.indexOf(comparedEventStatus)
+
+  switch (operator) {
+    case ComparisonOperator.Greater:
+      return position1 > position2
+    case ComparisonOperator.Less:
+      return position1 < position2
+    case ComparisonOperator.Equal:
+      return position1 === position2
+    case ComparisonOperator.GreaterOrEqual:
+      return position1 >= position2
+    case ComparisonOperator.LessOrEqual:
+      return position1 <= position2
+    default:
+      throw new Error(`Unsupported operator: ${operator}`)
+  }
+}
+
 export const eventTimes = new Map<string, string>([
   ['8', '8:00'],
   ['9', '9:00'],
@@ -101,7 +170,7 @@ export const eventSearch = (viewType: ViewType): SearchItem[] => {
       type: 'select',
       placeholder: 'Filtrar por estado',
       items: [
-        ...Array.from(eventStatus).map(([key, value]) => ({
+        ...Array.from(eventStatusRecord).map(([key, value]) => ({
           text: value.name,
           value: key,
         })),

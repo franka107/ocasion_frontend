@@ -128,8 +128,10 @@
           </template>
           <template #status="{ row }">
             <CustomChip
-              :text="eventStatus.get(row?.status)?.name || ''"
-              :variant="eventStatus.get(row?.status)?.color as any"
+              :text="eventStatusRecord[row?.status as EventStatus].name || ''"
+              :variant="
+                eventStatusRecord[row?.status as EventStatus].color as any
+              "
             ></CustomChip>
           </template>
           <template #goodType="{ row }">
@@ -183,13 +185,17 @@ import CustomIcons from '@/components/ui/custom-icons/CustomIcons.vue'
 import CustomPagination from '@/components/ui/custom-pagination/CustomPagination.vue'
 import {
   eventListHeaders,
-  eventStatus,
   eventType,
   eventSearch,
   goodType,
   eventTimes,
+  eventStatusRecord,
 } from '~/constants/events'
-import type { IEventLItem, IOrganizationSummary } from '@/types/Event'
+import type {
+  EventStatus,
+  IEventLItem,
+  IOrganizationSummary,
+} from '@/types/Event'
 import type { IDataResponse } from '@/types/Common'
 import EventForm from '@/components/events/EventForm.vue'
 import ContentLayout from '~/layouts/default/ContentLayout.vue'

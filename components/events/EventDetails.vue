@@ -58,8 +58,13 @@
           />
           <FakeInput read-field label="Estado">
             <CustomChip
-              :text="eventStatus.get(eventDetail.status)?.name || ''"
-              :variant="eventStatus.get(eventStatus.status)?.color as any"
+              :text="
+                eventStatusRecord[eventDetail.status as EventStatus].name || ''
+              "
+              :variant="
+                eventStatusRecord[eventDetail.status as EventStatus]
+                  .color as any
+              "
             ></CustomChip>
           </FakeInput>
           <InputWithLabel
@@ -91,12 +96,13 @@
 import FakeInput from '../auth/FakeInput.vue'
 import InputWithLabel from '~/components/auth/inputWithLabel.vue'
 import InputFile from '@/components/common/file/Input.vue'
-import type { IEventLItem } from '@/types/Event'
+import type { EventStatus, IEventLItem } from '@/types/Event'
 import {
   eventType,
   goodType,
   eventTimes,
   eventStatus,
+  eventStatusRecord,
 } from '@/constants/events'
 
 const { params } = useRoute()

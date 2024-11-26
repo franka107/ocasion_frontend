@@ -18,26 +18,29 @@
           "
         >
           <template #action-button>
-            <Button
-              v-if="
-                myGrants.data.value.includes(GrantId.OrganizationBidCanReject)
-              "
-              variant="default"
-              :disabled="disableMultipleSelect"
-              class="bg-white text-primary border border-primary hover:bg-accent"
-              @click="handleRejectBid(selectedMultipleData)"
-            >
-              Rechazar puja
-            </Button>
-            <Button
-              v-if="
-                myGrants.data.value.includes(GrantId.OrganizationBidCanAccept)
-              "
-              :disabled="disableMultipleSelect"
-              class="bg-white text-primary border border-primary hover:bg-accent"
-              @click="handleAddBid(selectedMultipleData)"
-              >Aceptar puja
-            </Button>
+            <div class="flex flex-row space-x-2">
+              <Button
+                v-if="
+                  myGrants.data.value.includes(GrantId.OrganizationBidCanReject)
+                "
+                variant="default"
+                :disabled="disableMultipleSelect"
+                class="bg-white text-primary border border-primary hover:bg-accent"
+                @click="handleRejectBid(selectedMultipleData)"
+              >
+                Rechazar puja
+              </Button>
+              <Button
+                v-if="
+                  myGrants.data.value.includes(GrantId.OrganizationBidCanAccept)
+                "
+                :disabled="disableMultipleSelect"
+                class="bg-white text-primary border border-primary hover:bg-accent"
+                @click="handleAddBid(selectedMultipleData)"
+                >Aceptar puja
+              </Button>
+            </div>
+
             <!-- <Button -->
             <!--   @click="" -->
             <!--   :disabled="disableMultipleSelect" -->
@@ -148,6 +151,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { GitCompareIcon } from 'lucide-vue-next'
 import CounterOfferBidModal from '../bid/CounterOfferBidModal.vue'
 import CustomIcons from '@/components/ui/custom-icons/CustomIcons.vue'
 import CustomPagination from '@/components/ui/custom-pagination/CustomPagination.vue'
@@ -156,6 +160,8 @@ import { BidStatus, type BidDto, type OfferWithBidDto } from '~/types/Bids'
 import { OfferStatus, type IAmountHistoryModal } from '~/types/Offer'
 import { GrantId } from '~/types/Grant'
 import { ComparisonOperator, offerStatusCheckPosition } from '~/constants/offer'
+import { eventStatusCheckPosition } from '~/constants/events'
+import { EventStatus } from '~/types/Event'
 
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const { rejectOfferBids, acceptOfferBids, page, sortOptions, onSort } =
@@ -260,27 +266,27 @@ const handleAddBid = async (values: { type: string; ids: string[] }) => {
     title: 'Aceptar puja',
     message: `¿Está seguro de aceptar la(s) puja(s) seleccionada(s)?`,
     callback: async () => {
-      try {
-        const { status } = await acceptOfferBids({
-          ...values,
-          eventId: String(route.params.eventId),
-        })
+      const { status, error } = await acceptOfferBids({
+        ...values,
+        eventId: String(route.params.eventId),
+      })
 
-        if (status.value === 'success') {
-          refresh()
-          resetMultipleSelect.value?.()
-          updateConfirmModal({
-            title: 'Puja(s) aceptada(s)',
-            message: 'La(s) puja(s) ha sido aceptada(s) exitosamente',
-            type: 'success',
-          })
-        } else {
-          throw new Error('Error al aceptar esta(s) puja(s)')
-        }
-      } catch (error) {
+      if (status.value === 'success') {
+        refresh()
+        resetMultipleSelect.value?.()
+        updateConfirmModal({
+          title: 'Puja(s) aceptada(s)',
+          message: 'La(s) puja(s) ha sido aceptada(s) exitosamente',
+          type: 'success',
+        })
+      } else {
+        const eMsg =
+          error.value.data?.errors?.[0].message ||
+          error.value.data.message ||
+          'No se pudo aceptar puja(s). Por favor, intente nuevamente.'
         updateConfirmModal({
           title: 'Error al aceptar puja(s)',
-          message: 'No se pudo aceptar puja(s). Por favor, intente nuevamente.',
+          message: eMsg,
           type: 'error',
         })
       }

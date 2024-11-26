@@ -180,7 +180,14 @@ if (props.id) {
   const userType = userTypeToGlobal(
     user.data.value.type || UserType.OrganizationUser,
   )
-  await fetchRoles([{ field: 'type', value: userType, type: 'equal' }])
+  await fetchRoles([
+    { field: 'type', value: userType, type: 'equal' },
+    {
+      field: 'organizations.id',
+      value: user.data.value.organizations.map((e) => e.id),
+      type: 'in',
+    },
+  ])
 } else {
   await fetchRoles([{ field: 'type', value: globalType, type: 'equal' }])
 }

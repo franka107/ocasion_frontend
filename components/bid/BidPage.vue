@@ -4,7 +4,7 @@
       <EventDetails :event-detail="eventDetail"> </EventDetails>
 
       <div>
-        <BidTable />
+        <BidTable :event-id="props.eventId" :offer-id="props.offerId" />
       </div>
     </section>
   </ContentLayout>
@@ -32,39 +32,8 @@ const isEventNotPublished = computed(
     eventDetail.value?.status !== EventStatus.Completed &&
     eventDetail.value?.status !== EventStatus.Finished,
 )
-const props = defineProps<{ eventId: string }>()
+const props = defineProps<{ eventId?: string; offerId?: string }>()
 const { data: eventDetail, refresh: refreshEventDetail } = await getEvent(
   props.eventId as string,
 )
-
-const handlePublishEvent = async () => {
-  openConfirmModal({
-    title: 'Publicar Evento',
-    message: `¿Estás seguro de que deseas publicar el evento ❝${props.eventId}❞?`,
-    callback: async () => {
-      try {
-        const { status, error } = await publishEvent(props.eventId as string)
-        if (status.value === 'success') {
-          refreshEventDetail()
-          updateConfirmModal({
-            title: 'Evento Publicado',
-            message: 'El evento ha sido publicado exitosamente',
-            type: 'success',
-          })
-        } else {
-          console.log('erro publi', error)
-          const eMsg =
-            error.value.data?.errors?.[0].message ||
-            error.value.data.message ||
-            'No se pudo publicar el evento. Por favor, intente nuevamente.'
-          updateConfirmModal({
-            title: 'Error al Publicar Evento',
-            message: eMsg,
-            type: 'error',
-          })
-        }
-      } catch (error) {}
-    },
-  })
-}
 </script>
