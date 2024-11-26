@@ -46,7 +46,7 @@
                     </DropdownMenuItem>
                   <DropdownMenuSeparator />
                     <DropdownMenuItem 
-                    @click="openParticipantDetail(row.id)">
+                    @click="openParticipantDetail(row)">
                       Detalle participante
                       <CustomIcons name="EyeIcon" class="ml-[10px]" />
                     </DropdownMenuItem>
@@ -111,7 +111,7 @@
           @interact-outside="(e: Event) => e.preventDefault()"
         >
           <ParticipantDetailForm 
-            :participant-id="rechargeId"
+          :participant-id="rechargeId"
           />
         </SheetContent>
 
@@ -150,10 +150,10 @@ import { useTopUpRequests } from '~/composables/useTopUpRequests';
 import { useAPI } from '~/composables/useAPI';
 
 // Variables de estado para los modales
-const openDetailModal = ref(false); // Modal de Detalle de Solicitud
-const openEditModal = ref(false); // Modal de Editar Solicitud
-const openParticipantModal = ref(false); // Modal de Detalle Participante
-const openRejectModal = ref(false); // Modal de rechazar recarga
+const openDetailModal = ref(false); 
+const openEditModal = ref(false); 
+const openParticipantModal = ref(false); 
+const openRejectModal = ref(false);
 
 const rechargeId = ref<number | undefined>(undefined);
 const rejectDetails = ref(null);
