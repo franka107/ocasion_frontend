@@ -1,12 +1,12 @@
 // by convention, composable function names start with "use"
-export function useTopUpRequests() {
+export function useWithdrawalRequests() {
   const page = ref(1)
   const filterOptions = ref('[]')
   const sortOptions = ref('[]')
   const onSort = (sortObject: { [key: string]: string }[]) => {
     sortOptions.value = JSON.stringify(sortObject)
   }
-  const BASE_ORG_URL = '/finance/recharge-request-management'
+  const BASE_ORG_URL = '/finance/withdrawal-request-management'
 
   const onSearch = (item: { [key: string]: string }) => {
     const filters = [
@@ -19,30 +19,9 @@ export function useTopUpRequests() {
     filterOptions.value = JSON.stringify(filters)
   }
 
-  const requestRecharge = async (values: any) => {
+  const requestWithdrawal = async (values: any) => {
     const { status, error }: any = await useAPI(
-      `${BASE_ORG_URL}/request-recharge`,
-      {
-        method: 'POST',
-        body: values,
-      } as any,
-    )
-    return { status, error }
-  }
-
-  const rejectRechargeRequest = async (values: any) => {
-    const { status, error }: any = await useAPI(
-      `${BASE_ORG_URL}/reject-recharge-request`,
-      {
-        method: 'POST',
-        body: values,
-      } as any,
-    )
-    return { status, error }
-  }
-  const authorizeRechargeRequest = async (values: any) => {
-    const { status, error }: any = await useAPI(
-      `${BASE_ORG_URL}/authorize-recharge-request`,
+      `${BASE_ORG_URL}/request-withdrawal`,
       {
         method: 'POST',
         body: values,
@@ -54,11 +33,9 @@ export function useTopUpRequests() {
   return {
     page,
     filterOptions,
-    requestRecharge,
-    authorizeRechargeRequest,
-    rejectRechargeRequest,
     sortOptions,
     onSort,
+    requestWithdrawal,
     onSearch,
   }
 }

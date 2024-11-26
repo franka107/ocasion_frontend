@@ -10,18 +10,21 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { useDisbursement } from '@/composables/useDisbursement'
-import { bankType, paymentMethodType, currencyType , paymentMediumType} from '@/constants/attention-tray'
-const {
-  generatelPreviewDisbursement,
-  generatelDisbursement,
-} = useDisbursement()
+import {
+  bankType,
+  paymentMethodType,
+  currencyType,
+  paymentMediumType,
+} from '@/constants/attention-tray'
+const { generatelPreviewDisbursement, generatelDisbursement } =
+  useDisbursement()
 const emit = defineEmits(['update:modelValue'])
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
-const props = defineProps<{ 
+const props = defineProps<{
   id?: string
-  modelValue: boolean 
+  modelValue: boolean
   bank: string
-  onSubmit: (values: any) => void;
+  onSubmit: (values: any) => void
   refreshTable: () => void
 }>()
 const resumenMensaje = `
@@ -30,31 +33,35 @@ const resumenMensaje = `
     **Suma de monto a desembolsar:** 0.00
     **Banco de origen:** BBVA
     **Cuenta de origen:** 0000 0000 0000 0000
-`;
-const paymentMethodOptions = Array.from(paymentMethodType).map(([id, name]) => ({
-  id,
-  name,
-}));
+`
+const paymentMethodOptions = Array.from(paymentMethodType).map(
+  ([id, name]) => ({
+    id,
+    name,
+  }),
+)
 
 const banksOptions = Array.from(bankType).map(([id, name]) => ({
   id,
   name,
-}));
+}))
 
 const currencyOptions = Array.from(currencyType).map(([id, name]) => ({
   id,
   name,
-}));
+}))
 
-const paymentMediumOptions = Array.from( paymentMediumType).map(([id, name]) => ({
-  id,
-  name,
-}));
+const paymentMediumOptions = Array.from(paymentMediumType).map(
+  ([id, name]) => ({
+    id,
+    name,
+  }),
+)
 
 const formSchema = toTypedSchema(
   z.object({
     paymentMethod: z.string().min(1, 'Seleccione una forma de pago.'),
-    bank: z.string().min(1, "Seleccione un banco"),
+    bank: z.string().min(1, 'Seleccione un banco'),
     currency: z.string().min(1, 'Seleccione una moneda.'),
     chargeAccount: z
       .string()
@@ -68,7 +75,14 @@ const form = useForm({
 const onSubmit = form.handleSubmit((values) => {
   const { paymentMethod, bank, currency, chargeAccount, paymentMedium } = values
   console.log('Formulario enviado con los valores:', values)
-  handleSubmit({ id: props.id, paymentMethod, bank, currency, chargeAccount, paymentMedium })
+  handleSubmit({
+    id: props.id,
+    paymentMethod,
+    bank,
+    currency,
+    chargeAccount,
+    paymentMedium,
+  })
   emit('update:modelValue', false)
 })
 const handleSubmit = async (values: any) => {
@@ -76,8 +90,8 @@ const handleSubmit = async (values: any) => {
     title: 'Resumen del desembolso',
     message: `
       ¿Está seguro de generar el lote del desembolso?
-      ${values.resumenMensaje}
     `,
+    // ${values.resumenMensaje}
     callback: async () => {
       const { status, error }: any = await generatelPreviewDisbursement(values)
       if (status.value === 'success') {
@@ -111,7 +125,10 @@ const handleSubmit = async (values: any) => {
     @update:open="(event) => emit('update:modelValue', event)"
   >
     <AlertDialogContent class="z-[98] h-auto max-w-[670px] px-0">
-      <form class="flex flex-col gap-6 flex-grow max-h-[calc(100vh-4rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-primary/50" @submit="onSubmit">
+      <form
+        class="flex flex-col gap-6 flex-grow max-h-[calc(100vh-4rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-primary/50"
+        @submit="onSubmit"
+      >
         <!-- Título -->
         <AlertDialogHeader class="border-b border-primary">
           <AlertDialogTitle
@@ -121,71 +138,71 @@ const handleSubmit = async (values: any) => {
         </AlertDialogHeader>
         <div class="grid grid-cols-2 gap-2 xl:gap-4 px-6">
           <!-- Forma de pago -->
-            <FormField v-slot="{ componentField }" name="paymentMethod">
-                <FormItem>
-                <FormControl>
-                    <CustomSelect
-                    v-bind="componentField"
-                    :items="paymentMethodOptions"
-                    placeholder="Forma de pago"
-                    />
-                </FormControl>
-                <FormMessage />
-                </FormItem>
-            </FormField>  
+          <FormField v-slot="{ componentField }" name="paymentMethod">
+            <FormItem>
+              <FormControl>
+                <CustomSelect
+                  v-bind="componentField"
+                  :items="paymentMethodOptions"
+                  placeholder="Forma de pago"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
           <!-- Banco -->
-            <FormField v-slot="{ componentField }" name="bank">
-                  <FormItem>
-                  <FormControl>
-                      <CustomSelect
-                      v-bind="componentField"
-                      :items="banksOptions"
-                      placeholder="Banco"
-                      />
-                  </FormControl>
-                  <FormMessage />
-                  </FormItem>
-            </FormField>      
+          <FormField v-slot="{ componentField }" name="bank">
+            <FormItem>
+              <FormControl>
+                <CustomSelect
+                  v-bind="componentField"
+                  :items="banksOptions"
+                  placeholder="Banco"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
           <!-- Moneda -->
           <FormField v-slot="{ componentField }" name="currency">
-              <FormItem >
+            <FormItem>
               <FormControl>
-                  <CustomSelect
+                <CustomSelect
                   v-bind="componentField"
                   :items="currencyOptions"
                   placeholder="Moneda"
-                  />
+                />
               </FormControl>
               <FormMessage />
-              </FormItem>
+            </FormItem>
           </FormField>
           <!-- Cuenta cargo -->
           <FormField v-slot="{ componentField }" name="chargeAccount">
-              <FormItem>
+            <FormItem>
               <FormControl>
-                  <CustomInput
+                <CustomInput
                   v-bind="componentField"
                   type="text"
                   placeholder="0000 0000 0000 0000"
                   label="Cuenta cargo"
-                  />
+                />
               </FormControl>
               <FormMessage />
-              </FormItem>
+            </FormItem>
           </FormField>
           <!-- Medio de pago -->
           <FormField v-slot="{ componentField }" name="paymentMedium">
-                <FormItem>
-                <FormControl>
-                    <CustomSelect
-                    v-bind="componentField"
-                    :items="paymentMediumOptions"
-                    placeholder="Medio de pago"
-                    />
-                </FormControl>
-                <FormMessage />
-                </FormItem>
-            </FormField>  
+            <FormItem>
+              <FormControl>
+                <CustomSelect
+                  v-bind="componentField"
+                  :items="paymentMediumOptions"
+                  placeholder="Medio de pago"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
         </div>
         <!-- Botones -->
         <AlertDialogFooter class="px-6">

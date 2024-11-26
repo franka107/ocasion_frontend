@@ -9,7 +9,7 @@
     <div class="w-full flex flex-col">
       <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
         <CustomTable
-          :data="withdrawalRequeststData"
+          :data="withDrawalRequeststData"
           :header="withdrawalRequeststHeader"
           :search="withdrawalRequestsSearch"
           class="mb-4"
@@ -114,6 +114,7 @@ import ContentLayout from '~/layouts/default/ContentLayout.vue'
 import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
 import ParticipantDetailEditForm from '~/components/attention-tray/withdrawal-requests/ParticipantDetailEditForm.vue'
 import WithdrawalDetailsForm from '~/components/attention-tray/withdrawal-requests/WithdrawalDetailsForm.vue'
+import dayjs from 'dayjs'
 
 const selectedMultipleData = ref<{ type: string; ids: string[] }>({
   type: 'empty',
@@ -127,7 +128,6 @@ const disableMultipleSelect = computed(
 )
 const openApplicationModal = ref(false)
 const openParticipantModal = ref(false)
-const { page, onSort, onSearch } = useTopUpRequests()
 const selectedRequestId = ref<string | null>(null)
 const openWithdrawalDetailsModal = ref(false)
 const openWithdrawalDetails = (requestId: string) => {
@@ -151,27 +151,47 @@ const onParticipantSubmit = (formData: any) => {
 const rechargeId = ref<number | undefined>(undefined)
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const rechargeModal = ref<any>({ offerId: '' })
-const data = [
+// const data = [
+//   {
+//     id: '000',
+//     dateOfRequest: '2024-11-01',
+//     fullName: 'Rossi Ferrari Lombardi',
+//     transfer: '2024-11-10',
+//     amount: '$ 1’000.00',
+//     status: 'EARRING',
+//     actions: '',
+//   },
+//   {
+//     id: '000',
+//     dateOfRequest: '2024-10-25',
+//     fullName: 'Martini Lombardi Lombardi',
+//     contractStartDate: '2024-11-01',
+//     operation: '98765',
+//     transfer: '2024-10-30',
+//     amount: '$ 1’000.00',
+//     status: 'EARRING',
+//     actions: '',
+//   },
+const { page, onSort, onSearch, filterOptions, sortOptions } =
+  useWithdrawalRequests()
+const BASE_RECHAR_URL = '/finance/withdrawal-request-management'
+const { data, refresh }: any = await useAPI(
+  `${BASE_RECHAR_URL}/view-paginated-withdrawal-requests`,
   {
-    id: '000',
-    dateOfRequest: '2024-11-01',
-    fullName: 'Rossi Ferrari Lombardi',
-    transfer: '2024-11-10',
-    amount: '$ 1’000.00',
-    status: 'EARRING',
-    actions: '',
-  },
-  {
-    id: '000',
-    dateOfRequest: '2024-10-25',
-    fullName: 'Martini Lombardi Lombardi',
-    contractStartDate: '2024-11-01',
-    operation: '98765',
-    transfer: '2024-10-30',
-    amount: '$ 1’000.00',
-    status: 'EARRING',
-    actions: '',
-  },
-]
-const withdrawalRequeststData = computed(() => data)
+    query: {
+      limit: 8,
+      page,
+      filterOptions,
+      sortOptions,
+    },
+  } as any,
+)
+const withDrawalRequeststData = computed(() =>
+  data.value?.data.map((item: any) => ({
+    fullName: item.participant.commonName,
+    ...item,
+    //transferedAt: dayjs(item.transferedAt).format('YYYY-MM-DD'),
+    createdAt: dayjs(item.updatedAt).format('YYYY-MM-DD'),
+  })),
+)
 </script>

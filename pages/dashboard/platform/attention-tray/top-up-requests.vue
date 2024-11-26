@@ -31,43 +31,38 @@
                   align="start"
                   class="bg-primary text-white"
                 >
-                  <DropdownMenuItem 
-                      @click="openModal(row.id)"
-                    >
-                      Detalle solicitud
-                      <CustomIcons name="EyeIcon" class="ml-auto" />
-                  </DropdownMenuItem>               
+                  <DropdownMenuItem @click="openModal(row.id)">
+                    Detalle solicitud
+                    <CustomIcons name="EyeIcon" class="ml-auto" />
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                      @click="openModalEditRequest(row.id)"
-                    >
-                     Editar solicitud
-                      <CustomIcons name="Pen" class="ml-auto" />
-                    </DropdownMenuItem>
+                  <DropdownMenuItem @click="openModalEditRequest(row.id)">
+                    Editar solicitud
+                    <CustomIcons name="Pen" class="ml-auto" />
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                    <DropdownMenuItem 
-                    @click="openParticipantDetail(row)">
-                      Detalle participante
-                      <CustomIcons name="EyeIcon" class="ml-[10px]" />
-                    </DropdownMenuItem>
+                  <DropdownMenuItem @click="handleReject(row)">
+                    Rechazar solicitud
+                    <CustomIcons name="X" class="ml-auto" />
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem @click="openParticipantDetail(row)">
+                    Detalle participante
+                    <CustomIcons name="EyeIcon" class="ml-[10px]" />
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
           </template>
           <template #livelihood="{ row }">
-            <div
-              class="flex items-center justify-center"
-              @click=""
-            >
-              <CustomIcons
-                name="Doc-Loupe"
-              />
+            <div class="flex items-center justify-center" @click="">
+              <CustomIcons name="Doc-Loupe" />
             </div>
           </template>
           <template #status="{ row }">
             <CustomChip
-            :text="rechargeStatus.get(row.status)?.name || ''"
-            :variant="rechargeStatus.get(row.status)?.color as any"
+              :text="rechargeStatus.get(row.status)?.name || ''"
+              :variant="rechargeStatus.get(row.status)?.color as any"
             ></CustomChip>
           </template>
         </CustomTable>
@@ -110,9 +105,7 @@
           @pointer-down-outside="(e: Event) => e.preventDefault()"
           @interact-outside="(e: Event) => e.preventDefault()"
         >
-          <ParticipantDetailForm 
-          :participant-id="rechargeId"
-          />
+          <ParticipantDetailForm :participant-id="rechargeId" />
         </SheetContent>
 
         <!-- Modal para rechazar recarga -->
@@ -132,53 +125,130 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import dayjs from 'dayjs';
-import ContentLayout from '~/layouts/default/ContentLayout.vue';
-import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue';
-import CustomTable from '~/components/ui/custom-table/CustomTable.vue';
-import CustomChip from '~/components/ui/custom-chip/CustomChip.vue';
-import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue';
-import CustomPagination from '~/components/ui/custom-pagination/CustomPagination.vue';
-import RequestDetailForm from '~/components/attention-tray/top-up-requests/RequestDetailForm.vue';
-import ParticipantDetailForm from '~/components/attention-tray/top-up-requests/ParticipantDetailForm.vue';
-import EditRequestForm from '~/components/attention-tray/top-up-requests/EditRequestForm.vue';
-import ModalRejectRecharge from '~/components/attention-tray/top-up-requests/ModalRejectRecharge.vue';
-import { rechargeStatus, rechargeHeader, rechargeSearch } from '~/constants/attention-tray';
-import { IuseRecharge } from '@/composables/useRecharge';
-import { useTopUpRequests } from '~/composables/useTopUpRequests';
-import { useAPI } from '~/composables/useAPI';
+import { ref, computed } from 'vue'
+import dayjs from 'dayjs'
+import ContentLayout from '~/layouts/default/ContentLayout.vue'
+import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
+import CustomTable from '~/components/ui/custom-table/CustomTable.vue'
+import CustomChip from '~/components/ui/custom-chip/CustomChip.vue'
+import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue'
+import CustomPagination from '~/components/ui/custom-pagination/CustomPagination.vue'
+import RequestDetailForm from '~/components/attention-tray/top-up-requests/RequestDetailForm.vue'
+import ParticipantDetailForm from '~/components/attention-tray/top-up-requests/ParticipantDetailForm.vue'
+import EditRequestForm from '~/components/attention-tray/top-up-requests/EditRequestForm.vue'
+import ModalRejectRecharge from '~/components/attention-tray/top-up-requests/ModalRejectRecharge.vue'
+import {
+  rechargeStatus,
+  rechargeHeader,
+  rechargeSearch,
+} from '~/constants/attention-tray'
+import { IuseRecharge } from '@/composables/useRecharge'
+import { useTopUpRequests } from '~/composables/useTopUpRequests'
+import { useAPI } from '~/composables/useAPI'
 
 // Variables de estado para los modales
-const openDetailModal = ref(false); 
-const openEditModal = ref(false); 
-const openParticipantModal = ref(false); 
-const openRejectModal = ref(false);
+const openDetailModal = ref(false)
+const openEditModal = ref(false)
+const openParticipantModal = ref(false)
+const openRejectModal = ref(false)
 
-const rechargeId = ref<number | undefined>(undefined);
-const rejectDetails = ref(null);
+const rechargeId = ref<number | undefined>(undefined)
+const rejectDetails = ref(null)
 
 // Funciones para manejar los modales
 const openModal = (rowId: number) => {
-  rechargeId.value = rowId;
-  openDetailModal.value = true;
-};
+  rechargeId.value = rowId
+  openDetailModal.value = true
+}
+const { openConfirmModal, updateConfirmModal } = useConfirmModal()
+
+const handleReject = async (values: any) => {
+  openConfirmModal({
+    title: 'Rechazar solicitud de recarga',
+    message: '¿Está seguro que desea rechazar la solicitud de recarga?',
+    callback: async () => {
+      const { status, error }: any = await rejectRechargeRequest({
+        id: values.id,
+        rejectionReason: 'Rechazado por el administrador',
+      })
+      if (status.value === 'success') {
+        openAnnulModal.value = false
+        refresh()
+        updateConfirmModal({
+          title: 'Solicitud de recarga rechazada',
+          message: 'Se ha rechazado la soliciud de recarga',
+          type: 'success',
+        })
+      } else {
+        const eMsg =
+          error.value.data?.errors?.[0].message ||
+          error.value.data.message ||
+          'El solicitud de recarga no se pudo rechazar, intentalo más tarde'
+        updateConfirmModal({
+          title: 'Error al rechazar la solicitud de recarga',
+          message: eMsg,
+          type: 'error',
+        })
+      }
+    },
+  })
+}
+
+const handleApprove = async (values: any) => {
+  openConfirmModal({
+    title: 'Aprobar solicitud de recarga',
+    message: '¿Está seguro que desea aprobar la solicitud de recarga?',
+    callback: async () => {
+      const { status, error }: any = await rejectRechargeRequest({
+        id: values.id,
+        rejectionReason: 'Rechazado por el administrador',
+      })
+      if (status.value === 'success') {
+        openAnnulModal.value = false
+        refresh()
+        updateConfirmModal({
+          title: 'Solicitud de recarga rechazada',
+          message: 'Se ha rechazado la soliciud de recarga',
+          type: 'success',
+        })
+      } else {
+        const eMsg =
+          error.value.data?.errors?.[0].message ||
+          error.value.data.message ||
+          'El solicitud de recarga no se pudo rechazar, intentalo más tarde'
+        updateConfirmModal({
+          title: 'Error al rechazar la solicitud de recarga',
+          message: eMsg,
+          type: 'error',
+        })
+      }
+    },
+  })
+}
 
 const openModalEditRequest = (rowId: number) => {
-  rechargeId.value = rowId;
-  openEditModal.value = true;
-};
+  rechargeId.value = rowId
+  openEditModal.value = true
+}
 
 const openParticipantDetail = (row: any) => {
-  rechargeId.value = row.participantId;
-  console.log('Abriendo detalle del participante:', row.participantId);
-  openParticipantModal.value = true;
-};
+  rechargeId.value = row.participantId
+  console.log('Abriendo detalle del participante:', row.participantId)
+  openParticipantModal.value = true
+}
 
 // Data y API
-const { page, onSort, onSearch, filterOptions, sortOptions } = useTopUpRequests();
-const { autorizationRecharge } = IuseRecharge();
-const BASE_RECHAR_URL = '/finance/recharge-request-management';
+const {
+  page,
+  onSort,
+  onSearch,
+  filterOptions,
+  sortOptions,
+  authorizeRechargeRequest,
+  rejectRechargeRequest,
+} = useTopUpRequests()
+const { autorizationRecharge } = IuseRecharge()
+const BASE_RECHAR_URL = '/finance/recharge-request-management'
 const { data, refresh }: any = await useAPI(
   `${BASE_RECHAR_URL}/view-paginated-recharge-requests`,
   {
@@ -197,15 +267,15 @@ const rechargeData = computed(() =>
     ...item,
     transferedAt: dayjs(item.transferedAt).format('YYYY-MM-DD'),
     updatedAt: dayjs(item.updatedAt).format('YYYY-MM-DD'),
-  }))
-);
+  })),
+)
 
 // Manejo de acciones
 const handleAuthorize = async (values: { id: string }) => {
-  console.log('Autorizando recarga:', values);
-};
+  console.log('Autorizando recarga:', values)
+}
 const handleOpenRejectModal = (details: any) => {
-  rejectDetails.value = details;
-  openRejectModal.value = true;
-};
+  rejectDetails.value = details
+  openRejectModal.value = true
+}
 </script>

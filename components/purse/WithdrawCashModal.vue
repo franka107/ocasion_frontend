@@ -10,7 +10,6 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 
-
 const emit = defineEmits(['update:modelValue'])
 const props = defineProps<{ modelValue: boolean }>()
 const formSchema = toTypedSchema(
@@ -25,17 +24,22 @@ const formSchema = toTypedSchema(
     destinationAccount: z
       .string()
       .regex(/^\d{10,20}$/, 'Ingrese un número de cuenta válido.'),
-    cciAccount: z
+    destinationCCI: z
       .string()
       .regex(/^\d{10,20}$/, 'Ingrese un número de cuenta válido.'),
-    termsAndConditions: z.boolean().refine(val => val === true, 'Debe aceptar los términos y condiciones'),
+    acceptedTermsAndConditions: z
+      .boolean()
+      .refine((val) => val === true, 'Debe aceptar los términos y condiciones'),
   }),
 )
 const form = useForm({
   validationSchema: formSchema,
 })
+const { requestWithdrawal } = useWithdrawalRequests()
 const onSubmit = form.handleSubmit((values) => {
   console.log('Formulario enviado con los valores:', values)
+  requestWithdrawal(values)
+
   emit('update:modelValue', false) // Cierra el modal al enviar.
 })
 </script>
@@ -47,7 +51,10 @@ const onSubmit = form.handleSubmit((values) => {
     @update:open="(event) => emit('update:modelValue', event)"
   >
     <AlertDialogContent class="z-[98] h-auto max-w-[670px] px-0">
-      <form class="flex flex-col gap-6 flex-grow max-h-[calc(100vh-4rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-primary/50" @submit="onSubmit">
+      <form
+        class="flex flex-col gap-6 flex-grow max-h-[calc(100vh-4rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-primary/50"
+        @submit="onSubmit"
+      >
         <!-- Título -->
         <AlertDialogHeader class="border-b border-primary">
           <AlertDialogTitle
@@ -56,7 +63,7 @@ const onSubmit = form.handleSubmit((values) => {
           >
         </AlertDialogHeader>
         <p class="text-[18px] font-[600] text-[#152A3C] px-6">
-            Transacción N° 123456
+          Transacción N° 123456
         </p>
         <!-- Formulario -->
         <div class="grid grid-cols-2 gap-2 xl:gap-4 px-6">
@@ -68,35 +75,39 @@ const onSubmit = form.handleSubmit((values) => {
                   v-bind="componentField"
                   type="number"
                   placeholder="0.00"
-                  staticLabel
+                  static-label
                   label="Ingresa monto"
                 />
               </FormControl>
               <FormMessage />
             </FormItem>
           </FormField>
-           <!-- Moneda -->
-           <FormField v-slot="{ componentField }" name="currency">
+          <!-- Moneda -->
+          <FormField v-slot="{ componentField }" name="currency">
             <FormItem>
               <FormControl>
                 <CustomSelect
                   v-bind="componentField"
-                  :items="[ { id: 'USD', name: 'USD' } ]"
-                  staticLabel
+                  :items="[{ id: 'USD', name: 'USD' }]"
+                  static-label
                   placeholder="Moneda"
                 />
               </FormControl>
               <FormMessage />
             </FormItem>
           </FormField>
-           <!-- Banco -->
-           <FormField v-slot="{ componentField }" name="bank">
+          <!-- Banco -->
+          <FormField v-slot="{ componentField }" name="bank">
             <FormItem>
               <FormControl>
                 <CustomSelect
                   v-bind="componentField"
-                  :items="[ { id: 'Bank1', name: 'Banco 1' }, { id: 'Bank2', name: 'Banco 2' } ]"
-                  staticLabel
+                  :items="[
+                    { id: 'BBVA', name: 'Bbva' },
+                    { id: 'BCP', name: 'Bcp' },
+                    { id: 'SCOTIABANK', name: 'Scotiabank' },
+                  ]"
+                  static-label
                   placeholder="Banco"
                 />
               </FormControl>
@@ -109,23 +120,26 @@ const onSubmit = form.handleSubmit((values) => {
               <FormControl>
                 <CustomSelect
                   v-bind="componentField"
-                  :items="[ { id: 'Savings', name: 'Ahorros' }, { id: 'Checking', name: 'Corriente' } ]"
-                  staticLabel
+                  :items="[
+                    { id: 'SAVINGS', name: 'Ahorros' },
+                    { id: 'CURRENT_ACCOUNT', name: 'Corriente' },
+                  ]"
+                  static-label
                   placeholder="Tipo de cuenta"
                 />
               </FormControl>
               <FormMessage />
             </FormItem>
           </FormField>
-           <!-- Cuenta destino -->
-           <FormField v-slot="{ componentField }" name="destinationAccount">
+          <!-- Cuenta destino -->
+          <FormField v-slot="{ componentField }" name="destinationAccount">
             <FormItem>
               <FormControl>
                 <CustomInput
                   v-bind="componentField"
                   type="text"
                   placeholder="Ingrese número"
-                  staticLabel
+                  static-label
                   label="Cuenta destino"
                 />
               </FormControl>
@@ -133,14 +147,14 @@ const onSubmit = form.handleSubmit((values) => {
             </FormItem>
           </FormField>
           <!-- Cuenta destino CCI -->
-          <FormField v-slot="{ componentField }" name="cciAccount">
+          <FormField v-slot="{ componentField }" name="destinationCCI">
             <FormItem>
               <FormControl>
                 <CustomInput
                   v-bind="componentField"
                   type="text"
                   placeholder="Ingrese número"
-                  staticLabel
+                  static-label
                   label="Cuenta destino (CCI)"
                 />
               </FormControl>
@@ -151,43 +165,57 @@ const onSubmit = form.handleSubmit((values) => {
 
         <!-- Aviso -->
         <div class="px-6">
-                  <!-- Aceptación de Terminos y Condiciones -->
-        <FormField v-slot="{ componentField }" name="termsAndConditions">
-          <FormItem class="flex items-center gap-2">
-            <FormControl>
-              <Checkbox
-                :checked="componentField.modelValue"
-                v-bind="componentField"
-                @update:checked="componentField.onChange"
-              />
-              <label class="font-[400] text-[14px] m-[0px] space-y-0 text-[#152A3C]"
-                >Aceptar <span class="font-[600] text-[#F97316]">terminos y condiciones</span>
-              </label
-              >
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-        <div class="rounded-[8px] bg-[#F3F8FC] p-4 mt-[18px]">
-          <h2 class="font-[700] text-[#152A3C] text-[14px]">Aviso</h2>
-          <ul class="font-[400] text-[12px] text-[#45454F] mt-[12px] space-y-2">
-            <li>
-              • La cuenta de destino del solicitante debe ser <b>en Dólares.</b> Cualquier transacción en otro tipo de moneda estará sujeto al tipo de cambio del banco de su cuenta.
-            </li>
-            <li>
-              • El tiempo de revisión de la solicitud es de 3 días útiles.
-            </li>
-            <li>
-              • La comisión de transferencia estará sujeto a las condiciones del banco y serán asumidas por el cliente.
-            </li>
-            <li>
-              • En caso se encuentre rechazada la solicitud, no se procederá con el desembolso. Asimismo, tendrá que generar una nueva solicitud.
-            </li>
-            <li>
-              • La cuenta destino debe estar a nombre del titular de la cuenta.
-            </li>
-          </ul>
-        </div>
+          <!-- Aceptación de Terminos y Condiciones -->
+          <FormField
+            v-slot="{ componentField }"
+            name="acceptedTermsAndConditions"
+          >
+            <FormItem class="flex items-center gap-2">
+              <FormControl>
+                <Checkbox
+                  :checked="componentField.modelValue"
+                  v-bind="componentField"
+                  @update:checked="componentField.onChange"
+                />
+                <label
+                  class="font-[400] text-[14px] m-[0px] space-y-0 text-[#152A3C]"
+                  >Aceptar
+                  <span class="font-[600] text-[#F97316]"
+                    >terminos y condiciones</span
+                  >
+                </label>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+          <div class="rounded-[8px] bg-[#F3F8FC] p-4 mt-[18px]">
+            <h2 class="font-[700] text-[#152A3C] text-[14px]">Aviso</h2>
+            <ul
+              class="font-[400] text-[12px] text-[#45454F] mt-[12px] space-y-2"
+            >
+              <li>
+                • La cuenta de destino del solicitante debe ser
+                <b>en Dólares.</b> Cualquier transacción en otro tipo de moneda
+                estará sujeto al tipo de cambio del banco de su cuenta.
+              </li>
+              <li>
+                • El tiempo de revisión de la solicitud es de 3 días útiles.
+              </li>
+              <li>
+                • La comisión de transferencia estará sujeto a las condiciones
+                del banco y serán asumidas por el cliente.
+              </li>
+              <li>
+                • En caso se encuentre rechazada la solicitud, no se procederá
+                con el desembolso. Asimismo, tendrá que generar una nueva
+                solicitud.
+              </li>
+              <li>
+                • La cuenta destino debe estar a nombre del titular de la
+                cuenta.
+              </li>
+            </ul>
+          </div>
         </div>
 
         <!-- Botones -->
