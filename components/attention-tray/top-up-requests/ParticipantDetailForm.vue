@@ -4,17 +4,16 @@ import { X } from 'lucide-vue-next';
 import { toTypedSchema } from '@vee-validate/zod';
 import * as z from 'zod';
 import { useForm } from 'vee-validate';
-import InputFile from '@/components/common/file/Input.vue';
 
 const props = defineProps<{
-  onSubmit: (values: any) => void;
+  participantId: string | number | undefined
 }>();
 
 const emit = defineEmits(['update:modelValue']);
 
 const formSchema = toTypedSchema(
   z.object({
-    name: z
+    firstName: z
       .string()
       .min(1, 'El nombre del evento es requerido.')
       .max(200, 'El nombre del evento no puede superar los 200 caracteres'),
@@ -40,13 +39,24 @@ const formSchema = toTypedSchema(
 
 const form = useForm({
   validationSchema: formSchema,
-});
+  initialValues: {},
+})
 
 const onSubmit = form.handleSubmit((values) => {
   console.log('Formulario enviado con los valores:', values);
   emit('update:modelValue', false);
 });
 
+if (props.participantId) {
+  const { data } = await useAPI<any>(`/user-management/get-user-detail`, {
+    method: 'GET',
+    query: {
+      id: props.participantId,
+    },
+  } as any)
+  console.log(data.value)
+  form.setValues(data.value)
+}
 </script>
 
 <template>
@@ -60,14 +70,19 @@ const onSubmit = form.handleSubmit((values) => {
     </SheetHeader>
 
     <div class="flex-grow overflow-y-auto no-scrollbar flex flex-col">
-        <form class="flex flex-col gap-6 flex-grow pb-[32px] pt-[40px] px-6 gap-y-[24px]" @submit="onSubmit">
+        <form class="flex flex-col gap-6 flex-grow pb-[32px] pt-[40px] px-6 gap-y-[24px]" >
             <section class="flex-grow">
                 <div class="grid grid-cols-1 gap-4 mb-[24px]">
                     <!-- Nombre  -->
                     <FormField v-slot="{ componentField }" name="firstName">
                         <FormItem>
                         <FormControl>
-                            <CustomInput type="text" label="Nombres" v-bind="componentField" disabled />
+                            <CustomInput 
+                            type="text" 
+                            label="Nombres" 
+                            v-bind="componentField"
+                            disabled
+                             />
                         </FormControl>
                         <FormMessage />
                         </FormItem>

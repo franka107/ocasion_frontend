@@ -5,15 +5,18 @@ import { toTypedSchema } from '@vee-validate/zod';
 import * as z from 'zod';
 import { useForm } from 'vee-validate';
 import InputFile from '@/components/common/file/Input.vue';
-
+import { IuseRecharge } from '@/composables/useRecharge'
+const {autorizationRecharge} = IuseRecharge()
+const BASE_RECHAR_URL = '/finance/recharge-request-management'
 const props = defineProps<{
-  onSubmit: (values: any) => void;
-  title: string;
-  isEditing: boolean; 
+  id: string | undefined | number 
+  refreshTable: () => void;
+  onAuthorize: (values: any) => void;
+  onReject: (values: any) => void;
 }>();
-
-const emit = defineEmits(['update:modelValue']);
-
+const { openConfirmModal, updateConfirmModal } = useConfirmModal()
+const emit = defineEmits(['update:modelValue', 'open-reject-modal']);
+const currentMode = ref<"reject" | "authorize">("authorize");
 const formSchema = toTypedSchema(
   z.object({
     operation: z
@@ -34,22 +37,97 @@ const formSchema = toTypedSchema(
 
 const form = useForm({
   validationSchema: formSchema,
-});
-
-const onSubmit = form.handleSubmit((values) => {
-  console.log('Formulario enviado con los valores:', values);
-  emit('update:modelValue', false);
+  initialValues: {},
 });
 
 const cancelEdit = () => {
   emit('update:modelValue', false); 
 };
+
+if (props.id) {
+  const { data } = await useAPI<any>(`${BASE_RECHAR_URL}/view-recharge-request-detail`, {
+    method: 'GET',
+    query: {
+      id: props.id,
+    },
+  } as any)
+  if (data.value) {
+    form.setValues({
+      ...data.value,
+      attachedFiles: data.value.sustentationFile ? [data.value.sustentationFile] : [],
+    });
+  }
+  console.log(data.value)
+  form.setValues(data.value)
+}
+const handleRecharge = async (values: any) => {
+  openConfirmModal({
+    title: 'Autorizar recarga',
+    message: '¿Estás seguro deseas confirmar este lote de desembolso?',
+    callback: async () => {
+      const { status, error } = await autorizationRecharge(values);
+      if (status.value === 'success') {
+        emit('update:modelValue', false);
+        props.refreshTable();
+        updateConfirmModal({
+          title: 'Recarga autorizada',
+          message: 'Se ha autorizado la recarga',
+          type: 'success',
+        });
+      } else {
+        const eMsg =
+          error?.value?.data?.errors?.[0]?.message ||
+          error?.value?.data?.message ||
+          'La recarga no se pudo confirmar, inténtalo más tarde';
+
+        updateConfirmModal({
+          title: 'Error al confirmar recarga',
+          message: eMsg,
+          type: 'error',
+        });
+      }
+    },
+  });
+};
+const handleFilesChange = (files: File[]) => {
+  // Combina los archivos actuales con los nuevos
+  const existingFiles = form.values.attachedFiles || [];
+  form.values.attachedFiles = [...existingFiles, ...files];
+};
+const handleDecline = () => {
+  // Emitir el evento con datos necesarios (si aplica)
+  emit('open-reject-modal', { id: props.id, reason: null });
+};
+
+const onSubmit = async (values:any)  => {
+  let formattedValues = null
+  if(currentMode.value === "reject") {
+    const { valid } = await form.validate();
+    if(valid) {
+      const { operation, transferDate, amount, currency, attachedFiles} = form.values;
+      formattedValues = {
+        operation, 
+        transferDate, 
+        amount, 
+        currency, 
+        attachedFiles
+      }
+      props.onReject(formattedValues)
+    }
+  } else if(currentMode.value === "authorize") {
+    formattedValues = {
+      deliverySupportId: props.id,
+    }
+    props.onAuthorize(formattedValues);
+  }
+};
+
 </script>
 
 <template>
     <SheetHeader class="justify-between">
         <SheetTitle class="ml-2 text-[18px] font-[700] text-[#152A3C]">
-            {{ isEditing ? 'Editar solicitud de recarga' : 'Detalle solicitud' }}
+          Editar solicitud de recarga
         </SheetTitle>
         <SheetClose class="rounded-full p-3 hover:bg-[#f1f5f9]">
             <X class="w-4 h-4 text-muted-foreground" />
@@ -65,7 +143,7 @@ const cancelEdit = () => {
                         <FormItem>
                             <FormControl>
                                 <CustomInput v-bind="componentField" type="text" placeholder="Ingrese número"
-                                :disabled="!isEditing" label="N° operación" />
+                                 label="N° operación" />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -74,7 +152,7 @@ const cancelEdit = () => {
                     <FormField v-slot="{ componentField }" name="transferDate">
                         <FormItem>
                             <FormControl>
-                                <CustomInput  :disabled="!isEditing" type="date" label="Fecha de transferencia" v-bind="componentField" />
+                                <CustomInput  type="date" label="Fecha de transferencia" v-bind="componentField" />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -83,7 +161,7 @@ const cancelEdit = () => {
                     <FormField v-slot="{ componentField }" name="amount">
                         <FormItem>
                             <FormControl>
-                                <CustomInput  :disabled="!isEditing" v-bind="componentField" type="number" placeholder="0.00" 
+                                <CustomInput  disabled v-bind="componentField" type="number" placeholder="0.00" 
                                     label="Ingresa monto" />
                             </FormControl>
                             <FormMessage />
@@ -93,7 +171,7 @@ const cancelEdit = () => {
                     <FormField v-slot="{ componentField }" name="currency">
                         <FormItem>
                             <FormControl>
-                                <CustomSelect  :disabled="!isEditing" v-bind="componentField" :items="[{ id: 'USD', name: 'USD' }]"
+                                <CustomSelect  v-bind="componentField" :items="[{ id: 'USD', name: 'USD' }]"
                                     placeholder="Moneda" />
                             </FormControl>
                             <FormMessage />
@@ -104,12 +182,14 @@ const cancelEdit = () => {
                     <h2 class="font-[700] text-sm text-[#20445E] pr-[4px]">
                         SUSTENTO
                     </h2>
-                  <FormField v-slot="{ componentField }" name="paymentVoucher">
+                  <FormField v-slot="{ componentField }" name="attachedFiles">
                     <FormItem>
                         <FormControl>
                             <InputFile 
                             v-model="form.values.attachedFiles" 
+                            @update:value="handleFilesChange"
                             title="Archivos adjuntos"
+                            disabled
                             instructions-text="Cargar máximo 3 elementos(xlsx, docx, pdf)" :limit-files="3"
                             v-bind="componentField" />
                         </FormControl>
@@ -120,9 +200,11 @@ const cancelEdit = () => {
             </section>
         <div
           class="mt-4 flex flex-wrap md:flex-nowrap justify-center gap-y-[10px] gap-x-[16px] w-full">
-          <Button @click.prevent="cancelEdit" type="button" size="xl"
+          <Button  @click.prevent="handleDecline" type="button" size="xl"
             class="w-full max-w-[223px] text-[14px] md:text-[16px] font-[600] bg-white text-primary border border-primary hover:bg-accent">Rechazar</Button>
-          <Button type="submit" :disabled="!form.meta.value.valid" :class="cn(
+          <Button type="submit" 
+          :disabled="!form.meta.value.valid" 
+          :class="cn(
             'w-full max-w-[223px] text-[14px] md:text-[16px] font-[600] bg-[#062339] hover:bg-gray-700',
             !form.meta.value.valid
               ? 'text-white'

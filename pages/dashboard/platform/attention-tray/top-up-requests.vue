@@ -9,7 +9,6 @@
     <div class="w-full flex flex-col">
       <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
         <CustomTable
-          class="mb-4"
           :data="rechargeData"
           :header="rechargeHeader"
           :search="rechargeSearch"
@@ -32,134 +31,181 @@
                   align="start"
                   class="bg-primary text-white"
                 >
-                  <DropdownMenuItem @click="openModal(true)">
-                    Detalle solicitud
-                    <CustomIcons name="EyeIcon" class="ml-auto" />
-                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                      @click="openModal(row.id)"
+                    >
+                      Detalle solicitud
+                      <CustomIcons name="EyeIcon" class="ml-auto" />
+                  </DropdownMenuItem>               
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
-                    :disabled="row.status === 'ACTIVE'"
-                    @click="openModal(false)"
-                  >
-                    Editar solicitud
-                    <CustomIcons name="Pen" class="ml-auto" />
-                  </DropdownMenuItem>
+                      @click="openModalEditRequest(row.id)"
+                    >
+                     Editar solicitud
+                      <CustomIcons name="Pen" class="ml-auto" />
+                    </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem @click="openParticipantDetail(row)">
-                    Detalle participante
-                    <CustomIcons name="EyeIcon" class="ml-[10px]" />
-                  </DropdownMenuItem>
+                    <DropdownMenuItem 
+                    @click="openParticipantDetail(row)">
+                      Detalle participante
+                      <CustomIcons name="EyeIcon" class="ml-[10px]" />
+                    </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
           </template>
           <template #livelihood="{ row }">
-            <div class="flex items-center justify-center" @click="">
-              <CustomIcons name="Doc-Loupe" />
+            <div
+              class="flex items-center justify-center"
+              @click=""
+            >
+              <CustomIcons
+                name="Doc-Loupe"
+              />
             </div>
           </template>
           <template #status="{ row }">
             <CustomChip
-              :text="rechargeStatus.get(row.status)?.name || ''"
-              :variant="rechargeStatus.get(row.status)?.color as any"
+            :text="rechargeStatus.get(row.status)?.name || ''"
+            :variant="rechargeStatus.get(row.status)?.color as any"
             ></CustomChip>
           </template>
         </CustomTable>
+        <!-- Modal de Detalle de Solicitud -->
         <SheetContent
-          v-model:open="openApplicationModal"
+          v-model:open="openDetailModal"
           class="flex flex-col h-full"
           custom-width="510px"
-          @pointer-down-outside="(e) => e.preventDefault()"
-          @interact-outside="(e) => e.preventDefault()"
+          @pointer-down-outside="(e: Event) => e.preventDefault()"
+          @interact-outside="(e: Event) => e.preventDefault()"
         >
-          <ApplicationForm
-            :is-editing="!isEditing"
-            :title="isEditing ? 'Editar solicitud' : 'Detalle solicitud'"
-            :on-submit="onSubmit"
+          <RequestDetailForm
+            :id="rechargeId"
+            :on-authorize="handleAuthorize"
+            :on-reject="handleOpenRejectModal"
           />
         </SheetContent>
+
+        <!-- Modal de Editar Solicitud -->
+        <SheetContent
+          v-model:open="openEditModal"
+          class="flex flex-col h-full"
+          custom-width="510px"
+          @pointer-down-outside="(e: Event) => e.preventDefault()"
+          @interact-outside="(e: Event) => e.preventDefault()"
+        >
+          <EditRequestForm
+            :id="rechargeId"
+            :refresh-table="refresh"
+            :on-authorize="handleAuthorize"
+            :on-reject="handleOpenRejectModal"
+          />
+        </SheetContent>
+
+        <!-- Modal de Detalle Participante -->
         <SheetContent
           v-model:open="openParticipantModal"
           class="flex flex-col h-full"
           custom-width="510px"
-          @pointer-down-outside="(e) => e.preventDefault()"
-          @interact-outside="(e) => e.preventDefault()"
+          @pointer-down-outside="(e: Event) => e.preventDefault()"
+          @interact-outside="(e: Event) => e.preventDefault()"
         >
-          <ParticipantDetailForm :on-submit="onParticipantSubmit" />
+          <ParticipantDetailForm 
+          :participant-id="rechargeId"
+          />
         </SheetContent>
+
+        <!-- Modal para rechazar recarga -->
+        <!-- <ModalRejectRecharge
+          v-model:open="openRejectModal"
+          :details="rejectDetails"
+        /> -->
       </div>
       <CustomPagination
         v-model:page="page"
         class="mt-5 mb-[19px]"
-        :total="1"
-        :limit="1"
+        :total="data.count"
+        :limit="data.limit"
       />
     </div>
   </ContentLayout>
 </template>
-<script setup lang="ts">
-import { ref } from 'vue'
-import CustomTable from '~/components/ui/custom-table/CustomTable.vue'
-import CustomChip from '~/components/ui/custom-chip/CustomChip.vue'
-import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue'
-import CustomPagination from '~/components/ui/custom-pagination/CustomPagination.vue'
-import type { OrganizationItem } from '~/types/Order.ts'
-import {
-  rechargeStatus,
-  rechargeHeader,
-  rechargeSearch,
-} from '~/constants/attention-tray'
-import ContentLayout from '~/layouts/default/ContentLayout.vue'
-import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
-import ApplicationForm from '~/components/attention-tray/top-up-requests/ApplicationForm.vue'
-import ParticipantDetailForm from '~/components/attention-tray/top-up-requests/ParticipantDetailForm.vue'
-const openApplicationModal = ref(false)
-const openParticipantModal = ref(false)
-const { page, onSort, onSearch } = useTopUpRequests()
-const onSubmit = (formData: any) => {
-  console.log('Formulario enviado:', formData)
-  openApplicationModal.value = false
-}
-const onParticipantSubmit = (formData: any) => {
-  console.log('Detalle del participante enviado:', formData)
-  openParticipantModal.value = false
-}
-const rechargeId = ref<number | undefined>(undefined)
-const { openConfirmModal, updateConfirmModal } = useConfirmModal()
-const rechargeModal = ref<any>({ offerId: '' })
-const data = [
-  {
-    id: '12345',
-    dateOfRequest: '2024-11-01',
-    contractStartDate: '2024-12-01',
-    operation: '54321',
-    transfer: '2024-11-10',
-    amount: '1500.00',
-    livelihood: 'Documento ABC',
-    status: 'EARRING',
-    actions: '',
-  },
-  {
-    id: '67890',
-    dateOfRequest: '2024-10-25',
-    contractStartDate: '2024-11-01',
-    operation: '98765',
-    transfer: '2024-10-30',
-    amount: '3000.00',
-    livelihood: 'Documento XYZ',
-    status: 'EARRING',
-    actions: '',
-  },
-]
-const rechargeData = computed(() => data)
-const isEditing = ref(false)
-const openModal = (editMode: boolean) => {
-  isEditing.value = editMode
-  openApplicationModal.value = true
-}
-const openParticipantDetail = (row: any) => {
-  console.log('Abriendo detalle del participante:', row)
-  openParticipantModal.value = true
-}
-</script>
 
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import dayjs from 'dayjs';
+import ContentLayout from '~/layouts/default/ContentLayout.vue';
+import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue';
+import CustomTable from '~/components/ui/custom-table/CustomTable.vue';
+import CustomChip from '~/components/ui/custom-chip/CustomChip.vue';
+import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue';
+import CustomPagination from '~/components/ui/custom-pagination/CustomPagination.vue';
+import RequestDetailForm from '~/components/attention-tray/top-up-requests/RequestDetailForm.vue';
+import ParticipantDetailForm from '~/components/attention-tray/top-up-requests/ParticipantDetailForm.vue';
+import EditRequestForm from '~/components/attention-tray/top-up-requests/EditRequestForm.vue';
+import ModalRejectRecharge from '~/components/attention-tray/top-up-requests/ModalRejectRecharge.vue';
+import { rechargeStatus, rechargeHeader, rechargeSearch } from '~/constants/attention-tray';
+import { IuseRecharge } from '@/composables/useRecharge';
+import { useTopUpRequests } from '~/composables/useTopUpRequests';
+import { useAPI } from '~/composables/useAPI';
+
+// Variables de estado para los modales
+const openDetailModal = ref(false); 
+const openEditModal = ref(false); 
+const openParticipantModal = ref(false); 
+const openRejectModal = ref(false);
+
+const rechargeId = ref<number | undefined>(undefined);
+const rejectDetails = ref(null);
+
+// Funciones para manejar los modales
+const openModal = (rowId: number) => {
+  rechargeId.value = rowId;
+  openDetailModal.value = true;
+};
+
+const openModalEditRequest = (rowId: number) => {
+  rechargeId.value = rowId;
+  openEditModal.value = true;
+};
+
+const openParticipantDetail = (row: any) => {
+  rechargeId.value = row.participantId;
+  console.log('Abriendo detalle del participante:', row.participantId);
+  openParticipantModal.value = true;
+};
+
+// Data y API
+const { page, onSort, onSearch, filterOptions, sortOptions } = useTopUpRequests();
+const { autorizationRecharge } = IuseRecharge();
+const BASE_RECHAR_URL = '/finance/recharge-request-management';
+const { data, refresh }: any = await useAPI(
+  `${BASE_RECHAR_URL}/view-paginated-recharge-requests`,
+  {
+    query: {
+      limit: 8,
+      page,
+      filterOptions,
+      sortOptions,
+    },
+  } as any,
+)
+
+const rechargeData = computed(() =>
+  data.value?.data.map((item: any) => ({
+    fullName: item.participant.commonName,
+    ...item,
+    transferedAt: dayjs(item.transferedAt).format('YYYY-MM-DD'),
+    updatedAt: dayjs(item.updatedAt).format('YYYY-MM-DD'),
+  }))
+);
+
+// Manejo de acciones
+const handleAuthorize = async (values: { id: string }) => {
+  console.log('Autorizando recarga:', values);
+};
+const handleOpenRejectModal = (details: any) => {
+  rejectDetails.value = details;
+  openRejectModal.value = true;
+};
+</script>

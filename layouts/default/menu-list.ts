@@ -263,6 +263,53 @@ export function getMenuList(
             },
           ]
         : []),
+      ...(grants.includes(GrantId.PlatformReportsManagement)
+      ? [
+          {
+            label: 'Reportes',
+            active: pathname.includes('/reports'),
+            icon: 'Passbook',
+            submenus: [
+              ...(grants.includes(GrantId.PlatformReportsCanViewGlobalTransactions)
+                ? [
+                    {
+                      href: '/dashboard/platform/reports/transactions',
+                      label: 'Transacciones (Global) ',
+                      active: pathname.includes('/reports/transactions'),
+                    },
+                  ]
+                : []),
+                ...(grants.includes(GrantId.PlatformReportsCanViewDisbursementLots)
+                ? [
+                    {
+                      href: '/dashboard/platform/reports/disbursement-batch',
+                      label: 'Lote de desembolso',
+                      active: pathname.includes('/reports/disbursement-batch'),
+                    },
+                  ]
+                : []),
+                ...(grants.includes(GrantId.PlatformReportsCanViewAccountValidations)
+                ? [
+                    {
+                      href: '/dashboard/platform/reports/account-validation',
+                      label: 'Validación de cuentas',
+                      active: pathname.includes('/reports/account-validation'),
+                    },
+                  ]
+                : []),
+                ...(grants.includes(GrantId.PlatformReportsCanViewAccountBalance)
+                ? [
+                    {
+                      href: '/dashboard/platform/reports/account-balance',
+                      label: 'Balance de cuenta',
+                      active: pathname.includes('/reports/account-balance'),
+                    },
+                  ]
+                : []),
+            ],
+          },
+        ]
+      : []),
       ...(grants.includes(GrantId.OrganizationKpisManagement)
         ? [
             {

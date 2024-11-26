@@ -1,8 +1,28 @@
 import type { HeaderItem, SearchItem } from '@/components/ui/custom-table/CustomTable.vue';
 export const rechargeStatus = new Map<string, { name: string; color: string }>([
-    ["EARRING", { name: "Pendiente", color: "orange" }],
-    ["CONCRETED", { name: "Concretada", color: "blue" }],
-  ]);
+    ["PENDING", { name: "Pendiente", color: "orange" }],
+    ["CONFIRMED_DEPOSIT", { name: "Deposito confirmado", color: "blue" }],
+    ["ANNULED_DEPOSIT", { name: "Deposito anulado", color: "red" }],
+]);
+export const disbursementStatus = new Map<string, { name: string; color: string }>([
+    ["PENDING", { name: "Pendiente", color: "orange" }],
+    ["CONFIRMED_DEPOSIT", { name: "Deposito confirmado", color: "blue" }],
+    ["ANNULED_DEPOSIT", { name: "Deposito anulado", color: "red" }],
+]);
+export const bankType = new Map<string, string>([
+    ['BBVA', 'BBVA'],
+    ['BCP', 'Bcp'],
+    ['SCOTIABANK', 'Scotiabank'],
+]);
+export const paymentMethodType = new Map<string, string>([
+    ['TRANSFERENCE', 'Transferencia'],
+]);
+export const currencyType = new Map<string, string>([
+    ['USD', 'USD'],
+]);
+export const paymentMediumType = new Map<string, string>([
+    ['ACCOUNT_DEPOSIT', 'Depósito en cuenta'],
+]);
 export const rechargeSearch: SearchItem[] = [
     {
         key: 'id',
@@ -23,6 +43,7 @@ export const rechargeSearch: SearchItem[] = [
         elementClass: 'min-w-[400px]',
         position: 2,
     },
+    
 ]
 export const accountSearch: SearchItem[] = [
     {
@@ -80,17 +101,16 @@ export const disbursementSearch: SearchItem[] = [
         position: 1,
     },
     {
-        key: 'name',
-        type: 'text',
+        key: 'transfer',
+        type: 'date',
         placeholder: 'Fecha de transferencia',
-        elementClass: 'min-w-[400px]',
         position: 2,
     },
     {
         key: 'status',
         type: 'select',
-        placeholder: 'Banco',
-        items: [{ text: 'Todos', value: " " }],
+        placeholder: 'Filtrar estados',
+        items: [...Array.from(bankType).map(([key, value]) => ({ text: value, value: key })), { text: 'Todos', value: " " }],
         elementClass: 'min-w-[400px]',
         position: 2,
     }
@@ -101,19 +121,19 @@ export const rechargeHeader: HeaderItem[] = [
         label: 'N° Transación',       
     }, 
     {
-        key: 'dateOfRequest',
+        key: 'updatedAt',
         label: 'Fec. Solicitud',
     }, 
     {
-        key: 'contractStartDate',
-        label: 'Fecha de inicio del contrato',
+        key: 'fullName',
+        label: 'Nombres y apellidos',
     },
     {
-        key: 'operation',
+        key: 'operationNumber',
         label: 'N° Operación',
     },
     {
-        key: 'transfer',
+        key: 'transferedAt',
         label: 'Fec. Transferencia',
     },
     {
@@ -209,19 +229,19 @@ export const withdrawalRequeststHeader: HeaderItem[] = [
     }]  
 export const disbursementHeader: HeaderItem[] = [
     {
-        key: 'lotCode',
+        key: 'id',
         label: 'Cod lote',       
     }, 
     {
-        key: 'fullName',
+        key: 'request',
         label: 'Cant. solicitud retiro',
     },
     {
-        key: 'dateOfRegistration',
+        key: 'createdAt',
         label: 'Fec. Registro',
     }, 
     {
-        key: 'amount',
+        key: 'totalAmount',
         label: 'Monto a  desembolsar',
         sortable: true,
     },

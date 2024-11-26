@@ -31,6 +31,11 @@ export enum GrantId {
   PlatformAttentionCanViewAccountValidation = 'PLATFORM_ATTENTION_CAN_VIEW_ACCOUNT_VALIDATION',
   PlatformAttentionCanViewWithDrawalRequest = 'PLATFORM_ATTENTION_CAN_VIEW_WITHDRAWAL_REQUEST',
   PlatformAttentionCanViewDisbursementLots = 'PLATFORM_ATTENTION_CAN_VIEW_DISBURSEMENT_LOTS',
+  PlatformReportsManagement = 'PLATFORM_REPORTS_MANAGEMENT',
+  PlatformReportsCanViewGlobalTransactions = 'PLATFORM_REPORTS_CAN_VIEW_GLOBAL_TRANSACTIONS',
+  PlatformReportsCanViewDisbursementLots = 'PLATFORM_REPORTS_CAN_VIEW_DISBURSEMENT_LOTS',
+  PlatformReportsCanViewAccountValidations = 'PLATFORM_REPORTS_CAN_VIEW_ACCOUNT_VALIDATIONS',
+  PlatformReportsCanViewAccountBalance = 'PLATFORM_REPORTS_CAN_VIEW_ACCOUNT_BALANCE',
   /* Organization */
   OrganizationKpisManagement = 'ORGANIZATION_KPIS_MANAGEMENT',
   OrganizationEventsManagement = 'ORGANIZATION_EVENTS_MANAGEMENT',
