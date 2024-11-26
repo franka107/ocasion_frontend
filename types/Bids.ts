@@ -1,3 +1,4 @@
+import type { UserDto } from './Administrators'
 import type { OfferDto } from './Offer'
 
 export enum BidStatus {
@@ -22,6 +23,7 @@ export interface OfferWithBidDto {
 
 export interface BidDto {
   id: string
+  user: UserDto
   amount: number
   offer: OfferDto
   status: BidStatus

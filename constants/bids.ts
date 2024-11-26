@@ -10,6 +10,7 @@ export const bidStatus = new Map<string, { name: string; color: string }>([
   ['DEBATED', { name: 'Debatido', color: 'blue' }],
   ['ACCEPTED', { name: 'Aceptado', color: 'blue' }],
   ['WINNER', { name: 'Ganador', color: 'green' }],
+  ['BASE', { name: 'Base', color: 'blue' }],
 ])
 
 export const bidsSearch: SearchItem[] = [
@@ -43,15 +44,22 @@ export const bidsHeader: HeaderItem[] = [
     sortable: true,
   },
   {
+    key: 'createdAt',
+    sortable: true,
+    label: 'Fecha y hora',
+  },
+  {
+    key: 'pseudonym',
+    sortable: false,
+    label: 'Pseudónimo',
+  },
+
+  {
     key: 'offer.title',
     label: 'Bien',
     sortable: true,
   },
-  {
-    key: 'date',
-    sortable: true,
-    label: 'Fecha y hora',
-  },
+
   {
     key: 'amount',
     label: 'Monto',

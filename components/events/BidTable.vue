@@ -152,6 +152,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { GitCompareIcon } from 'lucide-vue-next'
+import { format } from 'date-fns'
+import { es } from 'date-fns/locale'
 import CounterOfferBidModal from '../bid/CounterOfferBidModal.vue'
 import CustomIcons from '@/components/ui/custom-icons/CustomIcons.vue'
 import CustomPagination from '@/components/ui/custom-pagination/CustomPagination.vue'
@@ -187,15 +189,34 @@ const disableMultipleSelect = computed(
 )
 const openModalCounterOffer = ref(false)
 const selectedCounterOfferInfo = ref({ currentAmount: 0, id: '' })
-const filterOptions = ref(
-  `[
-    { "field": "event.id", "type": "equal", "value": "${route.params.eventId}" },
-    { "field": "status", "type": "equal", "value": "${BidStatus.Winner}" }
-  ]`,
-)
+const props = defineProps<{
+  eventId?: string
+  offerId?: string
+}>()
+
+const filterOptionsRaw: FilterOption[] = []
+if (props.offerId) {
+  filterOptionsRaw.push({
+    field: 'offer.id',
+    type: 'equal',
+    value: `${props.offerId}`,
+  })
+} else {
+  filterOptionsRaw.push({
+    field: 'event.id',
+    type: 'equal',
+    value: `${props.eventId}`,
+  })
+  filterOptionsRaw.push({
+    field: 'status',
+    type: 'equal',
+    value: BidStatus.Winner,
+  })
+}
+const filterOptions = ref(JSON.stringify(filterOptionsRaw))
 const onSearch = (item: { [key: string]: string }) => {
   filterOptions.value = JSON.stringify([
-    { field: 'title', type: 'like', value: item.title || '' },
+    { field: 'offer.id', type: 'like', value: item.title || '' },
     { field: 'status', type: 'equal', value: item.status || '' },
     { field: 'event.id', type: 'equal', value: route.params.eventId },
   ])
@@ -216,16 +237,11 @@ const { data, refresh }: any = await useAPI(
 const bidsData = computed(
   () =>
     data.value?.data.map((item: BidDto, index: number) => ({
-      code: item.offer.id,
-      date: new Date(item.createdAt).toLocaleString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
-
       ...item,
+      code: item.offer.id,
+      createdAt: format(item.createdAt, 'dd/MM/yyyy - HH:mm', { locale: es }),
+      pseudonym: item.guaranteedAmount?.pseudonym,
+      userCommonName: item.user?.commonName,
     })) || [],
 )
 

@@ -14,7 +14,7 @@ const cardClass = (totalSeconds: number, offer: OfferListItem) => {
   const BID_WINNER_STATUS = 'WINNER'
 
   if (totalSeconds <= 0) {
-    if (offer.bids[0].status === BID_WINNER_STATUS) {
+    if (offer.bids[0]?.status === BID_WINNER_STATUS) {
       return 'border-2 border-green-400'
     } else {
       return 'border-2 border-black-600'
