@@ -80,30 +80,6 @@
               ></CustomChip>
             </template>
           </CustomTable>
-          <SheetContent
-            v-model:open="openApplicationModal"
-            class="flex flex-col h-full"
-            custom-width="510px"
-            @pointer-down-outside="(e) => e.preventDefault()"
-            @interact-outside="(e) => e.preventDefault()"
-            >
-            <ApplicationForm
-            :isEditing="!isEditing" 
-            :title="isEditing ? 'Editar solicitud' : 'Detalle solicitud'"
-            :on-submit="onSubmit"
-            />
-          </SheetContent>
-          <SheetContent
-            v-model:open="openParticipantModal"
-            class="flex flex-col h-full"
-            custom-width="510px"
-            @pointer-down-outside="(e) => e.preventDefault()"
-            @interact-outside="(e) => e.preventDefault()"
-          >
-            <ParticipantDetailForm 
-            :onSubmit="onParticipantSubmit" 
-            />
-          </SheetContent>
         </div>
         <CustomPagination
           v-model:page="page"
@@ -126,9 +102,6 @@
     transactionsSearch,
   } from '~/constants/reports'
   import ContentLayout from '~/layouts/default/ContentLayout.vue'
-  import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
-  import ApplicationForm from '~/components/attention-tray/top-up-requests/ApplicationForm.vue'
-  import ParticipantDetailForm from '~/components/attention-tray/top-up-requests/ParticipantDetailForm.vue'
   import { ref } from 'vue' 
   import TransactionsDetails from '~/components/reports/transactions/TransactionsDetails.vue'
   const openApplicationModal = ref(false); 

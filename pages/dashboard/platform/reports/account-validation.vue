@@ -63,8 +63,7 @@
   } from '~/constants/reports'
   import ContentLayout from '~/layouts/default/ContentLayout.vue'
   import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
-  import ApplicationForm from '~/components/attention-tray/top-up-requests/ApplicationForm.vue'
-  import ParticipantDetailForm from '~/components/attention-tray/top-up-requests/ParticipantDetailForm.vue'
+
   import { ref } from 'vue' 
   const openApplicationModal = ref(false); 
   const openParticipantModal = ref(false); 

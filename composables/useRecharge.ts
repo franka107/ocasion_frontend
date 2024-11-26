@@ -2,7 +2,7 @@
 import type { DisbursementLot } from '~/types/Disbursement'
 const BASE_RECH_URL = '/finance/recharge-request-management'
 
-export function useDisbursement() {
+export function IuseRecharge() {
     const page = ref(1)
     const filterOptions = ref('[]')
     const sortOptions = ref('[]')

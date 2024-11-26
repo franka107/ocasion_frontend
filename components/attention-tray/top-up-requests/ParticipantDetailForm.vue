@@ -4,9 +4,9 @@ import { X } from 'lucide-vue-next';
 import { toTypedSchema } from '@vee-validate/zod';
 import * as z from 'zod';
 import { useForm } from 'vee-validate';
-import InputFile from '@/components/common/file/Input.vue';
 
 const props = defineProps<{
+  participantId: string | number | undefined
 }>();
 
 const emit = defineEmits(['update:modelValue']);
@@ -39,13 +39,24 @@ const formSchema = toTypedSchema(
 
 const form = useForm({
   validationSchema: formSchema,
-});
+  initialValues: {},
+})
 
 const onSubmit = form.handleSubmit((values) => {
   console.log('Formulario enviado con los valores:', values);
   emit('update:modelValue', false);
 });
 
+if (props.participantId) {
+  const { data } = await useAPI<any>(`/user-management/get-user-detail`, {
+    method: 'GET',
+    query: {
+      id: props.participantId,
+    },
+  } as any)
+  console.log(data.value)
+  form.setValues(data.value)
+}
 </script>
 
 <template>
@@ -70,7 +81,8 @@ const onSubmit = form.handleSubmit((values) => {
                             type="text" 
                             label="Nombres" 
                             v-bind="componentField"
-                            disabled />
+                            disabled
+                             />
                         </FormControl>
                         <FormMessage />
                         </FormItem>

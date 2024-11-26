@@ -23,8 +23,8 @@ const {confirmDisbursement} = useDisbursement()
 const emit = defineEmits(['update:modelValue'])
 const formSchema = toTypedSchema(
   z.object({
-    disbursementDate: z.string().nonempty('La fecha de desembolso es requerida').optional(),
-    attachedFiles: z
+    disbursedAt: z.string().nonempty('La fecha de desembolso es requerida').optional(),
+    paymentSupportFile: z
       .array(z.any())
       .min(1, 'Debe subir al menos un archivo')
       .max(3, 'Puede subir un máximo de tres archivos.'),
@@ -76,7 +76,7 @@ const handleConfirm = async (values: { id: string; paymentSupportFile:{}; disbur
   });
 };
 const handleFilesChange = (files: File[]) => {
-  form.values.attachedFiles = files.map((file) => file.name);
+  form.values.paymentSupportFile = files.map((file) => file.name);
 };
 </script>
 
@@ -98,7 +98,7 @@ const handleFilesChange = (files: File[]) => {
         <!-- Formulario -->
         <div class="grid grid-cols-1 gap-2 xl:gap-4 px-6">
             <!-- Fecha de Desembolso -->
-                <FormField v-slot="{ componentField }" name="disbursementDate">
+                <FormField v-slot="{ componentField }" name="disbursedAt">
                     <FormItem>
                         <FormControl>
                             <CustomInput staticLabel type="date" label="Fecha de desembolso" v-bind="componentField" />
@@ -110,11 +110,11 @@ const handleFilesChange = (files: File[]) => {
                     <h2 class="font-[600] text-sm text-[#152A3C] pr-[4px] mb-4">
                         CARGAR SUSTENTO
                     </h2>
-                  <FormField v-slot="{ componentField }" name="attachedFiles">
+                  <FormField v-slot="{ componentField }" name="paymentSupportFile">
                     <FormItem >
                         <FormControl >
                             <InputFile 
-                            v-model="form.values.attachedFiles" 
+                            v-model="form.values.paymentSupportFile" 
                             @update:value="handleFilesChange"
                             title="Archivos adjuntos"
                             :limit-files="3"

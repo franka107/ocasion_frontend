@@ -53,13 +53,13 @@ const paymentMediumOptions = Array.from( paymentMediumType).map(([id, name]) => 
 
 const formSchema = toTypedSchema(
   z.object({
-    paymentMethod: z.array(z.string()).min(1, 'Seleccione una forma de pago.'),
-    bank: z.array(z.string()).min(1, "Seleccione un banco"),
-    currency: z.array(z.string()).min(1, 'Seleccione una moneda.'),
+    paymentMethod: z.string().min(1, 'Seleccione una forma de pago.'),
+    bank: z.string().min(1, "Seleccione un banco"),
+    currency: z.string().min(1, 'Seleccione una moneda.'),
     chargeAccount: z
       .string()
       .regex(/^\d{10,20}$/, 'Ingrese un número de cuenta válido.'),
-    paymentMedium: z.array(z.string()).min(1, 'Seleccione un medio de pago.'),
+    paymentMedium: z.string().min(1, 'Seleccione un medio de pago.'),
   }),
 )
 const form = useForm({
