@@ -230,7 +230,7 @@
         @pointer-down-outside="(e) => e.preventDefault()"
         @interact-outside="(e) => e.preventDefault()"
       >
-        <HistoryForm
+        <AppraisalHistoryForm
           :bids-id="bidsId"
           :bid-id="appraisalHistoryModal.offerId"
           :endpoint="auditBidHistories"
@@ -278,6 +278,7 @@
 </template>
 
 <script setup lang="ts">
+import AppraisalHistoryForm from '../history/AppraisalHistoryForm.vue'
 import {
   offerHeader,
   offerStatusRecord,
