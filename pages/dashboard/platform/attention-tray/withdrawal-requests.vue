@@ -13,15 +13,6 @@
           :header="withdrawalRequeststHeader"
           :search="withdrawalRequestsSearch"
           class="mb-4"
-          multiple-select
-          @on-sort="onSort"
-          @on-search="onSearch"
-          @on-multiple-select="
-            ({ ids, type, resetMultipleSelect: onResetMultipleSelect }) => {
-              selectedMultipleData = { ids, type }
-              resetMultipleSelect = onResetMultipleSelect
-            }
-          "
         >
           <template #actions="{ row }">
             <div class="flex justify-center">
@@ -116,16 +107,6 @@ import ParticipantDetailEditForm from '~/components/attention-tray/withdrawal-re
 import WithdrawalDetailsForm from '~/components/attention-tray/withdrawal-requests/WithdrawalDetailsForm.vue'
 import dayjs from 'dayjs'
 
-const selectedMultipleData = ref<{ type: string; ids: string[] }>({
-  type: 'empty',
-  ids: [],
-})
-const resetMultipleSelect = ref<Function | undefined>(undefined)
-const disableMultipleSelect = computed(
-  () =>
-    selectedMultipleData.value.type === 'empty' &&
-    selectedMultipleData.value.ids.length === 0,
-)
 const openApplicationModal = ref(false)
 const openParticipantModal = ref(false)
 const selectedRequestId = ref<string | null>(null)

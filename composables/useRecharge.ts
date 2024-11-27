@@ -25,7 +25,7 @@ export function IuseRecharge() {
     }
     const autorizationRecharge = async (values: any) => {
         const { status, error } = await useAPI(
-          `${BASE_RECH_URL}/autorization-recharge-requests`,
+          `${BASE_RECH_URL}/authorize-recharge-requests`,
           {
             method: 'POST',
             body: values,

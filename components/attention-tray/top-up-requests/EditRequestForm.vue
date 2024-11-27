@@ -60,35 +60,7 @@ if (props.id) {
   console.log(data.value)
   form.setValues(data.value)
 }
-const handleRecharge = async (values: any) => {
-  openConfirmModal({
-    title: 'Autorizar recarga',
-    message: '¿Estás seguro deseas confirmar este lote de desembolso?',
-    callback: async () => {
-      const { status, error } = await autorizationRecharge(values);
-      if (status.value === 'success') {
-        emit('update:modelValue', false);
-        props.refreshTable();
-        updateConfirmModal({
-          title: 'Recarga autorizada',
-          message: 'Se ha autorizado la recarga',
-          type: 'success',
-        });
-      } else {
-        const eMsg =
-          error?.value?.data?.errors?.[0]?.message ||
-          error?.value?.data?.message ||
-          'La recarga no se pudo confirmar, inténtalo más tarde';
 
-        updateConfirmModal({
-          title: 'Error al confirmar recarga',
-          message: eMsg,
-          type: 'error',
-        });
-      }
-    },
-  });
-};
 const handleFilesChange = (files: File[]) => {
   // Combina los archivos actuales con los nuevos
   const existingFiles = form.values.attachedFiles || [];
@@ -106,6 +78,7 @@ const onSubmit = async (values:any)  => {
     if(valid) {
       const { operation, transferDate, amount, currency, attachedFiles} = form.values;
       formattedValues = {
+        id: props.id,
         operation, 
         transferDate, 
         amount, 
