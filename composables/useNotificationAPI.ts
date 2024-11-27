@@ -52,6 +52,16 @@ export function useNotificationAPI() {
     return { status, error, data, refresh }
   }
 
+  const getNotReadedNotificationsCount = async () => {
+    const { status, error, data, refresh } = await useAPI<
+      IDataResponse<Notification>
+    >(`${NOTIFICATION_BASE_URL}/get-not-readed-notifications-count`, {
+      method: 'GET',
+    } as any)
+
+    return { status, error, data, refresh }
+  }
+
   const listenDomainEvents = <T>(event: string) => {
     const { apiUrl } = useRuntimeConfig().public
     const { user } = useUserSession()
@@ -107,6 +117,7 @@ export function useNotificationAPI() {
     findNotificationsPaginated,
     listenDomainEvents,
     removeNotifications,
+    getNotReadedNotificationsCount,
     removeNotification,
     readNotification,
     page,

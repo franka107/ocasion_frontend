@@ -22,6 +22,11 @@
               v-if="
                 myGrants.data.value.includes(
                   GrantId.OrganizationOffersCanReject,
+                ) &&
+                eventStatusCheckPosition(
+                  eventDetail.status,
+                  EventStatus.Published,
+                  ComparisonOperator.Less,
                 )
               "
               class="bg-white text-primary border border-primary hover:bg-accent"
@@ -32,9 +37,13 @@
             </Button>
             <Button
               v-if="
-                isOfferActionsVisible &&
                 myGrants.data.value.includes(
                   GrantId.OrganizationOffersCanConfirm,
+                ) &&
+                eventStatusCheckPosition(
+                  eventDetail.status,
+                  EventStatus.Published,
+                  ComparisonOperator.Less,
                 )
               "
               class="bg-white text-primary border border-primary hover:bg-accent"
@@ -136,6 +145,11 @@
                   v-if="
                     myGrants.data.value.includes(
                       GrantId.OrganizationOffersCanDiscuss,
+                    ) &&
+                    eventStatusCheckPosition(
+                      row.event.status,
+                      EventStatus.Published,
+                      ComparisonOperator.Less,
                     )
                   "
                   @click="
@@ -264,7 +278,13 @@
 </template>
 
 <script setup lang="ts">
-import { offerHeader, offerStatusRecord, offerSearch } from '@/constants/offer'
+import {
+  offerHeader,
+  offerStatusRecord,
+  offerSearch,
+  offerStatusCheckPosition,
+  ComparisonOperator,
+} from '@/constants/offer'
 import {
   type OfferListItem,
   type IDebateForm,
@@ -280,6 +300,7 @@ import AppraisalOfferModal from '~/components/offers/AppraisalOfferModal.vue'
 import { GrantId } from '~/types/Grant'
 import { EventStatus } from '~/types/Event'
 import { GlobalType } from '~/types/Common'
+import { eventStatusCheckPosition } from '~/constants/events'
 
 const { getMyGrants } = useAuthManagement()
 const myGrants = await getMyGrants()

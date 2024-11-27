@@ -14,7 +14,7 @@
               v-if="status === 'success'"
               class="text-xs font-medium leading-4 text-white"
             >
-              {{ notifications?.count }}
+              {{ notReadedCount }}
             </p>
             <p v-else>⦿</p>
           </Badge>
@@ -44,7 +44,8 @@
                     v-for="(notification, index) in notifications?.data"
                     :key="index"
                     :notification="notification"
-                    @on-remove="refresh"
+                    @on-remove="refreshAll"
+                    @on-readed="refreshAll"
                   />
                 </div>
                 <div v-else>
@@ -141,8 +142,12 @@ import { UserType } from '~/types/Administrators'
 
 const router = useRouter()
 const userSession = useUserSession()
-const { findNotificationsPaginated, listenDomainEvents, removeNotifications } =
-  useNotificationAPI()
+const {
+  findNotificationsPaginated,
+  listenDomainEvents,
+  removeNotifications,
+  getNotReadedNotificationsCount,
+} = useNotificationAPI()
 
 const isParticipant = computed(
   () => userSession.user.value?.user.type === UserType.Participant,
@@ -180,6 +185,17 @@ const {
   filterOptions: [],
   sortOptions: [{ field: 'createdAt', order: 'desc' }],
 })
+
+const {
+  data: notReadedCount,
+  refresh: refreshCount,
+  status: countStatus,
+} = await getNotReadedNotificationsCount()
+
+const refreshAll = async () => {
+  await refresh()
+  await refreshCount()
+}
 
 const webNotification = useWebNotification({
   title: 'New Notification',
@@ -228,5 +244,6 @@ watch(notificationCreatedListener.data, (value, oldValue) => {
   // play()
   webNotification.show()
   refresh()
+  refreshCount()
 })
 </script>

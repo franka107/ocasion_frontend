@@ -78,7 +78,7 @@ import {
   type Notification,
 } from '~/types/Notification'
 
-const emit = defineEmits(['onRemove'])
+const emit = defineEmits(['onRemove', 'onReaded'])
 const props = defineProps<{
   notification: Notification
 }>()
@@ -92,7 +92,8 @@ const notificationDf = new DateFormatter('es', {
   month: 'long',
 })
 
-const { removeNotifications, removeNotification } = useNotificationAPI()
+const { removeNotifications, removeNotification, readNotification } =
+  useNotificationAPI()
 
 const toggleMenu = (event: Event) => {
   event.stopPropagation()
@@ -104,8 +105,20 @@ const closeMenu = () => {
 }
 
 const markAsRead = async () => {
-  console.log(`Marcando la notificación ${props.notification.id} como leída`)
-  props.notification.isRead = true
+  // console.log(`Marcando la notificación ${props.notification.id} como leída`)
+  // props.notification.isRead = true
+  // emit('onReaded')
+  // closeMenu()
+
+  try {
+    const { status } = await readNotification(props.notification.id)
+    if (status.value === 'success') {
+      emit('onReaded')
+      console.log('Notification eliminada')
+    }
+  } catch (error) {
+    console.error('Error al eliminar la notificación:', error)
+  }
   closeMenu()
 }
 

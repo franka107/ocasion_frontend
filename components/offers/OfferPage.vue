@@ -5,8 +5,12 @@
         <template #default>
           <Button
             v-if="
-              isEventNotPublished &&
-              myGrants.data.value.includes(GrantId.PlatformEventsCanPublish)
+              myGrants.data.value.includes(GrantId.PlatformEventsCanPublish) &&
+              eventStatusCheckPosition(
+                eventDetail.status,
+                EventStatus.Published,
+                ComparisonOperator.Less,
+              )
             "
             variant="default"
             class="bg-white text-primary border border-primary hover:bg-accent"
@@ -29,7 +33,8 @@ import OfferTable from '@/components/events/OfferTable.vue'
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
 import { EventStatus } from '~/types/Event'
 import { GrantId } from '~/types/Grant'
-import { eventStatus } from '~/constants/events'
+import { eventStatus, eventStatusCheckPosition } from '~/constants/events'
+import { ComparisonOperator } from '~/constants/offer'
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const { publishEvent } = useEvent()
 
