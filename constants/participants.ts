@@ -52,7 +52,7 @@ export const participantSearch = (): SearchItem[] => [
 
 export const participantsHeader: HeaderItem[] = [
   {
-    key: 'fullName',
+    key: 'commonName',
     label: 'Nombre y apellidos',
     sortable: true,
   },
