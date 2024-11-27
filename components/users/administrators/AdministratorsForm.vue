@@ -180,14 +180,18 @@ if (props.id) {
   const userType = userTypeToGlobal(
     user.data.value.type || UserType.OrganizationUser,
   )
-  await fetchRoles([
-    { field: 'type', value: userType, type: 'equal' },
-    {
-      field: 'organizations.id',
-      value: user.data.value.organizations.map((e) => e.id),
-      type: 'in',
-    },
-  ])
+  if (userType === GlobalType.Organization) {
+    await fetchRoles([
+      { field: 'type', value: userType, type: 'equal' },
+      {
+        field: 'organizations.id',
+        value: user.data.value.organizations.map((e) => e.id),
+        type: 'in',
+      },
+    ])
+  } else {
+    await fetchRoles([{ field: 'type', value: userType, type: 'equal' }])
+  }
 } else {
   await fetchRoles([{ field: 'type', value: globalType, type: 'equal' }])
 }
@@ -277,7 +281,6 @@ const handleUserTypeChange = async (userType: UserType) => {
     typeof form.values.organizations === 'string'
   ) {
     await fetchRoles([
-      // { field: 'type', value: GlobalType.Organization, type: 'equal' },
       {
         field: 'organizations.id',
         value: form.values.organizations,
@@ -287,7 +290,6 @@ const handleUserTypeChange = async (userType: UserType) => {
 
     const matchingRole = roles.value.find((role) => role.id === userType)
     if (matchingRole) {
-      // QUACK
       form.setFieldValue('roles', [matchingRole.id]) // Set the role automatically
     }
   } else {
