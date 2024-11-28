@@ -16,7 +16,7 @@ export const validationStatus = new Map<string, { name: string; color: string }>
 
 export const transactionsSearch: SearchItem[] = [
     {
-        key: 'id',
+        key: 'fullName',
         type: 'text',
         placeholder: 'Buscar participante, n° transacción o  n° DOI',
         elementClass: 'max-w-[700px] w-full',
