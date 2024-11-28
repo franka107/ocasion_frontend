@@ -32,20 +32,33 @@ const registerFormSchema = z.object({
 
   firstName: z.string().min(1, 'El nombre es requerido').optional(),
   lastName: z.string().min(1, 'El apellido es requerido').optional(),
-  maritalStatus: z.enum(['SINGLE', 'MARRIED', 'WIDOWED', 'DIVORCED']).optional(),
+  maritalStatus: z
+    .enum(['SINGLE', 'MARRIED', 'WIDOWED', 'DIVORCED'])
+    .optional(),
   gender: z.enum(['MALE', 'FEMALE']).optional(),
-  birthDate: z.string().nonempty('La fecha de nacimiento es requerida').optional(),
+  birthDate: z
+    .string()
+    .nonempty('La fecha de nacimiento es requerida')
+    .optional(),
 
-  businessName: z.string().min(1, 'El nombre del negocio es requerido').optional(),
+  businessName: z
+    .string()
+    .min(1, 'El nombre del negocio es requerido')
+    .optional(),
   ruc: z
     .string()
     .regex(/^\d{11}$/, 'El RUC debe contener 11 dígitos')
     .optional(),
-  legalRepresentative: z.string().min(1, 'El representante legal es requerido').optional(),
+  legalRepresentative: z
+    .string()
+    .min(1, 'El representante legal es requerido')
+    .optional(),
   taxAddress: z.string().min(1, 'El Domicilio Fiscal es requerida').optional(),
 
   email: z.string().email('Debe ser un correo electrónico válido'),
-  phoneNumber: z.string().min(9, 'El número de teléfono debe tener al menos 9 dígitos'),
+  phoneNumber: z
+    .string()
+    .min(9, 'El número de teléfono debe tener al menos 9 dígitos'),
   representative: z
     .object({
       documentType: z.enum(['DNI', 'CE', 'PT']),
@@ -77,7 +90,9 @@ const registerFormSchema = z.object({
         })
       }
     }),
-  areConditionsAccepted: z.boolean().refine(val => val === true, 'Debe aceptar los términos y condiciones'),
+  areConditionsAccepted: z
+    .boolean()
+    .refine((val) => val === true, 'Debe aceptar los términos y condiciones'),
 })
 
 type RegisterForm = z.infer<typeof registerFormSchema>
@@ -103,8 +118,14 @@ const onSubmit = form.handleSubmit(async (values: RegisterForm) => {
     const { representative, ...restValues } = values
     const formattedValues = {
       ...restValues,
-      documentType: representative.documentType,
-      documentIdentifier: representative.documentIdentifier,
+      documentType:
+        values.personType === 'NATURAL_PERSON'
+          ? representative.documentType
+          : 'RUC',
+      documentIdentifier:
+        values.personType === 'NATURAL_PERSON'
+          ? representative.documentIdentifier
+          : values.ruc,
     }
 
     await handleSignIn(formattedValues)
@@ -127,10 +148,13 @@ const handleSignIn = async (values: any) => {
   }
 }
 
-const personType = computed(() => form.values.personType);
-const showNaturalPersonFields = computed(() => personType.value === 'NATURAL_PERSON');
-const showJuridicPersonFields = computed(() => personType.value === 'JURIDIC_PERSON');
-
+const personType = computed(() => form.values.personType)
+const showNaturalPersonFields = computed(
+  () => personType.value === 'NATURAL_PERSON',
+)
+const showJuridicPersonFields = computed(
+  () => personType.value === 'JURIDIC_PERSON',
+)
 </script>
 
 <template>
@@ -176,7 +200,11 @@ const showJuridicPersonFields = computed(() => personType.value === 'JURIDIC_PER
             <FormField v-slot="{ componentField }" name="firstName">
               <FormItem>
                 <FormControl>
-                  <CustomInput type="text" label="Nombre" v-bind="componentField" />
+                  <CustomInput
+                    type="text"
+                    label="Nombre"
+                    v-bind="componentField"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -185,7 +213,11 @@ const showJuridicPersonFields = computed(() => personType.value === 'JURIDIC_PER
             <FormField v-slot="{ componentField }" name="lastName">
               <FormItem>
                 <FormControl>
-                  <CustomInput type="text" label="Apellido" v-bind="componentField" />
+                  <CustomInput
+                    type="text"
+                    label="Apellido"
+                    v-bind="componentField"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -228,7 +260,11 @@ const showJuridicPersonFields = computed(() => personType.value === 'JURIDIC_PER
             <FormField v-slot="{ componentField }" name="birthDate">
               <FormItem>
                 <FormControl>
-                  <CustomInput type="date" label="Fecha de Nacimiento" v-bind="componentField" />
+                  <CustomInput
+                    type="date"
+                    label="Fecha de Nacimiento"
+                    v-bind="componentField"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -241,7 +277,11 @@ const showJuridicPersonFields = computed(() => personType.value === 'JURIDIC_PER
           <FormField v-slot="{ componentField }" name="businessName">
             <FormItem>
               <FormControl>
-                <CustomInput type="text" label="Razón Social" v-bind="componentField" />
+                <CustomInput
+                  type="text"
+                  label="Razón Social"
+                  v-bind="componentField"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -259,7 +299,11 @@ const showJuridicPersonFields = computed(() => personType.value === 'JURIDIC_PER
           <FormField v-slot="{ componentField }" name="legalRepresentative">
             <FormItem>
               <FormControl>
-                <CustomInput type="text" label="Representante Legal" v-bind="componentField" />
+                <CustomInput
+                  type="text"
+                  label="Representante Legal"
+                  v-bind="componentField"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -268,20 +312,26 @@ const showJuridicPersonFields = computed(() => personType.value === 'JURIDIC_PER
           <FormField v-slot="{ componentField }" name="taxAddress">
             <FormItem>
               <FormControl>
-                <CustomInput type="text" label="Domicilio Fiscal" v-bind="componentField" />
+                <CustomInput
+                  type="text"
+                  label="Domicilio Fiscal"
+                  v-bind="componentField"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           </FormField>
         </template>
 
-
         <div class="grid grid-cols-2 gap-4">
-
           <FormField v-slot="{ componentField }" name="phoneNumber">
             <FormItem>
               <FormControl>
-                <CustomInput type="tel" label="Número de Teléfono" v-bind="componentField" />
+                <CustomInput
+                  type="tel"
+                  label="Número de Teléfono"
+                  v-bind="componentField"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -289,7 +339,11 @@ const showJuridicPersonFields = computed(() => personType.value === 'JURIDIC_PER
           <FormField v-slot="{ componentField }" name="email">
             <FormItem>
               <FormControl>
-                <CustomInput type="email" label="Email" v-bind="componentField" />
+                <CustomInput
+                  type="email"
+                  label="Email"
+                  v-bind="componentField"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
