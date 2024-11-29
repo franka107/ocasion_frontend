@@ -51,6 +51,11 @@ export interface Bid {
   userId: string
   user: UserDto
   __entity: string
+  guaranteedAmount: GuaranteedAmount
+}
+
+export interface GuaranteedAmount {
+  pseudonym: string
 }
 
 export interface BidHistory {
