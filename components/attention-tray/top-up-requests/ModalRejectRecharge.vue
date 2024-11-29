@@ -2,6 +2,8 @@
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import { z } from 'zod'
+import { ExclamationTriangleIcon } from '@radix-icons/vue'
+import { X } from 'lucide-vue-next'
 import {
   AlertDialog,
   AlertDialogContent,
@@ -9,92 +11,56 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { useDisbursement } from '@/composables/useDisbursement'
-import { bankType, paymentMethodType, currencyType , paymentMediumType} from '@/constants/attention-tray'
-const {
-  generatelPreviewDisbursement,
-  generatelDisbursement,
-} = useDisbursement()
-const emit = defineEmits(['update:modelValue'])
-const { openConfirmModal, updateConfirmModal } = useConfirmModal()
-const props = defineProps<{ 
-  id?: string
-  modelValue: boolean 
-  bank: string
-  onSubmit: (values: any) => void;
+const {rejectRechargeRequest} = useTopUpRequests()
+const openAnnulModal = ref(false) 
+const props = defineProps<{
+  id: string
+  modelValue: boolean
   refreshTable: () => void
 }>()
-const resumenMensaje = `
-    **Cod lote:** 0000
-    **N° solicitudes:** 00
-    **Suma de monto a desembolsar:** 0.00
-    **Banco de origen:** BBVA
-    **Cuenta de origen:** 0000 0000 0000 0000
-`;
-const paymentMethodOptions = Array.from(paymentMethodType).map(([id, name]) => ({
-  id,
-  name,
-}));
-
-const banksOptions = Array.from(bankType).map(([id, name]) => ({
-  id,
-  name,
-}));
-
-const currencyOptions = Array.from(currencyType).map(([id, name]) => ({
-  id,
-  name,
-}));
-
-const paymentMediumOptions = Array.from( paymentMediumType).map(([id, name]) => ({
-  id,
-  name,
-}));
-
+const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const formSchema = toTypedSchema(
   z.object({
-    paymentMethod: z.string().min(1, 'Seleccione una forma de pago.'),
-    bank: z.string().min(1, "Seleccione un banco"),
-    currency: z.string().min(1, 'Seleccione una moneda.'),
-    chargeAccount: z
-      .string()
-      .regex(/^\d{10,20}$/, 'Ingrese un número de cuenta válido.'),
-    paymentMedium: z.string().min(1, 'Seleccione un medio de pago.'),
+    rejection: z.string().min(1, 'Seleccione un motivo.'),
+    comment: z.string().min(1, "El comentario es requerido."),
   }),
 )
+const emit = defineEmits(['update:modelValue'])
 const form = useForm({
   validationSchema: formSchema,
 })
-const onSubmit = form.handleSubmit((values) => {
-  const { paymentMethod, bank, currency, chargeAccount, paymentMedium } = values
-  console.log('Formulario enviado con los valores:', values)
-  handleSubmit({ id: props.id, paymentMethod, bank, currency, chargeAccount, paymentMedium })
-  emit('update:modelValue', false)
+const onSubmit = form.handleSubmit((values: any) => {
+  const { rejection, comment } = values
+  handleReject({ rejectId: props.id, rejection, comment })
+  console.log('onsubmit', rejection, comment)
 })
-const handleSubmit = async (values: any) => {
+const cancelEdit = () => {
+  emit('update:modelValue', false); 
+};
+const handleReject = async (values: any) => {
   openConfirmModal({
-    title: 'Resumen del desembolso',
-    message: `
-      ¿Está seguro de generar el lote del desembolso?
-      ${values.resumenMensaje}
-    `,
+    title: 'Rechazar solicitud de recarga',
+    message: '¿Está seguro que desea rechazar la solicitud de recarga?',
     callback: async () => {
-      const { status, error }: any = await generatelPreviewDisbursement(values)
+      const { status, error }: any = await rejectRechargeRequest({
+        id: values.id,
+        rejectionReason: 'Rechazado por el administrador',
+      })
       if (status.value === 'success') {
-        emit('update:modelValue', false)
+        openAnnulModal.value = false
         props.refreshTable()
         updateConfirmModal({
-          title: 'Desembolso generado',
-          message: 'El desembolso ha sido generado exitosamente',
+          title: 'Solicitud de recarga rechazada',
+          message: 'Se ha rechazado la soliciud de recarga',
           type: 'success',
         })
       } else {
         const eMsg =
           error.value.data?.errors?.[0].message ||
           error.value.data.message ||
-          'El desembolso no se pudo generar, intentalo más tarde'
+          'El solicitud de recarga no se pudo rechazar, intentalo más tarde'
         updateConfirmModal({
-          title: 'Error al generar desembolso',
+          title: 'Error al rechazar la solicitud de recarga',
           message: eMsg,
           type: 'error',
         })
@@ -110,101 +76,61 @@ const handleSubmit = async (values: any) => {
     class="z-[30]"
     @update:open="(event) => emit('update:modelValue', event)"
   >
-    <AlertDialogContent class="z-[98] h-auto max-w-[670px] px-0">
-      <form class="flex flex-col gap-6 flex-grow max-h-[calc(100vh-4rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-primary/50" @submit="onSubmit">
-        <!-- Título -->
-        <AlertDialogHeader class="border-b border-primary">
-          <AlertDialogTitle
-            class="text-xl tracking-[-0.5px] text-primary text-start font-[600] px-6 pb-[18px]"
-            >Generar lote de desembolso</AlertDialogTitle
-          >
-        </AlertDialogHeader>
-        <div class="grid grid-cols-2 gap-2 xl:gap-4 px-6">
-          <!-- Forma de pago -->
-            <FormField v-slot="{ componentField }" name="paymentMethod">
-                <FormItem>
-                <FormControl>
-                    <CustomSelect
-                    v-bind="componentField"
-                    :items="paymentMethodOptions"
-                    placeholder="Forma de pago"
-                    />
-                </FormControl>
-                <FormMessage />
-                </FormItem>
-            </FormField>  
-          <!-- Banco -->
-            <FormField v-slot="{ componentField }" name="bank">
-                  <FormItem>
-                  <FormControl>
-                      <CustomSelect
-                      v-bind="componentField"
-                      :items="banksOptions"
-                      placeholder="Banco"
-                      />
-                  </FormControl>
-                  <FormMessage />
-                  </FormItem>
-            </FormField>      
-          <!-- Moneda -->
-          <FormField v-slot="{ componentField }" name="currency">
-              <FormItem >
-              <FormControl>
-                  <CustomSelect
-                  v-bind="componentField"
-                  :items="currencyOptions"
-                  placeholder="Moneda"
-                  />
-              </FormControl>
-              <FormMessage />
-              </FormItem>
-          </FormField>
-          <!-- Cuenta cargo -->
-          <FormField v-slot="{ componentField }" name="chargeAccount">
-              <FormItem>
-              <FormControl>
-                  <CustomInput
-                  v-bind="componentField"
-                  type="text"
-                  placeholder="0000 0000 0000 0000"
-                  label="Cuenta cargo"
-                  />
-              </FormControl>
-              <FormMessage />
-              </FormItem>
-          </FormField>
-          <!-- Medio de pago -->
-          <FormField v-slot="{ componentField }" name="paymentMedium">
-                <FormItem>
-                <FormControl>
-                    <CustomSelect
-                    v-bind="componentField"
-                    :items="paymentMediumOptions"
-                    placeholder="Medio de pago"
-                    />
-                </FormControl>
-                <FormMessage />
-                </FormItem>
-            </FormField>  
+    <AlertDialogContent class="z-[98] max-w-[409px] px-0">
+      <form class="flex flex-col gap-6 flex-grow" @submit="onSubmit">
+        <div>
+          <AlertDialogHeader class="flex items-center">
+            <CustomIcons name="Warning" class="w-[32px] h-[32px]" />
+            <AlertDialogTitle
+              class="text-xl tracking-[-0.5px] text-primary text-start mb-[18px] font-[600] px-6"
+              >Rechazar solicitud</AlertDialogTitle
+            >
+          </AlertDialogHeader>
         </div>
-        <!-- Botones -->
+        <div class="grid grid-cols-1 gap-3 px-6">
+          <p class="text-[14px] font-[500] text-[#68686C]">¿Está seguro que desea rechazar la solicitud de recarga? Si es asi por favor ingresar el motivo de rechazo.</p>
+          <!-- Motivo de Rechazo -->
+          <FormField v-slot="{ componentField }" name="rejection">
+            <FormItem>
+              <FormControl>
+                <CustomSelect
+                  v-bind="componentField"
+                  :items="[ { id: 'motivo1', name: 'Motivo 1' }, { id: 'motivo2', name: 'Motivo 2' } ]"
+                  placeholder="Forma de pago"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+          <!-- Comentario -->
+          <FormField v-slot="{ componentField }" name="comment">
+            <FormItem>
+              <FormControl>
+                <Textarea
+                type="text"
+                label="Comentarios"
+                v-bind="componentField"
+                />
+                <FormMessage />
+              </FormControl>
+            </FormItem>
+          </FormField>
+        </div>
         <AlertDialogFooter class="px-6">
           <Button
             type="button"
             size="xl"
-            class="text-[16px] font-[600] bg-white text-primary border border-primary hover:bg-accent mt-[16px]"
-            @click="emit('update:modelValue', false)"
+            class="text-[16px] font-[600] bg-white text-primary border border-primary hover:bg-accent"
+            @click.prevent="cancelEdit"
+            >Cancelar</Button
           >
-            Cancelar
-          </Button>
           <Button
             type="submit"
+            class="text-[16px] font-[600] "
             size="xl"
-            class="text-[16px] font-[600] mt-[16px]"
             :disabled="!form.meta.value.valid"
+            >Confirmar</Button
           >
-            Generar
-          </Button>
         </AlertDialogFooter>
       </form>
     </AlertDialogContent>

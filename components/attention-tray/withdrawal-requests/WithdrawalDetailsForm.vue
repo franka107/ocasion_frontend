@@ -6,9 +6,10 @@ import * as z from 'zod';
 import { useForm } from 'vee-validate';
 
 const props = defineProps<{
+  id: string
   onSubmit: (values: any) => void;
 }>();
-
+const BASE_WITH_URL = '/finance/withdrawal-request-management'
 const emit = defineEmits(['update:modelValue']);
 
 const formSchema = toTypedSchema(
@@ -31,12 +32,23 @@ const formSchema = toTypedSchema(
 
 const form = useForm({
   validationSchema: formSchema,
+  initialValues: {},
 });
 
 const onSubmit = form.handleSubmit((values) => {
   console.log('Formulario enviado con los valores:', values);
   emit('update:modelValue', false);
 });
+if (props.id) {
+  const { data } = await useAPI<any>(`${BASE_WITH_URL}/view-withdrawal-request-detail`, {
+    method: 'GET',
+    query: {
+      id: props.id,
+    },
+  } as any)
+  console.log(data.value)
+  form.setValues(data.value)
+}
 const cancelEdit = () => {
   emit('update:modelValue', false);
 };

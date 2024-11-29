@@ -65,7 +65,7 @@
                        <CustomIcons name="X" class="ml-auto" />
                      </DropdownMenuItem>
                    <DropdownMenuSeparator />
-                     <DropdownMenuItem @click="openParticipantDetail(row.id)">
+                     <DropdownMenuItem @click="openWithdrawalDetails(row.id)">
                        Detalle 
                        <CustomIcons name="EyeIcon" class="ml-auto" />
                      </DropdownMenuItem>
@@ -91,16 +91,17 @@
            </template>
          </CustomTable>
          <SheetContent
-           v-model:open="openParticipantModal"
-           class="flex flex-col h-full"
-           custom-width="510px"
-           @pointer-down-outside="(e) => e.preventDefault()"
-           @interact-outside="(e) => e.preventDefault()"
-         >
-           <ParticipantDetailForm 
-           :onSubmit="onParticipantSubmit" 
-           />
-         </SheetContent>
+          v-model:open="openWithdrawalDetailsModal"
+          class="flex flex-col h-full"
+          custom-width="510px"
+          @pointer-down-outside="(e) => e.preventDefault()"
+          @interact-outside="(e) => e.preventDefault()"
+        >
+          <WithdrawalDetailsForm
+            v-model="openWithdrawalDetailsModal"
+            @submit="onWithdrawalDetailsSubmit"
+          />
+        </SheetContent>
          <GenerateDisbursementBatchModal
            :id="generateDisbursementForm.id"
            v-model="openModalGenerate"
@@ -144,6 +145,7 @@
  import ConfirmDisbursementModal from '~/components/attention-tray/disbursement-lots/ConfirmDisbursementModal.vue'
  import { ref } from 'vue' 
  import { useDisbursement } from '@/composables/useDisbursement'
+ import WithdrawalDetailsForm from '~/components/attention-tray/withdrawal-requests/WithdrawalDetailsForm.vue'
  const openApplicationModal = ref(false); 
  const openParticipantModal = ref(false); 
  const {
@@ -157,6 +159,16 @@
  const openModalGenerate= ref(false)
  const openModalConfirm = ref(false)
  const openAnnulModal = ref(false)
+ const openWithdrawalDetailsModal = ref(false)
+ const selectedRequestId = ref<string | null>(null)
+ const openWithdrawalDetails = (requestId: string) => {
+    selectedRequestId.value = requestId
+    openWithdrawalDetailsModal.value = true
+  }
+ const onWithdrawalDetailsSubmit = (formData: any) => {
+    console.log('Detalle de solicitud enviado:', formData)
+    openWithdrawalDetailsModal.value = false
+  }
  const onSubmit = (formData: any) => {
    console.log("Formulario enviado:", formData);
    openApplicationModal.value = false; 

@@ -1,4 +1,5 @@
 import type { DisbursementLot } from '~/types/Disbursement'
+import dayjs from "dayjs"
 const BASE_DIS_URL = '/finance/disbursement-management'
 
 export function useDisbursement() {
@@ -11,14 +12,16 @@ export function useDisbursement() {
 
   const onSearch = (item: { [key: string]: string }) => {
     const filters = [
-      { field: 'id', type: 'like', value: item.id || '' },
-      { field: 'name', type: 'like', value: item.name || '' },
+      { field: 'quickSearch', type: 'like', value: item.quickSearch || '' },
     ]
     if (item.status) {
       filters.push({ field: 'status', type: 'equal', value: item.status })
     }
     if (item.bank) {
       filters.push({ field: 'bank', type: 'equal', value: item.bank })
+    }
+    if (item.createdAt) {
+      filters.push({ field: 'createdAt', type: 'between', value: item.createdAt })
     }
     filterOptions.value = JSON.stringify(filters)
   }
@@ -66,6 +69,46 @@ export function useDisbursement() {
     )
     return { status, error }
   }
+  const { openConfirmModal, updateConfirmModal } = useConfirmModal()
+  const handleExport = async () => {
+    openConfirmModal({
+      title: 'Exportar reporte de lotes de desembolso',
+      message: '¿Estás seguro de que deseas exportar reporte(s) de lote(s) de desembolso?',
+      callback: async () => {
+          const { data: response, error, status } = await useAPI<string | any>(`${BASE_DIS_URL}/export-disbursement-lots?filterOptions=${filterOptions.value}`,{} as any)
+          if (status.value === 'success') {
+            // Convertir la respuesta en un blob
+            const blob =new Blob([response.value], {
+              type: 'text/plain'
+            });
+            // Crear un enlace temporal para la descarga
+            const link = document.createElement('a')
+            link.href = URL.createObjectURL(blob)
+            link.setAttribute('download', `transacciones-${dayjs().format('YYYY-MM-DD hh:mm:ss')}.csv`)
+            document.body.appendChild(link)
+            link.click()
+            link.remove()
+            // Liberar la URL del blob
+            URL.revokeObjectURL(link.href)
+            updateConfirmModal({
+                title: 'Exportación exitosa',
+                message: 'Los reportes de lotes de desembolso han sido exportadas exitosamente.',
+                type: 'success',
+              })
+          
+          } else {
+            const eMsg =
+              error.value?.data.message ||
+              'Error al exportar reporte(s) de lotes de desembolso. Inténtalo de nuevo más tarde.'
+            updateConfirmModal({
+              title: 'Error al exportar transacciones',
+              message: String(eMsg),
+              type: 'error',
+            })
+          }
+      },
+    })
+  }
   return {
     page,
     filterOptions,
@@ -76,6 +119,7 @@ export function useDisbursement() {
     confirmDisbursement,
     generatelPreviewDisbursement,
     generatelDisbursement,
+    handleExport
   }
 }
 

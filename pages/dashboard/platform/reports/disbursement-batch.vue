@@ -27,11 +27,7 @@
                     >Mas filtros</Button>
                     <Button
                     variant="default"
-                    @click="
-                        () => {
-                        
-                        }
-                    "
+                    @click="handleExport"
                     >
                     <CustomIcons name="Download" class="ml-auto" />
                     Exportar
@@ -88,16 +84,19 @@
   } from '~/constants/reports'
   import ContentLayout from '~/layouts/default/ContentLayout.vue'
   import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
-  import ApplicationForm from '~/components/attention-tray/top-up-requests/ApplicationForm.vue'
-  import ParticipantDetailForm from '~/components/attention-tray/top-up-requests/ParticipantDetailForm.vue'
   import { ref } from 'vue' 
+  import { useDisbursement } from '@/composables/useDisbursement'
+  import dayjs from 'dayjs'
   const openApplicationModal = ref(false); 
   const openParticipantModal = ref(false); 
   const {
-    page,
-    onSort,
-    onSearch,
-  } = useTopUpRequests()
+   page,
+   onSort,
+   onSearch,
+   filterOptions,
+   sortOptions,
+   handleExport,
+ } = useDisbursement()
   const onSubmit = (formData: any) => {
     console.log("Formulario enviado:", formData);
     openApplicationModal.value = false; 
@@ -109,25 +108,25 @@
   const rechargeId = ref<number | undefined>(undefined)
   const { openConfirmModal, updateConfirmModal } = useConfirmModal()
   const rechargeModal = ref<any>({ offerId: '' })
-  const data = [
-  {
-    lotCode: '000',
-    requestAmount:'2',
-    dateOfRegistration: '2024-11-01',
-    amount: '$ 1’000.00',
-    bank:'Banco de crédito',
-    status: 'PAYMENT CONFIRMED',
-  },
-  {
-    lotCode: '000',
-    requestAmount:'2',
-    dateOfRegistration: '2024-05-01',
-    amount: '$ 1’000.00',
-    bank:'Banco de crédito',
-    status: 'CANCELED',
-  },
-];
-const disbursementData = computed(() => data);
+  const BASE_DIS_URL = '/finance/disbursement-management'
+  const { data, refresh }: any = await useAPI(
+    `${BASE_DIS_URL}/view-paginated-disbursement-lots`,
+    {
+      query: {
+        limit: 8,
+        page,
+        filterOptions,
+        sortOptions,
+      },
+    } as any,
+  )
+  
+  const disbursementData = computed(() =>
+    data.value?.data.map((item: any) => ({   
+      ...item,
+      createdAt:dayjs(item.createdAt).format('YYYY-MM-DD'),
+    })),
+  )
 const isEditing = ref(false); 
 const openModal = (editMode: boolean) => {
   isEditing.value = editMode;

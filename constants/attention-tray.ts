@@ -7,14 +7,17 @@ export const rechargeStatus = new Map<string, { name: string; color: string }>([
   ['REJECTED', { name: 'Rechazado', color: 'red' }],
   ['APPROVED', { name: 'Aprobado', color: 'blue' }],
 ])
-export const disbursementStatus = new Map<
-  string,
-  { name: string; color: string }
->([
+export const disbursementStatus = new Map<string,{ name: string; color: string }>([
   ['PENDING', { name: 'Pendiente', color: 'orange' }],
   ['CONFIRMED_DEPOSIT', { name: 'Deposito confirmado', color: 'blue' }],
   ['ANNULED_DEPOSIT', { name: 'Deposito anulado', color: 'red' }],
 ])
+export const accountStatus = new Map<string, { name: string; color: string }>([
+  ['PENDING', { name: 'Pendiente', color: 'orange' }],
+  ['REJECTED', { name: 'Rechazado', color: 'red' }],
+  ['APPROVED', { name: 'Aprobado', color: 'blue' }],
+]);
+
 export const bankType = new Map<string, string>([
   ['BBVA', 'BBVA'],
   ['BCP', 'Bcp'],
@@ -66,10 +69,16 @@ export const accountSearch: SearchItem[] = [
     position: 2,
   },
   {
-    key: 'status',
+    key: 'bank',
     type: 'select',
     placeholder: 'Banco',
-    items: [{ text: 'Todos', value: ' ' }],
+    items: [
+        ...Array.from(bankType).map(([key, value]) => ({
+          text: value,
+          value: key,
+        })),
+        { text: 'Todos', value: ' ' },
+      ],
     elementClass: 'min-w-[400px]',
     position: 3,
   },
@@ -99,7 +108,7 @@ export const withdrawalRequestsSearch: SearchItem[] = [
 ]
 export const disbursementSearch: SearchItem[] = [
   {
-    key: 'id',
+    key: 'bank',
     type: 'text',
     placeholder: 'Buscar banco',
     elementClass: 'max-w-[700px] w-full',
@@ -116,8 +125,8 @@ export const disbursementSearch: SearchItem[] = [
     type: 'select',
     placeholder: 'Filtrar estados',
     items: [
-      ...Array.from(bankType).map(([key, value]) => ({
-        text: value,
+      ...Array.from(disbursementStatus).map(([key, value]) => ({
+        text: value.name,
         value: key,
       })),
       { text: 'Todos', value: ' ' },
@@ -173,7 +182,7 @@ export const accountHeader: HeaderItem[] = [
     label: 'N° Transación',
   },
   {
-    key: 'dateOfRequest',
+    key: 'createdAt',
     label: 'Fec. Solicitud',
   },
   {
@@ -186,11 +195,11 @@ export const accountHeader: HeaderItem[] = [
     sortable: true,
   },
   {
-    key: 'coin',
+    key: 'currency',
     label: 'Moneda',
   },
   {
-    key: 'destinationAccount',
+    key: 'transactionNumber',
     label: 'N° de cueta destino',
   },
   {
@@ -247,7 +256,7 @@ export const disbursementHeader: HeaderItem[] = [
     label: 'Cod lote',
   },
   {
-    key: 'request',
+    key: 'withdrawalRequestCount',
     label: 'Cant. solicitud retiro',
   },
   {

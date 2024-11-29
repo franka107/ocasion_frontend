@@ -13,19 +13,19 @@ export function IuseRecharge() {
     const onSearch = (item: { [key: string]: string }) => {
       const filters = [
         { field: 'id', type: 'like', value: item.id || '' },
-        { field: 'name', type: 'like', value: item.name || '' },
+        // { field: 'name', type: 'like', value: item.name || '' },
       ]
-      if (item.status) {
-        filters.push({ field: 'status', type: 'equal', value: item.status })
-      }
-      if (item.bank) {
-        filters.push({ field: 'bank', type: 'equal', value: item.bank })
-      }
+      // if (item.status) {
+      //   filters.push({ field: 'status', type: 'equal', value: item.status })
+      // }
+      // if (item.bank) {
+      //   filters.push({ field: 'bank', type: 'equal', value: item.bank })
+      // }
       filterOptions.value = JSON.stringify(filters)
     }
     const autorizationRecharge = async (values: any) => {
         const { status, error } = await useAPI(
-          `${BASE_RECH_URL}/authorize-recharge-requests`,
+          `${BASE_RECH_URL}/authorize-recharge-request`,
           {
             method: 'POST',
             body: values,

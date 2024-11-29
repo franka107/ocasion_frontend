@@ -5,15 +5,21 @@ export const transactionsStatus = new Map<string, { name: string; color: string 
     ["EJECTED", { name: "Rechazada", color: "brown" }],
     ["ABANDONED", { name: "Abonada", color: "green" }],
 ]);
-export const disbursementStatus = new Map<string, { name: string; color: string }>([
-    ["PAYMENT CONFIRMED", { name:  "Abono confirmado", color: "blue" }],
-    ["CANCELED", { name: "Anulada", color: "brown" }],
-]);
+export const disbursementStatus = new Map<string,{ name: string; color: string }>([
+    ['PENDING', { name: 'Pendiente', color: 'orange' }],
+    ['CONFIRMED_DEPOSIT', { name: 'Deposito confirmado', color: 'blue' }],
+    ['ANNULED_DEPOSIT', { name: 'Deposito anulado', color: 'red' }],
+  ])
 export const validationStatus = new Map<string, { name: string; color: string }>([
-    ["APPROVED", { name:  "Aprovada", color: "blue" }],
-    ["REJECTED", { name: "Rechazada", color: "brown" }],
+    ['PENDING', { name: 'Pendiente', color: 'orange' }],
+    ['REJECTED', { name: 'Rechazado', color: 'red' }],
+    ['APPROVED', { name: 'Aprobado', color: 'blue' }],
 ]);
-
+export const bankType = new Map<string, string>([
+    ['BBVA', 'BBVA'],
+    ['BCP', 'Bcp'],
+    ['SCOTIABANK', 'Scotiabank'],
+  ])
 export const transactionsSearch: SearchItem[] = [
     {
         key: 'fullName',
@@ -41,7 +47,6 @@ export const disbursementSearch: SearchItem[] = [
         key: 'id',
         type: 'text',
         placeholder: 'Buscar participante, n° transacción o  n° DOI',
-        elementClass: 'max-w-[700px] w-full',
         position: 1,
     },
     {
@@ -52,13 +57,19 @@ export const disbursementSearch: SearchItem[] = [
         position: 2,
     },
     {
-        key: 'status',
+        key: 'bank',
         type: 'select',
         placeholder: 'Banco',
-        items: [{ text: 'Todos', value: " " }],
+        items: [
+            ...Array.from(bankType).map(([key, value]) => ({
+              text: value,
+              value: key,
+            })),
+            { text: 'Todos', value: ' ' },
+          ],
         elementClass: 'min-w-[400px]',
         position: 3,
-    }
+      },
 ]
 export const validationSearch: SearchItem[] = [
     {
@@ -137,19 +148,19 @@ export const transactionsHeader: HeaderItem[] = [
     }]  
 export const disbursementHeader: HeaderItem[] = [
     {
-        key: 'lotCode',
+        key: 'id',
         label: 'Cod lote',       
     }, 
     {
-        key: 'requestAmount',
+        key: 'withdrawalRequestCount',
         label: 'Cant. solicitud retiro',
     },
     {
-        key: 'dateOfRegistration',
+        key: 'createdAt',
         label: 'Fec. Registro',
     }, 
     {
-        key: 'amount',
+        key: 'totalAmount',
         label: 'Monto a  desembolsar',
         sortable: true,
     },
@@ -179,7 +190,7 @@ export const validationHeader: HeaderItem[] = [
         label: 'N° Transación',       
     }, 
     {
-        key: 'dateOfRequest',
+        key: 'createdAt',
         label: 'Fec. Solicitud',
     }, 
     {
@@ -196,11 +207,11 @@ export const validationHeader: HeaderItem[] = [
         sortable: true,
     },
     {
-        key: 'coin',
+        key: 'currency',
         label: 'Moneda',
     },
     {
-        key: 'account',
+        key: 'transactionNumber',
         label: 'N° de cueta',
     },
     {
@@ -215,31 +226,30 @@ export const balanceHeader: HeaderItem[] = [
         label: 'Nombres y apellidos',
     },
     {
-        key: 'income',
+        key: 'chargeBalance',
         label: 'Ingresos',
     }, 
     {
-        key: 'expenses',
+        key: 'dischargeBalance',
         label: 'Egresos',
     }, 
     {
-        key: 'penalties',
+        key: 'penaltyBalance',
         label: 'Penalidades',
     }, 
     {
-        key: 'guaranteed',
+        key: 'guaranteedBalance',
         label: 'Garantizada',
     },
     {
-        key: 'balance',
+        key: 'availableBalance',
         label: 'Saldo',
     },  
     {
-        key: 'pendingWithdrawal',
+        key: 'pendingWithdrawalBalance',
         label: 'Retiro pendiente',
     },  
     {
-        key: 'pendingRecharge',
+        key: 'pendingRechargeBalance',
         label: 'Recarga pendiente',
-        sortable: true,
     }]  
