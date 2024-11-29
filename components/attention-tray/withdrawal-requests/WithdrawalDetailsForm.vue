@@ -4,13 +4,31 @@ import { X } from 'lucide-vue-next';
 import { toTypedSchema } from '@vee-validate/zod';
 import * as z from 'zod';
 import { useForm } from 'vee-validate';
-
+import {
+  bankType,
+  currencyType,
+  accountType,
+} from '@/constants/attention-tray'
 const props = defineProps<{
   id: string
   onSubmit: (values: any) => void;
 }>();
 const BASE_WITH_URL = '/finance/withdrawal-request-management'
 const emit = defineEmits(['update:modelValue']);
+
+const banksOptions = Array.from(bankType).map(([id, name]) => ({
+  id,
+  name,
+}))
+const currencyOptions = Array.from(currencyType).map(([id, name]) => ({
+  id,
+  name,
+}))
+
+const accountTypeOptions = Array.from(accountType).map(([id, name]) => ({
+  id,
+  name,
+}))
 
 const formSchema = toTypedSchema(
   z.object({
@@ -24,7 +42,7 @@ const formSchema = toTypedSchema(
     destinationAccount: z
       .string()
       .regex(/^\d{10,20}$/, 'Ingrese un número de cuenta válido.'),
-    cciAccount: z
+      destinationCCI: z
       .string()
       .regex(/^\d{10,20}$/, 'Ingrese un número de cuenta válido.'),
   })
@@ -77,8 +95,7 @@ const cancelEdit = () => {
                             v-bind="componentField"
                             type="number"
                             placeholder="0.00"
-                            staticLabel
-                            label="Ingresa monto"
+                            label="Monto"
                             disabled
                             />
                         </FormControl>
@@ -91,8 +108,7 @@ const cancelEdit = () => {
                         <FormControl>
                             <CustomSelect
                             v-bind="componentField"
-                            :items="[ { id: 'USD', name: 'USD' } ]"
-                            staticLabel
+                            :items="currencyOptions"
                             placeholder="Moneda"
                             disabled
                             />
@@ -107,8 +123,7 @@ const cancelEdit = () => {
                         <FormControl>
                             <CustomSelect
                             v-bind="componentField"
-                            :items="[ { id: 'Bank1', name: 'Banco 1' }, { id: 'Bank2', name: 'Banco 2' } ]"
-                            staticLabel
+                            :items="banksOptions"
                             placeholder="Banco"
                             disabled
                             />
@@ -122,8 +137,7 @@ const cancelEdit = () => {
                         <FormControl>
                             <CustomSelect
                             v-bind="componentField"
-                            :items="[ { id: 'Savings', name: 'Ahorros' }, { id: 'Checking', name: 'Corriente' } ]"
-                            staticLabel
+                            :items="accountTypeOptions"
                             placeholder="Tipo de cuenta"
                             disabled
                             />
@@ -139,7 +153,6 @@ const cancelEdit = () => {
                             v-bind="componentField"
                             type="text"
                             placeholder="Ingrese número"
-                            staticLabel
                             label="Cuenta destino"
                             disabled
                             />
@@ -148,14 +161,13 @@ const cancelEdit = () => {
                         </FormItem>
                     </FormField>
                     <!-- Cuenta destino CCI -->
-                    <FormField v-slot="{ componentField }" name="cciAccount">
+                    <FormField v-slot="{ componentField }" name="destinationCCI">
                         <FormItem>
                         <FormControl>
                             <CustomInput
                             v-bind="componentField"
                             type="text"
                             placeholder="Ingrese número"
-                            staticLabel
                             label="Cuenta destino (CCI)"
                             disabled
                             />

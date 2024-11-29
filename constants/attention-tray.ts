@@ -30,6 +30,10 @@ export const currencyType = new Map<string, string>([['USD', 'USD']])
 export const paymentMediumType = new Map<string, string>([
   ['ACCOUNT_DEPOSIT', 'Depósito en cuenta'],
 ])
+export const accountType = new Map<string, string>([
+  ['SAVINGS', 'Cuenta de ahorros'],
+  ['CURRENT_ACCOUNT', 'Cuenta corriente'],
+])
 export const rechargeSearch: SearchItem[] = [
   {
     key: 'id',
