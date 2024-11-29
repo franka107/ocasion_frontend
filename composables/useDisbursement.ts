@@ -50,14 +50,14 @@ export function useDisbursement() {
     return { status, error }
   }
   const generatelPreviewDisbursement = async (values: any) => {
-    const { status, error } = await useAPI(
+    const { data, status, error } = await useAPI(
       `${BASE_DIS_URL}/generate-disbursement-lot-preview`,
       {
         method: 'POST',
         body: values,
       } as any,
     )
-    return { status, error }
+    return { data, status, error }
   }
   const generatelDisbursement = async (values: any) => {
     const { status, error } = await useAPI(
@@ -122,4 +122,3 @@ export function useDisbursement() {
     handleExport
   }
 }
-

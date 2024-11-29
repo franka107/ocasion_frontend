@@ -57,7 +57,8 @@ const paymentMediumOptions = Array.from(paymentMediumType).map(
     name,
   }),
 )
-
+const showDetailPreview = ref(false)
+const detailPreviewInfo = ref({})
 const formSchema = toTypedSchema(
   z.object({
     paymentMethod: z.string().min(1, 'Seleccione una forma de pago.'),
@@ -75,7 +76,7 @@ const form = useForm({
 const onSubmit = form.handleSubmit((values) => {
   const { paymentMethod, bank, currency, chargeAccount, paymentMedium } = values
   console.log('Formulario enviado con los valores:', values)
-  handleSubmit({
+  handlePreview({
     id: props.id,
     paymentMethod,
     bank,
@@ -83,18 +84,44 @@ const onSubmit = form.handleSubmit((values) => {
     chargeAccount,
     paymentMedium,
   })
-  emit('update:modelValue', false)
 })
-const handleSubmit = async (values: any) => {
+const handlePreview = async (values: any) => {
+  console.log('values', values)
+  const valuesToSend = {
+    bank: values.bank,
+    chargeAccount: values.chargeAccount,
+  }
+  const { status, error, data }: any = await generatelPreviewDisbursement(valuesToSend)
+  if(status.value === 'success') {
+    showDetailPreview.value = true
+    detailPreviewInfo.value = data.value
+  } else {  
+    const eMsg =
+      error.value.data?.errors?.[0].message ||
+      error.value.data.message ||
+      'El desembolso no se pudo generar, intentalo más tarde'
+    updateConfirmModal({
+      title: 'Error al generar desembolso',
+      message: eMsg,
+      type: 'error',
+    })
+  }
+}
+const handleSubmit = async () => {
+  const valuesToSend = {
+    ...form.values,
+    id: detailPreviewInfo.value.id
+  }
   openConfirmModal({
     title: 'Resumen del desembolso',
     message: `
       ¿Está seguro de generar el lote del desembolso?
     `,
-    // ${values.resumenMensaje}
     callback: async () => {
-      const { status, error }: any = await generatelPreviewDisbursement(values)
+      const { status, error  }: any = await generatelDisbursement(valuesToSend)
       if (status.value === 'success') {
+        showDetailPreview.value = false
+        detailPreviewInfo.value = {}
         emit('update:modelValue', false)
         props.refreshTable()
         updateConfirmModal({
@@ -126,6 +153,7 @@ const handleSubmit = async (values: any) => {
   >
     <AlertDialogContent class="z-[98] h-auto max-w-[670px] px-0">
       <form
+        v-show="!showDetailPreview"
         class="flex flex-col gap-6 flex-grow max-h-[calc(100vh-4rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-primary/50"
         @submit="onSubmit"
       >
@@ -224,6 +252,26 @@ const handleSubmit = async (values: any) => {
           </Button>
         </AlertDialogFooter>
       </form>
+      <div v-show="showDetailPreview">
+        {{  detailPreviewInfo }}
+        <AlertDialogFooter class="px-6">
+          <Button
+            type="button"
+            size="xl"
+            class="text-[16px] font-[600] bg-white text-primary border border-primary hover:bg-accent mt-[16px]"
+            @click="showDetailPreview = !showDetailPreview"
+          >
+            Cancelar
+          </Button>
+          <Button
+            @click="handleSubmit"
+            size="xl"
+            class="text-[16px] font-[600] mt-[16px]"
+          >
+            Confirmar
+          </Button>
+        </AlertDialogFooter>
+      </div>
     </AlertDialogContent>
   </AlertDialog>
 </template>
