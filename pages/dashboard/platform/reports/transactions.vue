@@ -8,19 +8,10 @@
             :header="transactionsHeader"
             :search="transactionsSearch"
             @on-sort="onSort"
+            show-more-button
             @on-search="onSearch"
           >
           <template #action-button>
-            <div class="flex">
-                <Button
-                variant="default"
-                class="text-[#F97316] bg-white hover:text-white hover:bg-[#F97316] mr-[8px]"
-                @click="
-                    () => {
-                    
-                    }
-                "
-                >Mas filtros</Button>
                 <Button
                 variant="default"
                 @click="handleExport"
@@ -28,7 +19,6 @@
                 <CustomIcons name="Download" class="ml-auto" />
                 Exportar
                 </Button>
-            </div>
           </template>
             <template #actions="{ row }">
               <div class="flex justify-center">

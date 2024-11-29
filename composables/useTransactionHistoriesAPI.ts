@@ -14,8 +14,10 @@ export function useTransactionHistoriesAPI() {
 
   const onSearch = (item: { [key: string]: string }) => {
     const filters = [
-      { field: 'fullName', type: 'like', value: item.fullName || '' },
-      { field: 'name', type: 'like', value: item.name || '' },
+      { field: 'quickSearch', type: 'like', value: item.quickSearch || '' },
+      { field: 'status', type: 'equal', value: item.status || '' },
+      { field: 'createdAt', type: 'between', value: item.createdAt || '' },
+      { field: 'motive', type: 'equal', value: item.motive || '' },
     ]
     if (item.status) {
       filters.push({ field: 'status', type: 'equal', value: item.status })

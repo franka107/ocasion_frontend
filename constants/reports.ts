@@ -1,4 +1,5 @@
 import type { HeaderItem, SearchItem } from '@/components/ui/custom-table/CustomTable.vue';
+import { TransactionHistoryMotive, transactionHistoryMotiveMap } from '~/types/TransactionHistory';
 
 export const transactionsStatus = new Map<string, { name: string; color: string }>([
     ["AUTHORIZED", { name:  "Autorizada", color: "blue" }],
@@ -22,23 +23,39 @@ export const bankType = new Map<string, string>([
   ])
 export const transactionsSearch: SearchItem[] = [
     {
-        key: 'fullName',
+        key: 'quickSearch',
         type: 'text',
-        placeholder: 'Buscar participante, n° transacción o  n° DOI',
-        elementClass: 'max-w-[700px] w-full',
-        position: 1,
+        placeholder: 'Buscar participante, n° transacción o  n° DNI',
+        width: 'max-w-sm w-full',
+        elementClass: 'w-full',
     },{
-        key: 'typeOfOperation',
-        type: 'text',
+        key: 'createdAt',
+        type: 'date-range',
         placeholder: 'Fecha de operación',
-        elementClass: 'min-w-[400px]',
-        position: 2,
+        width: 'w-auto',
     },{
         key: 'status',
-        type: 'text',
+        type: 'select',
+        items: [
+            ...Array.from(transactionsStatus).map(([key, value]) => ({
+              text: value.name,
+              value: key,
+            })),
+            { text: 'Todos', value: ' ' },
+        ],
         placeholder: 'Estado',
-        elementClass: 'min-w-[400px]',
-        position: 3,
+    },{
+        key: 'motive',
+        type: 'select',
+        items: [
+            ...Object.keys(transactionHistoryMotiveMap).map((key) => ({
+              text: transactionHistoryMotiveMap[key as TransactionHistoryMotive].label,
+              value: key,
+            })),
+            { text: 'Todos', value: ' ' },
+        ],
+        isHidden: true,
+        placeholder: 'Tipo de operación',
     },
 ]
 
