@@ -7,7 +7,7 @@ import { useForm } from 'vee-validate';
 import InputFile from '@/components/common/file/Input.vue';
 
 const props = defineProps<{
-  onSubmit: (values: any) => void;
+  participantId: string | number | undefined
 }>();
 
 const emit = defineEmits(['update:modelValue']);
@@ -40,13 +40,19 @@ const formSchema = toTypedSchema(
 
 const form = useForm({
   validationSchema: formSchema,
+  initialValues: {},
 });
 
-const onSubmit = form.handleSubmit((values) => {
-  console.log('Formulario enviado con los valores:', values);
-  emit('update:modelValue', false);
-});
-
+if (props.participantId) {
+  const { data } = await useAPI<any>(`/user-management/get-user-detail`, {
+    method: 'GET',
+    query: {
+      id: props.participantId,
+    },
+  } as any)
+  console.log(data.value)
+  form.setValues(data.value)
+}
 </script>
 
 <template>
@@ -60,7 +66,7 @@ const onSubmit = form.handleSubmit((values) => {
     </SheetHeader>
 
     <div class="flex-grow overflow-y-auto no-scrollbar flex flex-col">
-        <form class="flex flex-col gap-6 flex-grow pb-[32px] pt-[40px] px-6 gap-y-[24px]" @submit="onSubmit">
+        <form class="flex flex-col gap-6 flex-grow pb-[32px] pt-[40px] px-6 gap-y-[24px]">
             <section class="flex-grow">
                 <div class="grid grid-cols-1 gap-4 mb-[24px]">
                     <!-- Nombre  -->
@@ -177,15 +183,6 @@ const onSubmit = form.handleSubmit((values) => {
                     </FormField>
                 </div>
             </section>
-            <div class="mt-4  flex flex-wrap md:flex-nowrap justify-center gap-y-[10px] gap-x-[16px] w-full">
-            <Button type="submit" :disabled="!form.meta.value.valid" :class="cn(
-                'w-full text-[14px] md:text-[16px] font-[600] bg-[#062339] hover:bg-gray-700',
-                !form.meta.value.valid
-                ? 'text-white'
-                : 'hover:text-primary hover:bg-bgtheme',
-            )
-                " size="xl">Editar</Button>
-            </div>
         </form>
     </div>
 </template>

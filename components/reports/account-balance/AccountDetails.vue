@@ -5,7 +5,7 @@
             <div v-for="(card, index) in cardsData" :key="index"
                 class="max-w-[151.43px] bg-[#F3F8FC] px-[12px] py-[17.5px] flex flex-col rounded-[8px] w-full">                
                 <h3 class="text-[24px] text-[#152A3C] font-[700] leading-[32px]  mb-[4px]">
-                    {{ card.amountKey }}
+                  ${{ accountDetail[card.amountKey] }}
                 </h3>
                 <div class="flex justify-between items-center">
                     <h4 class="text-[12px] text-[#6B7280] font-[400] leading-[11px]">
@@ -17,34 +17,41 @@
     </div>
 </template>
 <script setup lang="ts">
+const { data: accountDetail, refresh } = await useAPI<any>(
+  `/finance/wallet-management/view-wallets-resume`,
+  {
+    query: {},
+    default: () => ({}),
+  },
+)
 const cardsData = ref([
   {
     subtitle: 'Total Ingresos',
-    amountKey: '00',
+    amountKey: 'totalChangeBalance',
   },
   {
     subtitle: 'Total Egresos',
-    amountKey: '00',
+    amountKey: 'totalDischargeBalance',
   },
   {
     subtitle: 'Total Penalidades',
-    amountKey: '00',
+    amountKey: 'totalPenaltyBalance',
   },
   {
     subtitle: 'Total Garantizada',
-    amountKey: '00',
+    amountKey: 'totalGuaranteedBalance',
   },
   {
     subtitle: 'Total Saldo',
-    amountKey: '00',
+    amountKey: 'totalAvailableBalance',
   },
   {
     subtitle: 'Total retiro pendiente',
-    amountKey: '00',
+    amountKey: 'totalPendingWithdrawalBalance',
   },
   {
     subtitle: 'Total recarga pendiente',
-    amountKey: '00',
+    amountKey: 'totalPendingRechargeBalance',
   },
 ])
 </script>

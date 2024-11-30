@@ -82,3 +82,24 @@ export const transactionHistoryMotiveMap: Record<
     label: 'Retiro de saldo',
   },
 }
+
+export interface TransactionHistoryListItem {
+  id: string
+  amount: number
+  createdAt: string
+  status: TransactionHistoryStatus
+  currency: string
+  type: string
+  motive: string
+  wallet: Wallet
+  walletId: string
+}
+
+export interface Wallet {
+  id: string
+  availableBalance: number
+  guaranteedBalance: number
+  createdAt: string
+  user: UserDto
+  userId: string
+}

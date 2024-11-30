@@ -11,14 +11,13 @@ export function useTopUpRequests() {
   const onSearch = (item: { [key: string]: string }) => {
     const filters = [
       { field: 'id', type: 'like', value: item.id || '' },
-      { field: 'name', type: 'like', value: item.name || '' },
+      { field: 'operationNumber', type: 'like', value: item.operationNumber || '' },
     ]
     if (item.status) {
       filters.push({ field: 'status', type: 'equal', value: item.status })
     }
     filterOptions.value = JSON.stringify(filters)
   }
-
   const requestRecharge = async (values: any) => {
     const { status, error }: any = await useAPI(
       `${BASE_ORG_URL}/request-recharge`,

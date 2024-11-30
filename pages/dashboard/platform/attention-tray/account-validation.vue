@@ -10,7 +10,7 @@
       <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
         <CustomTable
           class="mb-4"
-          :data="acccountData"
+          :data="accountData"
           :header="accountHeader"
           :search="accountSearch"
           @on-sort="onSort"
@@ -32,7 +32,7 @@
                   align="start"
                   class="bg-primary text-white"
                 >
-                  <DropdownMenuItem @click="openAccountDetailsModal = true">
+                  <DropdownMenuItem @click="openAccountDetail(row)">
                     Detalle de cuenta
                     <CustomIcons name="EyeIcon" class="ml-4" />
                   </DropdownMenuItem>
@@ -47,29 +47,30 @@
           </template>
           <template #status="{ row }">
             <CustomChip
-              :text="rechargeStatus.get(row.status)?.name || ''"
-              :variant="rechargeStatus.get(row.status)?.color as any"
+              :text="accountStatus.get(row.status)?.name || ''"
+              :variant="accountStatus.get(row.status)?.color as any"
             ></CustomChip>
           </template>
         </CustomTable>
         <SheetContent
-          v-model:open="openAccountDetailsModal"
+          v-model:open="openAccountDetailModal"
           class="flex flex-col h-full"
           custom-width="510px"
           @pointer-down-outside="(e) => e.preventDefault()"
           @interact-outside="(e) => e.preventDefault()"
         >
           <AccountDetailsForm
-            :on-submit="onAccountDetailsSubmit"
-            @update:model-value="openAccountDetailsModal = false"
+            v-model="openAccountDetailModal"
+            :id="accountId"
+            @submit="onAccountDetailSubmit"
           />
         </SheetContent>
       </div>
       <CustomPagination
         v-model:page="page"
         class="mt-5 mb-[19px]"
-        :total="1"
-        :limit="1"
+        :total="data.count"
+        :limit="data.limit"
       />
     </div>
   </ContentLayout>
@@ -82,55 +83,61 @@ import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue'
 import CustomPagination from '~/components/ui/custom-pagination/CustomPagination.vue'
 import type { OrganizationItem } from '~/types/Order.ts'
 import {
-  rechargeStatus,
+  accountStatus,
   accountHeader,
   accountSearch,
 } from '~/constants/attention-tray'
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
 import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
 import AccountDetailsForm from '~/components/attention-tray/account-validation/AccountDetailsForm.vue'
+import dayjs from 'dayjs'
+import { useAccountValidation } from '@/composables/useAccountValidation'
 const openApplicationModal = ref(false)
 const openParticipantModal = ref(false)
-const { page, onSort, onSearch } = useTopUpRequests()
-const onSubmit = (formData: any) => {
-  console.log('Formulario enviado:', formData)
-  openApplicationModal.value = false
-}
-const onParticipantSubmit = (formData: any) => {
-  console.log('Detalle del participante enviado:', formData)
-  openParticipantModal.value = false
-}
-const rechargeId = ref<number | undefined>(undefined)
+const {
+    page,
+    onSort,
+    onSearch,
+    filterOptions,
+    sortOptions,
+  } = useAccountValidation()
+const accountId = ref<number | undefined>(undefined)
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
-const rechargeModal = ref<any>({ offerId: '' })
-const data = [
+
+const BASE_VAL_URL = '/finance/account-validation'
+const { data, refresh }: any = await useAPI(
+  `${BASE_VAL_URL}/view-paginated-account-validations`,
   {
-    id: '0000',
-    dateOfRequest: '2024-11-01',
-    fullName: 'Rossi Ferrari',
-    bank: 'Banco de crédito del Perú',
-    coin: 'Dólar',
-    destinationAccount: '0000 0000 0000 0000',
-    livelihood: 'Documento ABC',
-    status: 'EARRING',
-    actions: '',
-  },
-  {
-    id: '0000',
-    dateOfRequest: '2024-10-25',
-    fullName: 'Martini Lombardi',
-    bank: 'Banco de crédito del Perú',
-    coin: 'Dólar',
-    destinationAccount: '0000 0000 0000 0000',
-    livelihood: 'Documento XYZ',
-    status: 'EARRING',
-    actions: '',
-  },
-]
-const acccountData = computed(() => data)
+    query: {
+      limit: 8,
+      page,
+      filterOptions,
+      sortOptions,
+    },
+  } as any,
+)
+const accountData = computed(() =>
+  data.value?.data.map((item: any) => ({
+    fullName: item.participant.commonName,
+    ...item,
+    createdAt: dayjs(item.updatedAt).format('YYYY-MM-DD'),
+  })),
+)
+
 const openAccountDetailsModal = ref(false)
-const onAccountDetailsSubmit = (formData: any) => {
-  console.log('Detalle de cuenta enviado:', formData)
-  openAccountDetailsModal.value = false
+const openAccountDetailModal = ref(false)
+const openAccountDetail = (row: any) => {
+  const accountDetailId = row.id;
+  if (accountId) {
+    accountId .value = accountDetailId;
+    console.log('Abriendo detalle del participante:', accountDetailId);
+    openAccountDetailModal.value = true;
+  } else {
+    console.error('No se encontró el participante para esta fila.');
+  }
+};
+const onAccountDetailSubmit = (formData: any) => {
+  console.log('Detalle de solicitud enviado:', formData)
+  openAccountDetailModal.value = false
 }
 </script>

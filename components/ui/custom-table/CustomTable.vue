@@ -1,8 +1,8 @@
 <template>
   <div class="w-full">
-    <div class="w-full flex flex-row flex-wrap py-6 gap-4 justify-between">
-      <div class="flex flex-wrap justify-start gap-4">
-        <template v-for="(item, i) in search" :index="i">
+    <div class="w-full flex flex-row flex-wrap md:flex-nowrap py-6 gap-4 justify-between">
+      <div class="flex flex-wrap justify-start gap-4 flex-grow">
+        <template v-for="(item, i) in displayableSearch" :index="i">
           <template v-if="item">
             <div :class="cn('flex flex-col w-[200px]', item.width)">
               <label
@@ -15,9 +15,8 @@
                 <Input
                   v-model="searchValues[item.key] as string | undefined"
                   type="string"
-                  :class="item.elementClass"
+                  :class="cn('w-[200px]', item.elementClass)"
                   :placeholder="item.placeholder"
-                  class="w-[200px]"
                 />
               </template>
               <template v-else-if="item.type === 'select'">
@@ -78,9 +77,17 @@
         </template>
       </div>
       <div>
-        <slot name="action-button">
-          <!-- Default button in case no prop is passed -->
-        </slot>
+        <div class="flex">
+          <Button
+            v-if="props.showMoreButton"
+            variant="default"
+            class="text-[#F97316] bg-white hover:text-white hover:bg-[#F97316] mr-[8px]"
+            @click="displayHiddenFilters = !displayHiddenFilters"
+            >Mas filtros</Button>
+          <slot name="action-button">
+            <!-- Default button in case no prop is passed -->
+          </slot>
+        </div>
       </div>
     </div>
     <div
@@ -211,6 +218,7 @@ export interface SearchItem {
   items?: SearchSelectItem[]
   width?: string
   key: string
+  isHidden?: boolean
   elementClass?: string
   label?: string
 }
@@ -227,14 +235,20 @@ interface Props {
   search?: SearchItem[]
   multipleSelect?: boolean
   multipleSelectKey?: string
+  showMoreButton?: boolean
   class?: string | object
   bgClass?: string
 }
 const props = withDefaults(defineProps<Props>(), {
   multipleSelect: false,
+  showMoreButton: false,
   multipleSelectKey: 'id',
   class: '',
 })
+const { search } = toRefs(props)
+
+const displayHiddenFilters = ref(false)
+const displayableSearch = computed(() => displayHiddenFilters.value ? search.value : search.value?.filter((item) => !item.isHidden) || [])
 
 const emit = defineEmits(['onSort', 'onSearch', 'onMultipleSelect'])
 
