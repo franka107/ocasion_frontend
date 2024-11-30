@@ -134,7 +134,7 @@ const chartConfigs: ChartConfig[] = [
 
                 const tooltipRoot = document.getElementById('chartjs-tooltip')
                 if (tooltipRoot) {
-                  tooltipRoot.style.opacity = '1'
+                  tooltipRoot.style.opacity = '0'
                   tooltipRoot.style.left =
                     position.left + context.tooltip.caretX + 'px'
                   tooltipRoot.style.top =
