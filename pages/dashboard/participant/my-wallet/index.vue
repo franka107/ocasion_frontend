@@ -22,12 +22,12 @@
               :text="
                 transactionHistoryStatusMap[
                   row.status as TransactionHistoryStatus
-                ].label || ''
+                ]?.label || ''
               "
               :variant="
                 transactionHistoryStatusMap[
                   row.status as TransactionHistoryStatus
-                ].color as any
+                ]?.color as any
               "
             ></CustomChip>
           </template>
@@ -124,9 +124,9 @@ const transactionHistoryData = computed(
       // ...item,
       ...item,
       createdAt: format(item.createdAt, 'dd/MM/yyyy'),
-      type: transactionHistoryTypeMap[item.type].label,
-      motive: transactionHistoryMotiveMap[item.motive].label,
-      currency: transactionHistoryCurrencyMap[item.currency].label,
+      type: transactionHistoryTypeMap[item.type]?.label,
+      motive: transactionHistoryMotiveMap[item.motive]?.label,
+      currency: transactionHistoryCurrencyMap[item.currency]?.label,
       amount: item.amount.toFixed(2),
     })) || [],
 )

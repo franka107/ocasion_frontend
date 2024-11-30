@@ -197,6 +197,13 @@
                       GrantId.PlatformOfferCanUpdateAppraisal,
                     )
                   "
+                  :disabled="
+                    eventStatusCheckPosition(
+                      row.event.status,
+                      EventStatus.Published,
+                      ComparisonOperator.GreaterOrEqual,
+                    )
+                  "
                   @click="
                     () => {
                       openModifyAppraisal = true
