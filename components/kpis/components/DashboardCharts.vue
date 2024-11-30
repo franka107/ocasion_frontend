@@ -123,7 +123,7 @@ const chartConfigs: ChartConfig[] = [
                 if (!tooltipEl) {
                   const newTooltip = document.createElement('div')
                   newTooltip.id = 'chartjs-tooltip'
-                  //newTooltip.style.background = 'rgba(0, 0, 0, 0.7)'
+                  newTooltip.style.background = 'rgba(0, 0, 0, 0.7)'
                   newTooltip.style.borderRadius = '3px'
                   newTooltip.style.color = 'white'
                   newTooltip.style.padding = '6px'
@@ -134,7 +134,7 @@ const chartConfigs: ChartConfig[] = [
 
                 const tooltipRoot = document.getElementById('chartjs-tooltip')
                 if (tooltipRoot) {
-                  tooltipRoot.style.opacity = '1'
+                  tooltipRoot.style.opacity = '0'
                   tooltipRoot.style.left =
                     position.left + context.tooltip.caretX + 'px'
                   tooltipRoot.style.top =
@@ -224,7 +224,7 @@ const chartConfigs: ChartConfig[] = [
                 }
               },
               onLeave: function (event, legendItem, legend) {
-               // legend.chart.tooltip.setActiveElements([], {})
+                legend.chart.tooltip.setActiveElements([], {})
                 legend.chart.update()
               },
             },
