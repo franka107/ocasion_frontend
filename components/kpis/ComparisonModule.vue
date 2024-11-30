@@ -7,58 +7,47 @@
         <!-- Settings Popover -->
         <div class="relative">
           <button
-            @click="isSettingsOpen = !isSettingsOpen"
-            class="p-2.5 hover:bg-gray-100 rounded-lg transition-colors"
+            @click.stop="toggleSettings"
+            class="p-2.5 hover:bg-gray-100 rounded-lg  flex items-center justify-center focus:outline-none "
             ref="settingsButtonRef"
           >
             <Settings class="w-5 h-5 text-gray-600" />
           </button>
-
-          <!-- Settings Menu con mejor padding -->
           <nav
             v-show="isSettingsOpen"
             id="settings-menu"
             class="absolute mt-3 w-72 bg-white rounded-lg shadow-lg border border-gray-200 z-50 settings-menu
-                   left-0 sm:left-auto sm:right-0"
+                  left-0 sm:left-auto sm:right-0"
             aria-label="Column settings"
           >
             <fieldset class="p-4 space-y-3">
-              <legend class="sr-only">Visible columns</legend>
+              <legend class="sr-only">Columnas Visibles</legend>
               <div
                 v-for="column in columns"
                 :key="column.key"
                 class="flex items-center space-x-3"
               >
-                <label class="relative flex items-center cursor-pointer">
+                <label class="relative flex items-center cursor-pointer group">
                   <input
                     type="checkbox"
                     :id="column.key"
                     v-model="column.visible"
-                    class="hidden"
-                    :aria-label="`Show ${column.label} column`"
+                    class="sr-only peer"
+                    :aria-label="`Mostrar columna ${column.label}`"
                   />
-                  <span
-                    class="w-6 h-6 border border-gray-300 rounded-sm flex items-center justify-center"
-                    :class="{ 'border-primary-950 bg-white': column.visible }"
+                  <div
+                    class="w-6 h-6 border rounded-sm flex items-center justify-center transition-colors peer-checked:bg-primary-500 peer-checked:border-primary-500 group-hover:border-primary-300 border-gray-300"
+                    :class="{ 'bg-primary-500 border-primary-500': column.visible }"
                     role="checkbox"
                     :aria-checked="column.visible"
                   >
-                    <svg
-                      v-show="column.visible"
-                      class="w-4 h-4 text-primary-950"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="3"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      aria-hidden="true"
-                    >
-                      <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                  </span>
-                  <span class="ml-3 text-sm text-gray-700">
+                    <Check
+                      v-if="column.visible"
+                      class="w-4 h-4 text-black"
+                    />
+                  </div>
+                  <!-- Label text -->
+                  <span class="ml-3 text-sm text-gray-700 group-hover:text-gray-900">
                     {{ column.label }}
                   </span>
                 </label>
@@ -199,11 +188,15 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { Settings, Maximize2, X } from 'lucide-vue-next'
+import { Settings, Maximize2, X , Check } from 'lucide-vue-next'
 
 const isSettingsOpen = ref(false)
 const isModalOpen = ref(false)
 const settingsButtonRef = ref<HTMLButtonElement | null>(null)
+
+const toggleSettings = () => {
+  isSettingsOpen.value = !isSettingsOpen.value;
+};
 
 const columns = ref([
   { key: 'events', label: 'Nº eventos', visible: true },

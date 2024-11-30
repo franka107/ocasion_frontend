@@ -1,10 +1,10 @@
 <template>
   <div
-    class="bg-white rounded-lg shadow-md p-6 w-[572px] transition-all duration-300 ease-in-out"
+    class="bg-white rounded-lg shadow-md p-6 w-full max-w-[572px] transition-all duration-300 ease-in-out mx-auto"
   >
     <h2
       :class="[
-        'text-[40px] font-roboto font-semibold  text-[#20445e]',
+        'text-[40px] font-roboto font-semibold text-[#20445e]',
         titleClass,
       ]"
     >
@@ -29,7 +29,7 @@
             'h-[54px]',
             isActive && !isLoading
               ? 'bg-primary text-white'
-              : 'bg-[#f1f5f9] text-[#95aab9]', // Fondo cuando está habilitado o deshabilitado
+              : 'bg-[#f1f5f9] text-[#95aab9]',
             'rounded-btn',
             'gap-8',
             'flex',

@@ -9,6 +9,7 @@
       :is-active="isActive"
       :is-loading="isLoading"
       @submit="handleSubmit"
+      class="px-4 sm:px-6 md:px-8"
     >
       <div class="mb-6 relative">
         <InputWithLabel
@@ -52,8 +53,21 @@
           </a>
         </div>
       </div>
+
+      <!-- Mensaje de registro (responsive) -->
+      <div class="text-center mt-4 px-4 sm:px-0">
+        <p class="text-sm sm:text-base">
+          ¿No estás registrado?
+          <router-link to="/auth/sign-in" class="font-semibold text-primary hover:underline">
+            Regístrate aquí
+          </router-link>
+        </p>
+      </div>
     </BaseForm>
+
     <ForgotPasswordForm v-else @back="toggleForgotPassword" />
+
+    <!-- Diálogos -->
     <Dialog
       v-model:open="dialogState.isSuspendedDialogOpen"
       :icon-src="messageIconSrc"
@@ -80,7 +94,7 @@
       v-model:open="dialogState.isIncorrectCredentialsOpen"
       :icon-src="messageIconSrc"
       icon-alt="Icono de alerta"
-      title="Credenciales  incorrectas"
+      title="Credenciales incorrectas"
       description="El correo electrónico o la contraseña son incorrectos. Por favor, vuelva a intentarlo."
       button-text="Aceptar"
       icon-bg-color="bg-[#f53e3e]"
@@ -113,7 +127,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import AuthForm from '~/components/auth/authForm.vue'
 import BaseForm from '~/components/auth/baseForm.vue'
@@ -128,9 +142,7 @@ const {
   password,
   showPassword,
   dialogState,
-
   showForgotPassword,
-
   errors,
   handleSubmit,
   togglePassword,
@@ -151,3 +163,26 @@ const submitButtonClass = computed(() => {
 })
 const messageIconSrc = messageIcon
 </script>
+
+<style scoped>
+
+@media (max-width: 640px) {
+  .auth-form {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .form-title {
+    font-size: 1.25rem;
+  }
+  .form-subtitle {
+    font-size: 0.875rem;
+  }
+}
+
+@media (min-width: 640px) {
+  .auth-form {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+</style>

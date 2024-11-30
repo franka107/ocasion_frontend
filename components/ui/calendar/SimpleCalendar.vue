@@ -80,15 +80,16 @@ const getDateCellClass = (date: CalendarDate): string => {
 
 <template>
   <CalendarRoot
-    v-slot="{ grid, }"
+    v-slot="{ grid }"
     v-model:placeholder="placeholder"
     @update:placeholder="handlePlaceholderChange"
     v-bind="forwarded"
-     class="p-4 w-full max-w-4xl mx-auto bg-white "
+    class="p-4 w-full max-w-4xl mx-auto bg-white"
   >
     <CalendarHeader class="flex justify-between items-center">
       <CalendarHeading class="flex-1 ml-4 font-bold text-xl">
-        {{ spanishMonths[placeholder.month - 1] }}</CalendarHeading>
+        {{ spanishMonths[placeholder.month - 1] }}
+      </CalendarHeading>
       <div class="flex items-center gap-1">
         <CalendarPrevButton />
         <CalendarNextButton />
@@ -96,38 +97,39 @@ const getDateCellClass = (date: CalendarDate): string => {
     </CalendarHeader>
 
     <div class="flex flex-col gap-y-4 mt-4 sm:flex-row sm:gap-x-4 sm:gap-y-0">
-      <CalendarGrid v-for="month in grid" :key="month.value.toString()" >
+      <CalendarGrid v-for="month in grid" :key="month.value.toString()" class="w-full">
         <CalendarGridHead>
           <CalendarGridRow>
             <CalendarHeadCell
-              v-for="(day) in spanishWeekdays"
+              v-for="day in spanishWeekdays"
               :key="day"
-              class="w-full sm:w-1/7 p-2 text-sm font-medium text-gray-500 mr-2"
+              class="w-9 p-0 text-sm font-medium text-gray-500"
             >
-              {{ day }}
+              {{ day.slice(0, 2) }}
             </CalendarHeadCell>
           </CalendarGridRow>
         </CalendarGridHead>
         <CalendarGridBody>
-          <CalendarGridRow v-for="(weekDates, index) in month.rows" :key="`weekDate-${index}`" class="mr-2">
+          <CalendarGridRow v-for="(weekDates, index) in month.rows" :key="`weekDate-${index}`">
             <CalendarCell
               v-for="weekDate in weekDates"
               :key="weekDate.toString()"
               :date="weekDate"
               :disabled="isDateDisabled(weekDate)"
-               class="w-full sm:w-1/7 p-2"
+              class="p-0 relative focus-within:relative focus-within:z-20"
             >
-            <CalendarCellTrigger
-            :day="weekDate"
-            :month="month.value"
-            :disabled="isDateDisabled(weekDate)"
-            :class="[
-            getDateCellClass(weekDate),
-            'h-8 w-8 flex items-center justify-center rounded-full',
-            'hover:bg-muted focus:bg-muted',
-            'aria-selected:bg-primary aria-selected:text-primary-foreground',
-            'transition-colors duration-200'
-            ]"
+              <CalendarCellTrigger
+                :day="weekDate"
+                :month="month.value"
+                :disabled="isDateDisabled(weekDate)"
+                :class="[
+                  getDateCellClass(weekDate),
+                  'h-9 w-9 mx-auto flex items-center justify-center rounded-full',
+                  'hover:bg-accent hover:text-accent-foreground',
+                  'focus:bg-accent focus:text-accent-foreground',
+                  'aria-selected:bg-primary aria-selected:text-primary-foreground',
+                  'transition-colors duration-200'
+                ]"
               >
                 {{ weekDate.day }}
               </CalendarCellTrigger>
@@ -138,5 +140,4 @@ const getDateCellClass = (date: CalendarDate): string => {
     </div>
   </CalendarRoot>
 </template>
-
 

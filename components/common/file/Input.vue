@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { CheckIcon, TrashIcon, ClipboardIcon } from '@radix-icons/vue'
-
+import { CheckIcon, TrashIcon, ClipboardIcon  } from '@radix-icons/vue'
+import { X,ExternalLink } from 'lucide-vue-next'
 const props = defineProps({
   title: {
     type: String,
@@ -115,6 +115,16 @@ const triggerFileInput = () => {
 const getFileNameFromPath = (path: string): string => {
   return path.split('/').pop() || 'Unknown file' // Obtén el nombre del archivo desde la URL
 }
+const viewFile = (file: { id: string; path: string }) => {
+
+  if (file.path) {
+
+    window.open(file.path, '_blank')
+  } else {
+    console.error('No se puede abrir el archivo. Ruta no válida.');
+  }
+}
+
 
 // Inicializa los archivos existentes
 onMounted(() => {
@@ -172,6 +182,7 @@ onMounted(() => {
           file.name
         }}</span>
         <div class="flex items-center space-x-2">
+          <ExternalLink class="h-6 w-6 text-blue-500 cursor-pointer" @click="viewFile(file)" />
           <CheckIcon class="h-6 w-6 text-[#22c55d]" />
           <TrashIcon
             v-if="!hideRemoveIcon"

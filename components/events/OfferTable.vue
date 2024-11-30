@@ -99,11 +99,12 @@
             </NuxtLink>
           </div>
         </template>
-        <template #attachedFiles>
+        <template #attachedFiles="{ row }">
           <div
             class="w-10 h-10 flex items-center justify-center rounded-full bg-[#0B38590A]"
+            @click="openAttachmentsModal(row)"
           >
-            <CustomIcons name="Clip" />
+            <CustomIcons class="cursor-pointer" name="Clip" />
           </div>
         </template>
         <template #actions="{ row }">
@@ -224,6 +225,10 @@
           ></CustomChip>
         </template>
       </CustomTable>
+      <AttachmentsModal
+      v-model:isOpen="showAttachmentsModal"
+      :attachments="selectedAttachments"
+    />
       <SheetContent
         v-model:open="openAppraisalHistoryModal"
         class="flex flex-col h-full"
@@ -302,7 +307,7 @@ import { GrantId } from '~/types/Grant'
 import { EventStatus } from '~/types/Event'
 import { GlobalType } from '~/types/Common'
 import { eventStatusCheckPosition } from '~/constants/events'
-
+import AttachmentsModal from './AttachmentsModal.vue'
 const { getMyGrants } = useAuthManagement()
 const myGrants = await getMyGrants()
 const { user, globalType } = useUserSessionExtended()
@@ -559,5 +564,12 @@ const handleRetireOffers = async (values: { type: string; ids: string[] }) => {
       }
     },
   })
+}
+const showAttachmentsModal = ref(false)
+const selectedAttachments = ref<Array<{ id: string, name: string, url: string }>>([])
+
+const openAttachmentsModal = (row: any) => {
+  selectedAttachments.value = row.attachedFiles || []
+  showAttachmentsModal.value = true
 }
 </script>

@@ -151,3 +151,21 @@ function handleSignOut() {
   // Lógica para cerrar sesión
 }
 </script>
+<style>
+.icon-normal {
+  color: #a6b4bf;
+}
+
+.icon-active {
+  color: #ffffff;
+}
+
+.text-normal {
+  color: #a6b4bf;
+}
+
+.text-active {
+  color: #ffffff;
+}
+
+</style>
