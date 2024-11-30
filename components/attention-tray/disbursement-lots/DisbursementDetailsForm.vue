@@ -4,7 +4,6 @@ import { X } from 'lucide-vue-next';
 import { toTypedSchema } from '@vee-validate/zod';
 import * as z from 'zod';
 import { useForm } from 'vee-validate';
-import InputFile from '@/components/common/file/Input.vue';
 import {
   bankType,
   currencyType,
@@ -14,9 +13,9 @@ const props = defineProps<{
     id: string | undefined | number 
   onSubmit: (values: any) => void;
 }>();
-
+const BASE_DIS_URL = '/finance/disbursement-management'
 const emit = defineEmits(['update:modelValue']);
-const BASE_ACC_URL = '/finance/account-validation'
+
 const banksOptions = Array.from(bankType).map(([id, name]) => ({
   id,
   name,
@@ -30,6 +29,7 @@ const accountTypeOptions = Array.from(accountType).map(([id, name]) => ({
   id,
   name,
 }))
+
 const formSchema = toTypedSchema(
   z.object({
     amount: z
@@ -39,10 +39,10 @@ const formSchema = toTypedSchema(
     currency: z.string().min(1, 'Seleccione una moneda.'),
     bank: z.string().min(1, 'Seleccione un banco.'),
     accountType: z.string().min(1, 'Seleccione un tipo de cuenta.'),
-    destinationAccountNumber: z
+    destinationAccount: z
       .string()
       .regex(/^\d{10,20}$/, 'Ingrese un número de cuenta válido.'),
-    transactionNumber: z
+      destinationCCI: z
       .string()
       .regex(/^\d{10,20}$/, 'Ingrese un número de cuenta válido.'),
   })
@@ -57,9 +57,8 @@ const onSubmit = form.handleSubmit((values) => {
   console.log('Formulario enviado con los valores:', values);
   emit('update:modelValue', false);
 });
-
 if (props.id) {
-  const { data } = await useAPI<any>(`${BASE_ACC_URL}/view-account-validation-detail`, {
+  const { data } = await useAPI<any>(`${BASE_DIS_URL}/view-disbursement-lot-detail`, {
     method: 'GET',
     query: {
       id: props.id,
@@ -76,7 +75,7 @@ const cancelEdit = () => {
 <template>
     <SheetHeader class="justify-between">
         <SheetTitle class="ml-2 text-[20px] font-[700] text-[#152A3C]">
-            Detalle de cuenta
+            Detalle
         </SheetTitle>
         <SheetClose class="rounded-full p-3 hover:bg-[#f1f5f9]">
             <X class="w-4 h-4 text-muted-foreground" />
@@ -89,7 +88,7 @@ const cancelEdit = () => {
                 <div class="grid grid-cols-1 gap-4 mb-[24px]">
                     <div class="flex gap-2">
                     <!-- Monto -->
-                    <FormField v-slot="{ componentField }" name="amount">
+                    <FormField v-slot="{ componentField }" name="totalAmount">
                         <FormItem class="w-1/2">
                         <FormControl>
                             <CustomInput
@@ -147,7 +146,7 @@ const cancelEdit = () => {
                         </FormItem>
                     </FormField>
                     <!-- Cuenta destino -->
-                    <FormField v-slot="{ componentField }" name="destinationAccountNumber">
+                    <FormField v-slot="{ componentField }" name="destinationAccount">
                         <FormItem>
                         <FormControl>
                             <CustomInput
@@ -162,7 +161,7 @@ const cancelEdit = () => {
                         </FormItem>
                     </FormField>
                     <!-- Cuenta destino CCI -->
-                    <FormField v-slot="{ componentField }" name="transactionNumber">
+                    <FormField v-slot="{ componentField }" name="destinationCCI">
                         <FormItem>
                         <FormControl>
                             <CustomInput
@@ -178,18 +177,6 @@ const cancelEdit = () => {
                     </FormField>
                 </div>
             </section>
-           <div
-            class="mt-4 flex flex-wrap md:flex-nowrap justify-center gap-y-[10px] gap-x-[16px] w-full">
-            <Button @click.prevent="cancelEdit" type="button" size="xl"
-                class="w-full max-w-[223px] text-[14px] md:text-[16px] font-[600] bg-white text-primary border border-primary hover:bg-accent">Rechazar</Button>
-            <Button type="submit" :disabled="!form.meta.value.valid" :class="cn(
-                'w-full max-w-[223px] text-[14px] md:text-[16px] font-[600] bg-[#062339] hover:bg-gray-700',
-                !form.meta.value.valid
-                ? 'text-white'
-                : 'hover:text-primary hover:bg-bgtheme',
-            )
-                " size="xl">Aprobar</Button>
-            </div>
         </form>
     </div>
 </template>

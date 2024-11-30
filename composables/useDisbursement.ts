@@ -13,15 +13,15 @@ export function useDisbursement() {
   const onSearch = (item: { [key: string]: string }) => {
     const filters = [
       { field: 'quickSearch', type: 'like', value: item.quickSearch || '' },
+      { field: 'status', type: 'equal', value: item.status || '' },
+      { field: 'createdAt', type: 'between', value: item.createdAt || '' },
+      { field: 'transferedAt', type: 'between', value: item.transferedAt || '' },
     ]
     if (item.status) {
       filters.push({ field: 'status', type: 'equal', value: item.status })
     }
     if (item.bank) {
       filters.push({ field: 'bank', type: 'equal', value: item.bank })
-    }
-    if (item.createdAt) {
-      filters.push({ field: 'createdAt', type: 'between', value: item.createdAt })
     }
     filterOptions.value = JSON.stringify(filters)
   }

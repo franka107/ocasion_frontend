@@ -14,18 +14,10 @@
             :search="validationSearch"
             @on-sort="onSort"
             @on-search="onSearch"
+            show-more-button
           >
           <template #action-button>
                 <div class="flex">
-                    <Button
-                    variant="default"
-                    class="text-[#F97316] bg-white hover:text-white hover:bg-[#F97316] mr-[8px]"
-                    @click="
-                        () => {
-                        
-                        }
-                    "
-                    >Mas filtros</Button>
                     <Button
                     variant="default"
                     @click="handleExport"

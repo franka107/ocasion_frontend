@@ -11,11 +11,14 @@ export function useAccountValidation() {
   
     const onSearch = (item: { [key: string]: string }) => {
       const filters = [
-        { field: 'id', type: 'like', value: item.id || '' },
-        { field: 'operationNumber', type: 'like', value: item.operationNumber || '' },
+        { field: 'quickSearch', type: 'like', value: item.quickSearch || '' },
+        { field: 'createdAt', type: 'between', value: item.createdAt || '' },
       ]
       if (item.status) {
         filters.push({ field: 'status', type: 'equal', value: item.status })
+      }
+      if (item.bank) {
+        filters.push({ field: 'bank', type: 'equal', value: item.bank })
       }
       filterOptions.value = JSON.stringify(filters)
     }

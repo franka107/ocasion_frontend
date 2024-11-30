@@ -40,11 +40,6 @@
                     Editar solicitud
                     <CustomIcons name="Pen" class="ml-auto" />
                   </DropdownMenuItem>
-                  <!-- <DropdownMenuSeparator />
-                  <DropdownMenuItem @click="handleReject(row)">
-                    Rechazar solicitud
-                    <CustomIcons name="X" class="ml-auto" />
-                  </DropdownMenuItem> -->
                   <DropdownMenuSeparator />
                   <DropdownMenuItem @click="openParticipantDetail(row)">
                     Detalle participante
@@ -55,8 +50,16 @@
             </div>
           </template>
           <template #livelihood="{ row }">
-            <div class="flex items-center justify-center" @click="">
-              <CustomIcons name="Doc-Loupe" />
+            <div class="flex items-center justify-center">
+              <component
+                :is="row.sustentationFile?.path ? 'a' : 'NuxtLink'"
+                :href="row.sustentationFile?.path || '/fallback-route'"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center justify-center"
+              >
+                <CustomIcons name="Doc-Loupe" />
+              </component>
             </div>
           </template>
           <template #status="{ row }">

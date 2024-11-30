@@ -65,7 +65,7 @@
                        <CustomIcons name="X" class="ml-auto" />
                      </DropdownMenuItem>
                    <DropdownMenuSeparator />
-                     <DropdownMenuItem @click="openWithdrawalDetails(row.id)">
+                     <DropdownMenuItem @click="openWithdrawalDetails(row)">
                        Detalle 
                        <CustomIcons name="EyeIcon" class="ml-auto" />
                      </DropdownMenuItem>
@@ -74,13 +74,16 @@
              </div>
            </template>
            <template #archive="{ row }">
-             <div
-               class="flex items-center justify-center"
-               @click=""
-             >
-               <CustomIcons
-                 name="Doc-Loupe"
-               />
+             <div class="flex items-center justify-center">
+              <component
+                :is="row.voucherGeneratedFile?.path ? 'a' : 'NuxtLink'"
+                :href="row.voucherGeneratedFile?.path || '/fallback-route'"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center justify-center"
+              >
+                <CustomIcons name="Doc-Loupe" />
+              </component>
              </div>
            </template>
            <template #status="{ row }">
@@ -97,18 +100,12 @@
           @pointer-down-outside="(e) => e.preventDefault()"
           @interact-outside="(e) => e.preventDefault()"
         >
-          <WithdrawalDetailsForm
+          <DisbursementDetailsForm
             v-model="openWithdrawalDetailsModal"
+            :id="disbursementId"
             @submit="onWithdrawalDetailsSubmit"
           />
         </SheetContent>
-         <GenerateDisbursementBatchModal
-           :id="generateDisbursementForm.id"
-           v-model="openModalGenerate"
-           :bank="generateDisbursementForm.bank"
-           @onsubmit="handleGenerateDisbursement"
-           :refresh-table="refresh"
-         />
          <ConfirmDisbursementModal
            :id="confirmModalInfo.id"
            v-model="openModalConfirm"
@@ -145,7 +142,7 @@
  import ConfirmDisbursementModal from '~/components/attention-tray/disbursement-lots/ConfirmDisbursementModal.vue'
  import { ref } from 'vue' 
  import { useDisbursement } from '@/composables/useDisbursement'
- import WithdrawalDetailsForm from '~/components/attention-tray/withdrawal-requests/WithdrawalDetailsForm.vue'
+ import DisbursementDetailsForm from '~/components/attention-tray/disbursement-lots/DisbursementDetailsForm.vue'
  const openApplicationModal = ref(false); 
  const openParticipantModal = ref(false); 
  const {
@@ -160,24 +157,23 @@
  const openModalConfirm = ref(false)
  const openAnnulModal = ref(false)
  const openWithdrawalDetailsModal = ref(false)
- const selectedRequestId = ref<string | null>(null)
- const openWithdrawalDetails = (requestId: string) => {
-    selectedRequestId.value = requestId
-    openWithdrawalDetailsModal.value = true
+ const disbursementId = ref<number | undefined>(undefined)
+const selectedRequestId = ref<string | null>(null);
+
+const openWithdrawalDetails = (row: any) => {
+  const disbursementDetailId = row.id;
+  if (disbursementDetailId) {
+    disbursementId.value = disbursementDetailId;
+    console.log('Abriendo detalle del participante:', disbursementDetailId);
+    openWithdrawalDetailsModal.value = true;
+  } else {
+    console.error('No se encontró lote');
   }
+};
  const onWithdrawalDetailsSubmit = (formData: any) => {
     console.log('Detalle de solicitud enviado:', formData)
     openWithdrawalDetailsModal.value = false
   }
- const onSubmit = (formData: any) => {
-   console.log("Formulario enviado:", formData);
-   openApplicationModal.value = false; 
- }; 
- const onParticipantSubmit = (formData: any) => {
-   console.log('Detalle del participante enviado:', formData);
-   openParticipantModal.value = false;
- };
- const rechargeId = ref<number | undefined>(undefined)
  const { openConfirmModal, updateConfirmModal } = useConfirmModal()
  const BASE_DIS_URL = '/finance/disbursement-management'
  const { data, refresh }: any = await useAPI(

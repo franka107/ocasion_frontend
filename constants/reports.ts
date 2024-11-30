@@ -26,7 +26,7 @@ export const transactionsSearch: SearchItem[] = [
         key: 'quickSearch',
         type: 'text',
         placeholder: 'Buscar participante, n° transacción o  n° DNI',
-        width: 'max-w-sm w-full',
+        width: 'max-w-xs w-full',
         elementClass: 'w-full',
     },{
         key: 'createdAt',
@@ -61,17 +61,17 @@ export const transactionsSearch: SearchItem[] = [
 
 export const disbursementSearch: SearchItem[] = [
     {
-        key: 'id',
+        key: 'quickSearch',
         type: 'text',
         placeholder: 'Buscar participante, n° transacción o  n° DOI',
-        position: 1,
+        width: 'max-w-xs w-full',
+        elementClass: 'w-full',
     },
     {
-        key: 'typeOfOperation',
-        type: 'text',
+        key: 'createdAt',
+        type: 'date-range',
         placeholder: 'Fecha de registro',
-        elementClass: 'min-w-[400px]',
-        position: 2,
+        width: 'w-auto'
     },
     {
         key: 'bank',
@@ -87,37 +87,74 @@ export const disbursementSearch: SearchItem[] = [
         elementClass: 'min-w-[400px]',
         position: 3,
       },
+      {
+        key: 'status',
+        type: 'select',
+        items: [
+            ...Array.from(disbursementStatus).map(([key, value]) => ({
+              text: value.name,
+              value: key,
+            })),
+            { text: 'Todos', value: ' ' },
+        ],
+        isHidden: true,
+        placeholder: 'Estado',
+      },
 ]
 export const validationSearch: SearchItem[] = [
     {
-        key: 'id',
+        key: 'quickSearch',
         type: 'text',
         placeholder: 'Buscar participante, n° transacción o  n° DOI',
-        elementClass: 'max-w-[700px] w-full',
-        position: 1,
+        width: 'max-w-xs w-full',
+        elementClass: 'w-full',
     },
     {
-        key: 'typeOfOperation',
-        type: 'text',
+        key: 'createdAt',
+        type: 'date-range',
         placeholder: 'Fecha de solicitud',
-        elementClass: 'min-w-[400px]',
-        position: 2,
+        width: 'w-auto',
+    },
+    {
+        key: 'status',
+        type: 'select',
+        items: [
+            ...Array.from(validationStatus).map(([key, value]) => ({
+              text: value.name,
+              value: key,
+            })),
+            { text: 'Todos', value: ' ' },
+        ],
+        isHidden: true,
+        placeholder: 'Estado',
+    },
+    {
+        key: 'bank',
+        type: 'select',
+        items: [
+            ...Array.from(bankType).map(([key, value]) => ({
+              text: value,
+              value: key,
+            })),
+            { text: 'Todos', value: ' ' },
+          ],
+        isHidden: true,
+        placeholder: 'Banco',
     },
 ]
 export const balanceSearch: SearchItem[] = [
     {
-        key: 'id',
+        key: 'quickSearch',
         type: 'text',
         placeholder: 'Buscar participane, documento',
-        elementClass: 'max-w-[700px] w-full',
-        position: 1,
+        width: 'max-w-xs w-full',
+        elementClass: 'w-full',
     },
     {
-        key: 'typeOfOperation',
+        key: 'quickSearchPeriod',
         type: 'text',
         placeholder: 'Periodo',
-        elementClass: 'min-w-[400px]',
-        position: 2,
+        width: 'w-auto',
     },
 ]
 

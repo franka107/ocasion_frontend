@@ -7,16 +7,12 @@ export function useAccountBalance() {
       sortOptions.value = JSON.stringify(sortObject)
     }
     const BASE_WALL_URL = '/finance/wallet-management'
-  
     const onSearch = (item: { [key: string]: string }) => {
-      const filters = [
-        { field: 'id', type: 'like', value: item.id || '' },
-        { field: 'operationNumber', type: 'like', value: item.operationNumber || '' },
-      ]
-      if (item.status) {
-        filters.push({ field: 'status', type: 'equal', value: item.status })
-      }
-      filterOptions.value = JSON.stringify(filters)
+        const filters = [
+          { field: 'quickSearch', type: 'like', value: item.quickSearch || '' },
+          { field: 'quickSearchPeriod',type :'in',value: item.quickSearchPeriod || '' }
+        ]
+        filterOptions.value = JSON.stringify(filters)
     }
     const requestRecharge = async (values: any) => {
       const { status, error }: any = await useAPI(

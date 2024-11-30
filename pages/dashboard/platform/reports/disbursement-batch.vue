@@ -13,18 +13,9 @@
             :search="disbursementSearch"
             @on-sort="onSort"
             @on-search="onSearch"
+            show-more-button
           >
                 <template #action-button>
-                <div class="flex">
-                    <Button
-                    variant="default"
-                    class="text-[#F97316] bg-white hover:text-white hover:bg-[#F97316] mr-[8px]"
-                    @click="
-                        () => {
-                        
-                        }
-                    "
-                    >Mas filtros</Button>
                     <Button
                     variant="default"
                     @click="handleExport"
@@ -32,26 +23,36 @@
                     <CustomIcons name="Download" class="ml-auto" />
                     Exportar
                     </Button>
-                </div>
+                <!-- </div> -->
             </template>
             <template #archive="{ row }">
               <div
                 class="flex items-center justify-center"
-                @click=""
               >
-                <CustomIcons
-                  name="Doc-Loupe"
-                />
+              <component
+                :is="row.sustentationFile?.path ? 'a' : 'NuxtLink'"
+                :href="row.sustentationFile?.path || '/fallback-route'"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center justify-center"
+              >
+                <CustomIcons name="Doc-Loupe" />
+              </component>
               </div>
             </template>
             <template #proofOfDisbursement="{ row }">
               <div
                 class="flex items-center justify-center"
-                @click=""
               >
-                <CustomIcons
-                  name="Doc-Loupe"
-                />
+              <component
+                :is="row.voucherGeneratedFile?.path ? 'a' : 'NuxtLink'"
+                :href="row.voucherGeneratedFile?.path || '/fallback-route'"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center justify-center"
+              >
+                <CustomIcons name="Doc-Loupe" />
+              </component>
               </div>
             </template>
             <template #status="{ row }">
@@ -65,8 +66,8 @@
         <CustomPagination
           v-model:page="page"
           class="mt-5 mb-[19px]"
-          :total="1"
-          :limit="1"
+          :total="data.count"
+          :limit="data.limit"
         />
       </div>
     </ContentLayout>

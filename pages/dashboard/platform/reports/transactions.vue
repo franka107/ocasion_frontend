@@ -50,13 +50,16 @@
               </div>
             </template>
             <template #livelihood="{ row }">
-              <div
+              <div class="flex items-center justify-center">
+              <component
+                :is="row.sustentationFile?.path ? 'a' : 'NuxtLink'"
+                :href="row.sustentationFile?.path || '/fallback-route'"
+                target="_blank"
+                rel="noopener noreferrer"
                 class="flex items-center justify-center"
-                @click=""
               >
-                <CustomIcons
-                  name="Doc-Loupe"
-                />
+                <CustomIcons name="Doc-Loupe" />
+              </component>
               </div>
             </template>
             <template #status="{ row }">

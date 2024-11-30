@@ -7,6 +7,7 @@ import { useForm } from 'vee-validate';
 import InputFile from '@/components/common/file/Input.vue';
 import { IuseRecharge } from '@/composables/useRecharge'
 import type{ IRecharge } from '@/types/Recharge'
+import dayjs from 'dayjs';
 const {autorizationRecharge} = IuseRecharge()
 const BASE_RECHAR_URL = '/finance/recharge-request-management'
 const props = defineProps<{
@@ -54,11 +55,11 @@ if (props.id) {
   if (data.value) {
     form.setValues({
       ...data.value,
+      transferedAt: dayjs(data.value.transferedAt).format('YYYY-MM-DD'),
       attachedFiles: data.value.sustentationFile ? [data.value.sustentationFile] : [],
     });
   }
-  console.log(data.value)
-  form.setValues(data.value)
+
 }
 
 const handleFilesChange = (files: File[]) => {
@@ -94,7 +95,6 @@ const onSubmit = async (values:any)  => {
     props.onAuthorize(formattedValues);
   }
 };
-
 const handleReject = () => {
   emit('on-reject', {  reason: 'Rechazo manual' });
 };

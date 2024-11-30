@@ -32,7 +32,7 @@
                   align="start"
                   class="bg-primary text-white"
                 >
-                  <DropdownMenuItem @click="openAccountDetailsModal = true">
+                  <DropdownMenuItem @click="openAccountDetail(row)">
                     Detalle de cuenta
                     <CustomIcons name="EyeIcon" class="ml-4" />
                   </DropdownMenuItem>
@@ -53,15 +53,16 @@
           </template>
         </CustomTable>
         <SheetContent
-          v-model:open="openAccountDetailsModal"
+          v-model:open="openAccountDetailModal"
           class="flex flex-col h-full"
           custom-width="510px"
           @pointer-down-outside="(e) => e.preventDefault()"
           @interact-outside="(e) => e.preventDefault()"
         >
           <AccountDetailsForm
-            :on-submit="onAccountDetailsSubmit"
-            @update:model-value="openAccountDetailsModal = false"
+            v-model="openAccountDetailModal"
+            :id="accountId"
+            @submit="onAccountDetailSubmit"
           />
         </SheetContent>
       </div>
@@ -100,17 +101,8 @@ const {
     filterOptions,
     sortOptions,
   } = useAccountValidation()
-const onSubmit = (formData: any) => {
-  console.log('Formulario enviado:', formData)
-  openApplicationModal.value = false
-}
-const onParticipantSubmit = (formData: any) => {
-  console.log('Detalle del participante enviado:', formData)
-  openParticipantModal.value = false
-}
-const rechargeId = ref<number | undefined>(undefined)
+const accountId = ref<number | undefined>(undefined)
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
-const rechargeModal = ref<any>({ offerId: '' })
 
 const BASE_VAL_URL = '/finance/account-validation'
 const { data, refresh }: any = await useAPI(
@@ -128,15 +120,24 @@ const accountData = computed(() =>
   data.value?.data.map((item: any) => ({
     fullName: item.participant.commonName,
     ...item,
-    //transferedAt: dayjs(item.transferedAt).format('YYYY-MM-DD'),
     createdAt: dayjs(item.updatedAt).format('YYYY-MM-DD'),
   })),
 )
 
-// const acccountData = computed(() => data)
 const openAccountDetailsModal = ref(false)
-const onAccountDetailsSubmit = (formData: any) => {
-  console.log('Detalle de cuenta enviado:', formData)
-  openAccountDetailsModal.value = false
+const openAccountDetailModal = ref(false)
+const openAccountDetail = (row: any) => {
+  const accountDetailId = row.id;
+  if (accountId) {
+    accountId .value = accountDetailId;
+    console.log('Abriendo detalle del participante:', accountDetailId);
+    openAccountDetailModal.value = true;
+  } else {
+    console.error('No se encontró el participante para esta fila.');
+  }
+};
+const onAccountDetailSubmit = (formData: any) => {
+  console.log('Detalle de solicitud enviado:', formData)
+  openAccountDetailModal.value = false
 }
 </script>
