@@ -11,11 +11,9 @@ export function useWithdrawalRequests() {
   const onSearch = (item: { [key: string]: string }) => {
     const filters = [
       { field: 'id', type: 'like', value: item.id || '' },
-      { field: 'name', type: 'like', value: item.name || '' },
+      { field: 'createdAt', type: 'between', value: item.createdAt || '' },
+      { field: 'transferedAt', type: 'between', value: item.transferedAt || '' },
     ]
-    if (item.status) {
-      filters.push({ field: 'status', type: 'equal', value: item.status })
-    }
     filterOptions.value = JSON.stringify(filters)
   }
 

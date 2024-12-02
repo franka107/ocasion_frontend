@@ -1,38 +1,24 @@
 <template>
     <ContentLayout title="Reporte de transacciones (Global)">
-      <TransactionsDetails />
+      <TransactionsDetails :cards-data="transactionHistoryResumeData" />
       <div class="w-full flex flex-col">
         <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
           <CustomTable
-            :data="transactionsData"
+            :data="parsedTransactionHistoryList"
             :header="transactionsHeader"
             :search="transactionsSearch"
             @on-sort="onSort"
+            show-more-button
             @on-search="onSearch"
           >
           <template #action-button>
-            <div class="flex">
                 <Button
                 variant="default"
-                class="text-[#F97316] bg-white hover:text-white hover:bg-[#F97316] mr-[8px]"
-                @click="
-                    () => {
-                    
-                    }
-                "
-                >Mas filtros</Button>
-                <Button
-                variant="default"
-                @click="
-                    () => {
-                    
-                    }
-                "
+                @click="handleExport"
                 >
                 <CustomIcons name="Download" class="ml-auto" />
                 Exportar
                 </Button>
-            </div>
           </template>
             <template #actions="{ row }">
               <div class="flex justify-center">
@@ -64,13 +50,16 @@
               </div>
             </template>
             <template #livelihood="{ row }">
-              <div
+              <div class="flex items-center justify-center">
+              <component
+                :is="row.sustentationFile?.path ? 'a' : 'NuxtLink'"
+                :href="row.sustentationFile?.path || '/fallback-route'"
+                target="_blank"
+                rel="noopener noreferrer"
                 class="flex items-center justify-center"
-                @click=""
               >
-                <CustomIcons
-                  name="Doc-Loupe"
-                />
+                <CustomIcons name="Doc-Loupe" />
+              </component>
               </div>
             </template>
             <template #status="{ row }">
@@ -84,75 +73,54 @@
         <CustomPagination
           v-model:page="page"
           class="mt-5 mb-[19px]"
-          :total="1"
-          :limit="1"
+          :total="total"
+          :limit="6"
         />
       </div>
     </ContentLayout>
   </template>
-  <script setup lang="ts">
+<script setup lang="ts">
   import CustomTable from '~/components/ui/custom-table/CustomTable.vue'
   import CustomChip from '~/components/ui/custom-chip/CustomChip.vue'
   import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue'
   import CustomPagination from '~/components/ui/custom-pagination/CustomPagination.vue'
-  import type { OrganizationItem } from '~/types/Order.ts'
   import {
     transactionsStatus,
     transactionsHeader,
     transactionsSearch,
   } from '~/constants/reports'
   import ContentLayout from '~/layouts/default/ContentLayout.vue'
-  import { ref } from 'vue' 
+  import formatCurrency from '~/utils/formatCurrency' 
   import TransactionsDetails from '~/components/reports/transactions/TransactionsDetails.vue'
-  const openApplicationModal = ref(false); 
-  const openParticipantModal = ref(false); 
+  import { TransactionHistoryMotive, transactionHistoryMotiveMap, type TransactionHistoryListItem } from '~/types/TransactionHistory'
+  import dayjs from 'dayjs'
   const {
     page,
     onSort,
     onSearch,
-  } = useTopUpRequests()
-  const onSubmit = (formData: any) => {
-    console.log("Formulario enviado:", formData);
-    openApplicationModal.value = false; 
-  }; 
-  const onParticipantSubmit = (formData: any) => {
-    console.log('Detalle del participante enviado:', formData);
-    openParticipantModal.value = false;
-  };
-  const rechargeId = ref<number | undefined>(undefined)
-  const { openConfirmModal, updateConfirmModal } = useConfirmModal()
-  const rechargeModal = ref<any>({ offerId: '' })
-  const data = [
-  {
-    id: '000',
-    fullName:'Jose Perez Perez',
-    document:'DNI 87654321',
-    typeOfOperation:'Recarga de monedero',
-    dateOfOperation: '2024-11-01',
-    amount: '$ 1’000.00',
-    status: 'AUTHORIZED',
-    actions: '',
-  },
-  {
-    id: '000',
-    fullName:'Rosi Ferri Lombardi',
-    document:'DNI 43544321',
-    typeOfOperation:'Retiro de saldo',
-    dateOfOperation: '2024-12-01',
-    amount: '$ 1’000.00',
-    status: 'ABANDONED',
-    actions: '',
-  },
-];
-const transactionsData = computed(() => data);
-const isEditing = ref(false); 
-const openModal = (editMode: boolean) => {
-  isEditing.value = editMode;
-  openApplicationModal.value = true;
-};
-const openParticipantDetail = (row: any) => {
-  console.log('Abriendo detalle del participante:', row);
-  openParticipantModal.value = true;
-};
-  </script>
+    getData,
+    handleExport
+  } = useTransactionHistoriesAPI()
+const { transactionHistoryList, transactionHistoryResume } = await getData()
+const transactionHistoryResumeData = computed(() => {
+  return [
+    { subtitle: 'Ingresos', amountKey: formatCurrency(transactionHistoryResume.data.value.incomeAmount, 'USD') },
+    { subtitle: 'Penalidades cobradas', amountKey: formatCurrency(transactionHistoryResume.data.value.penaltiesChargedAmount, 'USD') },
+    { subtitle: 'Retiros pendientes de procesar', amountKey: formatCurrency(transactionHistoryResume.data.value.withdrawalsPendingProcessingAmount, 'USD') },
+  ]
+})
+const total = computed(()=> transactionHistoryList.data.value.count)
+const parsedTransactionHistoryList = computed(() => transactionHistoryList.data.value.data.map((item) => {
+    return {
+      ...item,
+      fullName: item.wallet.user.firstName + ' ' + item.wallet.user.lastName,
+      document: `${item.wallet.user.documentType} ${item.wallet.user.documentIdentifier}`,
+      typeOfOperation: transactionHistoryMotiveMap[item.motive as TransactionHistoryMotive].label,
+      dateOfOperation: dayjs(item.createdAt).format('YYYY-MM-DD'),
+      amount: formatCurrency(item.amount, item.currency),
+      status: item.status,
+    }
+  })
+)
+</script>
   

@@ -1,0 +1,138 @@
+<script setup lang="ts">
+import { toTypedSchema } from '@vee-validate/zod'
+import { useForm } from 'vee-validate'
+import { z } from 'zod'
+import { ExclamationTriangleIcon } from '@radix-icons/vue'
+import { X } from 'lucide-vue-next'
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+const {rejectRechargeRequest} = useTopUpRequests()
+const openAnnulModal = ref(false) 
+const props = defineProps<{
+  id: string
+  modelValue: boolean
+  refreshTable: () => void
+}>()
+const { openConfirmModal, updateConfirmModal } = useConfirmModal()
+const formSchema = toTypedSchema(
+  z.object({
+    rejection: z.string().min(1, 'Seleccione un motivo.'),
+    comment: z.string().min(1, "El comentario es requerido."),
+  }),
+)
+const emit = defineEmits(['update:modelValue'])
+const form = useForm({
+  validationSchema: formSchema,
+})
+const onSubmit = form.handleSubmit((values: any) => {
+  const { rejection, comment } = values
+  handleReject({ rejectId: props.id, rejection, comment })
+  console.log('onsubmit', rejection, comment)
+})
+const cancelEdit = () => {
+  emit('update:modelValue', false); 
+};
+const handleReject = async (values: any) => {
+  openConfirmModal({
+    title: 'Rechazar solicitud de recarga',
+    message: '¿Está seguro que desea rechazar la solicitud de recarga?',
+    callback: async () => {
+      const { status, error }: any = await rejectRechargeRequest({
+        id: values.id,
+        rejectionReason: 'Rechazado por el administrador',
+      })
+      if (status.value === 'success') {
+        openAnnulModal.value = false
+        props.refreshTable()
+        updateConfirmModal({
+          title: 'Solicitud de recarga rechazada',
+          message: 'Se ha rechazado la soliciud de recarga',
+          type: 'success',
+        })
+      } else {
+        const eMsg =
+          error.value.data?.errors?.[0].message ||
+          error.value.data.message ||
+          'El solicitud de recarga no se pudo rechazar, intentalo más tarde'
+        updateConfirmModal({
+          title: 'Error al rechazar la solicitud de recarga',
+          message: eMsg,
+          type: 'error',
+        })
+      }
+    },
+  })
+}
+</script>
+
+<template>
+  <AlertDialog
+    :open="modelValue"
+    class="z-[30]"
+    @update:open="(event) => emit('update:modelValue', event)"
+  >
+    <AlertDialogContent class="z-[98] max-w-[409px] px-0">
+      <form class="flex flex-col gap-6 flex-grow" @submit="onSubmit">
+        <div>
+          <AlertDialogHeader class="flex items-center">
+            <CustomIcons name="Warning" class="w-[32px] h-[32px]" />
+            <AlertDialogTitle
+              class="text-xl tracking-[-0.5px] text-primary text-start mb-[18px] font-[600] px-6"
+              >Rechazar solicitud</AlertDialogTitle
+            >
+          </AlertDialogHeader>
+        </div>
+        <div class="grid grid-cols-1 gap-3 px-6">
+          <p class="text-[14px] font-[500] text-[#68686C]">¿Está seguro que desea rechazar la solicitud de recarga? Si es asi por favor ingresar el motivo de rechazo.</p>
+          <!-- Motivo de Rechazo -->
+          <FormField v-slot="{ componentField }" name="rejection">
+            <FormItem>
+              <FormControl>
+                <CustomSelect
+                  v-bind="componentField"
+                  :items="[ { id: 'motivo1', name: 'Motivo 1' }, { id: 'motivo2', name: 'Motivo 2' } ]"
+                  placeholder="Forma de pago"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+          <!-- Comentario -->
+          <FormField v-slot="{ componentField }" name="comment">
+            <FormItem>
+              <FormControl>
+                <Textarea
+                type="text"
+                label="Comentarios"
+                v-bind="componentField"
+                />
+                <FormMessage />
+              </FormControl>
+            </FormItem>
+          </FormField>
+        </div>
+        <AlertDialogFooter class="px-6">
+          <Button
+            type="button"
+            size="xl"
+            class="text-[16px] font-[600] bg-white text-primary border border-primary hover:bg-accent"
+            @click.prevent="cancelEdit"
+            >Cancelar</Button
+          >
+          <Button
+            type="submit"
+            class="text-[16px] font-[600] "
+            size="xl"
+            :disabled="!form.meta.value.valid"
+            >Confirmar</Button
+          >
+        </AlertDialogFooter>
+      </form>
+    </AlertDialogContent>
+  </AlertDialog>
+</template>

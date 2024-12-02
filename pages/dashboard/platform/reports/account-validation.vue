@@ -14,38 +14,32 @@
             :search="validationSearch"
             @on-sort="onSort"
             @on-search="onSearch"
+            show-more-button
           >
           <template #action-button>
                 <div class="flex">
                     <Button
                     variant="default"
-                    class="text-[#F97316] bg-white hover:text-white hover:bg-[#F97316] mr-[8px]"
-                    @click="
-                        () => {
-                        
-                        }
-                    "
-                    >Mas filtros</Button>
-                    <Button
-                    variant="default"
-                    @click="
-                        () => {
-                        
-                        }
-                    "
+                    @click="handleExport"
                     >
                     <CustomIcons name="Download" class="ml-auto" />
                     Exportar
                     </Button>
                 </div>
             </template>
+          <template #status="{ row }">
+            <CustomChip
+              :text="validationStatus.get(row.status)?.name || ''"
+              :variant="validationStatus.get(row.status)?.color as any"
+            ></CustomChip>
+          </template>
           </CustomTable>
         </div>
         <CustomPagination
           v-model:page="page"
           class="mt-5 mb-[19px]"
-          :total="1"
-          :limit="1"
+          :total="data.count"
+          :limit="data.limit"
         />
       </div>
     </ContentLayout>
@@ -63,57 +57,37 @@
   } from '~/constants/reports'
   import ContentLayout from '~/layouts/default/ContentLayout.vue'
   import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
-
+  import { useAccountValidation } from '@/composables/useAccountValidation'
   import { ref } from 'vue' 
-  const openApplicationModal = ref(false); 
-  const openParticipantModal = ref(false); 
+  import dayjs from 'dayjs'
+
   const {
     page,
     onSort,
     onSearch,
-  } = useTopUpRequests()
-  const onSubmit = (formData: any) => {
-    console.log("Formulario enviado:", formData);
-    openApplicationModal.value = false; 
-  }; 
-  const onParticipantSubmit = (formData: any) => {
-    console.log('Detalle del participante enviado:', formData);
-    openParticipantModal.value = false;
-  };
-  const rechargeId = ref<number | undefined>(undefined)
-  const { openConfirmModal, updateConfirmModal } = useConfirmModal()
-  const rechargeModal = ref<any>({ offerId: '' })
-  const data = [
-  {
-    id: '000',
-    dateOfRequest: '2024-11-01',
-    fullName:'Rose Ferrari Pausini',
-    document: 'DNI 87654321',
-    bank: 'Banco de crédito del Perú',
-    coin: 'Dólar',
-    account: '0000 0000 0000 0000',
-    status: 'APPROVED',
-  },
-  {
-    id: '000',
-    dateOfRequest: '2024-11-01',
-    fullName:'Franco Radocio Pausini',
-    document: 'DNI 87654321',
-    bank: 'Banco de crédito del Perú',
-    coin: 'Dólar',
-    account: '0000 0000 0000 0000',
-    status: 'REJECTED',
-  },
-];
-const validationData = computed(() => data);
-const isEditing = ref(false); 
-const openModal = (editMode: boolean) => {
-  isEditing.value = editMode;
-  openApplicationModal.value = true;
-};
-const openParticipantDetail = (row: any) => {
-  console.log('Abriendo detalle del participante:', row);
-  openParticipantModal.value = true;
-};
+    filterOptions,
+    sortOptions,
+    handleExport,
+  } = useAccountValidation()
+  const BASE_VAL_URL = '/finance/account-validation'
+  const { data, refresh }: any = await useAPI(
+    `${BASE_VAL_URL}/view-paginated-account-validations`,
+    {
+      query: {
+        limit: 8,
+        page,
+        filterOptions,
+        sortOptions,
+      },
+    } as any,
+  )
+  const validationData = computed(() =>
+  data.value?.data.map((item: any) => ({
+    fullName: item.participant.commonName,
+    document: `${item.participant.documentType} ${item.participant.documentIdentifier}`,
+    ...item,
+    createdAt: dayjs(item.updatedAt).format('YYYY-MM-DD'),
+  })),
+)
   </script>
   

@@ -1,6 +1,6 @@
 <template>
     <ContentLayout title="Balance de cuentas">
-      <AccountDetails/> 
+      <AccountDetails/>
       <div class="w-full flex flex-col">
         <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
           <CustomTable
@@ -15,8 +15,8 @@
         <CustomPagination
           v-model:page="page"
           class="mt-5 mb-[19px]"
-          :total="1"
-          :limit="1"
+          :total="data.count"
+          :limit="data.limit"
         />
       </div>
     </ContentLayout>
@@ -33,59 +33,35 @@
   } from '~/constants/reports'
   import ContentLayout from '~/layouts/default/ContentLayout.vue'
   import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
-  import ApplicationForm from '~/components/attention-tray/top-up-requests/ApplicationForm.vue'
-  import ParticipantDetailForm from '~/components/attention-tray/top-up-requests/ParticipantDetailForm.vue'
-  import { ref } from 'vue' 
-import AccountDetails from '~/components/reports/account-balance/AccountDetails.vue'
-  const openApplicationModal = ref(false); 
-  const openParticipantModal = ref(false); 
+  import { ref } from 'vue'
+  import AccountDetails from '~/components/reports/account-balance/AccountDetails.vue'
+  import { useAccountBalance } from '@/composables/useAccountBalance'
+
+  const openApplicationModal = ref(false);
+  const openParticipantModal = ref(false);
   const {
     page,
     onSort,
     onSearch,
-  } = useTopUpRequests()
-  const onSubmit = (formData: any) => {
-    console.log("Formulario enviado:", formData);
-    openApplicationModal.value = false; 
-  }; 
-  const onParticipantSubmit = (formData: any) => {
-    console.log('Detalle del participante enviado:', formData);
-    openParticipantModal.value = false;
-  };
-  const rechargeId = ref<number | undefined>(undefined)
-  const { openConfirmModal, updateConfirmModal } = useConfirmModal()
-  const rechargeModal = ref<any>({ offerId: '' })
-  const data = [
-  {
-    fullName:'Rose Ferrari Pausini',
-    income: '1000.00',
-    expenses: '1000.00',
-    penalties: '1000.00',
-    guaranteed: '1000.00',
-    balance: '1000.00',
-    pendingWithdrawal: '1000.00',
-    pendingRecharge:'1000.00',
-  },
-  {
-    fullName:'Bruno Lorezco Poula',
-    income: '1000.00',
-    expenses: '1000.00',
-    penalties: '1000.00',
-    guaranteed: '1000.00',
-    balance: '1000.00',
-    pendingWithdrawal: '1000.00',
-    pendingRecharge:'1000.00',
-  },
-];
-const balanceData = computed(() => data);
-const isEditing = ref(false); 
-const openModal = (editMode: boolean) => {
-  isEditing.value = editMode;
-  openApplicationModal.value = true;
-};
-const openParticipantDetail = (row: any) => {
-  console.log('Abriendo detalle del participante:', row);
-  openParticipantModal.value = true;
-};
+    filterOptions,
+    sortOptions,
+  } = useAccountBalance()
+  const BASE_WALL_URL = '/finance/wallet-management'
+  const { data, refresh }: any = await useAPI(
+    `${BASE_WALL_URL}/view-wallets-paginated`,
+    {
+      query: {
+        limit: 8,
+        page,
+        filterOptions,
+        sortOptions,
+      },
+    } as any,
+  )
+  const balanceData = computed(() =>
+    data.value?.data.map((item: any) => ({
+      fullName: item.user.commonName,
+      ...item,
+    })),
+  )
   </script>
-  

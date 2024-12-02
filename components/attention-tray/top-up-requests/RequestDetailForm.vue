@@ -6,6 +6,8 @@ import * as z from 'zod';
 import { useForm } from 'vee-validate';
 import InputFile from '@/components/common/file/Input.vue';
 import { IuseRecharge } from '@/composables/useRecharge'
+import type{ IRecharge } from '@/types/Recharge'
+import dayjs from 'dayjs';
 const {autorizationRecharge} = IuseRecharge()
 const BASE_RECHAR_URL = '/finance/recharge-request-management'
 const props = defineProps<{
@@ -14,14 +16,14 @@ const props = defineProps<{
   onReject: (values: any) => void;
 }>();
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
-const emit = defineEmits(['update:modelValue', 'open-reject-modal']);
+const emit = defineEmits(['update:modelValue', 'open-reject-modal','on-reject']);
 const currentMode = ref<"reject" | "authorize">("authorize");
 const formSchema = toTypedSchema(
   z.object({
-    operation: z
+    operationNumber: z
       .string()
       .regex(/^\d{10,20}$/, 'Ingrese número de operación válido.'),
-    transferDate: z.string().nonempty('La fecha de transferencia es requerida').optional(),
+    transferedAt: z.string().nonempty('La fecha de transferencia es requerida').optional(),
     amount: z
       .number()
       .positive('Debe ser un monto positivo.')
@@ -53,11 +55,11 @@ if (props.id) {
   if (data.value) {
     form.setValues({
       ...data.value,
+      transferedAt: dayjs(data.value.transferedAt).format('YYYY-MM-DD'),
       attachedFiles: data.value.sustentationFile ? [data.value.sustentationFile] : [],
     });
   }
-  console.log(data.value)
-  form.setValues(data.value)
+
 }
 
 const handleFilesChange = (files: File[]) => {
@@ -75,10 +77,10 @@ const onSubmit = async (values:any)  => {
   if(currentMode.value === "reject") {
     const { valid } = await form.validate();
     if(valid) {
-      const { operation, transferDate, amount, currency, attachedFiles} = form.values;
+      const { operationNumber, transferedAt, amount, currency, attachedFiles} = form.values;
       formattedValues = {
-        operation, 
-        transferDate, 
+        operationNumber, 
+        transferedAt, 
         amount, 
         currency, 
         attachedFiles
@@ -86,13 +88,16 @@ const onSubmit = async (values:any)  => {
       props.onReject(formattedValues)
     }
   } else if(currentMode.value === "authorize") {
-    formattedValues = {
-      deliverySupportId: props.id,
-    }
+    const formattedValues = {
+    ...values,
+    id: props.id,
+  }
     props.onAuthorize(formattedValues);
   }
 };
-
+const handleReject = () => {
+  emit('on-reject', {  reason: 'Rechazo manual' });
+};
 </script>
 
 <template>
@@ -110,7 +115,7 @@ const onSubmit = async (values:any)  => {
             <section class="flex-grow">
                 <div class="grid grid-cols-2 gap-4 mb-[24px]">
                     <!-- N° operación -->
-                    <FormField v-slot="{ componentField }" name="operation">
+                    <FormField v-slot="{ componentField }" name="operationNumber">
                         <FormItem>
                             <FormControl>
                                 <CustomInput v-bind="componentField" type="text" placeholder="Ingrese número"
@@ -120,7 +125,7 @@ const onSubmit = async (values:any)  => {
                         </FormItem>
                     </FormField>
                     <!-- Fecha de Transferencia -->
-                    <FormField v-slot="{ componentField }" name="transferDate">
+                    <FormField v-slot="{ componentField }" name="transferedAt">
                         <FormItem>
                             <FormControl>
                                 <CustomInput  disabled type="date" label="Fecha de transferencia" v-bind="componentField" />
@@ -162,7 +167,8 @@ const onSubmit = async (values:any)  => {
                             title="Archivos adjuntos"
                             disabled
                             instructions-text="Cargar máximo 3 elementos(xlsx, docx, pdf)" :limit-files="3"
-                            v-bind="componentField" />
+                            v-bind="componentField"
+                            hide-remove-icon />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -171,7 +177,7 @@ const onSubmit = async (values:any)  => {
             </section>
         <div
           class="mt-4 flex flex-wrap md:flex-nowrap justify-center gap-y-[10px] gap-x-[16px] w-full">
-          <Button  @click.prevent="handleDecline" type="button" size="xl"
+          <Button  @click="handleReject" type="button" size="xl"
             class="w-full max-w-[223px] text-[14px] md:text-[16px] font-[600] bg-white text-primary border border-primary hover:bg-accent">Rechazar</Button>
           <Button type="submit" 
           :disabled="!form.meta.value.valid" 

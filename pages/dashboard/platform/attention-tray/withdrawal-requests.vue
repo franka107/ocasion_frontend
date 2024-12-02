@@ -12,16 +12,9 @@
           :data="withDrawalRequeststData"
           :header="withdrawalRequeststHeader"
           :search="withdrawalRequestsSearch"
-          class="mb-4"
-          multiple-select
           @on-sort="onSort"
           @on-search="onSearch"
-          @on-multiple-select="
-            ({ ids, type, resetMultipleSelect: onResetMultipleSelect }) => {
-              selectedMultipleData = { ids, type }
-              resetMultipleSelect = onResetMultipleSelect
-            }
-          "
+          class="mb-4"
         >
           <template #actions="{ row }">
             <div class="flex justify-center">
@@ -44,7 +37,7 @@
                     <CustomIcons name="EyeIcon" class="ml-auto" />
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem @click="openParticipant(row.id)">
+                  <DropdownMenuItem @click="openParticipantDetail(row)">
                     Detalle participante
                     <CustomIcons name="EyeIcon" class="ml-[10px]" />
                   </DropdownMenuItem>
@@ -73,6 +66,7 @@
         >
           <WithdrawalDetailsForm
             v-model="openWithdrawalDetailsModal"
+            id="rechargeId"
             @submit="onWithdrawalDetailsSubmit"
           />
         </SheetContent>
@@ -84,8 +78,7 @@
           @interact-outside="(e) => e.preventDefault()"
         >
           <ParticipantDetailEditForm
-            v-model="openParticipantModal"
-            @submit="onParticipantSubmit"
+            :participant-id="rechargeId"
           />
         </SheetContent>
       </div>
@@ -116,20 +109,11 @@ import ParticipantDetailEditForm from '~/components/attention-tray/withdrawal-re
 import WithdrawalDetailsForm from '~/components/attention-tray/withdrawal-requests/WithdrawalDetailsForm.vue'
 import dayjs from 'dayjs'
 
-const selectedMultipleData = ref<{ type: string; ids: string[] }>({
-  type: 'empty',
-  ids: [],
-})
-const resetMultipleSelect = ref<Function | undefined>(undefined)
-const disableMultipleSelect = computed(
-  () =>
-    selectedMultipleData.value.type === 'empty' &&
-    selectedMultipleData.value.ids.length === 0,
-)
-const openApplicationModal = ref(false)
 const openParticipantModal = ref(false)
+const openEditModal = ref(false)
 const selectedRequestId = ref<string | null>(null)
 const openWithdrawalDetailsModal = ref(false)
+const rechargeId = ref<number | undefined>(undefined)
 const openWithdrawalDetails = (requestId: string) => {
   selectedRequestId.value = requestId
   openWithdrawalDetailsModal.value = true
@@ -139,44 +123,28 @@ const onWithdrawalDetailsSubmit = (formData: any) => {
   openWithdrawalDetailsModal.value = false
 }
 const selectedParticipantId = ref<string | null>(null)
-const openParticipant = (participantId: string) => {
-  selectedParticipantId.value = participantId
-  openParticipantModal.value = true
+const openModalEditRequest = (rowId: number) => {
+  rechargeId.value = rowId
+  openEditModal.value = true
 }
+const openParticipantDetail = (row: any) => {
+  const participantId = row.participant?.id;
+  if (participantId) {
+    rechargeId.value = participantId;
+    console.log('Abriendo detalle del participante:', participantId);
+    openParticipantModal.value = true;
+  } else {
+    console.error('No se encontró el participante para esta fila.');
+  }
+};
 
-const onParticipantSubmit = (formData: any) => {
-  console.log('Detalle del participante enviado:', formData)
-  openParticipantModal.value = false
-}
-const rechargeId = ref<number | undefined>(undefined)
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const rechargeModal = ref<any>({ offerId: '' })
-// const data = [
-//   {
-//     id: '000',
-//     dateOfRequest: '2024-11-01',
-//     fullName: 'Rossi Ferrari Lombardi',
-//     transfer: '2024-11-10',
-//     amount: '$ 1’000.00',
-//     status: 'EARRING',
-//     actions: '',
-//   },
-//   {
-//     id: '000',
-//     dateOfRequest: '2024-10-25',
-//     fullName: 'Martini Lombardi Lombardi',
-//     contractStartDate: '2024-11-01',
-//     operation: '98765',
-//     transfer: '2024-10-30',
-//     amount: '$ 1’000.00',
-//     status: 'EARRING',
-//     actions: '',
-//   },
 const { page, onSort, onSearch, filterOptions, sortOptions } =
   useWithdrawalRequests()
-const BASE_RECHAR_URL = '/finance/withdrawal-request-management'
+const BASE_WITH_URL = '/finance/withdrawal-request-management'
 const { data, refresh }: any = await useAPI(
-  `${BASE_RECHAR_URL}/view-paginated-withdrawal-requests`,
+  `${BASE_WITH_URL}/view-paginated-withdrawal-requests`,
   {
     query: {
       limit: 8,
@@ -194,4 +162,32 @@ const withDrawalRequeststData = computed(() =>
     createdAt: dayjs(item.updatedAt).format('YYYY-MM-DD'),
   })),
 )
+// const handleEdit = async (values: any) => {
+//   openConfirmModal({
+//     title: 'Actualizar participante',
+//     message: '¿Estás seguro de que deseas actualizar este participante?',
+//     callback: async () => {
+//       const { status, error }: any = await editEvent(values)
+//       if (status.value === 'success') {
+//         openEventModal.value = false
+//         refresh()
+//         updateConfirmModal({
+//           title: 'Participante actualizada',
+//           message: 'El participante ha sido actualizado exitosamente',
+//           type: 'success',
+//         })
+//       } else {
+//         const eMsg =
+//           error.value.data?.errors?.[0].message ||
+//           error.value.data.message ||
+//           'El participante no se pudo actualizar, intentalo más tarde'
+//         updateConfirmModal({
+//           title: 'Error al crear evento',
+//           message: eMsg,
+//           type: 'error',
+//         })
+//       }
+//     },
+//   })
+// }
 </script>

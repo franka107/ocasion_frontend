@@ -1,95 +1,160 @@
 import type { HeaderItem, SearchItem } from '@/components/ui/custom-table/CustomTable.vue';
+import { TransactionHistoryMotive, transactionHistoryMotiveMap } from '~/types/TransactionHistory';
 
 export const transactionsStatus = new Map<string, { name: string; color: string }>([
     ["AUTHORIZED", { name:  "Autorizada", color: "blue" }],
     ["EJECTED", { name: "Rechazada", color: "brown" }],
     ["ABANDONED", { name: "Abonada", color: "green" }],
 ]);
-export const disbursementStatus = new Map<string, { name: string; color: string }>([
-    ["PAYMENT CONFIRMED", { name:  "Abono confirmado", color: "blue" }],
-    ["CANCELED", { name: "Anulada", color: "brown" }],
-]);
+export const disbursementStatus = new Map<string,{ name: string; color: string }>([
+    ['PENDING', { name: 'Pendiente', color: 'orange' }],
+    ['CONFIRMED_DEPOSIT', { name: 'Deposito confirmado', color: 'blue' }],
+    ['ANNULED_DEPOSIT', { name: 'Deposito anulado', color: 'red' }],
+  ])
 export const validationStatus = new Map<string, { name: string; color: string }>([
-    ["APPROVED", { name:  "Aprovada", color: "blue" }],
-    ["REJECTED", { name: "Rechazada", color: "brown" }],
+    ['PENDING', { name: 'Pendiente', color: 'orange' }],
+    ['REJECTED', { name: 'Rechazado', color: 'red' }],
+    ['APPROVED', { name: 'Aprobado', color: 'blue' }],
 ]);
-
+export const bankType = new Map<string, string>([
+    ['BBVA', 'BBVA'],
+    ['BCP', 'Bcp'],
+    ['SCOTIABANK', 'Scotiabank'],
+  ])
 export const transactionsSearch: SearchItem[] = [
     {
-        key: 'id',
+        key: 'quickSearch',
         type: 'text',
-        placeholder: 'Buscar participante, n° transacción o  n° DOI',
-        elementClass: 'max-w-[700px] w-full',
-        position: 1,
+        placeholder: 'Buscar participante, n° transacción o  n° DNI',
+        width: 'max-w-xs w-full',
+        elementClass: 'w-full',
     },{
-        key: 'typeOfOperation',
-        type: 'text',
+        key: 'createdAt',
+        type: 'date-range',
         placeholder: 'Fecha de operación',
-        elementClass: 'min-w-[400px]',
-        position: 2,
+        width: 'w-auto',
     },{
         key: 'status',
-        type: 'text',
+        type: 'select',
+        items: [
+            ...Array.from(transactionsStatus).map(([key, value]) => ({
+              text: value.name,
+              value: key,
+            })),
+            { text: 'Todos', value: ' ' },
+        ],
         placeholder: 'Estado',
-        elementClass: 'min-w-[400px]',
-        position: 3,
+    },{
+        key: 'motive',
+        type: 'select',
+        items: [
+            ...Object.keys(transactionHistoryMotiveMap).map((key) => ({
+              text: transactionHistoryMotiveMap[key as TransactionHistoryMotive].label,
+              value: key,
+            })),
+            { text: 'Todos', value: ' ' },
+        ],
+        isHidden: true,
+        placeholder: 'Tipo de operación',
     },
 ]
 
 export const disbursementSearch: SearchItem[] = [
     {
-        key: 'id',
+        key: 'quickSearch',
         type: 'text',
         placeholder: 'Buscar participante, n° transacción o  n° DOI',
-        elementClass: 'max-w-[700px] w-full',
-        position: 1,
+        width: 'max-w-xs w-full',
+        elementClass: 'w-full',
     },
     {
-        key: 'typeOfOperation',
-        type: 'text',
+        key: 'createdAt',
+        type: 'date-range',
         placeholder: 'Fecha de registro',
+        width: 'w-auto'
+    },
+    {
+        key: 'bank',
+        type: 'select',
+        placeholder: 'Banco',
+        items: [
+            ...Array.from(bankType).map(([key, value]) => ({
+              text: value,
+              value: key,
+            })),
+            { text: 'Todos', value: ' ' },
+          ],
         elementClass: 'min-w-[400px]',
-        position: 2,
+        position: 3,
+      },
+      {
+        key: 'status',
+        type: 'select',
+        items: [
+            ...Array.from(disbursementStatus).map(([key, value]) => ({
+              text: value.name,
+              value: key,
+            })),
+            { text: 'Todos', value: ' ' },
+        ],
+        isHidden: true,
+        placeholder: 'Estado',
+      },
+]
+export const validationSearch: SearchItem[] = [
+    {
+        key: 'quickSearch',
+        type: 'text',
+        placeholder: 'Buscar participante, n° transacción o  n° DOI',
+        width: 'max-w-xs w-full',
+        elementClass: 'w-full',
+    },
+    {
+        key: 'createdAt',
+        type: 'date-range',
+        placeholder: 'Fecha de solicitud',
+        width: 'w-auto',
     },
     {
         key: 'status',
         type: 'select',
-        placeholder: 'Banco',
-        items: [{ text: 'Todos', value: " " }],
-        elementClass: 'min-w-[400px]',
-        position: 3,
-    }
-]
-export const validationSearch: SearchItem[] = [
-    {
-        key: 'id',
-        type: 'text',
-        placeholder: 'Buscar participante, n° transacción o  n° DOI',
-        elementClass: 'max-w-[700px] w-full',
-        position: 1,
+        items: [
+            ...Array.from(validationStatus).map(([key, value]) => ({
+              text: value.name,
+              value: key,
+            })),
+            { text: 'Todos', value: ' ' },
+        ],
+        isHidden: true,
+        placeholder: 'Estado',
     },
     {
-        key: 'typeOfOperation',
-        type: 'text',
-        placeholder: 'Fecha de solicitud',
-        elementClass: 'min-w-[400px]',
-        position: 2,
+        key: 'bank',
+        type: 'select',
+        items: [
+            ...Array.from(bankType).map(([key, value]) => ({
+              text: value,
+              value: key,
+            })),
+            { text: 'Todos', value: ' ' },
+          ],
+        isHidden: true,
+        placeholder: 'Banco',
     },
 ]
 export const balanceSearch: SearchItem[] = [
     {
-        key: 'id',
+        key: 'quickSearch',
         type: 'text',
         placeholder: 'Buscar participane, documento',
-        elementClass: 'max-w-[700px] w-full',
-        position: 1,
+        width: 'max-w-xs w-full',
+        elementClass: 'w-full',
     },
     {
-        key: 'typeOfOperation',
+        key: 'quickSearchPeriod',
         type: 'text',
         placeholder: 'Periodo',
-        elementClass: 'min-w-[400px]',
-        position: 2,
+        width: 'w-auto',
     },
 ]
 
@@ -137,19 +202,19 @@ export const transactionsHeader: HeaderItem[] = [
     }]  
 export const disbursementHeader: HeaderItem[] = [
     {
-        key: 'lotCode',
+        key: 'id',
         label: 'Cod lote',       
     }, 
     {
-        key: 'requestAmount',
+        key: 'withdrawalRequestCount',
         label: 'Cant. solicitud retiro',
     },
     {
-        key: 'dateOfRegistration',
+        key: 'createdAt',
         label: 'Fec. Registro',
     }, 
     {
-        key: 'amount',
+        key: 'totalAmount',
         label: 'Monto a  desembolsar',
         sortable: true,
     },
@@ -179,7 +244,7 @@ export const validationHeader: HeaderItem[] = [
         label: 'N° Transación',       
     }, 
     {
-        key: 'dateOfRequest',
+        key: 'createdAt',
         label: 'Fec. Solicitud',
     }, 
     {
@@ -196,11 +261,11 @@ export const validationHeader: HeaderItem[] = [
         sortable: true,
     },
     {
-        key: 'coin',
+        key: 'currency',
         label: 'Moneda',
     },
     {
-        key: 'account',
+        key: 'transactionNumber',
         label: 'N° de cueta',
     },
     {
@@ -215,31 +280,30 @@ export const balanceHeader: HeaderItem[] = [
         label: 'Nombres y apellidos',
     },
     {
-        key: 'income',
+        key: 'chargeBalance',
         label: 'Ingresos',
     }, 
     {
-        key: 'expenses',
+        key: 'dischargeBalance',
         label: 'Egresos',
     }, 
     {
-        key: 'penalties',
+        key: 'penaltyBalance',
         label: 'Penalidades',
     }, 
     {
-        key: 'guaranteed',
+        key: 'guaranteedBalance',
         label: 'Garantizada',
     },
     {
-        key: 'balance',
+        key: 'availableBalance',
         label: 'Saldo',
     },  
     {
-        key: 'pendingWithdrawal',
+        key: 'pendingWithdrawalBalance',
         label: 'Retiro pendiente',
     },  
     {
-        key: 'pendingRecharge',
+        key: 'pendingRechargeBalance',
         label: 'Recarga pendiente',
-        sortable: true,
     }]  

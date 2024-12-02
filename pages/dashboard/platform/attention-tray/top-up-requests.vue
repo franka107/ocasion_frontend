@@ -36,14 +36,9 @@
                     <CustomIcons name="EyeIcon" class="ml-auto" />
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem @click="openModalEditRequest(row.id)">
+                  <DropdownMenuItem @click="handleUpdateRequest(row)">
                     Editar solicitud
                     <CustomIcons name="Pen" class="ml-auto" />
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem @click="handleReject(row)">
-                    Rechazar solicitud
-                    <CustomIcons name="X" class="ml-auto" />
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem @click="openParticipantDetail(row)">
@@ -55,8 +50,16 @@
             </div>
           </template>
           <template #livelihood="{ row }">
-            <div class="flex items-center justify-center" @click="">
-              <CustomIcons name="Doc-Loupe" />
+            <div class="flex items-center justify-center">
+              <component
+                :is="row.sustentationFile?.path ? 'a' : 'NuxtLink'"
+                :href="row.sustentationFile?.path || '/fallback-route'"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center justify-center"
+              >
+                <CustomIcons name="Doc-Loupe" />
+              </component>
             </div>
           </template>
           <template #status="{ row }">
@@ -78,6 +81,8 @@
             :id="rechargeId"
             :on-authorize="handleAuthorize"
             :on-reject="handleOpenRejectModal"
+            :participant-id="rechargeId"
+            @on-reject="handleOpenRejectModal"
           />
         </SheetContent>
 
@@ -91,9 +96,8 @@
         >
           <EditRequestForm
             :id="rechargeId"
-            :refresh-table="refresh"
-            :on-authorize="handleAuthorize"
-            :on-reject="handleOpenRejectModal"
+            :onsubmit="handleUpdate"     
+            @update:model-value="openEditModal = false"      
           />
         </SheetContent>
 
@@ -109,10 +113,12 @@
         </SheetContent>
 
         <!-- Modal para rechazar recarga -->
-        <!-- <ModalRejectRecharge
-          v-model:open="openRejectModal"
-          :details="rejectDetails"
-        /> -->
+       <ModalRejectRecharge
+          :id="selectedRejectInfo.id"
+          v-model="openRejectModal"
+          :refresh-table="refreshRecharTable"
+          @update:model-value="openRejectModal = false"
+        /> 
       </div>
       <CustomPagination
         v-model:page="page"
@@ -151,7 +157,7 @@ const openDetailModal = ref(false)
 const openEditModal = ref(false)
 const openParticipantModal = ref(false)
 const openRejectModal = ref(false)
-
+const openAnnulModal = ref(false) 
 const rechargeId = ref<number | undefined>(undefined)
 const rejectDetails = ref(null)
 
@@ -161,7 +167,12 @@ const openModal = (rowId: number) => {
   openDetailModal.value = true
 }
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
-
+//Modal de rechazo
+const selectedRejectInfo = ref<any>({
+  id:'',
+  rejection: null,
+  comment: null,
+})
 const handleReject = async (values: any) => {
   openConfirmModal({
     title: 'Rechazar solicitud de recarga',
@@ -173,7 +184,7 @@ const handleReject = async (values: any) => {
       })
       if (status.value === 'success') {
         openAnnulModal.value = false
-        refresh()
+        refreshRecharTable()
         updateConfirmModal({
           title: 'Solicitud de recarga rechazada',
           message: 'Se ha rechazado la soliciud de recarga',
@@ -205,7 +216,7 @@ const handleApprove = async (values: any) => {
       })
       if (status.value === 'success') {
         openAnnulModal.value = false
-        refresh()
+        refreshRecharTable()
         updateConfirmModal({
           title: 'Solicitud de recarga rechazada',
           message: 'Se ha rechazado la soliciud de recarga',
@@ -247,9 +258,9 @@ const {
   authorizeRechargeRequest,
   rejectRechargeRequest,
 } = useTopUpRequests()
-const { autorizationRecharge } = IuseRecharge()
+const { autorizationRecharge, updateRecharge  } = IuseRecharge()
 const BASE_RECHAR_URL = '/finance/recharge-request-management'
-const { data, refresh }: any = await useAPI(
+const { data, refresh: refreshRecharTable }: any = await useAPI(
   `${BASE_RECHAR_URL}/view-paginated-recharge-requests`,
   {
     query: {
@@ -270,12 +281,76 @@ const rechargeData = computed(() =>
   })),
 )
 
-// Manejo de acciones
-const handleAuthorize = async (values: { id: string }) => {
-  console.log('Autorizando recarga:', values)
-}
+// Manejo de acciones detalle solicitud
+const handleAuthorize = async (values:any) => {
+  openConfirmModal({
+    title: 'Autorizar recarga',
+    message: '¿Estás seguro deseas confirmar este lote de desembolso?',
+    callback: async () => {
+      const { status, error } = await autorizationRecharge(values);
+      if (status.value === 'success') {
+        openEditModal.value = false
+        refreshRecharTable();
+        updateConfirmModal({
+          title: 'Recarga autorizada',
+          message: 'Se ha autorizado la recarga',
+          type: 'success',
+        });
+      } else {
+        const eMsg =
+          error?.value?.data?.errors?.[0]?.message ||
+          error?.value?.data?.message ||
+          'La recarga no se pudo confirmar, inténtalo más tarde';
+
+        updateConfirmModal({
+          title: 'Error al confirmar recarga',
+          message: eMsg,
+          type: 'error',
+        });
+      }
+    },
+  });
+};
+
 const handleOpenRejectModal = (details: any) => {
-  rejectDetails.value = details
-  openRejectModal.value = true
+  selectedRejectInfo.value = {
+    id: details.id,
+    rejection: details.rejectionReason || null,
+    comment: details.comment || null,
+  };
+  openRejectModal.value = true;
+};
+// Manejo de acciones editar solicitud
+const handleUpdateRequest = async (row: any) => {
+  rechargeId.value = row.id
+  openEditModal.value = true
+}
+const handleUpdate = async (values: any) => {
+  openConfirmModal({
+    title: 'Actualizar solicitud',
+    message: '¿Estás seguro de que deseas actualizar esta solicitud?',
+    callback: async () => {
+      const { status, error } = await updateRecharge(values)
+      if (status.value === 'success') {
+        openEditModal.value = false
+        refreshRecharTable()
+        updateConfirmModal({
+          title: 'Solicitud actualizada',
+          message: 'La solicitud ha sido actualizado exitosamente',
+          type: 'success',
+        })
+      } else {
+        const eMsg =
+          error?.value?.data?.errors?.[0]?.message ||
+          error?.value?.data?.message ||
+          'La solicitud no se pudo actualizar, intentalo más tarde'
+        updateConfirmModal({
+          title: 'Error al actualizar solicitud',
+          message: eMsg,
+          type: 'error',
+        })
+      }
+    },
+  })
 }
 </script>

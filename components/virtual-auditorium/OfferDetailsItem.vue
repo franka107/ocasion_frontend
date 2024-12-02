@@ -41,6 +41,10 @@ const offerNewBid = () => {
   const onQuickAction = (value: number) => {
     bidValue.value = (offer.value.bids[0].amount || 0) + value
   }
+  const isDisabledButton = (totalSeconds: number) =>
+    totalSeconds === 0 ||
+    invalidBidAmount.value ||
+    offer.value.status === 'DEBATED'
 
   return {
     bidValue,
@@ -49,6 +53,7 @@ const offerNewBid = () => {
     onQuickAction,
     invalidBidAmount,
     onFocusInput,
+    isDisabledButton
   }
 }
 const {
@@ -58,6 +63,7 @@ const {
   onQuickAction,
   onFocusInput,
   invalidBidAmount,
+  isDisabledButton
 } = offerNewBid()
 
 const showModal = ref(false)
@@ -169,6 +175,7 @@ const onSubmitBid = () => {
                   type="button"
                   variant="default"
                   class="py-[10px] px-[24px]"
+                  :disabled="isDisabledButton(totalSeconds)"
                   @click="onSubmitBid"
                 >
                   Ofertar
