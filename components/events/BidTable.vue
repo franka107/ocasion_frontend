@@ -210,8 +210,8 @@ if (props.offerId) {
   })
   filterOptionsRaw.push({
     field: 'status',
-    type: 'equal',
-    value: BidStatus.Winner,
+    type: 'in',
+    value: [BidStatus.Winner, BidStatus.Accepted],
   })
 }
 const filterOptions = ref(JSON.stringify(filterOptionsRaw))

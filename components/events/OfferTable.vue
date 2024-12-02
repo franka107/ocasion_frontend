@@ -127,8 +127,11 @@
                 >
                   <DropdownMenuItem
                     :disabled="
-                      row.status === OfferStatus.Confirmed ||
-                      eventDetail?.status === EventStatus.Published
+                      eventStatusCheckPosition(
+                        eventDetail.status,
+                        EventStatus.Published,
+                        ComparisonOperator.GreaterOrEqual,
+                      )
                     "
                     @click="
                       () => {
@@ -233,9 +236,9 @@
         </template>
       </CustomTable>
       <AttachmentsModal
-      v-model:isOpen="showAttachmentsModal"
-      :attachments="selectedAttachments"
-    />
+        v-model:isOpen="showAttachmentsModal"
+        :attachments="selectedAttachments"
+      />
       <SheetContent
         v-model:open="openAppraisalHistoryModal"
         class="flex flex-col h-full"
@@ -573,7 +576,9 @@ const handleRetireOffers = async (values: { type: string; ids: string[] }) => {
   })
 }
 const showAttachmentsModal = ref(false)
-const selectedAttachments = ref<Array<{ id: string, name: string, url: string }>>([])
+const selectedAttachments = ref<
+  Array<{ id: string; name: string; url: string }>
+>([])
 
 const openAttachmentsModal = (row: any) => {
   selectedAttachments.value = row.attachedFiles || []
