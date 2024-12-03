@@ -8,6 +8,7 @@ export const bidStatus = new Map<string, { name: string; color: string }>([
   ['DISCARDED', { name: 'Descartado', color: 'brown' }],
   ['REJECTED', { name: 'Rechazado', color: 'blue' }],
   ['DEBATED', { name: 'Debatido', color: 'blue' }],
+  ['RESERVED', { name: 'Reservada', color: 'blue' }],
   ['ACCEPTED', { name: 'Aceptado', color: 'blue' }],
   ['WINNER', { name: 'Ganador', color: 'green' }],
   ['BASE', { name: 'Base', color: 'blue' }],
