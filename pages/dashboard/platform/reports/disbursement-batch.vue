@@ -26,33 +26,31 @@
                 <!-- </div> -->
             </template>
             <template #archive="{ row }">
-              <div
-                class="flex items-center justify-center"
-              >
-              <component
-                :is="row.sustentationFile?.path ? 'a' : 'NuxtLink'"
-                :href="row.sustentationFile?.path || '/fallback-route'"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="flex items-center justify-center"
-              >
-                <CustomIcons name="Doc-Loupe" />
-              </component>
+              <div class="flex items-center justify-center">
+                <NuxtLink
+                  v-if="row.voucherGeneratedFile?.path"
+                  :to="row.voucherGeneratedFile.path"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="flex items-center justify-center"
+                >
+                  <CustomIcons name="Doc-Loupe" />
+                </NuxtLink>
+                <span v-else>-</span>
               </div>
             </template>
             <template #proofOfDisbursement="{ row }">
-              <div
-                class="flex items-center justify-center"
-              >
-              <component
-                :is="row.voucherGeneratedFile?.path ? 'a' : 'NuxtLink'"
-                :href="row.voucherGeneratedFile?.path || '/fallback-route'"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="flex items-center justify-center"
-              >
-                <CustomIcons name="Doc-Loupe" />
-              </component>
+              <div class="flex items-center justify-center">
+                <NuxtLink
+                  v-if="row.paymentSupportFile && row.paymentSupportFile[0]?.path"
+                  :to="row.paymentSupportFile[0].path"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="flex items-center justify-center"
+                >
+                  <CustomIcons name="Doc-Loupe" />
+                </NuxtLink>
+                <span v-else>-</span>
               </div>
             </template>
             <template #status="{ row }">

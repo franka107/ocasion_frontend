@@ -15,18 +15,6 @@
            @on-sort="onSort"
            @on-search="onSearch"
          >
-         <template #action-button>
-             <Button
-               variant="default"
-               @click="
-                 () => {
-                   openModalGenerate = true
-                   
-                 }
-               "
-               >Generar lote</Button
-             >
-           </template>
            <template #actions="{ row }">
              <div class="flex justify-center">
                <DropdownMenu>
@@ -74,17 +62,18 @@
              </div>
            </template>
            <template #archive="{ row }">
-             <div class="flex items-center justify-center">
-              <component
-                :is="row.voucherGeneratedFile?.path ? 'a' : 'NuxtLink'"
-                :href="row.voucherGeneratedFile?.path || '/fallback-route'"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="flex items-center justify-center"
-              >
-                <CustomIcons name="Doc-Loupe" />
-              </component>
-             </div>
+            <div class="flex items-center justify-center">
+              <NuxtLink
+                  v-if="row.voucherGeneratedFile?.path"
+                  :to="row.voucherGeneratedFile.path"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="flex items-center justify-center"
+                >
+                  <CustomIcons name="Doc-Loupe" />
+                </NuxtLink>
+                <span v-else>-</span>
+            </div>
            </template>
            <template #status="{ row }">
              <CustomChip
@@ -97,8 +86,8 @@
           v-model:open="openWithdrawalDetailsModal"
           class="flex flex-col h-full"
           custom-width="510px"
-          @pointer-down-outside="(e) => e.preventDefault()"
-          @interact-outside="(e) => e.preventDefault()"
+          @pointer-down-outside="(e: Event) => e.preventDefault()"
+          @interact-outside="(e: Event) => e.preventDefault()"
         >
           <DisbursementDetailsForm
             v-model="openWithdrawalDetailsModal"
@@ -153,12 +142,11 @@
    sortOptions,
    annulDisbursement,
  } = useDisbursement()
- const openModalGenerate= ref(false)
  const openModalConfirm = ref(false)
  const openAnnulModal = ref(false)
  const openWithdrawalDetailsModal = ref(false)
  const disbursementId = ref<number | undefined>(undefined)
-const selectedRequestId = ref<string | null>(null);
+ const selectedRequestId = ref<string | null>(null);
 
 const openWithdrawalDetails = (row: any) => {
   const disbursementDetailId = row.id;
@@ -199,18 +187,7 @@ const openWithdrawalDetails = (row: any) => {
    paymentSupportFile: {},
    disbursedAt:{}
  })
- const generateDisbursementForm = ref<any>({
-   id: '',
-   paymentMethod: '',
-   currency: '',
-   bank: '',
-   chargeAccount: '',
-   paymentMedium: '',
- })
- const handleGenerateDisbursement = (formData: any) => {
-   console.log('Lote generado con los datos:', formData);
-   openModalGenerate.value = false;
- };
+
  const openParticipantDetail = (row: any) => {
  console.log('Abriendo detalle del participante:', row);
  openParticipantModal.value = true;

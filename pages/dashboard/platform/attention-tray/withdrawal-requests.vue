@@ -15,7 +15,26 @@
           @on-sort="onSort"
           @on-search="onSearch"
           class="mb-4"
+          multiple-select
+          @on-multiple-select="
+            ({ ids, type, resetMultipleSelect: onResetMultipleSelect }) => {
+              selectedMultipleData = { ids, type }
+              resetMultipleSelect = onResetMultipleSelect
+            }
+          "
         >
+         <template #action-button>
+             <Button
+               variant="default"
+               :disabled="disableMultipleSelect"
+               @click="
+                 () => {
+                   openModalGenerate = true                 
+                 }
+               "
+               >Generar lote</Button
+             >
+          </template>
           <template #actions="{ row }">
             <div class="flex justify-center">
               <DropdownMenu>
@@ -32,7 +51,7 @@
                   align="start"
                   class="bg-primary text-white"
                 >
-                  <DropdownMenuItem @click="openWithdrawalDetails(row.id)">
+                  <DropdownMenuItem @click="openWithdrawalDetails(row)">
                     Detalle solicitud
                     <CustomIcons name="EyeIcon" class="ml-auto" />
                   </DropdownMenuItem>
@@ -65,9 +84,11 @@
           @interact-outside="(e) => e.preventDefault()"
         >
           <WithdrawalDetailsForm
+            :id="rechargeId"
+            :on-authorize="handleAuthorize"
+            :on-reject="handleOpenRejectModal"
             v-model="openWithdrawalDetailsModal"
-            id="rechargeId"
-            @submit="onWithdrawalDetailsSubmit"
+            @on-reject="handleOpenRejectModal"
           />
         </SheetContent>
         <SheetContent
@@ -81,6 +102,20 @@
             :participant-id="rechargeId"
           />
         </SheetContent>
+        <!-- Modal para rechazar retiro -->
+        <ModalRejectWithdrawal
+            :id="selectedRejectInfo.id"
+            v-model="openRejectModal"
+            :refresh-table="refresh"
+            @update:model-value="openRejectModal = false"
+          /> 
+        <GenerateDisbursementBatchModal
+           :id="generateDisbursementForm.id"
+           v-model="openModalGenerate"
+           :bank="generateDisbursementForm.bank"
+           @onsubmit="handleGenerateDisbursement"
+           :refresh-table="refresh"
+         />
       </div>
       <CustomPagination
         v-model:page="page"
@@ -107,17 +142,28 @@ import ContentLayout from '~/layouts/default/ContentLayout.vue'
 import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
 import ParticipantDetailEditForm from '~/components/attention-tray/withdrawal-requests/ParticipantDetailEditForm.vue'
 import WithdrawalDetailsForm from '~/components/attention-tray/withdrawal-requests/WithdrawalDetailsForm.vue'
+import GenerateDisbursementBatchModal from '~/components/attention-tray/disbursement-lots/GenerateDisbursementBatchModal.vue'
+import ModalRejectWithdrawal from '~/components/attention-tray/withdrawal-requests/ModalRejectWithdrawal.vue'
 import dayjs from 'dayjs'
 
 const openParticipantModal = ref(false)
 const openEditModal = ref(false)
+const openModalGenerate= ref(false)
 const selectedRequestId = ref<string | null>(null)
 const openWithdrawalDetailsModal = ref(false)
+const openRejectModal = ref(false)
 const rechargeId = ref<number | undefined>(undefined)
-const openWithdrawalDetails = (requestId: string) => {
-  selectedRequestId.value = requestId
-  openWithdrawalDetailsModal.value = true
-}
+const { page, onSort, onSearch, filterOptions, sortOptions, requestWithdrawal, authorizeWithdrawal, rejectWithdrawal, } = useWithdrawalRequests()
+const selectedMultipleData = ref<{ type: string; ids: string[] }>({
+  type: 'empty',
+  ids: [],
+})
+const resetMultipleSelect = ref<Function | undefined>(undefined)
+const disableMultipleSelect = computed(
+  () =>
+    selectedMultipleData.value.type === 'empty' &&
+    selectedMultipleData.value.ids.length === 0,
+)
 const onWithdrawalDetailsSubmit = (formData: any) => {
   console.log('Detalle de solicitud enviado:', formData)
   openWithdrawalDetailsModal.value = false
@@ -137,11 +183,18 @@ const openParticipantDetail = (row: any) => {
     console.error('No se encontró el participante para esta fila.');
   }
 };
-
+const openWithdrawalDetails = (row: any) => {
+  const requestId = row.id; 
+  if (requestId) {
+    rechargeId.value = requestId; 
+    console.log('Detalle de solicitud abierto con ID:', rechargeId.value);
+    openWithdrawalDetailsModal.value = true; 
+  } else {
+    console.error('ID no válido para abrir detalles del retiro.');
+  }
+};
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const rechargeModal = ref<any>({ offerId: '' })
-const { page, onSort, onSearch, filterOptions, sortOptions } =
-  useWithdrawalRequests()
 const BASE_WITH_URL = '/finance/withdrawal-request-management'
 const { data, refresh }: any = await useAPI(
   `${BASE_WITH_URL}/view-paginated-withdrawal-requests`,
@@ -162,32 +215,62 @@ const withDrawalRequeststData = computed(() =>
     createdAt: dayjs(item.updatedAt).format('YYYY-MM-DD'),
   })),
 )
-// const handleEdit = async (values: any) => {
-//   openConfirmModal({
-//     title: 'Actualizar participante',
-//     message: '¿Estás seguro de que deseas actualizar este participante?',
-//     callback: async () => {
-//       const { status, error }: any = await editEvent(values)
-//       if (status.value === 'success') {
-//         openEventModal.value = false
-//         refresh()
-//         updateConfirmModal({
-//           title: 'Participante actualizada',
-//           message: 'El participante ha sido actualizado exitosamente',
-//           type: 'success',
-//         })
-//       } else {
-//         const eMsg =
-//           error.value.data?.errors?.[0].message ||
-//           error.value.data.message ||
-//           'El participante no se pudo actualizar, intentalo más tarde'
-//         updateConfirmModal({
-//           title: 'Error al crear evento',
-//           message: eMsg,
-//           type: 'error',
-//         })
-//       }
-//     },
-//   })
-// }
+//Acciones para modal Generar Lote
+const handleGenerateDisbursement = (formData: any) => {
+   console.log('Lote generado con los datos:', formData);
+   openModalGenerate.value = false;
+ };
+ const generateDisbursementForm = ref<any>({
+   id: '',
+   paymentMethod: '',
+   currency: '',
+   bank: '',
+   chargeAccount: '',
+   paymentMedium: '',
+ })
+//Modal de rechazo retiro
+const selectedRejectInfo = ref<any>({
+  id:'',
+  rejection: null,
+  comment: null,
+})
+const handleOpenRejectModal = (details: any) => {
+  selectedRejectInfo.value = {
+    id: details.id, 
+    rejection: details.rejectionReason || null,
+    comment: details.comment || null,
+  };
+  openRejectModal.value = true; 
+};
+ // Manejo de acciones detalle solicitud
+const handleAuthorize = async (values:any) => {
+  openConfirmModal({
+    title: 'Autorizar retiro',
+    message: '¿Estás seguro que deseas autorizar este retiro?',
+    callback: async () => {
+      const { status, error } = await authorizeWithdrawal(values);
+      if (status.value === 'success') {
+        openEditModal.value = false
+        refresh();
+        updateConfirmModal({
+          title: 'Retiro autorizada',
+          message: 'Se ha autorizado el retiro',
+          type: 'success',
+        });
+      } else {
+        const eMsg =
+          error?.value?.data?.errors?.[0]?.message ||
+          error?.value?.data?.message ||
+          'El retiro no se pudo confirmar, inténtalo más tarde';
+
+        updateConfirmModal({
+          title: 'Error al confirmar retiro',
+          message: eMsg,
+          type: 'error',
+        });
+      }
+    },
+  });
+};
+
 </script>

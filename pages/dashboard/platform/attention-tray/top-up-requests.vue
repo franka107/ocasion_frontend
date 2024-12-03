@@ -51,15 +51,16 @@
           </template>
           <template #livelihood="{ row }">
             <div class="flex items-center justify-center">
-              <component
-                :is="row.sustentationFile?.path ? 'a' : 'NuxtLink'"
-                :href="row.sustentationFile?.path || '/fallback-route'"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="flex items-center justify-center"
-              >
-                <CustomIcons name="Doc-Loupe" />
-              </component>
+              <NuxtLink
+                  v-if="row.sustentationFile?.path"
+                  :to="row.sustentationFile.path"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="flex items-center justify-center"
+                >
+                  <CustomIcons name="Doc-Loupe" />
+                </NuxtLink>
+                <span v-else>-</span>
             </div>
           </template>
           <template #status="{ row }">

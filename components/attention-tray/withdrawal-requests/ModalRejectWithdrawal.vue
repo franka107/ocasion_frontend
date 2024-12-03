@@ -5,16 +5,16 @@ import { z } from 'zod'
 import { ExclamationTriangleIcon } from '@radix-icons/vue'
 import { X } from 'lucide-vue-next'
 import {
-  rejectionReasonType
-} from '@/constants/attention-tray'
-import {
   AlertDialog,
   AlertDialogContent,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-const {rejectRechargeRequest} = useTopUpRequests()
+import {
+  rejectionReasonType
+} from '@/constants/attention-tray'
+const {rejectWithdrawal} = useWithdrawalRequests()
 const openAnnulModal = ref(false) 
 const props = defineProps<{
   id: string
@@ -22,6 +22,7 @@ const props = defineProps<{
   refreshTable: () => void
 }>()
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
+const emit = defineEmits(['update:modelValue'])
 const rejectionReasonOptions = Array.from(rejectionReasonType).map(([id, name]) => ({
   id,
   name,
@@ -32,53 +33,50 @@ const formSchema = toTypedSchema(
     comment: z.string().min(1, "El comentario es requerido."),
   }),
 )
-const emit = defineEmits(['update:modelValue'])
 const form = useForm({
   validationSchema: formSchema,
 })
 const onSubmit = form.handleSubmit((values: any) => {
   const { rejection, comment } = values
   handleReject({ rejectId: props.id, rejection, comment })
-  console.log('onsubmit', props.id, comment)
+  console.log('onsubmit', rejection, comment)
 })
 const cancelEdit = () => {
   emit('update:modelValue', false); 
 };
 const handleReject = async (values: any) => {
   openConfirmModal({
-    title: 'Rechazar solicitud de recarga',
+    title: 'Rechazar solicitud de retiro',
     message: '¿Está seguro que desea rechazar la solicitud de recarga?',
     callback: async () => {
       const payload = {
         id: props.id, 
         rejectionReason: values.rejection, 
-        rejectionDetails: values.comment,
+        rejectionDetails: values.comment, 
       };
-
-      const { status, error }: any = await rejectRechargeRequest(payload);
-
+      const { status, error }: any = await rejectWithdrawal(payload)
       if (status.value === 'success') {
-        openAnnulModal.value = false;
-        props.refreshTable();
+        openAnnulModal.value = false
+        props.refreshTable()
         updateConfirmModal({
-          title: 'Solicitud de recarga rechazada',
-          message: 'Se ha rechazado la solicitud de recarga',
+          title: 'Solicitud de retiro rechazada',
+          message: 'Se ha rechazado la solicitud de retiro',
           type: 'success',
-        });
+        })
       } else {
         const eMsg =
-          error.value.data?.errors?.[0]?.message ||
-          error.value.data?.message ||
-          'La solicitud de recarga no se pudo rechazar, inténtalo más tarde.';
+          error.value.data?.errors?.[0].message ||
+          error.value.data.message ||
+          'El solicitud de retiro no se pudo rechazar, intentalo más tarde'
         updateConfirmModal({
-          title: 'Error al rechazar la solicitud de recarga',
+          title: 'Error al rechazar la solicitud de retiro',
           message: eMsg,
           type: 'error',
-        });
+        })
       }
     },
-  });
-};
+  })
+}
 </script>
 
 <template>
@@ -99,7 +97,8 @@ const handleReject = async (values: any) => {
           </AlertDialogHeader>
         </div>
         <div class="grid grid-cols-1 gap-3 px-6">
-          <p class="text-[14px] font-[500] text-[#68686C]">¿Está seguro que desea rechazar la solicitud de recarga? Si es asi por favor ingresar el motivo de rechazo.</p>
+          <p class="text-[14px] font-[500] text-[#68686C]">¿Está seguro que desea rechazar la solicitud de retiro? 
+            Si es asi por favor ingresar el motivo de rechazo.</p>
           <!-- Motivo de Rechazo -->
           <FormField v-slot="{ componentField }" name="rejection">
             <FormItem>

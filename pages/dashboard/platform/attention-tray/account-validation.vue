@@ -62,9 +62,17 @@
           <AccountDetailsForm
             v-model="openAccountDetailModal"
             :id="accountId"
-            @submit="onAccountDetailSubmit"
+            :on-authorize="handleApproval"
+            :on-reject="handleOpenRejectModal"
+            @on-reject="handleOpenRejectModal"
           />
         </SheetContent>
+        <ModalRejectAccount
+          :id="selectedRejectInfo.id"
+          v-model="openRejectModal"
+          :refresh-table="refresh"
+          @update:model-value="openRejectModal = false"
+        /> 
       </div>
       <CustomPagination
         v-model:page="page"
@@ -81,6 +89,7 @@ import CustomTable from '~/components/ui/custom-table/CustomTable.vue'
 import CustomChip from '~/components/ui/custom-chip/CustomChip.vue'
 import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue'
 import CustomPagination from '~/components/ui/custom-pagination/CustomPagination.vue'
+import ModalRejectAccount from '~/components/attention-tray/account-validation/ModalRejectAccount.vue'
 import type { OrganizationItem } from '~/types/Order.ts'
 import {
   accountStatus,
@@ -92,14 +101,14 @@ import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCar
 import AccountDetailsForm from '~/components/attention-tray/account-validation/AccountDetailsForm.vue'
 import dayjs from 'dayjs'
 import { useAccountValidation } from '@/composables/useAccountValidation'
-const openApplicationModal = ref(false)
-const openParticipantModal = ref(false)
+const openRejectModal = ref(false)
 const {
     page,
     onSort,
     onSearch,
     filterOptions,
     sortOptions,
+    approvalAccountBank,
   } = useAccountValidation()
 const accountId = ref<number | undefined>(undefined)
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
@@ -140,4 +149,48 @@ const onAccountDetailSubmit = (formData: any) => {
   console.log('Detalle de solicitud enviado:', formData)
   openAccountDetailModal.value = false
 }
+// Manejo de acciones detalle solicitud
+const handleApproval = async (values:any) => {
+  openConfirmModal({
+    title: 'Autorizar recarga',
+    message: '¿Estás seguro deseas confirmar este lote de desembolso?',
+    callback: async () => {
+      const { status, error } = await approvalAccountBank(values);
+      if (status.value === 'success') {
+        openAccountDetailModal.value = false
+        refresh();
+        updateConfirmModal({
+          title: 'Recarga autorizada',
+          message: 'Se ha autorizado la recarga',
+          type: 'success',
+        });
+      } else {
+        const eMsg =
+          error?.value?.data?.errors?.[0]?.message ||
+          error?.value?.data?.message ||
+          'La recarga no se pudo confirmar, inténtalo más tarde';
+
+        updateConfirmModal({
+          title: 'Error al confirmar recarga',
+          message: eMsg,
+          type: 'error',
+        });
+      }
+    },
+  });
+};
+//Modal de rechazo
+const selectedRejectInfo = ref<any>({
+  id:'',
+  rejection: null,
+  comment: null,
+})
+const handleOpenRejectModal = (details: any) => {
+  selectedRejectInfo.value = {
+    id: details.id,
+    rejection: details.rejectionReason || null,
+    comment: details.comment || null,
+  };
+  openRejectModal.value = true;
+};
 </script>
