@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { X } from 'lucide-vue-next'
+import { ToastAction, useToast } from '../ui/toast'
 import OfferList from '~/components/virtual-auditorium/OfferList.vue'
 import OfferDetailsItem from '~/components/virtual-auditorium/OfferDetailsItem.vue'
 import CustomPagination from '~/components/ui/custom-pagination/CustomPagination.vue'
@@ -34,6 +35,9 @@ const props = defineProps({
 const { apiUrl } = toRefs(props)
 const { page, sortOptions } = useOfferAPI()
 const filterOptions = ref('[]')
+
+const { toast } = useToast()
+
 const selectedOffer = ref<OfferListItem | undefined>(undefined)
 const { data: offerListData, refresh } = await useAPI<
   IDataResponse<OfferListItem>
@@ -52,8 +56,22 @@ watch([apiUrl], () => {
   refresh()
 })
 
-socket.on('bidError', (data) => {
-  console.error('bidError', data)
+socket.on('error', (data) => {
+  toast({
+    title: 'Problema al pujar',
+    description: data.errors[0].message,
+    variant: 'default',
+    class: 'border-red',
+    // action: h(
+    //   ToastAction,
+    //   {
+    //     altText: 'Try again',
+    //   },
+    //   {
+    //     default: () => 'Try again',
+    //   },
+    // ),
+  })
 })
 socket.on('offerUpdated', (newOffer: OfferListItem) => {
   const offerIndex = offerList.value.findIndex(
