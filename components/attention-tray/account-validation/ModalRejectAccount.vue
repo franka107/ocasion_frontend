@@ -14,7 +14,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-const {rejectRechargeRequest} = useTopUpRequests()
+const {rejectAccountBank} = useAccountValidation()
 const openAnnulModal = ref(false) 
 const props = defineProps<{
   id: string
@@ -46,8 +46,8 @@ const cancelEdit = () => {
 };
 const handleReject = async (values: any) => {
   openConfirmModal({
-    title: 'Rechazar solicitud de recarga',
-    message: '¿Está seguro que desea rechazar la solicitud de recarga?',
+    title: 'Rechazar la cuenta bancaria',
+    message: '¿Está seguro que desea rechazar la cuenta bancaria? ',
     callback: async () => {
       const payload = {
         id: props.id, 
@@ -55,23 +55,23 @@ const handleReject = async (values: any) => {
         rejectionDetails: values.comment,
       };
 
-      const { status, error }: any = await rejectRechargeRequest(payload);
+      const { status, error }: any = await rejectAccountBank(payload);
 
       if (status.value === 'success') {
         openAnnulModal.value = false;
         props.refreshTable();
         updateConfirmModal({
-          title: 'Solicitud de recarga rechazada',
-          message: 'Se ha rechazado la solicitud de recarga',
+          title: 'Solicitud de cuenta bancaria rechazada',
+          message: 'Se ha rechazado la solicitud de cuenta bancaria',
           type: 'success',
         });
       } else {
         const eMsg =
           error.value.data?.errors?.[0]?.message ||
           error.value.data?.message ||
-          'La solicitud de recarga no se pudo rechazar, inténtalo más tarde.';
+          'La solicitud de cuenta bancaria no se pudo rechazar, inténtalo más tarde.';
         updateConfirmModal({
-          title: 'Error al rechazar la solicitud de recarga',
+          title: 'Error al rechazar la solicitud de cuenta bancaria',
           message: eMsg,
           type: 'error',
         });
@@ -94,12 +94,13 @@ const handleReject = async (values: any) => {
             <CustomIcons name="Warning" class="w-[32px] h-[32px]" />
             <AlertDialogTitle
               class="text-xl tracking-[-0.5px] text-primary text-start mb-[18px] font-[600] px-6"
-              >Rechazar solicitud</AlertDialogTitle
+              >Rechazar cuenta bancaria</AlertDialogTitle
             >
           </AlertDialogHeader>
         </div>
         <div class="grid grid-cols-1 gap-3 px-6">
-          <p class="text-[14px] font-[500] text-[#68686C]">¿Está seguro que desea rechazar la solicitud de recarga? Si es asi por favor ingresar el motivo de rechazo.</p>
+          <p class="text-[14px] font-[500] text-[#68686C]">¿Está seguro que desea rechazar la cuenta bancaria? 
+            Si es asi por favor ingresar el motivo de rechazo.</p>
           <!-- Motivo de Rechazo -->
           <FormField v-slot="{ componentField }" name="rejection">
             <FormItem>

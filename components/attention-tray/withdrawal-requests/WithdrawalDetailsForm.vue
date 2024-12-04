@@ -10,12 +10,13 @@ import {
   accountType,
 } from '@/constants/attention-tray'
 const props = defineProps<{
-  id: string
-  onSubmit: (values: any) => void;
+  id: string | undefined | number 
+  onAuthorize: (values: any) => void;
+  onReject: (details: any) => void;
 }>();
 const BASE_WITH_URL = '/finance/withdrawal-request-management'
-const emit = defineEmits(['update:modelValue']);
-
+const emit = defineEmits(['update:modelValue', 'open-reject-modal','on-reject']);
+const currentMode = ref<"reject" | "authorize">("authorize");
 const banksOptions = Array.from(bankType).map(([id, name]) => ({
   id,
   name,
@@ -42,7 +43,7 @@ const formSchema = toTypedSchema(
     destinationAccount: z
       .string()
       .regex(/^\d{10,20}$/, 'Ingrese un número de cuenta válido.'),
-      destinationCCI: z
+    destinationCCI: z
       .string()
       .regex(/^\d{10,20}$/, 'Ingrese un número de cuenta válido.'),
   })
@@ -52,11 +53,7 @@ const form = useForm({
   validationSchema: formSchema,
   initialValues: {},
 });
-
-const onSubmit = form.handleSubmit((values) => {
-  console.log('Formulario enviado con los valores:', values);
-  emit('update:modelValue', false);
-});
+const withdrawalDetailId = ref<string | null>(null);
 if (props.id) {
   const { data } = await useAPI<any>(`${BASE_WITH_URL}/view-withdrawal-request-detail`, {
     method: 'GET',
@@ -67,8 +64,35 @@ if (props.id) {
   console.log(data.value)
   form.setValues(data.value)
 }
-const cancelEdit = () => {
-  emit('update:modelValue', false);
+
+const onSubmit = async (values: any) => {
+  let formattedValues = null;
+
+  if (currentMode.value === "reject") {
+    const { valid } = await form.validate();
+    if (valid) {
+      const { amount, currency, bank, accountType, destinationAccount, destinationCCI } = form.values;
+      formattedValues = {
+        amount,
+        currency,
+        bank,
+        accountType,
+        destinationAccount,
+        destinationCCI,
+      };
+      props.onReject({ ...formattedValues});
+    }
+  } else if (currentMode.value === "authorize") {
+    const formattedValues = {
+      ...values,
+      id: props.id,
+    };
+    props.onAuthorize(formattedValues);
+  }
+};
+
+const handleReject = () => {
+  emit('on-reject', { id: props.id, reason: 'Rechazo manual' });
 };
 </script>
 
@@ -83,7 +107,7 @@ const cancelEdit = () => {
     </SheetHeader>
 
     <div class="flex-grow overflow-y-auto no-scrollbar flex flex-col">
-        <form class="flex flex-col gap-6 flex-grow pb-[32px] pt-[40px] px-6 gap-y-[24px]" @submit="onSubmit">
+        <form class="flex flex-col gap-6 flex-grow pb-[32px] pt-[40px] px-6 gap-y-[24px]" @submit.prevent="onSubmit">
             <section class="flex-grow">
                 <div class="grid grid-cols-1 gap-4 mb-[24px]">
                     <div class="flex gap-2">
@@ -179,7 +203,7 @@ const cancelEdit = () => {
             </section>
            <div
             class="mt-4 flex flex-wrap md:flex-nowrap justify-center gap-y-[10px] gap-x-[16px] w-full">
-            <Button @click.prevent="cancelEdit" type="button" size="xl"
+            <Button @click="handleReject"  type="button" size="xl"
                 class="w-full max-w-[223px] text-[14px] md:text-[16px] font-[600] bg-white text-primary border border-primary hover:bg-accent">Rechazar</Button>
             <Button type="submit" :disabled="!form.meta.value.valid" :class="cn(
                 'w-full max-w-[223px] text-[14px] md:text-[16px] font-[600] bg-[#062339] hover:bg-gray-700',

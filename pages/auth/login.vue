@@ -43,26 +43,29 @@
             </button>
           </template>
         </InputWithLabel>
-        <div class="flex justify-end mt-2">
-          <a
-            href="#"
-            class="font-semibold text-sm text-primary hover:underline h-[20px] rounded-tl-[2px] opacity-100"
-            @click.prevent="toggleForgotPassword"
-          >
-            ¿Olvidaste tu contraseña?
-          </a>
+        <div>
+          <div class="flex justify-between items-center mt-2">
+            <p class="text-sm sm:text-base px-4 sm:px-0">
+              <router-link
+                to="/auth/sign-in"
+                class="font-semibold text-sm text-primary hover:underline h-[20px] rounded-tl-[2px] opacity-100"
+              >
+                Regístrate aquí
+              </router-link>
+            </p>
+            <a
+              href="#"
+              class="font-semibold text-sm text-primary hover:underline h-[20px] rounded-tl-[2px] opacity-100"
+              @click.prevent="toggleForgotPassword"
+            >
+              ¿Olvidaste tu contraseña?
+            </a>
+          </div>
         </div>
+
       </div>
 
-      <!-- Mensaje de registro (responsive) -->
-      <div class="text-center mt-4 px-4 sm:px-0">
-        <p class="text-sm sm:text-base">
-          ¿No estás registrado?
-          <router-link to="/auth/sign-in" class="font-semibold text-primary hover:underline">
-            Regístrate aquí
-          </router-link>
-        </p>
-      </div>
+
     </BaseForm>
 
     <ForgotPasswordForm v-else @back="toggleForgotPassword" />

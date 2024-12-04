@@ -12,10 +12,13 @@ import {
 } from '@/constants/attention-tray'
 const props = defineProps<{
     id: string | undefined | number 
-  onSubmit: (values: any) => void;
+    onAuthorize: (values: any) => void;
+    onReject: (values: any) => void;
 }>();
 
-const emit = defineEmits(['update:modelValue']);
+
+const emit = defineEmits(['update:modelValue', 'open-reject-modal','on-reject']);
+const currentMode = ref<"reject" | "authorize">("authorize");
 const BASE_ACC_URL = '/finance/account-validation'
 const banksOptions = Array.from(bankType).map(([id, name]) => ({
   id,
@@ -53,10 +56,10 @@ const form = useForm({
   initialValues: {},
 });
 
-const onSubmit = form.handleSubmit((values) => {
-  console.log('Formulario enviado con los valores:', values);
-  emit('update:modelValue', false);
-});
+// const onSubmit = form.handleSubmit((values) => {
+//   console.log('Formulario enviado con los valores:', values);
+//   emit('update:modelValue', false);
+// });
 
 if (props.id) {
   const { data } = await useAPI<any>(`${BASE_ACC_URL}/view-account-validation-detail`, {
@@ -70,6 +73,32 @@ if (props.id) {
 }
 const cancelEdit = () => {
   emit('update:modelValue', false);
+};
+const onSubmit = async (values:any)  => {
+  let formattedValues = null
+  if(currentMode.value === "reject") {
+    const { valid } = await form.validate();
+    if(valid) {
+      const { amount, currency, accountType, destinationAccountNumber, transactionNumber,} = form.values;
+      formattedValues = {
+        amount,
+        currency,
+        accountType,
+        destinationAccountNumber,
+        transactionNumber,
+      }
+      props.onReject(formattedValues)
+    }
+  } else if(currentMode.value === "authorize") {
+    const formattedValues = {
+    ...values,
+    id: props.id,
+  }
+    props.onAuthorize(formattedValues);
+  }
+};
+const handleReject = () => {
+  emit('on-reject', { id: props.id, reason: 'Rechazo manual' });
 };
 </script>
 
@@ -180,7 +209,7 @@ const cancelEdit = () => {
             </section>
            <div
             class="mt-4 flex flex-wrap md:flex-nowrap justify-center gap-y-[10px] gap-x-[16px] w-full">
-            <Button @click.prevent="cancelEdit" type="button" size="xl"
+            <Button @click="handleReject " type="button" size="xl"
                 class="w-full max-w-[223px] text-[14px] md:text-[16px] font-[600] bg-white text-primary border border-primary hover:bg-accent">Rechazar</Button>
             <Button type="submit" :disabled="!form.meta.value.valid" :class="cn(
                 'w-full max-w-[223px] text-[14px] md:text-[16px] font-[600] bg-[#062339] hover:bg-gray-700',

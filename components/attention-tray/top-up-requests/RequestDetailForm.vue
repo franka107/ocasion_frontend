@@ -96,7 +96,7 @@ const onSubmit = async (values:any)  => {
   }
 };
 const handleReject = () => {
-  emit('on-reject', {  reason: 'Rechazo manual' });
+  emit('on-reject', { id: props.id, reason: 'Rechazo manual' });
 };
 </script>
 

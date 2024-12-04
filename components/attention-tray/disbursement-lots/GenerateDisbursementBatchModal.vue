@@ -27,13 +27,13 @@ const props = defineProps<{
   onSubmit: (values: any) => void
   refreshTable: () => void
 }>()
-const resumenMensaje = `
-    **Cod lote:** 0000
-    **N° solicitudes:** 00
-    **Suma de monto a desembolsar:** 0.00
-    **Banco de origen:** BBVA
-    **Cuenta de origen:** 0000 0000 0000 0000
-`
+interface DetailPreviewInfo {
+  id?: string
+  retireRequestsCount?: number
+  sumOfAmountToBeDisbursed?: number
+  bank?: string
+  chargeAccount?: string
+}
 const paymentMethodOptions = Array.from(paymentMethodType).map(
   ([id, name]) => ({
     id,
@@ -58,7 +58,7 @@ const paymentMediumOptions = Array.from(paymentMediumType).map(
   }),
 )
 const showDetailPreview = ref(false)
-const detailPreviewInfo = ref({})
+const detailPreviewInfo = ref<DetailPreviewInfo>({})
 const formSchema = toTypedSchema(
   z.object({
     paymentMethod: z.string().min(1, 'Seleccione una forma de pago.'),
@@ -151,7 +151,10 @@ const handleSubmit = async () => {
     class="z-[30]"
     @update:open="(event) => emit('update:modelValue', event)"
   >
-    <AlertDialogContent class="z-[98] h-auto max-w-[670px] px-0">
+    <AlertDialogContent 
+     class="z-[98] h-auto w-full px-0"
+     :class="[showDetailPreview ? 'max-w-[450px]' : 'max-w-[670px]']"
+    >
       <form
         v-show="!showDetailPreview"
         class="flex flex-col gap-6 flex-grow max-h-[calc(100vh-4rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-primary/50"
@@ -252,13 +255,39 @@ const handleSubmit = async () => {
           </Button>
         </AlertDialogFooter>
       </form>
-      <div v-show="showDetailPreview">
-        {{  detailPreviewInfo }}
+      <div v-show="showDetailPreview" class=" mx-auto" >
+        <div class="flex flex-col items-center px-6">
+          <CustomIcons name="Icon-USD" class="w-[48px] h-[48px] pb-[16px]" />
+          <h2 class="text-[#152A3C] text-[16px] font-[600] pb-[12px]">Resumen del desembolso</h2>
+          <p class="text-[#68686C] text-[14px] font-[500] pb-[20px]">¿Está seguro de generar el lote del desembolso? </p>
+        </div>
+        <div class="flex flex-col items-left px-6 pb-[32px]">
+          <div class="flex font-[500] text-[14px]">
+            <h3 class="text-[#225B82]">Cod Lote: </h3>
+            <p class="text-[#68686C]">{{ detailPreviewInfo.id }}</p>
+          </div>
+          <div class="flex font-[500] text-[14px]">
+            <h3 class="text-[#225B82]">N° solicitudes: </h3>
+            <p class="text-[#68686C]">{{ detailPreviewInfo.retireRequestsCount }}</p>
+          </div>
+          <div class="flex font-[500] text-[14px]">
+            <h3 class="text-[#225B82]">Suma de monto a desembolsar: </h3>
+            <p class="text-[#68686C]">{{ detailPreviewInfo.sumOfAmountToBeDisbursed }}</p>
+          </div>
+          <div class="flex font-[500] text-[14px]">
+            <h3 class="text-[#225B82]">Banco de origen: </h3>
+            <p class="text-[#68686C]">{{ detailPreviewInfo.bank }}</p>
+          </div>
+          <div class="flex font-[500] text-[14px]">
+            <h3 class="text-[#225B82]">Cuenta de origen: </h3>
+            <p class="text-[#68686C]">{{ detailPreviewInfo.chargeAccount }}</p>
+          </div>
+        </div>
         <AlertDialogFooter class="px-6">
           <Button
             type="button"
             size="xl"
-            class="text-[16px] font-[600] bg-white text-primary border border-primary hover:bg-accent mt-[16px]"
+            class="text-[16px] font-[600] bg-white text-primary border border-primary hover:bg-accent"
             @click="showDetailPreview = !showDetailPreview"
           >
             Cancelar
@@ -266,7 +295,7 @@ const handleSubmit = async () => {
           <Button
             @click="handleSubmit"
             size="xl"
-            class="text-[16px] font-[600] mt-[16px]"
+            class="text-[16px] font-[600]"
           >
             Confirmar
           </Button>

@@ -3,8 +3,9 @@ import { TransactionHistoryMotive, transactionHistoryMotiveMap } from '~/types/T
 
 export const transactionsStatus = new Map<string, { name: string; color: string }>([
     ["AUTHORIZED", { name:  "Autorizada", color: "blue" }],
-    ["EJECTED", { name: "Rechazada", color: "brown" }],
+    ["REJECTED", { name: "Rechazada", color: "brown" }],
     ["ABANDONED", { name: "Abonada", color: "green" }],
+    ["PENDING", { name: 'Pendiente', color: 'orange' }],
 ]);
 export const disbursementStatus = new Map<string,{ name: string; color: string }>([
     ['PENDING', { name: 'Pendiente', color: 'orange' }],
@@ -57,6 +58,47 @@ export const transactionsSearch: SearchItem[] = [
         isHidden: true,
         placeholder: 'Tipo de operación',
     },
+]
+
+export const transactionsParticipantSearch: SearchItem[] = [
+    {
+        key: 'quickSearch',
+        type: 'text',
+        placeholder: 'Buscar cliente, evento o n° de transacción',
+        width: 'max-w-xs w-full',
+        elementClass: 'w-full',
+    },
+    {
+        key: 'createdAt',
+        type: 'date-range',
+        placeholder: 'Periodo de transacción',
+        width: 'w-auto',
+    },
+    {
+        key: 'motive',
+        type: 'select',
+        items: [
+            ...Object.keys(transactionHistoryMotiveMap).map((key) => ({
+              text: transactionHistoryMotiveMap[key as TransactionHistoryMotive].label,
+              value: key,
+            })),
+            { text: 'Todos', value: ' ' },
+        ],
+        placeholder: 'Tipo de operación',
+    },
+    {
+        key: 'status',
+        type: 'select',
+        items: [
+            ...Array.from(transactionsStatus).map(([key, value]) => ({
+              text: value.name,
+              value: key,
+            })),
+            { text: 'Todos', value: ' ' },
+        ],
+        isHidden: true,
+        placeholder: 'Estado',
+    }
 ]
 
 export const disbursementSearch: SearchItem[] = [
@@ -307,3 +349,37 @@ export const balanceHeader: HeaderItem[] = [
         key: 'pendingRechargeBalance',
         label: 'Recarga pendiente',
     }]  
+export const transactionsParticipantHeader: HeaderItem[] = [
+    {
+        key: 'id',
+        label: 'N° Transación',       
+    }, 
+    {
+        key: 'typeOfOperation',
+        label: 'Tipo de operación',
+        sortable: true,
+    },
+    {
+        key: 'dateOfOperation',
+        label: 'Fecha de operación',
+    },
+    {
+        key: 'amount',
+        label: 'Monto',
+    },
+    {
+        key: 'livelihood',
+        label: 'Sustento',
+        align: 'center'
+    },
+    {
+        key: 'voucher',
+        label: 'Comprobante',
+        align: 'center'
+    },
+    {
+        key: 'status',
+        label: 'Estado',
+        sortable: true,
+    },
+   ]  

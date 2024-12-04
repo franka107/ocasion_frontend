@@ -34,6 +34,12 @@ export const accountType = new Map<string, string>([
   ['SAVINGS', 'Cuenta de ahorros'],
   ['CURRENT_ACCOUNT', 'Cuenta corriente'],
 ])
+export const rejectionReasonType = new Map<string, string>([
+  ['NOT_ACCOUNT_HOLDER', 'No es titular de la cuenta'],
+  ['INVALID_ACCOUNT_NUMBER', 'Número de cuenta inválido'],
+  ['CLOSED_ACCOUNT', 'Cuenta cerrada'],
+  ['OTHER', 'Otros'],
+])
 export const rechargeSearch: SearchItem[] = [
   {
     key: 'id',
@@ -203,7 +209,7 @@ export const accountHeader: HeaderItem[] = [
     label: 'Moneda',
   },
   {
-    key: 'transactionNumber',
+    key: 'destinationAccountNumber',
     label: 'N° de cueta destino',
   },
   {

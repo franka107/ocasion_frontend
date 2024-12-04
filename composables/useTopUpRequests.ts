@@ -30,14 +30,14 @@ export function useTopUpRequests() {
   }
 
   const rejectRechargeRequest = async (values: any) => {
-    const { status, error }: any = await useAPI(
+    const { data, status, error }: any = await useAPI(
       `${BASE_ORG_URL}/reject-recharge-request`,
       {
         method: 'POST',
         body: values,
       } as any,
     )
-    return { status, error }
+    return { data, status, error }
   }
   const authorizeRechargeRequest = async (values: any) => {
     const { status, error }: any = await useAPI(

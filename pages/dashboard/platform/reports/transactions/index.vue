@@ -39,7 +39,7 @@
                     <DropdownMenuItem>
                        <NuxtLink
                         class="flex justify-between w-full"
-                        :to="`/dashboard/platform/events/${row.id}`"
+                        :to="`/dashboard/platform/reports/transactions/${row.wallet.userId}`"
                         >
                         Estado de cuenta
                         <CustomIcons name="EyeIcon" class="ml-[14px]" />
@@ -58,7 +58,8 @@
                 rel="noopener noreferrer"
                 class="flex items-center justify-center"
               >
-                <CustomIcons name="Doc-Loupe" />
+                <CustomIcons v-if="row.sustentationFile?.path" name="Doc-Loupe" />
+                <span v-else>-</span>
               </component>
               </div>
             </template>

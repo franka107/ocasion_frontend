@@ -22,20 +22,10 @@ export function useAccountValidation() {
       }
       filterOptions.value = JSON.stringify(filters)
     }
-    const requestRecharge = async (values: any) => {
-      const { status, error }: any = await useAPI(
-        `${BASE_VAL_URL}/request-recharge`,
-        {
-          method: 'POST',
-          body: values,
-        } as any,
-      )
-      return { status, error }
-    }
   
-    const rejectRechargeRequest = async (values: any) => {
+    const rejectAccountBank = async (values: any) => {
       const { status, error }: any = await useAPI(
-        `${BASE_VAL_URL}/reject-recharge-request`,
+        `${BASE_VAL_URL}/reject-account-bank`,
         {
           method: 'POST',
           body: values,
@@ -43,9 +33,9 @@ export function useAccountValidation() {
       )
       return { status, error }
     }
-    const authorizeRechargeRequest = async (values: any) => {
+    const approvalAccountBank = async (values: any) => {
       const { status, error }: any = await useAPI(
-        `${BASE_VAL_URL}/authorize-recharge-request`,
+        `${BASE_VAL_URL}/approval-account-bank`,
         {
           method: 'POST',
           body: values,
@@ -96,9 +86,8 @@ export function useAccountValidation() {
     return {
       page,
       filterOptions,
-      requestRecharge,
-      authorizeRechargeRequest,
-      rejectRechargeRequest,
+      rejectAccountBank,
+      approvalAccountBank,
       sortOptions,
       onSort,
       onSearch,
