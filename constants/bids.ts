@@ -54,7 +54,6 @@ export const bidsHeader: HeaderItem[] = [
     sortable: false,
     label: 'Pseudónimo',
   },
-
   {
     key: 'offer.title',
     label: 'Bien',

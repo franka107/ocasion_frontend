@@ -110,6 +110,9 @@
               </DropdownMenu>
             </div>
           </template>
+          <template #pseudonym="{ row }">
+            <p>{{ row.pseudonym || '-' }}</p>
+          </template>
           <template #status="{ row }">
             <CustomChip
               :text="bidStatus.get(row.status)?.name || ''"
