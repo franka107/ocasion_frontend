@@ -26,7 +26,7 @@
             </Button>
           </template>
           <template #actions="{ row }">
-            <div class="flex justify-center">
+            <div v-if="row.counterOffer" class="flex justify-center">
               <DropdownMenu>
                 <Button
                   variant="ghost"
@@ -36,8 +36,9 @@
                     () => {
                       openModalCounterOffer = true
                       selectedCounterOfferInfo = {
-                        currentAmount: row.bid.amount,
-                        id: row.bid.id,
+                        currentAmount: row.amount,
+                        counterOfferAmount: row.counterOffer.amount,
+                        id: row.id,
                       }
                     }
                   "
@@ -45,6 +46,16 @@
                   <span>Ver contraoferta</span>
                 </Button>
               </DropdownMenu>
+            </div>
+            <div v-else>
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled
+                class="text-[#a1a1a3] underline h-8 data-[state=open]:bg-accent"
+              >
+                <span>Sin información</span>
+              </Button>
             </div>
           </template>
           <template #status="{ row }">
@@ -76,10 +87,11 @@
         >
           <UploadPaymentSupport :id="selectedId" :on-submit="onSubmit" />
         </SheetContent>
-        <CounterOfferBidModal
+        <CounterOfferInboundModal
           :id="selectedCounterOfferInfo.id"
           v-model="openModalCounterOffer"
           :current-amount="selectedCounterOfferInfo.currentAmount"
+          :counter-offer-amount="selectedCounterOfferInfo.counterOfferAmount"
           :refresh-table="refresh"
         />
       </div>
@@ -98,7 +110,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import dayjs from 'dayjs'
-import CounterOfferBidModal from '../../bid/CounterOfferBidModal.vue'
+import CounterOfferBidModal from '../../bid/CounterOfferOutbountBidModal.vue'
 import CustomIcons from '@/components/ui/custom-icons/CustomIcons.vue'
 import CustomPagination from '@/components/ui/custom-pagination/CustomPagination.vue'
 import {
@@ -110,6 +122,7 @@ import type { BidDto, OfferWithBidDto } from '~/types/Bids'
 import { GrantId } from '~/types/Grant'
 import GoodsTransferForm from '~/components/participant/bid/GoodsTransferForm.vue'
 import UploadPaymentSupport from '~/components/participant/bid/UploadPaymentSupport.vue'
+import CounterOfferInboundModal from '~/components/bid/CounterOfferInboundModal.vue'
 const selectedId = ref('') // Define el id que necesitas pasar
 const selectedPersonStatus = ref<'single' | 'married' | 'legal'>('legal')
 const openTransferModal = ref(false)
@@ -139,7 +152,11 @@ const disableMultipleSelect = computed(
     selectedMultipleData.value.ids.length === 0,
 )
 const openModalCounterOffer = ref(false)
-const selectedCounterOfferInfo = ref({ currentAmount: 0, id: '' })
+const selectedCounterOfferInfo = ref({
+  currentAmount: 0,
+  counterOfferAmount: 0,
+  id: '',
+})
 const filterOptions = ref(`[]`)
 const onSearch = (item: { [key: string]: string }) => {
   filterOptions.value = JSON.stringify([
