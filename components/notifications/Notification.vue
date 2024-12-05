@@ -137,7 +137,7 @@ import {
   domainEvents,
   type NotificationCreatedDomainEvent,
 } from '~/types/DomainEvent'
-import notificationSound from '~/assets/sounds/notification.mp3'
+import { playNotificationSound } from './SoundManager'
 import { UserType } from '~/types/Administrators'
 
 const router = useRouter()
@@ -240,10 +240,13 @@ const confirmArchive = async () => {
   await archiveNotifications()
 }
 
-watch(notificationCreatedListener.data, (value, oldValue) => {
-  // play()
-  webNotification.show()
-  refresh()
-  refreshCount()
-})
+watch(notificationCreatedListener.data, (newValue, oldValue) => {
+  if (newValue !== oldValue) {
+    console.log('Notificación creada, reproduciendo sonido...');
+    playNotificationSound();
+    webNotification.show();
+    refresh();
+    refreshCount();
+  }
+});
 </script>
