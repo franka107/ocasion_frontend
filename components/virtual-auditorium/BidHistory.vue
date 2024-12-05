@@ -17,7 +17,10 @@ const { bids } = toRefs(props)
     <ul class="space-y-3 overflow-y-auto max-w-[276px]">
       <li class="uppercase font-bold">Puja anteriores</li>
       <li v-for="(item, i) in bids" :key="i">
-        <span :class="{ 'font-bold':  user?.user.id === item.userId }">{{ `${item.guaranteedAmount?.pseudonym} ${ user?.user.id === item.userId  ? '(YO)' : ''}` || '-' }}</span
+        <span :class="{ 'font-bold': user?.user.id === item.userId }">{{
+          `${item.guaranteedAmount?.pseudonym || '-'} ${user?.user.id === item.userId ? '(YO)' : ''}` ||
+          '-'
+        }}</span
         ><span class="float-right">USD ${{ item.amount }}</span>
       </li>
     </ul>

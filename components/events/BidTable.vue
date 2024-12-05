@@ -133,7 +133,7 @@
             title="Historial de pujas"
           />
         </SheetContent>
-        <CounterOfferBidModal
+        <CounterOfferOutbountBidModal
           :id="selectedCounterOfferInfo.id"
           v-model="openModalCounterOffer"
           :current-amount="selectedCounterOfferInfo.currentAmount"
@@ -157,8 +157,8 @@ import { ref, computed } from 'vue'
 import { GitCompareIcon } from 'lucide-vue-next'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
-import CounterOfferBidModal from '../bid/CounterOfferBidModal.vue'
 import BidHistoryForm from '../history/BidHistoryForm.vue'
+import CounterOfferOutbountBidModal from '../bid/CounterOfferOutbountBidModal.vue'
 import CustomIcons from '@/components/ui/custom-icons/CustomIcons.vue'
 import CustomPagination from '@/components/ui/custom-pagination/CustomPagination.vue'
 import { bidsHeader, bidsSearch, bidStatus } from '@/constants/bids'

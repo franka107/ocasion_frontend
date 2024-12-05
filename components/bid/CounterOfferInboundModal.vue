@@ -13,6 +13,7 @@ import {
 const props = defineProps<{
   id: string
   currentAmount: number
+  counterOfferAmount: number
   modelValue: boolean
   refreshTable: () => void
 }>()
@@ -88,20 +89,28 @@ const handleSubmit = async (values: any) => {
             :disabled="true"
             label-offset
           />
-          <FormField v-slot="{ componentField }" name="counterOfferAmount">
-            <FormItem>
-              <FormControl>
-                <CustomInput
-                  class="h-14 w-full"
-                  type="number"
-                  label="Monto de contraoferta"
-                  v-bind="componentField"
-                  label-offset
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
+          <CustomInput
+            class="h-14 w-full"
+            type="number"
+            label="Monto de la contraoferta"
+            :model-value="props.counterOfferAmount"
+            :disabled="true"
+            label-offset
+          />
+          <!-- <FormField v-slot="{ componentField }" name="counterOfferAmount"> -->
+          <!--   <FormItem> -->
+          <!--     <FormControl> -->
+          <!--       <CustomInput -->
+          <!--         class="h-14 w-full" -->
+          <!--         type="number" -->
+          <!--         label="Monto de contraoferta" -->
+          <!--         v-bind="componentField" -->
+          <!--         label-offset -->
+          <!--       /> -->
+          <!--     </FormControl> -->
+          <!--     <FormMessage /> -->
+          <!--   </FormItem> -->
+          <!-- </FormField> -->
         </div>
 
         <AlertDialogFooter class="px-6">
@@ -119,9 +128,17 @@ const handleSubmit = async (values: any) => {
           <Button
             type="submit"
             class="text-[16px] font-[600] mt-[16px]"
+            variant="destructive"
             size="xl"
             :disabled="!form.meta.value.valid"
-            >Confirmar</Button
+            >Rechazar</Button
+          >
+          <Button
+            type="submit"
+            class="text-[16px] font-[600] mt-[16px]"
+            size="xl"
+            :disabled="!form.meta.value.valid"
+            >Aceptar</Button
           >
         </AlertDialogFooter>
       </form>
