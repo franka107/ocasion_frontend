@@ -11,6 +11,8 @@ export function useTopUpRequests() {
   const onSearch = (item: { [key: string]: string }) => {
     const filters = [
       { field: 'id', type: 'like', value: item.id || '' },
+      { field: 'transferedA', type: 'between', value: item.transferedAt || '' },
+      { field: 'createdAt', type: 'between', value: item.createdAt || '' },
       { field: 'operationNumber', type: 'like', value: item.operationNumber || '' },
     ]
     if (item.status) {

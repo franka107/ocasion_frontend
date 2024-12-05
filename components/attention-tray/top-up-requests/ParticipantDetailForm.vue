@@ -62,7 +62,7 @@ if (props.participantId) {
 <template>
     <SheetHeader class="justify-between">
         <SheetTitle class="ml-2 text-[20px] font-[700] text-[#152A3C]">
-            Detalle participante
+            Detalle participante persona natural
         </SheetTitle>
         <SheetClose class="rounded-full p-3 hover:bg-[#f1f5f9]">
             <X class="w-4 h-4 text-muted-foreground" />

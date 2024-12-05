@@ -58,7 +58,7 @@
   import ContentLayout from '~/layouts/default/ContentLayout.vue'
   import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
   import { useAccountValidation } from '@/composables/useAccountValidation'
-  import { ref } from 'vue' 
+  import type { IAccountLItem } from '~/types/Account'
   import dayjs from 'dayjs'
 
   const {
@@ -82,11 +82,11 @@
     } as any,
   )
   const validationData = computed(() =>
-  data.value?.data.map((item: any) => ({
+  data.value?.data.map((item: IAccountLItem) => ({
     fullName: item.participant.commonName,
     document: `${item.participant.documentType} ${item.participant.documentIdentifier}`,
     ...item,
-    createdAt: dayjs(item.updatedAt).format('YYYY-MM-DD'),
+    createdAt: dayjs(item.createdAt).format('YYYY-MM-DD'),
   })),
 )
   </script>

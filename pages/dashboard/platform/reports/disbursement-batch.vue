@@ -85,6 +85,7 @@
   import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
   import { ref } from 'vue' 
   import { useDisbursement } from '@/composables/useDisbursement'
+  import type { DisbursementLot } from '~/types/Disbursement'
   import dayjs from 'dayjs'
   const openApplicationModal = ref(false); 
   const openParticipantModal = ref(false); 
@@ -121,7 +122,7 @@
   )
   
   const disbursementData = computed(() =>
-    data.value?.data.map((item: any) => ({   
+    data.value?.data.map((item: DisbursementLot) => ({   
       ...item,
       createdAt:dayjs(item.createdAt).format('YYYY-MM-DD'),
     })),
