@@ -17,13 +17,26 @@
             }
           "
         >
-          <template #documents>
-            <Button variant="ghost" @click="openModals">
-              <CustomIcons
-                name="Doc-Transfer"
-                class="w-6 h-6 text-reminder-600"
-              />
-            </Button>
+          <template #documents="{ row }">
+            <div v-if="row.payment" class="flex justify-center">
+              <Button variant="ghost" @click="handleCompostSupportFiles(row)">
+                <CustomIcons
+                  name="Doc-Transfer"
+                  class="w-6 h-6 text-reminder-600"
+                />
+              </Button>
+            </div>
+
+            <div v-else>
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled
+                class="text-[#a1a1a3] h-8 data-[state=open]:bg-accent"
+              >
+                <span>Sin información</span>
+              </Button>
+            </div>
           </template>
           <template #actions="{ row }">
             <div v-if="row.counterOffer" class="flex justify-center">
@@ -85,7 +98,10 @@
           @pointer-down-outside="(e) => e.preventDefault()"
           @interact-outside="(e) => e.preventDefault()"
         >
-          <UploadPaymentSupport :id="selectedId" :on-submit="onSubmit" />
+          <UploadPaymentSupport
+            :id="paymentId"
+            :on-submit="handleUploadCompostSupportFiles"
+          />
         </SheetContent>
         <CounterOfferInboundModal
           :id="selectedCounterOfferInfo.id"
@@ -132,9 +148,18 @@ const openModals = () => {
   openTransferModal.value = false
   openUploadModal.value = true
 }
+const bidId = ref<string>('')
+const paymentId = ref<string | null>(null)
+const handleCompostSupportFiles = (row: any) => {
+  bidId.value = row.id
+  paymentId.value = row.payment?.id
+  // openTransferModal.value = false
+  openUploadModal.value = true
+}
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const { rejectOfferBids, acceptOfferBids, page, sortOptions, onSort } =
   useBidAPI()
+const { uploadCompostSupportFiles } = usePaymentAPI()
 const findBidHistories = '/audit/find-bid-histories'
 const { getMyGrants } = useAuthManagement()
 const myGrants = await getMyGrants()
@@ -250,6 +275,41 @@ const handleAddBid = async (values: { type: string; ids: string[] }) => {
         updateConfirmModal({
           title: 'Error al aceptar puja(s)',
           message: 'No se pudo aceptar puja(s). Por favor, intente nuevamente.',
+          type: 'error',
+        })
+      }
+    },
+  })
+}
+
+const handleUploadCompostSupportFiles = async (values: any) => {
+  openConfirmModal({
+    title: 'Carga de sustento de abono ',
+    message: `¿Está seguro de subir estos sustentos`,
+    callback: async () => {
+      const { status, error } = await uploadCompostSupportFiles({
+        ...values,
+        bidId: bidId.value,
+        compostComissionPaymentFile: values.compostComissionPaymentFiles[0],
+        compostPropertyPaymentFile: values.compostPropertyPaymentFiles[0],
+      })
+
+      if (status.value === 'success') {
+        refresh()
+        resetMultipleSelect.value?.()
+        updateConfirmModal({
+          title: 'Sustento de abonos subidos',
+          message: 'Los sustentos han sido subidos exitosamente',
+          type: 'success',
+        })
+      } else {
+        const eMsg =
+          error.value.data?.errors?.[0].message ||
+          error.value.data.message ||
+          'El desembolso no se pudo anular, intentalo más tarde'
+        updateConfirmModal({
+          title: 'Error al cargar los sustentos de abonos',
+          message: eMsg,
           type: 'error',
         })
       }

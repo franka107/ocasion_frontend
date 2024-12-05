@@ -35,5 +35,24 @@ export function usePaymentAPI() {
     return { status, error }
   }
 
-  return { confirmPayment, observePayment, sortOptions, page, onSort }
+  const uploadCompostSupportFiles = async (values: any) => {
+    const { status, error }: any = await useAPI(
+      `${BASE_PAY_URL}/upload-compost-support-files`,
+      {
+        method: 'POST',
+        body: values,
+      } as any,
+    )
+
+    return { status, error }
+  }
+
+  return {
+    confirmPayment,
+    observePayment,
+    sortOptions,
+    page,
+    onSort,
+    uploadCompostSupportFiles,
+  }
 }

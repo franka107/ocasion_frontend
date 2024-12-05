@@ -1,54 +1,54 @@
-const BID_BASE_URL = "/bid-management";
+const BID_BASE_URL = '/bid-management'
 
 export function useBidAPI() {
-  const page = ref(1);
-  const sortOptions = ref("[]");
+  const page = ref(1)
+  const sortOptions = ref('[]')
   const onSort = (sortObject: { [key: string]: string }[]) => {
-    sortOptions.value = JSON.stringify(sortObject);
-  };
+    sortOptions.value = JSON.stringify(sortObject)
+  }
   const rejectOfferBids = async (values: {
-    type: string;
-    ids: string[];
-    eventId: string;
+    type: string
+    ids: string[]
+    eventId: string
   }) => {
     const { status, error }: any = await useAPI(
       `${BID_BASE_URL}/reject-offer-bids`,
       {
-        method: "POST",
+        method: 'POST',
         body: values,
       } as any,
-    );
-    return { status, error };
-  };
+    )
+    return { status, error }
+  }
 
   const acceptOfferBids = async (values: {
-    type: string;
-    ids: string[];
-    eventId: string;
+    type: string
+    ids: string[]
+    eventId: string
   }) => {
     const { status, error }: any = await useAPI(
       `${BID_BASE_URL}/accept-offer-bids`,
       {
-        method: "POST",
+        method: 'POST',
         body: values,
       } as any,
-    );
-    return { status, error };
-  };
+    )
+    return { status, error }
+  }
 
   const counterOfferBid = async (values: {
-    id: string;
-    counterOfferAmount: string;
+    id: string
+    counterOfferAmount: string
   }) => {
     const { status, error }: any = await useAPI(
       `${BID_BASE_URL}/counter-offer-bid`,
       {
-        method: "POST",
+        method: 'POST',
         body: values,
       } as any,
-    );
-    return { status, error };
-  };
+    )
+    return { status, error }
+  }
 
   return {
     rejectOfferBids,
@@ -57,5 +57,5 @@ export function useBidAPI() {
     sortOptions,
     onSort,
     counterOfferBid,
-  };
+  }
 }
