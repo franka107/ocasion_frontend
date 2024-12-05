@@ -236,7 +236,7 @@
         </template>
       </CustomTable>
       <AttachmentsModal
-        v-model:isOpen="showAttachmentsModal"
+        v-model:is-open="showAttachmentsModal"
         :attachments="selectedAttachments"
       />
       <SheetContent
@@ -294,6 +294,7 @@
 
 <script setup lang="ts">
 import AppraisalHistoryForm from '../history/AppraisalHistoryForm.vue'
+import AttachmentsModal from './AttachmentsModal.vue'
 import {
   offerHeader,
   offerStatusRecord,
@@ -317,7 +318,6 @@ import { GrantId } from '~/types/Grant'
 import { EventStatus } from '~/types/Event'
 import { GlobalType } from '~/types/Common'
 import { eventStatusCheckPosition } from '~/constants/events'
-import AttachmentsModal from './AttachmentsModal.vue'
 const { getMyGrants } = useAuthManagement()
 const myGrants = await getMyGrants()
 const { user, globalType } = useUserSessionExtended()
@@ -499,7 +499,7 @@ const handleConfirmOffers = async (values: { type: string; ids: string[] }) => {
           error.value.data.message ||
           'No se pudo confirmar oferta(s). Por favor, intente nuevamente.'
         updateConfirmModal({
-          title: 'Error al rechazar Oferta(s)',
+          title: 'Error al confirmar oferta(s)',
           message: eMsg,
           type: 'error',
         })
