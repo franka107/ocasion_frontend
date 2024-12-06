@@ -88,6 +88,11 @@ export const offerStatusRecord: Record<
     color: 'green',
     flowPosition: 16,
   },
+  [OfferStatus.DebatedBid]: {
+    name: 'Puja debatida',
+    color: 'green',
+    flowPosition: 17,
+  },
 }
 export enum ComparisonOperator {
   Greater = 'greater',
