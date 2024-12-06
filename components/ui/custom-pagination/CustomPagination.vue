@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full flex justify-between">
+  <div class="w-full flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
     <div class="flex flex-row items-center">
       <span class="text-[#475569]">Total de registros</span>
       <div
@@ -8,40 +8,42 @@
         {{ total }}
       </div>
     </div>
-    <div class="flex flex-row gap-x-[6px]">
-      <button
-        @click="props.page > 1 ? emit('update:page', props.page - 1) : null"
-        :class="cn(activeBtnClass({ size: 'md' }), 'w-[120px]')"
-        :disabled="props.page <= 1"
-      >
-        <CustomIcons name="ArrowLeft" class="rotate-180 mr-1 w-6 h-6" />
-        <span>Atrás</span>
-      </button>
+    <div class="flex flex-col sm:flex-row items-center w-full sm:w-auto">
+      <div class="flex flex-row gap-x-[6px] w-full sm:w-auto">
+        <button
+          @click="props.page > 1 ? emit('update:page', props.page - 1) : null"
+          :class="cn(activeBtnClass({ size: 'md' }), 'w-[120px]')"
+          :disabled="props.page <= 1"
+        >
+          <CustomIcons name="ArrowLeft" class="rotate-180 mr-1 w-6 h-6" />
+          <span>Atrás</span>
+        </button>
 
-      <button
-        v-for="(pageNumber, i) in visiblePages"
-        :key="i"
-        :class="[
-          activeBtnClass({
-            status: props.page === pageNumber ? 'active' : 'inactive',
-            size: 'sm'
-          }),
-          pageNumber === '...' ? 'cursor-default hover:bg-white hover:text-primary' : ''
-        ]"
-        @click="pageNumber !== '...' ? emit('update:page', pageNumber) : null"
-        :disabled="pageNumber === '...'"
-      >
-        {{ pageNumber }}
-      </button>
+        <button
+          v-for="(pageNumber, i) in visiblePages"
+          :key="i"
+          :class="[
+            activeBtnClass({
+              status: props.page === pageNumber ? 'active' : 'inactive',
+              size: 'sm'
+            }),
+            pageNumber === '...' ? 'cursor-default hover:bg-white hover:text-primary' : ''
+          ]"
+          @click="pageNumber !== '...' ? emit('update:page', pageNumber) : null"
+          :disabled="pageNumber === '...'"
+        >
+          {{ pageNumber }}
+        </button>
 
-      <button
-        @click="props.page < pages ? emit('update:page', props.page + 1) : null"
-        :class="cn(activeBtnClass({ size: 'md' }), 'w-[120px]')"
-        :disabled="props.page >= pages"
-      >
-        <span>Siguiente</span>
-        <CustomIcons name="ArrowLeft" class="ml-1 w-6 h-6" />
-      </button>
+        <button
+          @click="props.page < pages ? emit('update:page', props.page + 1) : null"
+          :class="cn(activeBtnClass({ size: 'md' }), 'w-[120px]')"
+          :disabled="props.page >= pages"
+        >
+          <span>Siguiente</span>
+          <CustomIcons name="ArrowLeft" class="ml-1 w-6 h-6" />
+        </button>
+      </div>
     </div>
   </div>
 </template>

@@ -144,6 +144,7 @@ import ParticipantDetailEditForm from '~/components/attention-tray/withdrawal-re
 import WithdrawalDetailsForm from '~/components/attention-tray/withdrawal-requests/WithdrawalDetailsForm.vue'
 import GenerateDisbursementBatchModal from '~/components/attention-tray/disbursement-lots/GenerateDisbursementBatchModal.vue'
 import ModalRejectWithdrawal from '~/components/attention-tray/withdrawal-requests/ModalRejectWithdrawal.vue'
+import type { IWithdrawalItem } from '~/types/Withdrawal'
 import dayjs from 'dayjs'
 
 const openParticipantModal = ref(false)
@@ -208,10 +209,9 @@ const { data, refresh }: any = await useAPI(
   } as any,
 )
 const withDrawalRequeststData = computed(() =>
-  data.value?.data.map((item: any) => ({
+  data.value?.data.map((item: IWithdrawalItem ) => ({
     fullName: item.participant.commonName,
     ...item,
-    //transferedAt: dayjs(item.transferedAt).format('YYYY-MM-DD'),
     createdAt: dayjs(item.updatedAt).format('YYYY-MM-DD'),
   })),
 )

@@ -153,6 +153,7 @@ const closeModal = () => {
       class="hidden xl:block w-full max-w-[350px]"
       :offer="selectedOffer"
       :on-place-bid="onPlaceBid"
+      :socket="socket"
     />
 
     <!-- Modal OfferDetailItem móvil -->
@@ -173,6 +174,7 @@ const closeModal = () => {
           <OfferDetailsItem
             v-if="selectedOffer"
             :offer="selectedOffer"
+            :socket="socket"
             :on-place-bid="onPlaceBid"
           />
         </div>

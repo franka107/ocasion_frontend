@@ -4,11 +4,24 @@ import BidHistory from './BidHistory.vue'
 import type { OfferListItem } from '~/types/Offer'
 import { getRemainingTime } from '@/utils/countDown'
 import ConfirmBidDialog from '~/components/virtual-auditorium/ConfirmBidDialog.vue'
+import type { Socket } from 'socket.io-client'
 
 const props = defineProps<{
   offer: OfferListItem
   onPlaceBid: ({ offerId, amount }: { offerId: string; amount: number }) => void
+  socket: Socket
+
 }>()
+
+const subscribeError = ref(false)
+props.socket.on('error', (data) => {
+  const ERROR_NOT_SUBSCRIBED = data.errors.find((error: { code: string }) => error.code === 'AUCTION_MANAGEMENT.USER_NOT_SUBSCRIBED')
+  if(ERROR_NOT_SUBSCRIBED){
+    showModal.value = true
+    subscribeError.value = true
+  }
+})
+
 const { offer } = toRefs(props)
 const useCountDown = (offer: Ref<OfferListItem>) => {
   const endMiliseconds = computed(() => getRemainingTime(offer.value.endTime))
@@ -69,16 +82,19 @@ const {
 const showModal = ref(false)
 const onSubmitBid = () => {
   if (!invalidBidAmount.value) {
-    showModal.value = true
+    props.onPlaceBid({ offerId: offer.value.id, amount: bidValue.value })
+    // showModal.value = true
   }
 }
 </script>
 <template>
   <section class="flex justify-center">
     <ConfirmBidDialog
+      v-if="subscribeError"
       v-model="showModal"
       :on-place-bid="onPlaceBid"
       :bid="bidValue"
+      :event-id="offer.event?.id || ''"
       :offer-id="offer.id"
     />
     <Countdown

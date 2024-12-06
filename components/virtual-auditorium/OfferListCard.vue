@@ -15,7 +15,7 @@ const cardClass = (totalSeconds: number, offer: OfferListItem) => {
 
   if (totalSeconds <= 0) {
     if (offer.bids[0]?.status === BID_WINNER_STATUS) {
-      return 'border-2 border-green-400'
+      return 'overlay-item border-2 border-green-400'
     } else {
       return 'overlay-item'
     }

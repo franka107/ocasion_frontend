@@ -101,8 +101,7 @@
             @update:model-value="openEditModal = false"      
           />
         </SheetContent>
-
-        <!-- Modal de Detalle Participante -->
+      <!-- Modal de Detalle Participante Natural -->
         <SheetContent
           v-model:open="openParticipantModal"
           class="flex flex-col h-full"
@@ -113,6 +112,16 @@
           <ParticipantDetailForm :participant-id="rechargeId" />
         </SheetContent>
 
+        <!-- Modal de Detalle Participante Jurídico -->
+        <SheetContent
+          v-model:open="openJuridicModal"
+          class="flex flex-col h-full"
+          custom-width="510px"
+          @pointer-down-outside="(e: Event) => e.preventDefault()"
+          @interact-outside="(e: Event) => e.preventDefault()"
+        >
+          <JuridicDetailForm :participant-id="rechargeId" />
+        </SheetContent>
         <!-- Modal para rechazar recarga -->
        <ModalRejectRecharge
           :id="selectedRejectInfo.id"
@@ -142,6 +151,7 @@ import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue'
 import CustomPagination from '~/components/ui/custom-pagination/CustomPagination.vue'
 import RequestDetailForm from '~/components/attention-tray/top-up-requests/RequestDetailForm.vue'
 import ParticipantDetailForm from '~/components/attention-tray/top-up-requests/ParticipantDetailForm.vue'
+import JuridicDetailForm from '~/components/attention-tray/top-up-requests/JuridicDetailForm.vue'
 import EditRequestForm from '~/components/attention-tray/top-up-requests/EditRequestForm.vue'
 import ModalRejectRecharge from '~/components/attention-tray/top-up-requests/ModalRejectRecharge.vue'
 import {
@@ -152,11 +162,12 @@ import {
 import { IuseRecharge } from '@/composables/useRecharge'
 import { useTopUpRequests } from '~/composables/useTopUpRequests'
 import { useAPI } from '~/composables/useAPI'
-
+import type { IRecharge } from '~/types/Recharge'
 // Variables de estado para los modales
 const openDetailModal = ref(false)
 const openEditModal = ref(false)
 const openParticipantModal = ref(false)
+const openJuridicModal = ref(false)
 const openRejectModal = ref(false)
 const openAnnulModal = ref(false) 
 const rechargeId = ref<number | undefined>(undefined)
@@ -174,69 +185,6 @@ const selectedRejectInfo = ref<any>({
   rejection: null,
   comment: null,
 })
-const handleReject = async (values: any) => {
-  openConfirmModal({
-    title: 'Rechazar solicitud de recarga',
-    message: '¿Está seguro que desea rechazar la solicitud de recarga?',
-    callback: async () => {
-      const { status, error }: any = await rejectRechargeRequest({
-        id: values.id,
-        rejectionReason: 'Rechazado por el administrador',
-      })
-      if (status.value === 'success') {
-        openAnnulModal.value = false
-        refreshRecharTable()
-        updateConfirmModal({
-          title: 'Solicitud de recarga rechazada',
-          message: 'Se ha rechazado la soliciud de recarga',
-          type: 'success',
-        })
-      } else {
-        const eMsg =
-          error.value.data?.errors?.[0].message ||
-          error.value.data.message ||
-          'El solicitud de recarga no se pudo rechazar, intentalo más tarde'
-        updateConfirmModal({
-          title: 'Error al rechazar la solicitud de recarga',
-          message: eMsg,
-          type: 'error',
-        })
-      }
-    },
-  })
-}
-
-const handleApprove = async (values: any) => {
-  openConfirmModal({
-    title: 'Aprobar solicitud de recarga',
-    message: '¿Está seguro que desea aprobar la solicitud de recarga?',
-    callback: async () => {
-      const { status, error }: any = await rejectRechargeRequest({
-        id: values.id,
-        rejectionReason: 'Rechazado por el administrador',
-      })
-      if (status.value === 'success') {
-        openAnnulModal.value = false
-        refreshRecharTable()
-        updateConfirmModal({
-          title: 'Solicitud de recarga rechazada',
-          message: 'Se ha rechazado la soliciud de recarga',
-          type: 'success',
-        })
-      } else {
-        const eMsg =
-          error.value.data?.errors?.[0].message ||
-          error.value.data.message ||
-          'El solicitud de recarga no se pudo rechazar, intentalo más tarde'
-        updateConfirmModal({
-          title: 'Error al rechazar la solicitud de recarga',
-          message: eMsg,
-          type: 'error',
-        })
-      }
-    },
-  })
-}
 
 const openModalEditRequest = (rowId: number) => {
   rechargeId.value = rowId
@@ -244,10 +192,18 @@ const openModalEditRequest = (rowId: number) => {
 }
 
 const openParticipantDetail = (row: any) => {
-  rechargeId.value = row.participantId
-  console.log('Abriendo detalle del participante:', row.participantId)
-  openParticipantModal.value = true
-}
+  rechargeId.value = row.participantId;
+
+  if (row.participant?.personType === 'NATURAL_PERSON') {
+    console.log('Abriendo detalle del participante natural:', row.participantId);
+    openParticipantModal.value = true;
+  } else if (row.participant?.personType === 'JURIDIC_PERSON') {
+    console.log('Abriendo detalle del participante jurídico:', row.participantId);
+    openJuridicModal.value = true;
+  } else {
+    console.error('Tipo de persona desconocido:', row.participant?.personType);
+  }
+};
 
 // Data y API
 const {
@@ -274,7 +230,7 @@ const { data, refresh: refreshRecharTable }: any = await useAPI(
 )
 
 const rechargeData = computed(() =>
-  data.value?.data.map((item: any) => ({
+  data.value?.data.map((item: IRecharge) => ({
     fullName: item.participant.commonName,
     ...item,
     transferedAt: dayjs(item.transferedAt).format('YYYY-MM-DD'),

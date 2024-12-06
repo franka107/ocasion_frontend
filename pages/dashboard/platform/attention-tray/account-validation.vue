@@ -101,6 +101,7 @@ import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCar
 import AccountDetailsForm from '~/components/attention-tray/account-validation/AccountDetailsForm.vue'
 import dayjs from 'dayjs'
 import { useAccountValidation } from '@/composables/useAccountValidation'
+import type { IAccountLItem } from '~/types/Account'
 const openRejectModal = ref(false)
 const {
     page,
@@ -126,10 +127,10 @@ const { data, refresh }: any = await useAPI(
   } as any,
 )
 const accountData = computed(() =>
-  data.value?.data.map((item: any) => ({
+  data.value?.data.map((item: IAccountLItem) => ({
     fullName: item.participant.commonName,
     ...item,
-    createdAt: dayjs(item.updatedAt).format('YYYY-MM-DD'),
+    createdAt: dayjs(item.createdAt).format('YYYY-MM-DD'),
   })),
 )
 

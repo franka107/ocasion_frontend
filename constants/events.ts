@@ -188,7 +188,7 @@ export const eventSearch = (viewType: ViewType): SearchItem[] => {
       type: 'select',
       placeholder: 'Filtrar por estado',
       items: [
-        ...Array.from(eventStatusRecord).map(([key, value]) => ({
+        ...Object.entries(eventStatusRecord).map(([key, value]) => ({
           text: value.name,
           value: key,
         })),

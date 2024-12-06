@@ -36,7 +36,7 @@
   import { ref } from 'vue'
   import AccountDetails from '~/components/reports/account-balance/AccountDetails.vue'
   import { useAccountBalance } from '@/composables/useAccountBalance'
-
+  import type { IAccountBalanceItem } from '~/types/AccountBalance'
   const openApplicationModal = ref(false);
   const openParticipantModal = ref(false);
   const {
@@ -59,7 +59,7 @@
     } as any,
   )
   const balanceData = computed(() =>
-    data.value?.data.map((item: any) => ({
+    data.value?.data.map((item: IAccountBalanceItem) => ({
       fullName: item.user.commonName,
       ...item,
     })),
