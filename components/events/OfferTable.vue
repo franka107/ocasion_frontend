@@ -230,8 +230,8 @@
         </template>
         <template #status="{ row }">
           <CustomChip
-            :text="offerStatusRecord[row.status].name || ''"
-            :variant="offerStatusRecord[row.status].color as any"
+            :text="offerStatusRecord[row.status]?.name || ''"
+            :variant="offerStatusRecord[row.status]?.color as any"
           ></CustomChip>
         </template>
       </CustomTable>
