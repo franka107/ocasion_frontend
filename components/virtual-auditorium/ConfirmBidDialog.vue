@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button'
+import type { IDataResponse } from '~/types/Common';
+import { toast } from '../ui/toast';
 const props = withDefaults(
   defineProps<{
     modelValue: boolean
@@ -13,6 +15,7 @@ const props = withDefaults(
     }) => void
     bid: number
     offerId: string
+    eventId: string
   }>(),
   {
     title: '',
@@ -21,16 +24,48 @@ const props = withDefaults(
 )
 const { onPlaceBid } = toRefs(props)
 const emit = defineEmits(['update:modelValue', 'onSubmitBid'])
-const BALANCE = 20000
+const pseudonym = ref<string>('')
 const successSubmit = ref(false)
 const title = ref('Separación de garantía')
 const icon = ref('CurencyOutline')
 
+const { data, status }= await useAPI<{amountToBeSeparated: number, availableBalance: number, remainingBalance: number}>(
+    `/auction-management/subscribe-to-offer-preview/?eventId=${props.eventId}`,
+    { method: 'POST' } as any)
+    console.log("data", data, status);
+    
+if (status.value !== 'success') {
+  toast({
+    title: 'Problema en el servidor',
+    description: 'intentelo mas tarde',
+    variant: 'default',
+    class: 'border-red',
+  })
+}
+
 const onSubmit = async () => {
-  await onPlaceBid.value({ offerId: props.offerId, amount: props.bid })
-  successSubmit.value = true
-  title.value = 'Separación confirmada'
-  icon.value = 'AccountOutline'
+  try {
+    const { data, status }= await useAPI<{ pseudonym: string }>(
+    `/auction-management/subscribe-to-offer/?eventId=${props.eventId}`,
+    { method: 'POST' } as any)
+    console.log("data", data, status);
+      
+    if (status.value !== 'success') {
+      toast({
+        title: 'Problema en el servidor',
+        description: 'intentelo mas tarde',
+        variant: 'default',
+        class: 'border-red',
+      })
+    }
+    pseudonym.value = data.value.pseudonym
+    await onPlaceBid.value({ offerId: props.offerId, amount: props.bid })
+    successSubmit.value = true
+    title.value = 'Separación confirmada'
+    icon.value = 'AccountOutline'
+  } catch (error) {
+    console.error("error", error)
+  }
 }
 const resetForm = () => {
   successSubmit.value = false
@@ -52,18 +87,18 @@ const resetForm = () => {
         descontada de tu monedero. Este monto corresponde a la preliquidación de
         la separación de garantía.
       </p>
-      <ul class="mb-6 text-sm font-medium">
+      <ul v-if="data" class="mb-6 text-sm font-medium">
         <li>
           <span class="text-primary-700">Saldo disponible: </span
-          ><span>$ {{ BALANCE }}</span>
+          ><span>$ {{ data.availableBalance }}</span>
         </li>
         <li>
           <span class="text-primary-700">monto a separar: </span
-          ><span>$ {{ props.bid }}</span>
+          ><span>$ {{ data.amountToBeSeparated }}</span>
         </li>
         <li>
           <span class="text-primary-700">Saldo restante: </span
-          ><span>$ {{ BALANCE - props.bid }}</span>
+          ><span>$ {{ data.remainingBalance }}</span>
         </li>
       </ul>
       <div class="flex gap-x-[10px] w-full">
@@ -79,7 +114,7 @@ const resetForm = () => {
     <template v-else>
       <p class="mb-4 text-sm text-gray-500 font-medium">
         Se confirmo la separación de tu garantia exitosamente y tu seudónimo
-        asignado es MAPACHE508
+        asignado es {{ pseudonym }}
       </p>
     </template>
   </CustomModal>

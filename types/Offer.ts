@@ -36,6 +36,7 @@ export interface OfferListItem {
   bids: Bid[]
   bidHistories: BidHistory[]
   annexesFiles: AnnexesFile[]
+  event?: IEventLItem
   attachedFiles: AttachedFile[]
   status: OfferStatus
   endTime?: string
