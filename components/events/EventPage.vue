@@ -128,9 +128,9 @@
           </template>
           <template #status="{ row }">
             <CustomChip
-              :text="eventStatusRecord[row?.status as EventStatus].name || ''"
+              :text="eventStatusRecord[row?.status as EventStatus]?.name || ''"
               :variant="
-                eventStatusRecord[row?.status as EventStatus].color as any
+                eventStatusRecord[row?.status as EventStatus]?.color as any
               "
             ></CustomChip>
           </template>
@@ -221,7 +221,7 @@ const openCancelModal = ref(false)
 
 const onSearch = (item: { [key: string]: string }) => {
   filterOptions.value = JSON.stringify([
-    { field: 'name', type: 'like', value: item.name || '' },
+    { field: 'name', type: 'like', value: item?.name || '' },
     { field: 'status', type: 'equal', value: item.status || '' },
     {
       field: 'organization.name',
