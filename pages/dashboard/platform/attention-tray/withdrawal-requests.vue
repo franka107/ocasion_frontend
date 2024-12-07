@@ -91,6 +91,7 @@
             @on-reject="handleOpenRejectModal"
           />
         </SheetContent>
+        <!-- Modal de Detalle Participante Natural -->
         <SheetContent
           v-model:open="openParticipantModal"
           class="flex flex-col h-full"
@@ -101,6 +102,16 @@
           <ParticipantDetailEditForm
             :participant-id="rechargeId"
           />
+        </SheetContent>
+        <!-- Modal de Detalle Participante Jurídico -->
+        <SheetContent
+          v-model:open="openJuridicModal"
+          class="flex flex-col h-full"
+          custom-width="510px"
+          @pointer-down-outside="(e: Event) => e.preventDefault()"
+          @interact-outside="(e: Event) => e.preventDefault()"
+        >
+          <JuridicDetailForm :participant-id="rechargeId" />
         </SheetContent>
         <!-- Modal para rechazar retiro -->
         <ModalRejectWithdrawal
@@ -113,7 +124,7 @@
            :id="generateDisbursementForm.id"
            v-model="openModalGenerate"
            :bank="generateDisbursementForm.bank"
-           @onsubmit="handleGenerateDisbursement"
+           :onSubmit="handleGenerateDisbursement"
            :refresh-table="refresh"
          />
       </div>
@@ -132,7 +143,6 @@ import CustomTable from '~/components/ui/custom-table/CustomTable.vue'
 import CustomChip from '~/components/ui/custom-chip/CustomChip.vue'
 import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue'
 import CustomPagination from '~/components/ui/custom-pagination/CustomPagination.vue'
-import type { OrganizationItem } from '~/types/Order.ts'
 import {
   rechargeStatus,
   withdrawalRequeststHeader,
@@ -145,14 +155,15 @@ import WithdrawalDetailsForm from '~/components/attention-tray/withdrawal-reques
 import GenerateDisbursementBatchModal from '~/components/attention-tray/disbursement-lots/GenerateDisbursementBatchModal.vue'
 import ModalRejectWithdrawal from '~/components/attention-tray/withdrawal-requests/ModalRejectWithdrawal.vue'
 import type { IWithdrawalItem } from '~/types/Withdrawal'
+import type { IDataResponse } from '~/types/Common'
 import dayjs from 'dayjs'
 
 const openParticipantModal = ref(false)
 const openEditModal = ref(false)
 const openModalGenerate= ref(false)
-const selectedRequestId = ref<string | null>(null)
 const openWithdrawalDetailsModal = ref(false)
 const openRejectModal = ref(false)
+const openJuridicModal = ref(false)
 const rechargeId = ref<number | undefined>(undefined)
 const { page, onSort, onSearch, filterOptions, sortOptions, requestWithdrawal, authorizeWithdrawal, rejectWithdrawal, } = useWithdrawalRequests()
 const selectedMultipleData = ref<{ type: string; ids: string[] }>({
@@ -165,25 +176,20 @@ const disableMultipleSelect = computed(
     selectedMultipleData.value.type === 'empty' &&
     selectedMultipleData.value.ids.length === 0,
 )
-const onWithdrawalDetailsSubmit = (formData: any) => {
-  console.log('Detalle de solicitud enviado:', formData)
-  openWithdrawalDetailsModal.value = false
-}
-const selectedParticipantId = ref<string | null>(null)
-const openModalEditRequest = (rowId: number) => {
-  rechargeId.value = rowId
-  openEditModal.value = true
-}
 const openParticipantDetail = (row: any) => {
-  const participantId = row.participant?.id;
-  if (participantId) {
-    rechargeId.value = participantId;
-    console.log('Abriendo detalle del participante:', participantId);
+  rechargeId.value = row.participant?.id;
+
+  if (row.participant?.personType === 'NATURAL_PERSON') {
+    console.log('Abriendo detalle del participante natural:', row.participantId);
     openParticipantModal.value = true;
+  } else if (row.participant?.personType === 'JURIDIC_PERSON') {
+    console.log('Abriendo detalle del participante jurídico:', row.participantId);
+    openJuridicModal.value = true;
   } else {
-    console.error('No se encontró el participante para esta fila.');
+    console.error('Tipo de persona desconocido:', row.participant?.personType);
   }
 };
+
 const openWithdrawalDetails = (row: any) => {
   const requestId = row.id; 
   if (requestId) {
@@ -197,22 +203,20 @@ const openWithdrawalDetails = (row: any) => {
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const rechargeModal = ref<any>({ offerId: '' })
 const BASE_WITH_URL = '/finance/withdrawal-request-management'
-const { data, refresh }: any = await useAPI(
-  `${BASE_WITH_URL}/view-paginated-withdrawal-requests`,
-  {
-    query: {
-      limit: 8,
-      page,
-      filterOptions,
-      sortOptions,
-    },
-  } as any,
-)
+const { data, refresh } = await useAPI<IDataResponse<IWithdrawalItem>>(() => `${BASE_WITH_URL}/view-paginated-withdrawal-requests`, {
+  query: {
+    limit: 8,
+    page,
+    filterOptions,
+    sortOptions,
+  },
+} as any)
+
 const withDrawalRequeststData = computed(() =>
   data.value?.data.map((item: IWithdrawalItem ) => ({
     fullName: item.participant.commonName,
     ...item,
-    createdAt: dayjs(item.updatedAt).format('YYYY-MM-DD'),
+    createdAt: dayjs(item.createdAt).format('YYYY-MM-DD'),
   })),
 )
 //Acciones para modal Generar Lote

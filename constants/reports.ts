@@ -2,10 +2,8 @@ import type { HeaderItem, SearchItem } from '@/components/ui/custom-table/Custom
 import { TransactionHistoryMotive, transactionHistoryMotiveMap } from '~/types/TransactionHistory';
 
 export const transactionsStatus = new Map<string, { name: string; color: string }>([
-    ["AUTHORIZED", { name:  "Autorizada", color: "blue" }],
-    ["REJECTED", { name: "Rechazada", color: "brown" }],
-    ["ABANDONED", { name: "Abonada", color: "green" }],
-    ["PENDING", { name: 'Pendiente', color: 'orange' }],
+    ["AUTHORIZED", { name:  "Autorizado", color: "blue" }],
+    ["REJECTED", { name: "Rechazado", color: "brown" }],
 ]);
 export const disbursementStatus = new Map<string,{ name: string; color: string }>([
     ['PENDING', { name: 'Pendiente', color: 'orange' }],
@@ -188,7 +186,7 @@ export const balanceSearch: SearchItem[] = [
     {
         key: 'quickSearch',
         type: 'text',
-        placeholder: 'Buscar participane, documento',
+        placeholder: 'Buscar participante, documento',
         width: 'max-w-xs w-full',
         elementClass: 'w-full',
     },

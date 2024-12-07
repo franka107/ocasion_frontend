@@ -102,6 +102,7 @@ import AccountDetailsForm from '~/components/attention-tray/account-validation/A
 import dayjs from 'dayjs'
 import { useAccountValidation } from '@/composables/useAccountValidation'
 import type { IAccountLItem } from '~/types/Account'
+import type { IDataResponse } from '~/types/Common'
 const openRejectModal = ref(false)
 const {
     page,
@@ -115,17 +116,15 @@ const accountId = ref<number | undefined>(undefined)
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 
 const BASE_VAL_URL = '/finance/account-validation'
-const { data, refresh }: any = await useAPI(
-  `${BASE_VAL_URL}/view-paginated-account-validations`,
-  {
-    query: {
-      limit: 8,
-      page,
-      filterOptions,
-      sortOptions,
-    },
-  } as any,
-)
+const {  data, refresh } = await useAPI<IDataResponse<IAccountLItem>>(() => `${BASE_VAL_URL}/view-paginated-account-validations`, {
+  query: {
+    limit: 8,
+    page,
+    filterOptions,
+    sortOptions,
+  },
+} as any)
+
 const accountData = computed(() =>
   data.value?.data.map((item: IAccountLItem) => ({
     fullName: item.participant.commonName,
