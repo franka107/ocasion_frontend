@@ -57,9 +57,13 @@ watch([apiUrl], () => {
 })
 
 socket.on('error', (data) => {
+  const mainError = data.errors[0]
+  if (mainError.code === 'AUCTION_MANAGEMENT.USER_NOT_SUBSCRIBED') {
+    return
+  }
   toast({
     title: 'Problema al pujar',
-    description: data.errors[0].message,
+    description: mainError.message,
     variant: 'default',
     class: 'border-red',
     // action: h(
