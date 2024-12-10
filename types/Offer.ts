@@ -17,6 +17,7 @@ export enum OfferStatus {
   ObservedDeposit = 'OBSERVED_DEPOSIT', // Abono observado
   ConfirmedDeposit = 'CONFIRMED_DEPOSIT', // Deposito confirmado
   InTransferOfGood = 'IN_TRANSFER_OF_GOOD', // En transferencia de bienes
+  DebatedBid = 'DEBATED_BID', // Puja debatida PSD-63
   Delivered = 'DELIVERED', // Enviado
   Concreted = 'CONCRETED', // Concreatedo
   // -----------------
