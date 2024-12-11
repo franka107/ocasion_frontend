@@ -78,7 +78,7 @@ export function useNotificationAPI() {
     const { status, error, data, refresh } = await useAPI<void>(
       `${NOTIFICATION_BASE_URL}/remove-notifications`,
       {
-        method: 'POST',
+        method: 'DELETE',
         body: {
           notificationIds: ids,
         },
@@ -100,6 +100,7 @@ export function useNotificationAPI() {
     return { status, error, data, refresh }
   }
 
+
   const readNotification = async (id: string) => {
     const { status, error, data, refresh } = await useAPI<void>(
       `${NOTIFICATION_BASE_URL}/read-notification`,
@@ -112,6 +113,7 @@ export function useNotificationAPI() {
     )
     return { status, error, data, refresh }
   }
+
 
   return {
     findNotificationsPaginated,
