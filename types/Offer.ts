@@ -11,7 +11,6 @@ export enum OfferStatus {
   InProgress = 'IN_PROGRESS', // En curso
   Cancelled = 'CANCELLED', // Cancelado
   InReview = 'IN_REVIEW', // En revision
-  Rejected = 'REJECTED', // Rechazado
   InDepositReview = 'IN_DEPOSIT_REVIEW', // Rechazado
   PendingDeposit = 'PENDING_DEPOSIT', // Abono pendiente
   ObservedDeposit = 'OBSERVED_DEPOSIT', // Abono observado
@@ -22,6 +21,7 @@ export enum OfferStatus {
   Concreted = 'CONCRETED', // Concreatedo
   // -----------------
   PendingOfDelivery = 'PENDING_OF_DELIVERY', // Pendiente de entrega
+  Rejected = 'REJECTED', // Rechazado
 }
 
 export interface OfferListItem {

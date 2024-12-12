@@ -65,14 +65,16 @@
                   class="bg-primary text-white"
                 >
                   <DropdownMenuItem
-                    v-if="
-                      myGrants.data.value.includes(
-                        GrantId.OrganizationBidCanCounterOffer,
-                      ) &&
-                      offerStatusCheckPosition(
-                        row.offer.status,
-                        OfferStatus.Concreted,
-                        ComparisonOperator.Less,
+                    :disabled="
+                      !(
+                        myGrants.data.value.includes(
+                          GrantId.OrganizationBidCanCounterOffer,
+                        ) &&
+                        offerStatusCheckPosition(
+                          row.offer.status,
+                          OfferStatus.Concreted,
+                          ComparisonOperator.Less,
+                        )
                       )
                     "
                     @click="

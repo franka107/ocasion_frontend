@@ -49,16 +49,20 @@ console.log('data', data, status)
 
 const onSubmit = async () => {
   try {
-    const { data, status } = await useAPI<{ pseudonym: string }>(
+    const { data, status, error } = await useAPI<{ pseudonym: string }>(
       `/auction-management/subscribe-to-offer/?eventId=${props.eventId}`,
       { method: 'POST' } as any,
     )
     console.log('data', data, status)
 
     if (status.value !== 'success') {
+      const eMsg =
+        error.value?.data?.errors?.[0].message ||
+        error.value?.data?.message ||
+        'No se pudo continuar con la puja. \nTe recomendamos intentarlo nuevamente.'
       toast({
-        title: 'Problema en el servidor',
-        description: 'intentelo mas tarde',
+        title: 'Problema en la puja',
+        description: eMsg,
         variant: 'default',
         class: 'border-red',
       })

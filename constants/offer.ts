@@ -43,11 +43,7 @@ export const offerStatusRecord: Record<
     color: 'orange',
     flowPosition: 7,
   },
-  [OfferStatus.Rejected]: {
-    name: 'Rechazado',
-    color: 'red',
-    flowPosition: 8,
-  },
+
   [OfferStatus.InDepositReview]: {
     name: 'En revisión de depósito',
     color: 'red',
@@ -92,6 +88,11 @@ export const offerStatusRecord: Record<
     name: 'Puja debatida',
     color: 'green',
     flowPosition: 17,
+  },
+  [OfferStatus.Rejected]: {
+    name: 'Rechazado',
+    color: 'red',
+    flowPosition: 18,
   },
 }
 export enum ComparisonOperator {
