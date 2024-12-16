@@ -11,5 +11,12 @@ export function useUserSessionExtended() {
     ? userTypeToGlobal(userSession.user.value?.user.type)
     : GlobalType.Organization
 
-  return { globalType, user }
+  const getDefaultOrganization = () => {
+    if (globalType === GlobalType.Organization) {
+      return user.organizations[0]
+    }
+    throw new Error('User type is not an organization')
+  }
+
+  return { globalType, user, getDefaultOrganization }
 }

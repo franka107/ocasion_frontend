@@ -1,83 +1,98 @@
 import type {
   HeaderItem,
   SearchItem,
-} from "@/components/ui/custom-table/CustomTable.vue";
+} from '@/components/ui/custom-table/CustomTable.vue'
 
 export const paymentStatus = new Map<string, { name: string; color: string }>([
-  ["OBSERVED", { name: "Abono observado", color: "orange" }],
-  ["IN_REVIEW", { name: "En revisión de abono", color: "blue" }],
-  ["CONFIRMED", { name: "Abono confirmado", color: "green" }],
-  ["CANCELLED", { name: "Cancelada", color: "red" }],
-  ["CONCRETED", { name: "Concretada", color: "brown" }],
-]);
+  ['BASE', { name: 'Base', color: 'brown' }],
+  ['OBSERVED', { name: 'Abono observado', color: 'orange' }],
+  ['IN_REVIEW', { name: 'En revisión de abono', color: 'blue' }],
+  ['CONFIRMED', { name: 'Abono confirmado', color: 'green' }],
+  ['CANCELLED', { name: 'Cancelada', color: 'red' }],
+  ['CONCRETED', { name: 'Concretada', color: 'brown' }],
+])
 export const paymentsSearch: SearchItem[] = [
   {
-    key: "organization",
-    type: "text",
-    placeholder: "Buscar organización",
-    elementClass: "min-w-[400px]",
+    key: 'organization',
+    type: 'text',
+    placeholder: 'Buscar organización',
+    elementClass: 'min-w-[400px]',
     position: 1,
   },
   {
-    key: "status",
-    type: "select",
-    placeholder: "Filtrar estados",
+    key: 'status',
+    type: 'select',
+    placeholder: 'Filtrar estados',
     items: [
       ...Array.from(paymentStatus).map(([key, value]) => ({
         text: value.name,
         value: key,
       })),
-      { text: "Todos", value: " " },
+      { text: 'Todos', value: ' ' },
     ],
-    elementClass: "min-w-[400px]",
+    elementClass: 'min-w-[400px]',
     position: 2,
   },
-];
+]
 export const paymentsHeader = (viewType: ViewType): HeaderItem[] => [
   {
-    key: "offer.id",
-    label: "Cód. Oferta",
+    key: 'offer.id',
+    label: 'Cód. Oferta',
     sortable: true,
   },
   {
-    key: "event",
-    label: "Evento",
+    key: 'event',
+    label: 'Evento',
     sortable: true,
   },
-  ...(viewType === "platform"
+  ...(viewType === 'platform'
     ? [
         {
-          key: "organization.name",
-          label: "Organización",
+          key: 'organization.name',
+          label: 'Organización',
           sortable: true,
+        },
+      ]
+    : []),
+  ...(viewType === 'platform'
+    ? [
+        {
+          key: 'compostComissionPaymentFile',
+          label: 'Sustento pago de comisión',
+          sortable: false,
+        },
+      ]
+    : []),
+
+  ...(viewType === 'organization'
+    ? [
+        {
+          key: 'compostPropertyPaymentFile',
+          label: 'Sustento pago de propiedad',
+          sortable: false,
         },
       ]
     : []),
 
   {
-    key: "supportingDetails",
-    label: "Detalle sustento",
+    key: 'date',
+    label: 'Fecha de envio',
     sortable: true,
   },
   {
-    key: "date",
-    label: "Fecha de envio",
+    key: 'propertyAmount',
+    label: 'Monto de sustento',
     sortable: true,
   },
   {
-    key: "amount",
-    label: "Monto de sustento",
+    key: 'status',
+    label: 'Estado abono',
     sortable: true,
   },
   {
-    key: "status",
-    label: "Estado abono",
-    sortable: true,
-  },
-  {
-    key: "actions",
-    label: "Acciones",
+    key: 'actions',
+    label: 'Acciones',
     sortable: false,
-    align: "center",
+    align: 'center',
   },
-];
+]

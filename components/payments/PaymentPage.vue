@@ -14,6 +14,44 @@
             @on-sort="onSort"
             @on-search="onSearch"
           >
+            <template #compostPropertyPaymentFile="{ row }">
+              <Button
+                variant="ghost"
+                size="icon"
+                class="flex items-center justify-center rounded-full"
+                @click="handleCompostComissionPaymentFile(row)"
+              >
+                <CustomIcons
+                  :name="
+                    compostPaymentStatus.get(row.compostPropertyPaymentFile)
+                      ?.icon || 'Doc-Loupe'
+                  "
+                  :class="
+                    compostPaymentStatus.get(row.compostPropertyPaymentFile)
+                      ?.class || 'text-gray-500'
+                  "
+                />
+              </Button>
+            </template>
+            <template #compostComissionPaymentFile="{ row }">
+              <Button
+                variant="ghost"
+                size="icon"
+                class="flex items-center justify-center rounded-full"
+                @click="handleCompostComissionPaymentFile(row)"
+              >
+                <CustomIcons
+                  :name="
+                    compostPaymentStatus.get(row.compostComissionPaymentStatus)
+                      ?.icon || 'Doc-Loupe'
+                  "
+                  :class="
+                    compostPaymentStatus.get(row.compostComissionPaymentStatus)
+                      ?.class || 'text-gray-500'
+                  "
+                />
+              </Button>
+            </template>
             <template #actions="{ row }">
               <div class="flex justify-center">
                 <DropdownMenu>
@@ -40,7 +78,7 @@
                       <DropdownMenuItem
                         @click="
                           () => {
-                            paymentsId = row.id
+                            paymentId = row.id
                             openModalObservePayment = true
                           }
                         "
@@ -57,7 +95,9 @@
                         )
                       "
                     >
-                      <DropdownMenuItem @click="handleConfirmPayment(row.id)">
+                      <DropdownMenuItem
+                        @click="handleConfirmComissionPayment(row.id)"
+                      >
                         Confirmar abono
                         <CustomIcons name="ArrowLeft" class="ml-auto" />
                       </DropdownMenuItem>
@@ -74,13 +114,26 @@
             </template>
           </CustomTable>
           <SheetContent
+            v-model:open="openCompostComissionPaymentFileSheet"
+            class="flex flex-col h-full"
+            @pointer-down-outside="(e) => e.preventDefault()"
+            @interact-outside="(e) => e.preventDefault()"
+          >
+            <ComposeComissionPaymentFileForm
+              :id="paymentId || ''"
+              :on-observe="onObserveComissionButtonPressed"
+              :on-confirm="handleConfirmComissionPayment"
+              :close-modal="() => (openModalObservePayment = false)"
+            />
+          </SheetContent>
+          <SheetContent
             v-model:open="openModalObservePayment"
             class="flex flex-col h-full"
             @pointer-down-outside="(e) => e.preventDefault()"
             @interact-outside="(e) => e.preventDefault()"
           >
             <PaymentsForm
-              :id="paymentsId"
+              :id="paymentId"
               :on-submit="handleObserve"
               :close-modal="() => (openModalObservePayment = false)"
             />
@@ -97,6 +150,7 @@
   </section>
 </template>
 <script setup lang="ts">
+import ComposeComissionPaymentFileForm from './ComposeComissionPaymentFileForm.vue'
 import CustomTable from '@/components/ui/custom-table/CustomTable.vue'
 import CustomChip from '@/components/ui/custom-chip/CustomChip.vue'
 import CustomPagination from '@/components/ui/custom-pagination/CustomPagination.vue'
@@ -109,22 +163,30 @@ import {
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
 import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
 import { GrantId } from '~/types/Grant'
+import { compostPaymentStatus } from '~/constants/evidenceOrg'
 const props = defineProps<{
   type: 'organization' | 'platform'
   organizationId: string | null
 }>()
+const session = useUserSessionExtended()
 const filterOptions = ref(
   props.type === 'organization'
-    ? `[{ "field": "organization.id", "type": "equal", "value": "${props.organizationId}" }]`
+    ? `[{ "field": "organization.id", "type": "equal", "value": "${session.getDefaultOrganization().id}" }]`
     : '[]',
 )
 const openModalObservePayment = ref(false)
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
-const { confirmPayment, observePayment, page, sortOptions, onSort } =
-  usePaymentAPI()
+const {
+  confirmPayment,
+  confirmPropertyPayment,
+  observePayment,
+  page,
+  sortOptions,
+  onSort,
+} = usePaymentAPI()
 const { getMyGrants } = useAuthManagement()
 const myGrants = await getMyGrants()
-const paymentsId = ref<number | undefined>(undefined)
+const paymentId = ref<string | undefined>(undefined)
 const BASE_PAY_URL = '/payment-management'
 const selectedMultipleData = ref<{ type: string; ids: string[] }>({
   type: 'empty',
@@ -152,7 +214,7 @@ const onSearch = (item: { [key: string]: string }) => {
   ])
 }
 const { data, refresh }: any = await useAPI(
-  `${BASE_PAY_URL}/find-payments-paginated`,
+  `${BASE_PAY_URL}/view-payments-paginated-for-organization`,
   {
     query: {
       limit: 10,
@@ -163,12 +225,21 @@ const { data, refresh }: any = await useAPI(
   } as any,
   true,
 )
+const openCompostComissionPaymentFileSheet = ref(false)
+
+const handleCompostComissionPaymentFile = (row: any) => {
+  paymentId.value = row.id
+  openCompostComissionPaymentFileSheet.value = true
+}
+
+const onObserveComissionButtonPressed = (row: any) => {
+  paymentId.value = row.id
+  openModalObservePayment.value = true
+}
 
 const paymentsData = computed(() =>
   data.value.data.map((item: IPaymentsLItem, index: number) => ({
-    code: '-',
-    supportingDetails: 'Documento.pdf',
-    date: new Date(item.submittedAt).toLocaleString('es-ES', {
+    date: new Date(item.createdAt).toLocaleString('es-ES', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
@@ -180,15 +251,16 @@ const paymentsData = computed(() =>
   })),
 )
 
-const handleConfirmPayment = async (paymentId: string) => {
-  console.log(paymentId)
+const handleConfirmPropertyPayment = async () => {
   openConfirmModal({
-    title: 'Confirmar abono',
+    title: 'Confirmar sustento de pago de comisión',
     message: `¿Está seguro de que deseas confirmar este abono?`,
     callback: async () => {
       try {
         // const { paymentId } = values;
-        const { status } = await confirmPayment({ paymentId })
+        const { status } = await confirmPropertyPayment({
+          paymentId: paymentId.value,
+        })
         if (status.value === 'success') {
           refresh()
           resetMultipleSelect.value?.()
@@ -205,6 +277,66 @@ const handleConfirmPayment = async (paymentId: string) => {
         updateConfirmModal({
           title: 'Error al confirmar Abono',
           message: 'No se pudo confirmar Abono. Por favor, intente nuevamente.',
+          type: 'error',
+        })
+      }
+    },
+  })
+}
+
+const handleConfirmComissionPayment = async () => {
+  // console.log(paymentId)
+  openConfirmModal({
+    title: 'Confirmar sustento de pago de comisión',
+    message: `¿Está seguro de que deseas confirmar este abono?`,
+    callback: async () => {
+      try {
+        // const { paymentId } = values;
+        const { status } = await confirmPayment({ paymentId: paymentId.value })
+        if (status.value === 'success') {
+          refresh()
+          resetMultipleSelect.value?.()
+          updateConfirmModal({
+            title: 'Abono confirmado',
+            message: 'El abono ha sido confirmado exitosamente',
+            type: 'success',
+          })
+        } else {
+          throw new Error('Error al confirmar este abono')
+        }
+      } catch (error) {
+        console.log('error', error)
+        updateConfirmModal({
+          title: 'Error al confirmar Abono',
+          message: 'No se pudo confirmar Abono. Por favor, intente nuevamente.',
+          type: 'error',
+        })
+      }
+    },
+  })
+}
+const handleConfirm = async (values: any) => {
+  openConfirmModal({
+    title: 'Actualizar abono',
+    message: '¿Estás seguro de que deseas actualizar este Abono?',
+    callback: async () => {
+      const { status, error }: any = await observePayment(values)
+      if (status.value === 'success') {
+        openModalObservePayment.value = false
+        refresh()
+        updateConfirmModal({
+          title: 'Abono actualizado',
+          message: 'El abono ha sido actualizado exitosamente',
+          type: 'success',
+        })
+      } else {
+        const eMsg =
+          error.value.data?.errors?.[0].message ||
+          error.value.data.message ||
+          'El abono no se pudo actualizar, intentalo más tarde'
+        updateConfirmModal({
+          title: 'Error al actualizar bono',
+          message: eMsg,
           type: 'error',
         })
       }

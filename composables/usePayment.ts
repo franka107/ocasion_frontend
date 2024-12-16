@@ -23,9 +23,21 @@ export function usePaymentAPI() {
     return { status, error }
   }
 
-  const confirmPayment = async (values: { paymentId: string }) => {
+  const confirmComissionPayment = async (values: { paymentId: string }) => {
     const { status, error }: any = await useAPI(
-      `${BASE_PAY_URL}/confirm-payment`,
+      `${BASE_PAY_URL}/confirm-comission-payment`,
+      {
+        method: 'POST',
+        body: values,
+      } as any,
+    )
+
+    return { status, error }
+  }
+
+  const confirmPropertyPayment = async (values: { paymentId: string }) => {
+    const { status, error }: any = await useAPI(
+      `${BASE_PAY_URL}/confirm-comission-payment`,
       {
         method: 'POST',
         body: values,
@@ -48,7 +60,8 @@ export function usePaymentAPI() {
   }
 
   return {
-    confirmPayment,
+    confirmPayment: confirmComissionPayment,
+    confirmPropertyPayment,
     observePayment,
     sortOptions,
     page,

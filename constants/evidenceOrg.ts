@@ -26,6 +26,16 @@ export const evidenceStatus = new Map<string, { name: string; color: string }>([
   ['CONCRETED', { name: 'Concretado', color: 'green' }], // Concretado (similar a 'Confirmado')
 ])
 
+export const compostPaymentStatus = new Map<
+  string | null,
+  { icon: string; class: string }
+>([
+  ['CONFIRMED', { icon: 'Doc-Loupe', class: 'text-green' }], // Aprobado
+  ['OBSERVED', { icon: 'Doc-Loupe', class: 'text-yellow' }], // Observado
+  ['IN_REVIEW', { icon: 'Doc-Loupe', class: 'text-blue' }], // Entregado
+  [null, { icon: 'Doc-Loupe', class: 'text-[#a1a1a3]' }], // Entregado
+])
+
 export const deliverySupportIcons = new Map<
   string,
   { icon: string; class: string }
