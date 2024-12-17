@@ -52,7 +52,7 @@
 import Sidebar from './Sidebar.vue'
 import ConfirmModal from '~/components/ui/confirm-modal/ConfirmModal.vue'
 import IconAlert from '~/assets/icon/svg/alert.svg'
-import { UserType } from '~/types/Administrators';
+import { UserType } from '~/types/Administrators'
 
 const isSidebarOpen = ref(true)
 const isIdleDialogOpen = ref(false)
@@ -78,31 +78,45 @@ const closeDialog = (dialog: string) => {
 
 const session = useUserSession()
 
-const allPlatform = [UserType.]
-
 const loggedUser = session.user.value
 
 // Mostrar la alerta cuando el usuario esté inactivo
 watch(isIdle20.idle, (idle) => {
-  if (idle && session.loggedIn && loggedUser?.user.type !== UserType.Participant ) {
+  if (
+    idle &&
+    session.loggedIn &&
+    loggedUser?.user.type !== UserType.Participant
+  ) {
     isIdleDialogOpen.value = true
   }
 })
 
 watch(isIdle30.idle, (idle) => {
-  if (idle && session.loggedIn && loggedUser?.user.type !== UserType.Participant ) {
+  if (
+    idle &&
+    session.loggedIn &&
+    loggedUser?.user.type !== UserType.Participant
+  ) {
     handleSignOut()
   }
 })
 
 watch(isIdle10.idle, (idle) => {
-  if (idle && session.loggedIn && loggedUser?.user.type === UserType.Participant ) {
+  if (
+    idle &&
+    session.loggedIn &&
+    loggedUser?.user.type === UserType.Participant
+  ) {
     isIdleDialogOpen.value = true
   }
 })
 
 watch(isIdle12.idle, (idle) => {
-  if (idle && session.loggedIn && loggedUser?.user.type === UserType.Participant ) {
+  if (
+    idle &&
+    session.loggedIn &&
+    loggedUser?.user.type === UserType.Participant
+  ) {
     handleSignOut()
   }
 })
