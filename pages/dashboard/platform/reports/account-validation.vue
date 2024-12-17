@@ -49,7 +49,6 @@
   import CustomChip from '~/components/ui/custom-chip/CustomChip.vue'
   import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue'
   import CustomPagination from '~/components/ui/custom-pagination/CustomPagination.vue'
-  import type { OrganizationItem } from '~/types/Order.ts'
   import {
     validationStatus,
     validationHeader,
@@ -59,6 +58,7 @@
   import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
   import { useAccountValidation } from '@/composables/useAccountValidation'
   import type { IAccountLItem } from '~/types/Account'
+  import type { IDataResponse } from '~/types/Common'
   import dayjs from 'dayjs'
 
   const {
@@ -70,17 +70,15 @@
     handleExport,
   } = useAccountValidation()
   const BASE_VAL_URL = '/finance/account-validation'
-  const { data, refresh }: any = await useAPI(
-    `${BASE_VAL_URL}/view-paginated-account-validations`,
-    {
-      query: {
-        limit: 8,
-        page,
-        filterOptions,
-        sortOptions,
-      },
-    } as any,
-  )
+  const { data, refresh } = await useAPI<IDataResponse<IAccountLItem>>(() => `${BASE_VAL_URL}/view-paginated-account-validations`, {
+    query: {
+      limit: 8,
+      page,
+      filterOptions,
+      sortOptions,
+    },
+  } as any)
+
   const validationData = computed(() =>
   data.value?.data.map((item: IAccountLItem) => ({
     fullName: item.participant.commonName,

@@ -79,6 +79,7 @@
   import ContentLayout from '~/layouts/default/ContentLayout.vue' 
   import TransactionPaticipantDetails from '~/components/reports/transactions/TransactionPaticipantDetails.vue'
   import { TransactionHistoryMotive, transactionHistoryMotiveMap, type TransactionHistoryListItem } from '~/types/TransactionHistory'
+  import type { IDataResponse } from '~/types/Common'
   import dayjs from 'dayjs'
   const route = useRoute();
   const filterOptionsRaw = ref([
@@ -93,20 +94,18 @@
     handleExport
   } = useTransactionParticipant()
   const BASE_TRANS_URL = '/finance/transaction-history-management'
-  const { data, refresh }: any = await useAPI(
-    `${BASE_TRANS_URL}/view-transaction-histories-paginated`,
-    {
-      query: {
-        limit: 8,
-        page,   
-        filterOptionsRaw: JSON.stringify(filterOptionsRaw.value), 
-        filterOptions,
-        sortOptions,
-      },
-    } as any,
-  )
+
+  const { data, refresh } = await useAPI<IDataResponse<TransactionHistoryListItem>>(() => `${BASE_TRANS_URL}/view-transaction-histories-paginated`, {
+    query: {
+      limit: 8,
+      page,
+      filterOptions,
+      sortOptions,
+    },
+  } as any)
+
   const transactionsData = computed(() =>
-    data.value?.data.map((item: any) => ({
+    data.value?.data.map((item: TransactionHistoryListItem) => ({
       ...item,
       dateOfOperation: dayjs(item.createdAt).format('YYYY-MM-DD'),
       typeOfOperation: transactionHistoryMotiveMap[item.motive as TransactionHistoryMotive].label,

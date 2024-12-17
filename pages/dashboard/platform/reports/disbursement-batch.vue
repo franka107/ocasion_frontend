@@ -75,20 +75,19 @@
   import CustomChip from '~/components/ui/custom-chip/CustomChip.vue'
   import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue'
   import CustomPagination from '~/components/ui/custom-pagination/CustomPagination.vue'
-  import type { OrganizationItem } from '~/types/Order.ts'
+  import ContentLayout from '~/layouts/default/ContentLayout.vue'
+  import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
+  import { ref } from 'vue' 
+  import { useDisbursement } from '@/composables/useDisbursement'
+  import type { IDataResponse } from '~/types/Common'
+  import type { DisbursementLot } from '~/types/Disbursement'
   import {
     disbursementStatus,
     disbursementHeader,
     disbursementSearch,
   } from '~/constants/reports'
-  import ContentLayout from '~/layouts/default/ContentLayout.vue'
-  import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
-  import { ref } from 'vue' 
-  import { useDisbursement } from '@/composables/useDisbursement'
-  import type { DisbursementLot } from '~/types/Disbursement'
   import dayjs from 'dayjs'
-  const openApplicationModal = ref(false); 
-  const openParticipantModal = ref(false); 
+ 
   const {
    page,
    onSort,
@@ -97,44 +96,24 @@
    sortOptions,
    handleExport,
  } = useDisbursement()
-  const onSubmit = (formData: any) => {
-    console.log("Formulario enviado:", formData);
-    openApplicationModal.value = false; 
-  }; 
-  const onParticipantSubmit = (formData: any) => {
-    console.log('Detalle del participante enviado:', formData);
-    openParticipantModal.value = false;
-  };
-  const rechargeId = ref<number | undefined>(undefined)
-  const { openConfirmModal, updateConfirmModal } = useConfirmModal()
-  const rechargeModal = ref<any>({ offerId: '' })
+
   const BASE_DIS_URL = '/finance/disbursement-management'
-  const { data, refresh }: any = await useAPI(
-    `${BASE_DIS_URL}/view-paginated-disbursement-lots`,
-    {
-      query: {
-        limit: 8,
-        page,
-        filterOptions,
-        sortOptions,
-      },
-    } as any,
-  )
-  
+
+  const { data, refresh } = await useAPI<IDataResponse<DisbursementLot>>(() => `${BASE_DIS_URL}/view-paginated-disbursement-lots`, {
+    query: {
+      limit: 8,
+      page,
+      filterOptions,
+      sortOptions,
+    },
+  } as any)
+
   const disbursementData = computed(() =>
     data.value?.data.map((item: DisbursementLot) => ({   
       ...item,
       createdAt:dayjs(item.createdAt).format('YYYY-MM-DD'),
     })),
   )
-const isEditing = ref(false); 
-const openModal = (editMode: boolean) => {
-  isEditing.value = editMode;
-  openApplicationModal.value = true;
-};
-const openParticipantDetail = (row: any) => {
-  console.log('Abriendo detalle del participante:', row);
-  openParticipantModal.value = true;
-};
+
   </script>
   

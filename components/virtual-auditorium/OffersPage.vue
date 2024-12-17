@@ -90,16 +90,36 @@ socket.on('offerUpdated', (newOffer: OfferListItem) => {
   }
 })
 
+const isMobile = ref(false)
+
+const checkIfMobile = () => {
+  isMobile.value = window.innerWidth < 1280 
+}
+window.addEventListener('resize', checkIfMobile)
+checkIfMobile() 
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkIfMobile)
+})
+
 const isModalOpen = ref(false)
 
 const openModal = () => {
-  isModalOpen.value = true
+  if (isMobile.value) {
+    isModalOpen.value = true
+  }
 }
 
 const closeModal = () => {
   isModalOpen.value = false
 }
-/**/
+
+const openDetails = (offer: OfferListItem) => {
+  selectedOffer.value = offer 
+  if (isMobile.value) {
+    isModalOpen.value = true 
+  }
+}
 </script>
 
 <template>
@@ -128,21 +148,11 @@ const closeModal = () => {
             </SelectItem>
           </SelectContent>
         </Select>
-        <!-- Botón para abrir el modal OfferDetailItem móvil -->
-        <Button
-          variant="default"
-          class="hidden xl:hidden px-4 py-2"
-          @click="openModal"
-        >
-          Ver detalle
-        </Button>
       </div>
       <OfferList
         :offer-list="offerList"
         @on-select-offer="
-          (value) => {
-            selectedOffer = value
-          }
+          openDetails
         "
       />
       <CustomPagination
@@ -153,7 +163,7 @@ const closeModal = () => {
       />
     </div>
     <OfferDetailsItem
-      v-if="selectedOffer"
+      v-if="selectedOffer && !isMobile"
       class="hidden xl:block w-full max-w-[350px]"
       :offer="selectedOffer"
       :on-place-bid="onPlaceBid"
@@ -161,8 +171,12 @@ const closeModal = () => {
     />
 
     <!-- Modal OfferDetailItem móvil -->
-    <AlertDialog :open="isModalOpen" class="z-[30]" @update:open="closeModal">
-      <AlertDialogContent class="z-[98] max-w-[400px] px-0 py-4">
+    <AlertDialog
+      :open="isModalOpen"
+      class="z-[30] xl:hidden"
+      @update:open="closeModal"
+    >
+      <AlertDialogContent class="z-[98] max-w-[400px] px-0 py-4  overflow-y-auto max-h-[calc(100vh-80px)] custom-scrollbar">
         <AlertDialogHeader
           class="flex flex-row justify-between items-center border-b border-primary"
         >

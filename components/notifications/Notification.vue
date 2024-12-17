@@ -84,7 +84,7 @@
                     Confirm Archive
                   </DialogTitle>
                   <DialogDescription class="mt-2 text-sm text-gray-500">
-                    Are you sure you want to archive all notifications?
+                    ¿Estás seguro de que deseas archivar todas las notificaciones?
                   </DialogDescription>
                 </DialogHeader>
                 <div class="mt-4 flex justify-end space-x-2">
@@ -93,13 +93,13 @@
                     class="px-4 py-2 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                     @click="showConfirmationDialog = false"
                   >
-                    Cancel
+                    Cancelar
                   </Button>
                   <Button
                     class="px-4 py-2 text-sm font-medium text-white bg-[#54c9dd] hover:bg-[#06B6D4] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#54c9dd]"
-                    @click="confirmArchive"
+                    @click="confirmArchive()"
                   >
-                    Confirm
+                    Confirmar
                   </Button>
                 </div>
               </DialogContent>
@@ -208,8 +208,6 @@ const notificationCreatedListener =
   listenDomainEvents<NotificationCreatedDomainEvent>(
     domainEvents.notificationCreated,
   )
-
-// const { play, sound } = useSound(notificationSound)
 
 const handleButtonClick = () => {
   if (isAdmin.value) {

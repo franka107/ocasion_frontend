@@ -23,22 +23,17 @@
   </template>
   <script setup lang="ts">
   import CustomTable from '~/components/ui/custom-table/CustomTable.vue'
-  import CustomChip from '~/components/ui/custom-chip/CustomChip.vue'
-  import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue'
   import CustomPagination from '~/components/ui/custom-pagination/CustomPagination.vue'
-  import type { OrganizationItem } from '~/types/Order.ts'
+  import ContentLayout from '~/layouts/default/ContentLayout.vue'
+  import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
+  import AccountDetails from '~/components/reports/account-balance/AccountDetails.vue'
+  import { useAccountBalance } from '@/composables/useAccountBalance'
+  import type { IAccountBalanceItem } from '~/types/AccountBalance'
+  import type { IDataResponse } from '~/types/Common'
   import {
     balanceHeader,
     balanceSearch,
   } from '~/constants/reports'
-  import ContentLayout from '~/layouts/default/ContentLayout.vue'
-  import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
-  import { ref } from 'vue'
-  import AccountDetails from '~/components/reports/account-balance/AccountDetails.vue'
-  import { useAccountBalance } from '@/composables/useAccountBalance'
-  import type { IAccountBalanceItem } from '~/types/AccountBalance'
-  const openApplicationModal = ref(false);
-  const openParticipantModal = ref(false);
   const {
     page,
     onSort,
@@ -47,17 +42,15 @@
     sortOptions,
   } = useAccountBalance()
   const BASE_WALL_URL = '/finance/wallet-management'
-  const { data, refresh }: any = await useAPI(
-    `${BASE_WALL_URL}/view-wallets-paginated`,
-    {
-      query: {
-        limit: 8,
-        page,
-        filterOptions,
-        sortOptions,
-      },
-    } as any,
-  )
+  const { data, refresh } = await useAPI<IDataResponse<IAccountBalanceItem>>(() => `${BASE_WALL_URL}/view-wallets-paginated`, {
+  query: {
+    limit: 8,
+    page,
+    filterOptions,
+    sortOptions,
+  },
+} as any)
+
   const balanceData = computed(() =>
     data.value?.data.map((item: IAccountBalanceItem) => ({
       fullName: item.user.commonName,

@@ -82,7 +82,7 @@ const offerImage = offer.value.attachedFiles[0].path
         <div class="h-24">
           <img
             :src="offerImage"
-            alt="Imagen del auto"
+            alt="Imagen"
             class="w-full h-full object-cover rounded-md"
           />
         </div>

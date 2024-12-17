@@ -163,13 +163,13 @@ import { IuseRecharge } from '@/composables/useRecharge'
 import { useTopUpRequests } from '~/composables/useTopUpRequests'
 import { useAPI } from '~/composables/useAPI'
 import type { IRecharge } from '~/types/Recharge'
+import type { IDataResponse } from '~/types/Common'
 // Variables de estado para los modales
 const openDetailModal = ref(false)
 const openEditModal = ref(false)
 const openParticipantModal = ref(false)
 const openJuridicModal = ref(false)
 const openRejectModal = ref(false)
-const openAnnulModal = ref(false) 
 const rechargeId = ref<number | undefined>(undefined)
 const rejectDetails = ref(null)
 
@@ -185,11 +185,6 @@ const selectedRejectInfo = ref<any>({
   rejection: null,
   comment: null,
 })
-
-const openModalEditRequest = (rowId: number) => {
-  rechargeId.value = rowId
-  openEditModal.value = true
-}
 
 const openParticipantDetail = (row: any) => {
   rechargeId.value = row.participantId;
@@ -217,17 +212,14 @@ const {
 } = useTopUpRequests()
 const { autorizationRecharge, updateRecharge  } = IuseRecharge()
 const BASE_RECHAR_URL = '/finance/recharge-request-management'
-const { data, refresh: refreshRecharTable }: any = await useAPI(
-  `${BASE_RECHAR_URL}/view-paginated-recharge-requests`,
-  {
-    query: {
-      limit: 8,
-      page,
-      filterOptions,
-      sortOptions,
-    },
-  } as any,
-)
+const { data, refresh: refreshRecharTable } = await useAPI<IDataResponse<IRecharge>>(() => `${BASE_RECHAR_URL}/view-paginated-recharge-requests`, {
+  query: {
+    limit: 8,
+    page,
+    filterOptions,
+    sortOptions,
+  },
+} as any)
 
 const rechargeData = computed(() =>
   data.value?.data.map((item: IRecharge) => ({

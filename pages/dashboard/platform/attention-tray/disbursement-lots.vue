@@ -133,6 +133,7 @@
  import { useDisbursement } from '@/composables/useDisbursement'
  import DisbursementDetailsForm from '~/components/attention-tray/disbursement-lots/DisbursementDetailsForm.vue'
  import type { DisbursementLot } from '~/types/Disbursement'
+ import type { IDataResponse } from '~/types/Common'
  const openParticipantModal = ref(false); 
  const {
    page,
@@ -164,17 +165,14 @@ const openWithdrawalDetails = (row: any) => {
   }
  const { openConfirmModal, updateConfirmModal } = useConfirmModal()
  const BASE_DIS_URL = '/finance/disbursement-management'
- const { data, refresh }: any = await useAPI(
-   `${BASE_DIS_URL}/view-paginated-disbursement-lots`,
-   {
-     query: {
-       limit: 8,
-       page,
-       filterOptions,
-       sortOptions,
-     },
-   } as any,
- )
+ const { data, refresh } = await useAPI<IDataResponse<DisbursementLot>>(() => `${BASE_DIS_URL}/view-paginated-disbursement-lots`, {
+  query: {
+    limit: 8,
+    page,
+    filterOptions,
+    sortOptions,
+  },
+} as any)
  
  const disbursementData = computed(() =>
    data.value?.data.map((item: DisbursementLot) => ({   
