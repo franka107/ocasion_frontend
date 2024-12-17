@@ -251,64 +251,33 @@ const paymentsData = computed(() =>
   })),
 )
 
-const handleConfirmPropertyPayment = async () => {
-  openConfirmModal({
-    title: 'Confirmar sustento de pago de comisión',
-    message: `¿Está seguro de que deseas confirmar este abono?`,
-    callback: async () => {
-      try {
-        // const { paymentId } = values;
-        const { status } = await confirmPropertyPayment({
-          paymentId: paymentId.value,
-        })
-        if (status.value === 'success') {
-          refresh()
-          resetMultipleSelect.value?.()
-          updateConfirmModal({
-            title: 'Abono confirmado',
-            message: 'El abono ha sido confirmado exitosamente',
-            type: 'success',
-          })
-        } else {
-          throw new Error('Error al confirmar este abono')
-        }
-      } catch (error) {
-        console.log('error', error)
-        updateConfirmModal({
-          title: 'Error al confirmar Abono',
-          message: 'No se pudo confirmar Abono. Por favor, intente nuevamente.',
-          type: 'error',
-        })
-      }
-    },
-  })
-}
-
 const handleConfirmComissionPayment = async () => {
   // console.log(paymentId)
   openConfirmModal({
     title: 'Confirmar sustento de pago de comisión',
     message: `¿Está seguro de que deseas confirmar este abono?`,
     callback: async () => {
-      try {
-        // const { paymentId } = values;
-        const { status } = await confirmPayment({ paymentId: paymentId.value })
-        if (status.value === 'success') {
-          refresh()
-          resetMultipleSelect.value?.()
-          updateConfirmModal({
-            title: 'Abono confirmado',
-            message: 'El abono ha sido confirmado exitosamente',
-            type: 'success',
-          })
-        } else {
-          throw new Error('Error al confirmar este abono')
-        }
-      } catch (error) {
+      // const { paymentId } = values;
+      const { status, error } = await confirmPayment({
+        paymentId: paymentId.value,
+      })
+      if (status.value === 'success') {
+        refresh()
+        resetMultipleSelect.value?.()
+        updateConfirmModal({
+          title: 'Abono confirmado',
+          message: 'El abono ha sido confirmado exitosamente',
+          type: 'success',
+        })
+      } else {
         console.log('error', error)
+        const eMsg =
+          error?.value?.data?.errors?.[0]?.message ||
+          error?.value?.data?.message ||
+          'No se pudo confirmar Abono. Por favor, intente nuevamente.'
         updateConfirmModal({
           title: 'Error al confirmar Abono',
-          message: 'No se pudo confirmar Abono. Por favor, intente nuevamente.',
+          message: eMsg,
           type: 'error',
         })
       }
