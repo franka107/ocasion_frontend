@@ -62,7 +62,7 @@ const offerImage = offer.value.attachedFiles[0].path
       <!-- Información de la tarjeta -->
       <div class="px-2 py-2">
         <div class="h-24">
-          <img :src="offerImage" alt="Imagen del auto" class="w-full h-full object-cover rounded-md" />
+          <img :src="offerImage" alt="Imagen" class="w-full h-full object-cover rounded-md" />
         </div>
         <p class="text-[#152A3C] text-[12px] font-[700] my-3 leading-2">
           N°{{ offer.id }}
