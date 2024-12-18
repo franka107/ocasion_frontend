@@ -270,7 +270,6 @@ const handleConfirmComissionPayment = async () => {
           type: 'success',
         })
       } else {
-        console.log('error', error)
         const eMsg =
           error?.value?.data?.errors?.[0]?.message ||
           error?.value?.data?.message ||
