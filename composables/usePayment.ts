@@ -37,7 +37,7 @@ export function usePaymentAPI() {
 
   const confirmPropertyPayment = async (values: { paymentId: string }) => {
     const { status, error }: any = await useAPI(
-      `${BASE_PAY_URL}/confirm-comission-payment`,
+      `${BASE_PAY_URL}/confirm-property-payment`,
       {
         method: 'POST',
         body: values,

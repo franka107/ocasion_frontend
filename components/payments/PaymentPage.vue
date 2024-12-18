@@ -19,7 +19,7 @@
                 variant="ghost"
                 size="icon"
                 class="flex items-center justify-center rounded-full"
-                @click="handleCompostComissionPaymentFile(row)"
+                @click="handleCompostPropertyPaymentFile(row)"
               >
                 <CustomIcons
                   :name="
@@ -64,45 +64,45 @@
                       <CustomIcons name="VerticalDots" class="w-6 h-6" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="start"
-                    class="bg-primary text-white"
-                  >
-                    <div
-                      v-if="
-                        myGrants.data.value.includes(
-                          GrantId.OrganizationPaymentCanObserve,
-                        )
-                      "
-                    >
-                      <DropdownMenuItem
-                        @click="
-                          () => {
-                            paymentId = row.id
-                            openModalObservePayment = true
-                          }
-                        "
-                      >
-                        Observar abono
-                        <CustomIcons name="EyeIcon" class="ml-auto" />
-                      </DropdownMenuItem>
-                    </div>
-                    <DropdownMenuSeparator />
-                    <div
-                      v-if="
-                        myGrants.data.value.includes(
-                          GrantId.OrganizationPaymentCanConfirm,
-                        )
-                      "
-                    >
-                      <DropdownMenuItem
-                        @click="handleConfirmComissionPayment(row.id)"
-                      >
-                        Confirmar abono
-                        <CustomIcons name="ArrowLeft" class="ml-auto" />
-                      </DropdownMenuItem>
-                    </div>
-                  </DropdownMenuContent>
+                  <!-- <DropdownMenuContent -->
+                  <!--   align="start" -->
+                  <!--   class="bg-primary text-white" -->
+                  <!-- > -->
+                  <!--   <div -->
+                  <!--     v-if=" -->
+                  <!--       myGrants.data.value.includes( -->
+                  <!--         GrantId.OrganizationPaymentCanObserve, -->
+                  <!--       ) -->
+                  <!--     " -->
+                  <!--   > -->
+                  <!--     <DropdownMenuItem -->
+                  <!--       @click=" -->
+                  <!--         () => { -->
+                  <!--           paymentId = row.id -->
+                  <!--           openModalObservePayment = true -->
+                  <!--         } -->
+                  <!--       " -->
+                  <!--     > -->
+                  <!--       Observar abono -->
+                  <!--       <CustomIcons name="EyeIcon" class="ml-auto" /> -->
+                  <!--     </DropdownMenuItem> -->
+                  <!--   </div> -->
+                  <!--   <DropdownMenuSeparator /> -->
+                  <!--   <div -->
+                  <!--     v-if=" -->
+                  <!--       myGrants.data.value.includes( -->
+                  <!--         GrantId.OrganizationPaymentCanConfirm, -->
+                  <!--       ) -->
+                  <!--     " -->
+                  <!--   > -->
+                  <!--     <DropdownMenuItem -->
+                  <!--       @click="handleConfirmComissionPayment(row.id)" -->
+                  <!--     > -->
+                  <!--       Confirmar abono -->
+                  <!--       <CustomIcons name="ArrowLeft" class="ml-auto" /> -->
+                  <!--     </DropdownMenuItem> -->
+                  <!--   </div> -->
+                  <!-- </DropdownMenuContent> -->
                 </DropdownMenu>
               </div>
             </template>
@@ -123,6 +123,19 @@
               :id="paymentId || ''"
               :on-observe="onObserveComissionButtonPressed"
               :on-confirm="handleConfirmComissionPayment"
+              :close-modal="() => (openModalObservePayment = false)"
+            />
+          </SheetContent>
+          <SheetContent
+            v-model:open="openCompostPropertyPaymentFileSheet"
+            class="flex flex-col h-full"
+            @pointer-down-outside="(e) => e.preventDefault()"
+            @interact-outside="(e) => e.preventDefault()"
+          >
+            <ComposePropertyPaymentFileForm
+              :id="paymentId || ''"
+              :on-observe="onObserveComissionButtonPressed"
+              :on-confirm="handleConfirmPropertyPayment"
               :close-modal="() => (openModalObservePayment = false)"
             />
           </SheetContent>
@@ -151,6 +164,7 @@
 </template>
 <script setup lang="ts">
 import ComposeComissionPaymentFileForm from './ComposeComissionPaymentFileForm.vue'
+import ComposePropertyPaymentFileForm from './ComposePropertyPaymentFileForm.vue'
 import CustomTable from '@/components/ui/custom-table/CustomTable.vue'
 import CustomChip from '@/components/ui/custom-chip/CustomChip.vue'
 import CustomPagination from '@/components/ui/custom-pagination/CustomPagination.vue'
@@ -226,10 +240,16 @@ const { data, refresh }: any = await useAPI(
   true,
 )
 const openCompostComissionPaymentFileSheet = ref(false)
+const openCompostPropertyPaymentFileSheet = ref(false)
 
 const handleCompostComissionPaymentFile = (row: any) => {
   paymentId.value = row.id
   openCompostComissionPaymentFileSheet.value = true
+}
+
+const handleCompostPropertyPaymentFile = (row: any) => {
+  paymentId.value = row.id
+  openCompostPropertyPaymentFileSheet.value = true
 }
 
 const onObserveComissionButtonPressed = (row: any) => {
@@ -259,6 +279,39 @@ const handleConfirmComissionPayment = async () => {
     callback: async () => {
       // const { paymentId } = values;
       const { status, error } = await confirmPayment({
+        paymentId: paymentId.value,
+      })
+      if (status.value === 'success') {
+        refresh()
+        resetMultipleSelect.value?.()
+        updateConfirmModal({
+          title: 'Abono confirmado',
+          message: 'El abono ha sido confirmado exitosamente',
+          type: 'success',
+        })
+      } else {
+        const eMsg =
+          error?.value?.data?.errors?.[0]?.message ||
+          error?.value?.data?.message ||
+          'No se pudo confirmar Abono. Por favor, intente nuevamente.'
+        updateConfirmModal({
+          title: 'Error al confirmar Abono',
+          message: eMsg,
+          type: 'error',
+        })
+      }
+    },
+  })
+}
+
+const handleConfirmPropertyPayment = async () => {
+  // console.log(paymentId)
+  openConfirmModal({
+    title: 'Confirmar sustento de pago de propiedad',
+    message: `¿Está seguro de que deseas confirmar este abono?`,
+    callback: async () => {
+      // const { paymentId } = values;
+      const { status, error } = await confirmPropertyPayment({
         paymentId: paymentId.value,
       })
       if (status.value === 'success') {
