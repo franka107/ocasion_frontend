@@ -269,7 +269,6 @@ const handleAuthorize = async (values: any) => {
       if (status.value === 'success') {
         openEditModal.value = false
         refresh()
-
         updateConfirmModal({
           title: 'Retiro autorizada',
           message: 'Se ha autorizado el retiro',
