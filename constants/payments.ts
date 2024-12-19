@@ -61,6 +61,11 @@ export const paymentsHeader = (viewType: ViewType): HeaderItem[] => [
           label: 'Sustento pago de comisión',
           sortable: false,
         },
+        {
+          key: 'compostPropertyPaymentFile',
+          label: 'Sustento pago de propiedad',
+          sortable: false,
+        },
       ]
     : []),
 
@@ -79,14 +84,45 @@ export const paymentsHeader = (viewType: ViewType): HeaderItem[] => [
     label: 'Fecha de envio',
     sortable: true,
   },
-  {
-    key: 'propertyAmount',
-    label: 'Monto de sustento',
-    sortable: true,
-  },
+  ...(viewType === 'platform'
+    ? [
+        {
+          key: 'comissionAmount',
+          label: 'Monto de comisión',
+          sortable: true,
+        },
+        {
+          key: 'propertyAmount',
+          label: 'Monto de propiedad',
+          sortable: true,
+        },
+      ]
+    : []),
+
+  ...(viewType === 'organization'
+    ? [
+        {
+          key: 'propertyAmount',
+          label: 'Monto de propiedad',
+          sortable: true,
+        },
+      ]
+    : []),
+
+  // {
+  //   key: 'compostPropertyPaymentStatus',
+  //   label: 'Estado de sustento de pago (propiedad)',
+  //   sortable: true,
+  // },
+  //
+  // {
+  //   key: 'compostComissionPaymentStatus',
+  //   label: 'Estado de sustento de pago (comisión)',
+  //   sortable: true,
+  // },
   {
     key: 'status',
-    label: 'Estado abono',
+    label: 'Estado general de abono',
     sortable: true,
   },
   {

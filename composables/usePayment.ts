@@ -8,12 +8,27 @@ export function usePaymentAPI() {
   const onSort = (sortObject: { [key: string]: string }[]) => {
     sortOptions.value = JSON.stringify(sortObject)
   }
-  const observePayment = async (values: {
+  const observeComissionPayment = async (values: {
     paymentId: string
     reason: string
   }) => {
     const { status, error }: any = await useAPI(
-      `${BASE_PAY_URL}/observe-payment`,
+      `${BASE_PAY_URL}/observe-comission-payment`,
+      {
+        method: 'POST',
+        body: values,
+      } as any,
+    )
+
+    return { status, error }
+  }
+
+  const observePropertyPayment = async (values: {
+    paymentId: string
+    reason: string
+  }) => {
+    const { status, error }: any = await useAPI(
+      `${BASE_PAY_URL}/observe-comission-payment`,
       {
         method: 'POST',
         body: values,
@@ -60,9 +75,10 @@ export function usePaymentAPI() {
   }
 
   return {
-    confirmPayment: confirmComissionPayment,
+    confirmComissionPayment,
     confirmPropertyPayment,
-    observePayment,
+    observeComissionPayment,
+    observePropertyPayment,
     sortOptions,
     page,
     onSort,

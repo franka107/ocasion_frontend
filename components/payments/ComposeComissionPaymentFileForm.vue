@@ -143,17 +143,18 @@ const handleCommissionVoucherChange = (files: File[]) => {
       <div class="flex flex-row space-x-4 p-6">
         <Button
           variant="default"
+          as="div"
           :disabled="!form.meta.value.valid"
-          onclick="onObserve()"
-          class="w-full bg-yellow-500"
+          class="w-full bg-yellow-500 cursor-pointer"
+          @click="onObserve"
         >
           Observar abono
         </Button>
         <Button
           variant="default"
           :disabled="!form.meta.value.valid"
-          onclick="onConfirm()"
           class="w-full"
+          @click="onConfirm"
         >
           Confirmar abono
         </Button>
