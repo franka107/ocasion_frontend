@@ -96,14 +96,59 @@
                     <div
                       v-if="
                         myGrants.data.value.includes(
-                          GrantId.OrganizationPaymentCanConfirm,
+                          GrantId.OrganizationPaymentPropertyCanConfirm,
                         )
                       "
                     >
                       <DropdownMenuItem
-                        @click="handleConfirmComissionPayment(row.id)"
+                        @click="
+                          () => {
+                            paymentId = row.id
+                            handleConfirmPropertyPayment()
+                          }
+                        "
                       >
-                        Confirmar abono
+                        Confirmar abono de propiedad
+                        <CustomIcons name="ArrowLeft" class="ml-auto" />
+                      </DropdownMenuItem>
+                    </div>
+
+                    <div
+                      v-if="
+                        myGrants.data.value.includes(
+                          GrantId.PlatformPaymentComissionCanObserve,
+                        )
+                      "
+                    >
+                      <DropdownMenuItem
+                        @click="
+                          () => {
+                            paymentId = row.id
+                            openModalObserveComissionPayment = true
+                          }
+                        "
+                      >
+                        Observar abono de comisión
+                        <CustomIcons name="EyeIcon" class="ml-auto" />
+                      </DropdownMenuItem>
+                    </div>
+                    <DropdownMenuSeparator />
+                    <div
+                      v-if="
+                        myGrants.data.value.includes(
+                          GrantId.PlatformPaymentComissionCanConfirm,
+                        )
+                      "
+                    >
+                      <DropdownMenuItem
+                        @click="
+                          () => {
+                            paymentId = row.id
+                            handleConfirmComissionPayment()
+                          }
+                        "
+                      >
+                        Confirmar abono de comisión
                         <CustomIcons name="ArrowLeft" class="ml-auto" />
                       </DropdownMenuItem>
                     </div>

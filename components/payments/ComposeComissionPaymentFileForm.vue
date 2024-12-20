@@ -148,7 +148,6 @@ const handleCommissionVoucherChange = (files: File[]) => {
             <h2 class="mt-4 font-bold uppercase text-gray-500 text-sm">
               Última observación
             </h2>
-
             <Textarea
               type="text"
               label="Descripción"
