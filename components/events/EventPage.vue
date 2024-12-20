@@ -48,6 +48,16 @@
               eventTimes.get(String(row.closingTime))
             }}</span>
           </template>
+          <template #id="{ row }">
+            <NuxtLink
+              class="text-[#09314F] hover:decoration-[#09314F] hover:decoration-2 hover:underline font-medium cursor-pointer"
+              :to="props.organizationId
+                ? `/dashboard/organization/${props.organizationId}/events/${row.id}`
+                : `/dashboard/platform/events/${row.id}`"
+            >
+              {{ row.id }}
+            </NuxtLink>
+          </template>
           <template #actions="{ row }">
             <div class="flex justify-center">
               <DropdownMenu>

@@ -11,6 +11,12 @@ export interface Notification {
   tag: NotificationTag
   isRead: boolean
   createdAt: string
+  messageDetail?: string
+  metadata?: {
+    type: string
+    offerId?: string
+    offerTitle?: string
+  }
 }
 
 export const NotiificationStringMap = {
