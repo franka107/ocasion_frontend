@@ -144,6 +144,19 @@ const handleCommissionVoucherChange = (files: File[]) => {
               <FormMessage />
             </FormItem>
           </FormField>
+          <div v-if="data.compostComissionPaymentObservationMotive">
+            <h2 class="mt-4 font-bold uppercase text-gray-500 text-sm">
+              Última observación
+            </h2>
+
+            <Textarea
+              type="text"
+              label="Descripción"
+              :readonly="true"
+              class="mt-6"
+              :default-value="data.compostComissionPaymentObservationMotive"
+            />
+          </div>
           <h2 class="mt-4 font-bold uppercase text-gray-500 text-sm">
             Detalle de participante
           </h2>
