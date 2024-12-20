@@ -46,26 +46,24 @@ const onSubmit = form.handleSubmit(async (values) => {
   props.onConfirm(values)
 })
 
-if (props.id) {
-  const { data } = await useAPI<any>(`payment-management/view-payment-detail`, {
-    method: 'GET',
-    query: {
-      id: props.id,
-    },
-  } as any)
-  if (data.value) {
-    form.setValues({
-      ...data.value,
-      // compostPropertyPaymentFiles: data.value.compostPropertyPaymentFile
-      //   ? [data.value.compostPropertyPaymentFile]
-      //   : [],
-      compostComissionPaymentFiles: data.value.compostComissionPaymentFile
-        ? [data.value.compostComissionPaymentFile]
-        : [],
-      // transferedAt: dayjs(data.value.transferedAt).format('YYYY-MM-DD'),
-      // attachedFiles: data.value.sustentationFile ? [data.value.sustentationFile] : [],
-    })
-  }
+const { data } = await useAPI<any>(`payment-management/view-payment-detail`, {
+  method: 'GET',
+  query: {
+    id: props.id,
+  },
+} as any)
+if (data.value) {
+  form.setValues({
+    ...data.value,
+    // compostPropertyPaymentFiles: data.value.compostPropertyPaymentFile
+    //   ? [data.value.compostPropertyPaymentFile]
+    //   : [],
+    compostComissionPaymentFiles: data.value.compostComissionPaymentFile
+      ? [data.value.compostComissionPaymentFile]
+      : [],
+    // transferedAt: dayjs(data.value.transferedAt).format('YYYY-MM-DD'),
+    // attachedFiles: data.value.sustentationFile ? [data.value.sustentationFile] : [],
+  })
 }
 
 // const handlePaymentVoucherChange = (files: File[]) => {

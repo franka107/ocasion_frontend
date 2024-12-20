@@ -69,45 +69,45 @@
                       <CustomIcons name="VerticalDots" class="w-6 h-6" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <!-- <DropdownMenuContent -->
-                  <!--   align="start" -->
-                  <!--   class="bg-primary text-white" -->
-                  <!-- > -->
-                  <!--   <div -->
-                  <!--     v-if=" -->
-                  <!--       myGrants.data.value.includes( -->
-                  <!--         GrantId.OrganizationPaymentCanObserve, -->
-                  <!--       ) -->
-                  <!--     " -->
-                  <!--   > -->
-                  <!--     <DropdownMenuItem -->
-                  <!--       @click=" -->
-                  <!--         () => { -->
-                  <!--           paymentId = row.id -->
-                  <!--           openModalObservePayment = true -->
-                  <!--         } -->
-                  <!--       " -->
-                  <!--     > -->
-                  <!--       Observar abono -->
-                  <!--       <CustomIcons name="EyeIcon" class="ml-auto" /> -->
-                  <!--     </DropdownMenuItem> -->
-                  <!--   </div> -->
-                  <!--   <DropdownMenuSeparator /> -->
-                  <!--   <div -->
-                  <!--     v-if=" -->
-                  <!--       myGrants.data.value.includes( -->
-                  <!--         GrantId.OrganizationPaymentCanConfirm, -->
-                  <!--       ) -->
-                  <!--     " -->
-                  <!--   > -->
-                  <!--     <DropdownMenuItem -->
-                  <!--       @click="handleConfirmComissionPayment(row.id)" -->
-                  <!--     > -->
-                  <!--       Confirmar abono -->
-                  <!--       <CustomIcons name="ArrowLeft" class="ml-auto" /> -->
-                  <!--     </DropdownMenuItem> -->
-                  <!--   </div> -->
-                  <!-- </DropdownMenuContent> -->
+                  <DropdownMenuContent
+                    align="start"
+                    class="bg-primary text-white"
+                  >
+                    <div
+                      v-if="
+                        myGrants.data.value.includes(
+                          GrantId.OrganizationPaymentPropertyCanObserve,
+                        )
+                      "
+                    >
+                      <DropdownMenuItem
+                        @click="
+                          () => {
+                            paymentId = row.id
+                            openModalObservePropertyPayment = true
+                          }
+                        "
+                      >
+                        Observar abono de propiedad
+                        <CustomIcons name="EyeIcon" class="ml-auto" />
+                      </DropdownMenuItem>
+                    </div>
+                    <DropdownMenuSeparator />
+                    <div
+                      v-if="
+                        myGrants.data.value.includes(
+                          GrantId.OrganizationPaymentCanConfirm,
+                        )
+                      "
+                    >
+                      <DropdownMenuItem
+                        @click="handleConfirmComissionPayment(row.id)"
+                      >
+                        Confirmar abono
+                        <CustomIcons name="ArrowLeft" class="ml-auto" />
+                      </DropdownMenuItem>
+                    </div>
+                  </DropdownMenuContent>
                 </DropdownMenu>
               </div>
             </template>
