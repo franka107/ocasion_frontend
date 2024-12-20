@@ -3,14 +3,19 @@ import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
 import { X } from 'lucide-vue-next'
+import ParticipantDetailFields from '../attention-tray/withdrawal-requests/ParticipantDetailFields.vue'
 import { SheetClose } from '@/components/ui/sheet'
 import InputFile from '@/components/common/file/Input.vue'
+import { GrantId } from '~/types/Grant'
 
 const props = defineProps<{
   onConfirm: (values: any) => void
   onObserve: (values: any) => void
   id: string
 }>()
+
+const { getMyGrants } = useAuthManagement()
+const myGrants = await getMyGrants()
 
 const formSchema = toTypedSchema(
   z.object({
@@ -119,6 +124,9 @@ const handleCommissionVoucherChange = (files: File[]) => {
           <!--     Adjuntar voucher pago de comisión -->
           <!--   </h2> -->
           <!-- </div> -->
+          <h2 class="mb-4 font-bold uppercase text-gray-500 text-sm">
+            Voucher de pago de comisión
+          </h2>
           <FormField
             v-slot="{ componentField }"
             name="compostComissionPaymentFiles"
@@ -138,10 +146,19 @@ const handleCommissionVoucherChange = (files: File[]) => {
               <FormMessage />
             </FormItem>
           </FormField>
+          <h2 class="mt-4 font-bold uppercase text-gray-500 text-sm">
+            Detalle de participante
+          </h2>
+          <ParticipantDetailFields :participant-id="data.user.id" />
         </div>
       </section>
       <div class="flex flex-row space-x-4 p-6">
         <Button
+          v-if="
+            myGrants.data.value.includes(
+              GrantId.PlatformPaymentComissionCanObserve,
+            )
+          "
           variant="default"
           as="div"
           :disabled="!form.meta.value.valid"
@@ -151,12 +168,17 @@ const handleCommissionVoucherChange = (files: File[]) => {
           Observar abono
         </Button>
         <Button
+          v-if="
+            myGrants.data.value.includes(
+              GrantId.PlatformPaymentComissionCanConfirm,
+            )
+          "
           variant="default"
           :disabled="!form.meta.value.valid"
           class="w-full"
           @click="onConfirm"
         >
-          Confirmar abono
+          Confirmar sustento
         </Button>
       </div>
     </form>

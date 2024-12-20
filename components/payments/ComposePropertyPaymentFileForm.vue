@@ -3,8 +3,11 @@ import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
 import { X } from 'lucide-vue-next'
+import ParticipantDetailFields from '../attention-tray/withdrawal-requests/ParticipantDetailFields.vue'
 import { SheetClose } from '@/components/ui/sheet'
 import InputFile from '@/components/common/file/Input.vue'
+import ParticipantDetailEditForm from '~/components/attention-tray/withdrawal-requests/ParticipantDetailEditForm.vue'
+import { GrantId } from '~/types/Grant'
 
 const props = defineProps<{
   onConfirm: (values: any) => void
@@ -12,12 +15,11 @@ const props = defineProps<{
   id: string
 }>()
 
+const { getMyGrants } = useAuthManagement()
+const myGrants = await getMyGrants()
+
 const formSchema = toTypedSchema(
   z.object({
-    // compostPropertyPaymentFiles: z
-    //   .array(z.any())
-    //   .min(1, 'Debe subir al menos un archivo')
-    //   .max(1, 'Puede subir solo un archivo para el voucher de pago del bien'),
     compostPropertyPaymentFiles: z
       .array(z.any())
       .min(1, 'Debe subir al menos un archivo')
@@ -41,26 +43,24 @@ const onSubmit = form.handleSubmit(async (values) => {
   props.onConfirm(values)
 })
 
-if (props.id) {
-  const { data } = await useAPI<any>(`payment-management/view-payment-detail`, {
-    method: 'GET',
-    query: {
-      id: props.id,
-    },
-  } as any)
-  if (data.value) {
-    form.setValues({
-      ...data.value,
-      // compostPropertyPaymentFiles: data.value.compostPropertyPaymentFile
-      //   ? [data.value.compostPropertyPaymentFile]
-      //   : [],
-      compostPropertyPaymentFiles: data.value.compostPropertyPaymentFile
-        ? [data.value.compostPropertyPaymentFile]
-        : [],
-      // transferedAt: dayjs(data.value.transferedAt).format('YYYY-MM-DD'),
-      // attachedFiles: data.value.sustentationFile ? [data.value.sustentationFile] : [],
-    })
-  }
+const { data } = await useAPI<any>(`payment-management/view-payment-detail`, {
+  method: 'GET',
+  query: {
+    id: props.id,
+  },
+} as any)
+if (data.value) {
+  form.setValues({
+    ...data.value,
+    // compostPropertyPaymentFiles: data.value.compostPropertyPaymentFile
+    //   ? [data.value.compostPropertyPaymentFile]
+    //   : [],
+    compostPropertyPaymentFiles: data.value.compostPropertyPaymentFile
+      ? [data.value.compostPropertyPaymentFile]
+      : [],
+    // transferedAt: dayjs(data.value.transferedAt).format('YYYY-MM-DD'),
+    // attachedFiles: data.value.sustentationFile ? [data.value.sustentationFile] : [],
+  })
 }
 
 // const handlePaymentVoucherChange = (files: File[]) => {
@@ -119,6 +119,9 @@ const handlePropertyVoucherChange = (files: File[]) => {
           <!--     Adjuntar voucher pago de comisión -->
           <!--   </h2> -->
           <!-- </div> -->
+          <h2 class="mb-4 font-bold uppercase text-gray-500 text-sm">
+            Voucher de pago de propiedad
+          </h2>
           <FormField
             v-slot="{ componentField }"
             name="compostPropertyPaymentFiles"
@@ -138,10 +141,19 @@ const handlePropertyVoucherChange = (files: File[]) => {
               <FormMessage />
             </FormItem>
           </FormField>
+          <h2 class="mt-4 font-bold uppercase text-gray-500 text-sm">
+            Detalle de participante
+          </h2>
+          <ParticipantDetailFields :participant-id="data.user.id" />
         </div>
       </section>
       <div class="flex flex-row space-x-4 p-6">
         <Button
+          v-if="
+            myGrants.data.value.includes(
+              GrantId.OrganizationPaymentPropertyCanObserve,
+            )
+          "
           variant="default"
           :disabled="!form.meta.value.valid"
           onclick="onObserve()"
@@ -150,12 +162,17 @@ const handlePropertyVoucherChange = (files: File[]) => {
           Observar abono
         </Button>
         <Button
+          v-if="
+            myGrants.data.value.includes(
+              GrantId.OrganizationPaymentPropertyCanConfirm,
+            )
+          "
           variant="default"
           :disabled="!form.meta.value.valid"
           onclick="onConfirm()"
           class="w-full"
         >
-          Confirmar abono
+          Confirmar sustento
         </Button>
       </div>
     </form>
