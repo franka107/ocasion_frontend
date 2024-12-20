@@ -1,4 +1,4 @@
-import type { IEventLItem } from '~/types/Event'
+import type { EventDto } from '~/types/Event'
 
 const EVENT_BASE_URL = '/event-management'
 // by convention, composable function names start with "use"
@@ -32,7 +32,7 @@ export function useEvent() {
   }
 
   const getEvent = async (id: number | string) => {
-    const { status, error, data, refresh } = await useAPI<IEventLItem>(
+    const { status, error, data, refresh } = await useAPI<EventDto>(
       `${EVENT_BASE_URL}/get-event-detail`,
       {
         method: 'GET',
@@ -78,4 +78,3 @@ export function useEvent() {
     publishEvent,
   }
 }
-

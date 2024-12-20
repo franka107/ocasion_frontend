@@ -177,12 +177,12 @@ export const offerHeader: HeaderItem[] = [
   {
     key: 'attachedFiles',
     label: 'Fotos',
-    sortable: true,
+    sortable: false,
   },
   {
     key: 'addressCity',
     label: 'Ubicación',
-    sortable: true,
+    sortable: false,
   },
   {
     key: 'appraisal',

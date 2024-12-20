@@ -1,6 +1,6 @@
 import type { UserDto } from './Administrators'
 import type { BidDto } from './Bids'
-import type { IEventLItem } from './Event'
+import type { EventDto } from './Event'
 import type { Organization } from '~/models/organizations'
 
 export enum OfferStatus {
@@ -37,7 +37,7 @@ export interface OfferListItem {
   bids: Bid[]
   bidHistories: BidHistory[]
   annexesFiles: AnnexesFile[]
-  event?: IEventLItem
+  event?: EventDto
   attachedFiles: AttachedFile[]
   status: OfferStatus
   endTime?: string
@@ -85,7 +85,7 @@ export interface OfferDto {
   endTime?: string
   createdAt: string
   updatedAt: string
-  event?: IEventLItem
+  event?: EventDto
   organization: Organization
   bids: BidDto[]
   organizationId: string

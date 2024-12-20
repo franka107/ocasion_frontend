@@ -191,11 +191,7 @@ import {
   eventTimes,
   eventStatusRecord,
 } from '~/constants/events'
-import type {
-  EventStatus,
-  IEventLItem,
-  IOrganizationSummary,
-} from '@/types/Event'
+import type { EventStatus, EventDto, IOrganizationSummary } from '@/types/Event'
 import type { IDataResponse } from '@/types/Common'
 import EventForm from '@/components/events/EventForm.vue'
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
@@ -249,17 +245,14 @@ const onSearch = (item: { [key: string]: string }) => {
 }
 const BASE_ORG_URL = '/event-management'
 const [eventListData, organizationSummaryData] = await Promise.all([
-  useAPI<IDataResponse<IEventLItem[]>>(
-    `${BASE_ORG_URL}/find-events-paginated`,
-    {
-      query: {
-        limit: 6,
-        page,
-        filterOptions,
-        sortOptions,
-      },
-    } as any,
-  ),
+  useAPI<IDataResponse<EventDto[]>>(`${BASE_ORG_URL}/find-events-paginated`, {
+    query: {
+      limit: 6,
+      page,
+      filterOptions,
+      sortOptions,
+    },
+  } as any),
   useAPI<IOrganizationSummary>(
     `${BASE_ORG_URL}/get-events-summary`,
     {} as any,

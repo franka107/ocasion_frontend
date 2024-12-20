@@ -25,7 +25,7 @@ import {
 import Textarea from '../ui/textarea/Textarea.vue'
 import type { Item } from '../ui/custom-select/CustomSelect.vue'
 import { eventType, goodType, eventTimes } from '@/constants/events'
-import type { IEventLItem } from '@/types/Event'
+import type { EventDto } from '@/types/Event'
 import InputFile from '@/components/common/file/Input.vue'
 const EVENT_BASE_URL = '/event-management'
 let form: any

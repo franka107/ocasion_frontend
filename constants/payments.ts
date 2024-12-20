@@ -45,6 +45,11 @@ export const paymentsHeader = (viewType: ViewType): HeaderItem[] => [
     label: 'Evento',
     sortable: true,
   },
+  {
+    key: 'bid',
+    label: 'Puja',
+    sortable: false,
+  },
   ...(viewType === 'platform'
     ? [
         {

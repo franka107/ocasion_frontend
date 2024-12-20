@@ -1,6 +1,30 @@
-export interface IEventLItem {
+import type { FileType } from './Disbursement'
+import type { OrganizationDto } from './Organization'
+
+export enum EventType {
+  HandOver = 'HAND_OVER', // Puesta en mano
+  Auction = 'AUCTION', // Subasta
+}
+
+export enum EventStatus {
+  Created = 'CREATED', // Creado
+  InDebate = 'IN_DEBATE', // En debate
+  ReadyToPublish = 'READY_TO_PUBLISH', // Listo para publicar
+  Published = 'PUBLISHED', // Publicado
+  InProgress = 'IN_PROGRESS', // Publicado
+  Cancelled = 'CANCELLED', // Cancelado
+  Finished = 'FINISHED', // Finalizado
+  Completed = 'COMPLETED', // Completado
+}
+
+interface GoodFile {
   id: string
-  organization: Organization
+  path: string
+}
+
+export interface EventDto {
+  id: string
+  organization: OrganizationDto
   createdAt: string
   updatedAt: string
   name: string
@@ -11,24 +35,8 @@ export interface IEventLItem {
   endDate: string
   closingTime: number
   goodFiles: GoodFile[]
-  termsAndConditionsFiles: TermsAndConditionsFile[]
+  termsAndConditionsFiles: FileType[]
   status: EventStatus
-}
-
-interface Organization {
-  id: string
-  name: string
-}
-
-interface GoodFile {
-  id: string
-  path: string
-}
-
-interface TermsAndConditionsFile {
-  id: string
-  name: string
-  path: string
 }
 
 export interface IOrganizationSummary {
@@ -51,19 +59,4 @@ interface Status {
 interface Goal {
   amountRaised: number
   goalAmount: number
-}
-
-export enum EventType {
-  HandOver = 'HAND_OVER', // Puesta en mano
-  Auction = 'AUCTION', // Subasta
-}
-export enum EventStatus {
-  Created = 'CREATED', // Creado
-  InDebate = 'IN_DEBATE', // En debate
-  ReadyToPublish = 'READY_TO_PUBLISH', // Listo para publicar
-  Published = 'PUBLISHED', // Publicado
-  InProgress = 'IN_PROGRESS', // Publicado
-  Cancelled = 'CANCELLED', // Cancelado
-  Finished = 'FINISHED', // Finalizado
-  Completed = 'COMPLETED', // Completado
 }

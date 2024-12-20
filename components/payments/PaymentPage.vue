@@ -17,6 +17,14 @@
             @on-sort="onSort"
             @on-search="onSearch"
           >
+            <template #bid="{ row }">
+              <div
+                class="w-10 h-10 flex items-center justify-center rounded-full bg-[#0B38590A]"
+                @click="openBidDetail(row as PaymentDto)"
+              >
+                <CustomIcons class="cursor-pointer" name="Clip" />
+              </div>
+            </template>
             <template #compostPropertyPaymentFile="{ row }">
               <Button
                 variant="ghost"
@@ -163,6 +171,12 @@
               ></CustomChip>
             </template>
           </CustomTable>
+
+          <BidModal
+            v-if="selectedBid"
+            v-model:is-open="isBidModalOpen"
+            :bid="selectedBid"
+          />
           <SheetContent
             v-model:open="openCompostComissionPaymentFileSheet"
             class="flex flex-col h-full"
@@ -225,6 +239,7 @@
   </section>
 </template>
 <script setup lang="ts">
+import BidModal from '../bid/BidModal.vue'
 import ComposeComissionPaymentFileForm from './ComposeComissionPaymentFileForm.vue'
 import ComposePropertyPaymentFileForm from './ComposePropertyPaymentFileForm.vue'
 import ObserveComissionPaymentForm from './ObserveComissionPaymentForm.vue'
@@ -232,7 +247,7 @@ import ObservePropertyPaymentForm from './ObservePropertyPaymentForm.vue'
 import CustomTable from '@/components/ui/custom-table/CustomTable.vue'
 import CustomChip from '@/components/ui/custom-chip/CustomChip.vue'
 import CustomPagination from '@/components/ui/custom-pagination/CustomPagination.vue'
-import type { IPaymentsLItem } from '@/types/Payment.ts'
+import type { PaymentDto } from '@/types/Payment.ts'
 import {
   paymentsHeader,
   paymentStatus,
@@ -242,6 +257,7 @@ import ContentLayout from '~/layouts/default/ContentLayout.vue'
 import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
 import { GrantId } from '~/types/Grant'
 import { compostPaymentStatus } from '~/constants/evidenceOrg'
+import type { BidDto } from '~/types/Bids'
 const props = defineProps<{
   type: 'organization' | 'platform'
   organizationId: string | null
@@ -297,6 +313,15 @@ const onSearch = (item: { [key: string]: string }) => {
       : []),
   ])
 }
+
+const selectedBid = ref<BidDto | null>(null)
+const isBidModalOpen = ref(false)
+
+const openBidDetail = (row: PaymentDto) => {
+  selectedBid.value = row.bid
+  isBidModalOpen.value = true
+}
+
 const { data, refresh }: any = await useAPI(
   `${BASE_PAY_URL}/view-payments-paginated-for-organization`,
   {
@@ -333,7 +358,7 @@ const onObservePropertyButtonPressed = (row: any) => {
 }
 
 const paymentsData = computed(() =>
-  data.value.data.map((item: IPaymentsLItem, index: number) => ({
+  data.value.data.map((item: PaymentDto, index: number) => ({
     date: new Date(item.createdAt).toLocaleString('es-ES', {
       day: '2-digit',
       month: '2-digit',

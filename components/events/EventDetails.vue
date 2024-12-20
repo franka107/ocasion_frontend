@@ -96,7 +96,7 @@
 import FakeInput from '../auth/FakeInput.vue'
 import InputWithLabel from '~/components/auth/inputWithLabel.vue'
 import InputFile from '@/components/common/file/Input.vue'
-import type { EventStatus, IEventLItem } from '@/types/Event'
+import type { EventStatus, EventDto } from '@/types/Event'
 import {
   eventType,
   goodType,
@@ -107,6 +107,6 @@ import {
 
 const { params } = useRoute()
 const router = useRouter()
-const props = defineProps<{ eventDetail: IEventLItem }>()
+const props = defineProps<{ eventDetail: EventDto }>()
 const { eventDetail } = toRefs(props)
 </script>
