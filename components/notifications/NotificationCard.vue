@@ -19,7 +19,7 @@
         </p>
         <div
           v-if="showDetail && notification.messageDetail"
-          class="text-sm text-[#20445E] pt-4 pb-2 "
+          class=" w-[720px] text-sm text-[#20445E] pt-4 pb-2 pl-4 bg-[#FAFBFC] rounded-lg"
         >
           <div class="max-w-3xl">
             {{ htmlToText(notification.messageDetail) }}
