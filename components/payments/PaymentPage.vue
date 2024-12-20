@@ -281,7 +281,11 @@ const disableMultipleSelect = computed(
 const onSearch = (item: { [key: string]: string }) => {
   filterOptions.value = JSON.stringify([
     { field: 'status', type: 'equal', value: item.status || '' },
-    { field: 'organization.name', type: 'like', value: item.organization },
+    {
+      field: 'quickSearch',
+      type: 'equal',
+      value: item.quickSearch || '',
+    },
     ...(props.organizationId
       ? [
           {

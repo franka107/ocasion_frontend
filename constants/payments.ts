@@ -13,10 +13,10 @@ export const paymentStatus = new Map<string, { name: string; color: string }>([
 ])
 export const paymentsSearch: SearchItem[] = [
   {
-    key: 'organization',
+    key: 'quickSearch',
     type: 'text',
-    placeholder: 'Buscar organización',
-    elementClass: 'min-w-[400px]',
+    placeholder: 'Buscar por Org/ Cód. Oferta',
+    elementClass: 'min-w-[500px]',
     position: 1,
   },
   {
