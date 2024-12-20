@@ -408,7 +408,7 @@ const handlePropertyObserve = async (values: any) => {
         openModalObserveComissionPayment.value = false
         refresh()
         updateConfirmModal({
-          title: 'Abono de comisión',
+          title: 'Abono de propiedad',
           message: 'El abono de propiedad ha sido actualizado exitosamente',
           type: 'success',
         })

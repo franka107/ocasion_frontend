@@ -28,7 +28,7 @@ export function usePaymentAPI() {
     reason: string
   }) => {
     const { status, error }: any = await useAPI(
-      `${BASE_PAY_URL}/observe-comission-payment`,
+      `${BASE_PAY_URL}/observe-property-payment`,
       {
         method: 'POST',
         body: values,

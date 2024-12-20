@@ -156,9 +156,9 @@ const handlePropertyVoucherChange = (files: File[]) => {
           "
           variant="default"
           :disabled="!form.meta.value.valid"
-          onclick="onObserve()"
           as="div"
           class="w-full bg-yellow-500 cursor-pointer"
+          @click="onObserve"
         >
           Observar abono
         </Button>
