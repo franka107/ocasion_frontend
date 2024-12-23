@@ -118,7 +118,6 @@ import {
   type Notification,
 } from '~/types/Notification'
 import { htmlToText } from '~/utils/htmlUtils'
-import { onClickOutside } from '@vueuse/core'
 
 const props = defineProps<{
   notification: Notification
@@ -201,19 +200,8 @@ const toggleDetail = (event: Event) => {
 
 const closeAllMenus = () => {
   isOpen.value = false
-  showDetail.value = false
+  // showDetail.value = false
 }
-
-// Modificamos el onClickOutside para excluir el botón
-onClickOutside(showDetail, (event) => {
-  const target = event.target as HTMLElement
-  const button = buttonRef.value as HTMLElement
-
-  // No cerrar si el click fue en el botón
-  if (button && !button.contains(target)) {
-    showDetail.value = false
-  }
-}, { ignore: [buttonRef] })
 </script>
 
 <style scoped>

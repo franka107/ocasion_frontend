@@ -50,7 +50,7 @@
           </template>
           <template #id="{ row }">
             <NuxtLink
-              class="text-[#09314F] hover:decoration-[#09314F] hover:decoration-2 hover:underline font-medium cursor-pointer"
+              class="text-[#0000EE] hover:text-[#0000CD] hover:decoration-[#0000EE] hover:decoration-2 hover:underline font-medium cursor-pointer"
               :to="props.organizationId
                 ? `/dashboard/organization/${props.organizationId}/events/${row.id}`
                 : `/dashboard/platform/events/${row.id}`"
