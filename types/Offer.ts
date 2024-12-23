@@ -1,6 +1,6 @@
 import type { UserDto } from './Administrators'
 import type { BidDto } from './Bids'
-import type { IEventLItem } from './Event'
+import type { EventDto } from './Event'
 import type { Organization } from '~/models/organizations'
 
 export enum OfferStatus {
@@ -11,16 +11,17 @@ export enum OfferStatus {
   InProgress = 'IN_PROGRESS', // En curso
   Cancelled = 'CANCELLED', // Cancelado
   InReview = 'IN_REVIEW', // En revision
-  Rejected = 'REJECTED', // Rechazado
   InDepositReview = 'IN_DEPOSIT_REVIEW', // Rechazado
   PendingDeposit = 'PENDING_DEPOSIT', // Abono pendiente
   ObservedDeposit = 'OBSERVED_DEPOSIT', // Abono observado
   ConfirmedDeposit = 'CONFIRMED_DEPOSIT', // Deposito confirmado
   InTransferOfGood = 'IN_TRANSFER_OF_GOOD', // En transferencia de bienes
+  DebatedBid = 'DEBATED_BID', // Puja debatida PSD-63
   Delivered = 'DELIVERED', // Enviado
   Concreted = 'CONCRETED', // Concreatedo
   // -----------------
   PendingOfDelivery = 'PENDING_OF_DELIVERY', // Pendiente de entrega
+  Rejected = 'REJECTED', // Rechazado
 }
 
 export interface OfferListItem {
@@ -36,7 +37,7 @@ export interface OfferListItem {
   bids: Bid[]
   bidHistories: BidHistory[]
   annexesFiles: AnnexesFile[]
-  event?: IEventLItem
+  event?: EventDto
   attachedFiles: AttachedFile[]
   status: OfferStatus
   endTime?: string
@@ -84,7 +85,7 @@ export interface OfferDto {
   endTime?: string
   createdAt: string
   updatedAt: string
-  event?: IEventLItem
+  event?: EventDto
   organization: Organization
   bids: BidDto[]
   organizationId: string

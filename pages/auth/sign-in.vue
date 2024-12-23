@@ -142,7 +142,7 @@ const handleSignIn = async (values: any) => {
     const eMsg =
       error.value.data?.errors?.[0].message ||
       error.value.data.message ||
-      'No se puedo continuar con el proceso de registro. \nTe recomendamos intentarlo nuevamente.'
+      'No se pudo continuar con el proceso de registro. \nTe recomendamos intentarlo nuevamente.'
     errorDialogMessage.value = eMsg
     isErrorDialogOpen.value = true
   }

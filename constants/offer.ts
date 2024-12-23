@@ -43,11 +43,7 @@ export const offerStatusRecord: Record<
     color: 'orange',
     flowPosition: 7,
   },
-  [OfferStatus.Rejected]: {
-    name: 'Rechazado',
-    color: 'red',
-    flowPosition: 8,
-  },
+
   [OfferStatus.InDepositReview]: {
     name: 'En revisión de depósito',
     color: 'red',
@@ -87,6 +83,16 @@ export const offerStatusRecord: Record<
     name: 'Contretado',
     color: 'green',
     flowPosition: 16,
+  },
+  [OfferStatus.DebatedBid]: {
+    name: 'Puja debatida',
+    color: 'green',
+    flowPosition: 17,
+  },
+  [OfferStatus.Rejected]: {
+    name: 'Rechazado',
+    color: 'red',
+    flowPosition: 18,
   },
 }
 export enum ComparisonOperator {
@@ -171,12 +177,12 @@ export const offerHeader: HeaderItem[] = [
   {
     key: 'attachedFiles',
     label: 'Fotos',
-    sortable: true,
+    sortable: false,
   },
   {
     key: 'addressCity',
     label: 'Ubicación',
-    sortable: true,
+    sortable: false,
   },
   {
     key: 'appraisal',

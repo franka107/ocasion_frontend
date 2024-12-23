@@ -138,9 +138,9 @@
           </template>
           <template #status="{ row }">
             <CustomChip
-              :text="eventStatusRecord[row?.status as EventStatus].name || ''"
+              :text="eventStatusRecord[row?.status as EventStatus]?.name || ''"
               :variant="
-                eventStatusRecord[row?.status as EventStatus].color as any
+                eventStatusRecord[row?.status as EventStatus]?.color as any
               "
             ></CustomChip>
           </template>
@@ -201,11 +201,7 @@ import {
   eventTimes,
   eventStatusRecord,
 } from '~/constants/events'
-import type {
-  EventStatus,
-  IEventLItem,
-  IOrganizationSummary,
-} from '@/types/Event'
+import type { EventStatus, EventDto, IOrganizationSummary } from '@/types/Event'
 import type { IDataResponse } from '@/types/Common'
 import EventForm from '@/components/events/EventForm.vue'
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
@@ -231,7 +227,7 @@ const openCancelModal = ref(false)
 
 const onSearch = (item: { [key: string]: string }) => {
   filterOptions.value = JSON.stringify([
-    { field: 'name', type: 'like', value: item.name || '' },
+    { field: 'name', type: 'like', value: item?.name || '' },
     { field: 'status', type: 'equal', value: item.status || '' },
     {
       field: 'organization.name',
@@ -259,17 +255,14 @@ const onSearch = (item: { [key: string]: string }) => {
 }
 const BASE_ORG_URL = '/event-management'
 const [eventListData, organizationSummaryData] = await Promise.all([
-  useAPI<IDataResponse<IEventLItem[]>>(
-    `${BASE_ORG_URL}/find-events-paginated`,
-    {
-      query: {
-        limit: 6,
-        page,
-        filterOptions,
-        sortOptions,
-      },
-    } as any,
-  ),
+  useAPI<IDataResponse<EventDto[]>>(`${BASE_ORG_URL}/find-events-paginated`, {
+    query: {
+      limit: 6,
+      page,
+      filterOptions,
+      sortOptions,
+    },
+  } as any),
   useAPI<IOrganizationSummary>(
     `${BASE_ORG_URL}/get-events-summary`,
     {} as any,

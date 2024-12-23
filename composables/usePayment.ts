@@ -8,12 +8,12 @@ export function usePaymentAPI() {
   const onSort = (sortObject: { [key: string]: string }[]) => {
     sortOptions.value = JSON.stringify(sortObject)
   }
-  const observePayment = async (values: {
+  const observeComissionPayment = async (values: {
     paymentId: string
     reason: string
   }) => {
     const { status, error }: any = await useAPI(
-      `${BASE_PAY_URL}/observe-payment`,
+      `${BASE_PAY_URL}/observe-comission-payment`,
       {
         method: 'POST',
         body: values,
@@ -23,9 +23,36 @@ export function usePaymentAPI() {
     return { status, error }
   }
 
-  const confirmPayment = async (values: { paymentId: string }) => {
+  const observePropertyPayment = async (values: {
+    paymentId: string
+    reason: string
+  }) => {
     const { status, error }: any = await useAPI(
-      `${BASE_PAY_URL}/confirm-payment`,
+      `${BASE_PAY_URL}/observe-property-payment`,
+      {
+        method: 'POST',
+        body: values,
+      } as any,
+    )
+
+    return { status, error }
+  }
+
+  const confirmComissionPayment = async (values: { paymentId: string }) => {
+    const { status, error }: any = await useAPI(
+      `${BASE_PAY_URL}/confirm-comission-payment`,
+      {
+        method: 'POST',
+        body: values,
+      } as any,
+    )
+
+    return { status, error }
+  }
+
+  const confirmPropertyPayment = async (values: { paymentId: string }) => {
+    const { status, error }: any = await useAPI(
+      `${BASE_PAY_URL}/confirm-property-payment`,
       {
         method: 'POST',
         body: values,
@@ -48,8 +75,10 @@ export function usePaymentAPI() {
   }
 
   return {
-    confirmPayment,
-    observePayment,
+    confirmComissionPayment,
+    confirmPropertyPayment,
+    observeComissionPayment,
+    observePropertyPayment,
     sortOptions,
     page,
     onSort,

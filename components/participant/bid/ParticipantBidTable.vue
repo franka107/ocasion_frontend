@@ -99,7 +99,9 @@
           @interact-outside="(e) => e.preventDefault()"
         >
           <UploadPaymentSupport
+            v-if="currentOrganization && paymentId"
             :id="paymentId"
+            :organization="currentOrganization"
             :on-submit="handleUploadCompostSupportFiles"
           />
         </SheetContent>
@@ -139,6 +141,7 @@ import { GrantId } from '~/types/Grant'
 import GoodsTransferForm from '~/components/participant/bid/GoodsTransferForm.vue'
 import UploadPaymentSupport from '~/components/participant/bid/UploadPaymentSupport.vue'
 import CounterOfferInboundModal from '~/components/bid/CounterOfferInboundModal.vue'
+import type { OrganizationDto } from '~/types/Organization'
 const selectedId = ref('') // Define el id que necesitas pasar
 const selectedPersonStatus = ref<'single' | 'married' | 'legal'>('legal')
 const openTransferModal = ref(false)
@@ -153,6 +156,7 @@ const paymentId = ref<string | null>(null)
 const handleCompostSupportFiles = (row: any) => {
   bidId.value = row.id
   paymentId.value = row.payment?.id
+  currentOrganization.value = row.offer.organization
   // openTransferModal.value = false
   openUploadModal.value = true
 }
@@ -189,6 +193,7 @@ const onSearch = (item: { [key: string]: string }) => {
     { field: 'status', type: 'equal', value: item.status || '' },
   ])
 }
+const currentOrganization = ref<OrganizationDto | null>(null)
 const { data, refresh }: any = await useAPI(
   `${BID_BASE_URL}/find-bids-paginated-for-participant`,
   {

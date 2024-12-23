@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { toast } from '../ui/toast'
 import { Button } from '@/components/ui/button'
-import type { IDataResponse } from '~/types/Common';
-import { toast } from '../ui/toast';
+import type { IDataResponse } from '~/types/Common'
 const props = withDefaults(
   defineProps<{
     modelValue: boolean
@@ -29,31 +29,40 @@ const successSubmit = ref(false)
 const title = ref('Separación de garantía')
 const icon = ref('CurencyOutline')
 
-const { data, status }= await useAPI<{amountToBeSeparated: number, availableBalance: number, remainingBalance: number}>(
-    `/auction-management/subscribe-to-offer-preview/?eventId=${props.eventId}`,
-    { method: 'POST' } as any)
-    console.log("data", data, status);
-    
-if (status.value !== 'success') {
-  toast({
-    title: 'Problema en el servidor',
-    description: 'intentelo mas tarde',
-    variant: 'default',
-    class: 'border-red',
-  })
-}
+const { data, status } = await useAPI<{
+  amountToBeSeparated: number
+  availableBalance: number
+  remainingBalance: number
+}>(`/auction-management/subscribe-to-offer-preview/?eventId=${props.eventId}`, {
+  method: 'GET',
+} as any)
+console.log('data', data, status)
+
+// if (status.value !== 'success') {
+//   toast({
+//     title: 'Problema en el servidor',
+//     description: 'intentelo mas tarde',
+//     variant: 'default',
+//     class: 'border-red',
+//   })
+// }
 
 const onSubmit = async () => {
   try {
-    const { data, status }= await useAPI<{ pseudonym: string }>(
-    `/auction-management/subscribe-to-offer/?eventId=${props.eventId}`,
-    { method: 'POST' } as any)
-    console.log("data", data, status);
-      
+    const { data, status, error } = await useAPI<{ pseudonym: string }>(
+      `/auction-management/subscribe-to-offer/?eventId=${props.eventId}`,
+      { method: 'POST' } as any,
+    )
+    console.log('data', data, status)
+
     if (status.value !== 'success') {
+      const eMsg =
+        error.value?.data?.errors?.[0].message ||
+        error.value?.data?.message ||
+        'No se pudo continuar con la puja. \nTe recomendamos intentarlo nuevamente.'
       toast({
-        title: 'Problema en el servidor',
-        description: 'intentelo mas tarde',
+        title: 'Problema en la puja',
+        description: eMsg,
         variant: 'default',
         class: 'border-red',
       })
@@ -64,7 +73,7 @@ const onSubmit = async () => {
     title.value = 'Separación confirmada'
     icon.value = 'AccountOutline'
   } catch (error) {
-    console.error("error", error)
+    console.error('error', error)
   }
 }
 const resetForm = () => {

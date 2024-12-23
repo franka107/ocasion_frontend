@@ -97,7 +97,7 @@
       icon-alt="Icono de alerta"
       title="Error"
       description="Ocurrio un error al crear la contraseña."
-      sub-description="El enlace es incorrecto o ha expirado."
+      sub-description="El enlace es incorrecto, ya fue usado o ha expirado."
       button-text="Aceptar"
       icon-bg-color="bg-[#ff0000]"
       @close="closeErrorDialog"

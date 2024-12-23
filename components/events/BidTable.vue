@@ -65,14 +65,16 @@
                   class="bg-primary text-white"
                 >
                   <DropdownMenuItem
-                    v-if="
-                      myGrants.data.value.includes(
-                        GrantId.OrganizationBidCanCounterOffer,
-                      ) &&
-                      offerStatusCheckPosition(
-                        row.offer.status,
-                        OfferStatus.Concreted,
-                        ComparisonOperator.Less,
+                    :disabled="
+                      !(
+                        myGrants.data.value.includes(
+                          GrantId.OrganizationBidCanCounterOffer,
+                        ) &&
+                        offerStatusCheckPosition(
+                          row.offer.status,
+                          OfferStatus.Concreted,
+                          ComparisonOperator.Less,
+                        )
                       )
                     "
                     @click="
@@ -126,10 +128,10 @@
           @pointer-down-outside="(e) => e.preventDefault()"
           @interact-outside="(e) => e.preventDefault()"
         >
-          <BidHistoryForm
-            :bids-id="bidsId"
-            :bid-id="appraisalHistoryModal.offerId"
-            :endpoint="findBidHistories"
+          <AuditableEventHistory
+            :filter-options="[
+              { field: `aggregateId`, type: `equal`, value: bidsId },
+            ]"
             title="Historial de pujas"
           />
         </SheetContent>
@@ -159,6 +161,7 @@ import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import BidHistoryForm from '../history/BidHistoryForm.vue'
 import CounterOfferOutbountBidModal from '../bid/CounterOfferOutbountBidModal.vue'
+import AuditableEventHistory from '../history/AuditableEventHistory.vue'
 import CustomIcons from '@/components/ui/custom-icons/CustomIcons.vue'
 import CustomPagination from '@/components/ui/custom-pagination/CustomPagination.vue'
 import { bidsHeader, bidsSearch, bidStatus } from '@/constants/bids'

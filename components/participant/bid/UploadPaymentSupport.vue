@@ -5,9 +5,11 @@ import * as z from 'zod'
 import { X } from 'lucide-vue-next'
 import { SheetClose } from '@/components/ui/sheet'
 import InputFile from '@/components/common/file/Input.vue'
+import type { OrganizationDto } from '~/types/Organization'
 
 const props = defineProps<{
   onSubmit: (values: any) => void
+  organization: OrganizationDto
   id: string
 }>()
 
@@ -95,13 +97,16 @@ const handleCommissionVoucherChange = (files: File[]) => {
             <ul class="text-[12px] md:text-[14px] tracking-[0.5px] font-[400]">
               <li>1. Confirmar la continuación del proceso</li>
               <li>
-                2. Realizar el abono a [Organización] por concepto de pago de
-                subasta
+                2. Realizar el abono a la organización
+                {{ organization.name }} por concepto de pago de subasta
               </li>
               <li>3. Realizar el abono por la comisión a DeOcasión</li>
               <li>4. Enviar los sustentos a las entidades correspondientes</li>
               <li>5. Firmar la documentación de transferencia de propiedad</li>
-              <li>6. Coordinar la entrega con la [Organización]</li>
+              <li>
+                6. Coordinar la entrega con la organización
+                {{ organization.name }}
+              </li>
             </ul>
           </div>
           <p class="text-[12px] tracking-[0.5px]">
@@ -128,6 +133,7 @@ const handleCommissionVoucherChange = (files: File[]) => {
                 <InputFile
                   v-model="form.values.compostPropertyPaymentFiles"
                   title="Arrastrar o abrir archivo"
+                  :accepted-file-types="['.jpg', '.png', '.jpeg', '.pdf']"
                   instructions-text="JPG, PNG, JPEG o PDF Tamaño máx 5MB"
                   :limit-files="1"
                   v-bind="componentField"
@@ -157,6 +163,7 @@ const handleCommissionVoucherChange = (files: File[]) => {
                 <InputFile
                   v-model="form.values.compostComissionPaymentFiles"
                   title="Arrastrar o abrir archivo"
+                  :accepted-file-types="['.jpg', '.png', '.jpeg', '.pdf']"
                   instructions-text="JPG, PNG, JPEG o PDF Tamaño máx 5MB"
                   :limit-files="1"
                   v-bind="componentField"

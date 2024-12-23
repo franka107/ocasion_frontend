@@ -1,22 +1,24 @@
 <script setup lang="ts">
 import { ref, computed, watch, toRefs } from 'vue'
+import type { Socket } from 'socket.io-client'
 import BidHistory from './BidHistory.vue'
 import type { OfferListItem } from '~/types/Offer'
 import { getRemainingTime } from '@/utils/countDown'
 import ConfirmBidDialog from '~/components/virtual-auditorium/ConfirmBidDialog.vue'
-import type { Socket } from 'socket.io-client'
 
 const props = defineProps<{
   offer: OfferListItem
   onPlaceBid: ({ offerId, amount }: { offerId: string; amount: number }) => void
   socket: Socket
-
 }>()
 
 const subscribeError = ref(false)
 props.socket.on('error', (data) => {
-  const ERROR_NOT_SUBSCRIBED = data.errors.find((error: { code: string }) => error.code === 'AUCTION_MANAGEMENT.USER_NOT_SUBSCRIBED')
-  if(ERROR_NOT_SUBSCRIBED){
+  const ERROR_NOT_SUBSCRIBED = data.errors.find(
+    (error: { code: string }) =>
+      error.code === 'AUCTION_MANAGEMENT.USER_NOT_SUBSCRIBED',
+  )
+  if (ERROR_NOT_SUBSCRIBED) {
     showModal.value = true
     subscribeError.value = true
   }
@@ -66,7 +68,7 @@ const offerNewBid = () => {
     onQuickAction,
     invalidBidAmount,
     onFocusInput,
-    isDisabledButton
+    isDisabledButton,
   }
 }
 const {
@@ -76,7 +78,7 @@ const {
   onQuickAction,
   onFocusInput,
   invalidBidAmount,
-  isDisabledButton
+  isDisabledButton,
 } = offerNewBid()
 
 const showModal = ref(false)
