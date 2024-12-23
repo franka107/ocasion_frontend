@@ -234,6 +234,30 @@
             :variant="offerStatusRecord[row.status]?.color as any"
           ></CustomChip>
         </template>
+        <template #number="{ row }">
+          <NuxtLink
+            :to="globalType === GlobalType.Platform
+              ? `/dashboard/platform/events/${route.params.eventId}/offers/${row.id}/bids`
+              : `/dashboard/organization/${route.params.organizationId}/events/${route.params.eventId}/offers/${row.id}/bids`"
+            class="flex items-center text-[#09314F] hover:text-[#20445E] hover:underline font-medium cursor-pointer"
+          >
+            {{ row.number }}
+            <CustomIcons
+              name="ArrowDown"
+              class="w-4 h-4 ml-1"
+            />
+          </NuxtLink>
+        </template>
+        <template #id="{ row }">
+          <NuxtLink
+            :to="globalType === GlobalType.Platform
+              ? `/dashboard/platform/events/${route.params.eventId}/offers/${row.id}/bids`
+              : `/dashboard/organization/${route.params.organizationId}/events/${route.params.eventId}/offers/${row.id}/bids`"
+            class="text-[#09314F] hover:text-[#09314F] hover:decoration-[#09314F] hover:decoration-2 hover:underline font-medium cursor-pointer"
+          >
+            {{ row.id }}
+          </NuxtLink>
+        </template>
       </CustomTable>
       <AttachmentsModal
         v-model:is-open="showAttachmentsModal"

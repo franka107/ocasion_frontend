@@ -17,6 +17,14 @@
         >
           {{ notification.message }}
         </p>
+        <div
+          v-if="showDetail && notification.messageDetail"
+          class=" w-[720px] text-sm text-[#20445E] pt-4 pb-2 pl-4 bg-[#FAFBFC] rounded-lg"
+        >
+          <div class="max-w-3xl">
+            {{ htmlToText(notification.messageDetail) }}
+          </div>
+        </div>
         <p
           class="font-normal text-sm leading-[20px] tracking-[0.25px] text-[#20445E] mt-1"
         >
@@ -42,16 +50,36 @@
           v-if="!notification.isRead"
           class="w-2 h-2 rounded-full bg-[#20445E] mr-2"
         ></div>
+        <button
+          ref="buttonRef"
+          v-if="notification.messageDetail"
+          class="w-5 h-5 flex items-center justify-center hover:bg-[#d1d7de] transition-colors duration-200 mr-2 border-2 border-[#d1d7de] rounded"
+          @click="toggleDetail"
+          title="Ver detalles"
+        >
+          <svg
+            class="w-4 h-4 transition-transform duration-200 text-[#09314F]"
+            :class="{ 'transform rotate-180': showDetail }"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M6 9L12 15L18 9"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+
         <button class="focus:outline-none" @click="toggleMenu">
           <img src="@/assets/icon/svg/Button.svg" class="w-5 h-5" />
           <span class="sr-only">Open menu</span>
         </button>
 
-        <!-- Menú desplegable -->
-        <div
-          v-if="isOpen"
-          class="absolute right-0 top-6 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50"
-        >
+        <div v-if="isOpen" class="absolute right-0 top-6 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
           <div class="py-1">
             <button
               class="w-full text-left px-4 py-2 text-sm text-[#20445E] hover:bg-gray-50 transition-colors duration-200"
@@ -69,7 +97,11 @@
         </div>
       </div>
     </div>
-    <div v-if="isOpen" class="fixed inset-0 z-40" @click="closeMenu"></div>
+    <div
+      v-if="isOpen"
+      class="fixed inset-0 z-40"
+      @click="closeAllMenus"
+    ></div>
   </div>
 </template>
 
@@ -85,6 +117,9 @@ import {
   NotificationTag,
   type Notification,
 } from '~/types/Notification'
+import { htmlToText } from '~/utils/htmlUtils'
+import { onClickOutside } from '@vueuse/core'
+
 const props = defineProps<{
   notification: Notification
   isSelected?: boolean
@@ -109,7 +144,7 @@ const toggleMenu = (event: Event) => {
 }
 
 const closeMenu = () => {
-  isOpen.value = false
+  closeAllMenus()
 }
 
 const toggleSelection = () => {
@@ -152,4 +187,35 @@ const NotificationColorMap = {
   [NotificationTag.Delivery]: 'bg-[#F0FDF4] text-[#16A34A]',
   [NotificationTag.Alert]: 'bg-[#FEF3C7] text-[#B45309]',
 }
+
+const showDetail = ref(false)
+const buttonRef = ref(null)
+
+const toggleDetail = (event: Event) => {
+  event.stopPropagation()
+  showDetail.value = !showDetail.value
+  if (showDetail.value) {
+    isOpen.value = false
+  }
+}
+
+const closeAllMenus = () => {
+  isOpen.value = false
+  showDetail.value = false
+}
+
+// Modificamos el onClickOutside para excluir el botón
+onClickOutside(showDetail, (event) => {
+  const target = event.target as HTMLElement
+  const button = buttonRef.value as HTMLElement
+
+  // No cerrar si el click fue en el botón
+  if (button && !button.contains(target)) {
+    showDetail.value = false
+  }
+}, { ignore: [buttonRef] })
 </script>
+
+<style scoped>
+/* Estilos existentes... */
+</style>
