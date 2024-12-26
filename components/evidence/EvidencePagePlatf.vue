@@ -22,7 +22,13 @@
               }
             "
           >
-            <template #SupportForDelivery="{ row }">
+            <!-- <template #paymentStatus="{ row }"> -->
+            <!--   <CustomChip -->
+            <!--     :text="paymentStatus.get(row.payment.status)?.name || ''" -->
+            <!--     :variant="paymentStatus.get(row.payment.status)?.color as any" -->
+            <!--   ></CustomChip> -->
+            <!-- </template> -->
+            <template #deliverySustentation="{ row }">
               <div
                 class="flex items-center justify-center"
                 :class="
@@ -32,7 +38,7 @@
                 "
                 @click="
                   () => {
-                    if (row.deliverySupport?.files.length)
+                    if (row.transferenceSustentation)
                       openDeliveryForTransferModal(row)
                   }
                 "
@@ -49,11 +55,35 @@
                 />
               </div>
             </template>
-            <template #status="{ row }">
-              <CustomChip
-                :text="evidencePlatfStatus.get(row.status)?.name || ''"
-                :variant="evidencePlatfStatus.get(row.status)?.color as any"
-              ></CustomChip>
+            <template #transferenceSustentation="{ row }">
+              <div
+                class="flex items-center justify-center"
+                :class="
+                  !row.deliverySupport?.files?.length
+                    ? 'cursor-not-allowed'
+                    : 'cursor-pointer'
+                "
+                @click="
+                  () => {
+                    if (row.transferenceSustentation)
+                      openDeliveryForTransferModal(row)
+                  }
+                "
+              >
+                <CustomIcons
+                  :name="
+                    deliverySupportIcons.get(row.deliverySupport?.status)
+                      ?.icon || 'Doc-Loupe'
+                  "
+                  :class="
+                    deliverySupportIcons.get(row.deliverySupport?.status)
+                      ?.class || 'text-[#AFAFB1]'
+                  "
+                />
+              </div>
+            </template>
+            <template #eventGoodType="{ row }">
+              {{ goodType.get(row.event.goodType) }}
             </template>
           </CustomTable>
           <SheetContent
@@ -85,7 +115,7 @@ import DeliveryForm from './DeliveryForm.vue'
 import CustomTable from '@/components/ui/custom-table/CustomTable.vue'
 import CustomChip from '@/components/ui/custom-chip/CustomChip.vue'
 import CustomPagination from '@/components/ui/custom-pagination/CustomPagination.vue'
-import type { EvidenseItem } from '@/types/Evidence.ts'
+import type { EvidenseItem, IDateModal } from '@/types/Evidence.ts'
 import {
   evidencePlatfStatus,
   evidencePlatfSearch,
@@ -95,7 +125,8 @@ import {
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
 import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
 import { GrantId } from '~/types/Grant'
-import type { IDateModal } from '~/types/Evidence'
+import { paymentStatus } from '~/constants/payments'
+import { goodType } from '~/constants/events'
 
 const filterOptions = ref('[]')
 const openModalDeliveryTransfer = ref(false)
@@ -129,13 +160,13 @@ const onSearch = (item: { [key: string]: string }) => {
 }
 
 const { data, refresh }: any = await useAPI(
-  `${OFFER_BASE_URL}/find-offers-paginated`,
+  `sustentation-management/view-sustentations-paginated`,
   {
     query: {
       limit: 10,
       page,
       filterOptions,
-      relations: JSON.stringify(['transferenceSupport', 'deliverySupport']),
+      // relations: JSON.stringify(['transferenceSupport', 'deliverySupport']),
       sortOptions,
     },
   } as any,
@@ -147,10 +178,11 @@ const evidenceData = computed(() =>
 )
 
 const openDeliveryForTransferModal = (row: any) => {
-  if (row.deliverySupport?.id) {
-    deliveryId.value = row.deliverySupport.id
-    openModalDeliveryTransfer.value = true
-  }
+  // if (row.deliverySupport?.id) {
+  // deliveryId.value = row.deliverySupport.id
+  deliveryId.value = 'proban'
+  openModalDeliveryTransfer.value = true
+  // }
 }
 
 const handleConfirmDelivery = async (value: { deliverySupportId: string }) => {

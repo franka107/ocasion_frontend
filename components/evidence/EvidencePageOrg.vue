@@ -126,7 +126,7 @@ import SupportForm from './SupportForm.vue'
 import CustomTable from '@/components/ui/custom-table/CustomTable.vue'
 import CustomChip from '@/components/ui/custom-chip/CustomChip.vue'
 import CustomPagination from '@/components/ui/custom-pagination/CustomPagination.vue'
-import type { EvidenseItem } from '@/types/Evidence.ts'
+import type { EvidenseItem, IDateModal } from '@/types/Evidence.ts'
 import {
   evidenceStatus,
   evidenceSearch,
@@ -137,7 +137,6 @@ import {
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
 import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
 import { GrantId } from '~/types/Grant'
-import type { IDateModal } from '~/types/Evidence'
 
 const props = defineProps<{ organizationId: string | null }>()
 const filterOptions = ref(
@@ -181,7 +180,7 @@ const onSearch = (item: { [key: string]: string }) => {
 }
 
 const { data, refresh }: any = await useAPI(
-  `${OFFER_BASE_URL}/find-offers-paginated`,
+  `susntentation-management/find-sustentations-paginated`,
   {
     query: {
       limit: 10,

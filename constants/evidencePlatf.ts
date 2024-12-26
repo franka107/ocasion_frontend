@@ -61,40 +61,67 @@ export const evidencePlatfSearch: SearchItem[] = [
   },
 ]
 
+// Título de oferta
+//
+// Descripción
+//
+// Categoría del bien
+//
+// Sub categoría del bien
+//
+// Estado
+//
+// Sustentos de Transferencia (Documentos cargados. Vista solo para
+// Organización
+// )
+//
+// Sustentos de Entrega (Documentos cargados. vista para
+// organización
+// y
+// plataforma
+// )
+
 export const evidencePlatfHeader: HeaderItem[] = [
   {
-    key: 'organization',
+    key: 'organization.name',
     label: 'Organización',
     sortable: true,
   },
   {
-    key: 'title',
+    key: 'offer.title',
     label: 'Titulo oferta',
-    sortable: true,
+    sortable: false,
   },
+
   {
-    key: 'description',
+    key: 'offer.description',
     label: 'Descripción',
-    sortable: true,
+    sortable: false,
   },
   {
-    key: 'Category of the good',
+    key: 'eventGoodType',
     sortable: true,
     label: 'Categoría del bien',
   },
+  // {
+  //  key: 'Subcategory of the good',
+  //  label: 'Sub Categoría del bien',
+  //  sortable: true,
+  // },
   {
-    key: 'Subcategory of the good',
-    label: 'Sub Categoría del bien',
-    sortable: true,
-  },
-  {
-    key: 'status',
+    key: 'paymentStatus',
     label: 'Estado abono',
     sortable: true,
   },
   {
-    key: 'SupportForDelivery',
-    label: 'S. de Entrega',
+    key: 'transferenceSustentation',
+    label: 'S. de transferencia',
+    align: 'center',
+    sortable: true,
+  },
+  {
+    key: 'deliverySustentation',
+    label: 'S. de entrega',
     align: 'center',
     sortable: true,
   },
