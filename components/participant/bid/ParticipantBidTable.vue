@@ -17,6 +17,34 @@
             }
           "
         >
+          <template #transferenceSustentation="{ row }">
+            <div v-if="row.sustentation" class="flex justify-center">
+              <Button
+                variant="ghost"
+                @click="
+                  () => {
+                    openTransferenceSustentationModal(row)
+                  }
+                "
+              >
+                <CustomIcons
+                  name="Doc-Transfer"
+                  class="w-6 h-6 text-reminder-600"
+                />
+              </Button>
+            </div>
+
+            <div v-else>
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled
+                class="text-[#a1a1a3] h-8 data-[state=open]:bg-accent"
+              >
+                <span>Sin información</span>
+              </Button>
+            </div>
+          </template>
           <template #documents="{ row }">
             <div v-if="row.payment" class="flex justify-center">
               <Button variant="ghost" @click="handleCompostSupportFiles(row)">
@@ -77,7 +105,24 @@
               :variant="bidStatus.get(row.status)?.color as any"
             ></CustomChip>
           </template>
+          <template #eventGoodType="{ row }">
+            {{ goodType.get(row.offer.event.goodType) }}
+          </template>
         </CustomTable>
+
+        <SheetContent
+          v-model:open="isTransferenceSustentationFormOpened"
+          class="flex flex-col h-full"
+          @pointer-down-outside="(e) => e.preventDefault()"
+          @interact-outside="(e) => e.preventDefault()"
+        >
+          <SupportForm
+            :id="transferenceSustentationId"
+            :on-confirm="() => {}"
+            :on-edit="() => {}"
+            :close-modal="() => (isTransferenceSustentationFormOpened = false)"
+          />
+        </SheetContent>
         <SheetContent
           v-model:open="openTransferModal"
           custom-width="510px"
@@ -142,6 +187,8 @@ import GoodsTransferForm from '~/components/participant/bid/GoodsTransferForm.vu
 import UploadPaymentSupport from '~/components/participant/bid/UploadPaymentSupport.vue'
 import CounterOfferInboundModal from '~/components/bid/CounterOfferInboundModal.vue'
 import type { OrganizationDto } from '~/types/Organization'
+import { goodType } from '~/constants/events'
+import SupportForm from '~/components/evidence/SupportForm.vue'
 const selectedId = ref('') // Define el id que necesitas pasar
 const selectedPersonStatus = ref<'single' | 'married' | 'legal'>('legal')
 const openTransferModal = ref(false)
@@ -159,6 +206,15 @@ const handleCompostSupportFiles = (row: any) => {
   currentOrganization.value = row.offer.organization
   // openTransferModal.value = false
   openUploadModal.value = true
+}
+
+const isTransferenceSustentationFormOpened = ref(false)
+const transferenceSustentationId = ref<string | undefined>(undefined)
+
+const openTransferenceSustentationModal = (row: any) => {
+  transferenceSustentationId.value =
+    row.sustentation.transferenceSustentation.id
+  isTransferenceSustentationFormOpened.value = true
 }
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const { rejectOfferBids, acceptOfferBids, page, sortOptions, onSort } =

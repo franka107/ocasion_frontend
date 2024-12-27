@@ -124,7 +124,7 @@ export const bidsParticipantHeader: HeaderItem[] = [
     label: 'Fec. cierre oferta',
   },
   {
-    key: 'type',
+    key: 'eventGoodType',
     label: 'Tipo de activo',
     sortable: true,
   },
@@ -150,9 +150,14 @@ export const bidsParticipantHeader: HeaderItem[] = [
     sortable: true,
   },
   {
+    key: 'transferenceSustentation',
+    label: 'D. Sustento de Transferencia',
+    sortable: false,
+  },
+  {
     key: 'documents',
-    label: 'Documentos',
-    sortable: true,
+    label: 'D. Sustento de abono',
+    sortable: false,
   },
   {
     key: 'actions',

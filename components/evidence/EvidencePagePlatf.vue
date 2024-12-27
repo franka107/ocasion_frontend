@@ -22,12 +22,12 @@
               }
             "
           >
-            <!-- <template #paymentStatus="{ row }"> -->
-            <!--   <CustomChip -->
-            <!--     :text="paymentStatus.get(row.payment.status)?.name || ''" -->
-            <!--     :variant="paymentStatus.get(row.payment.status)?.color as any" -->
-            <!--   ></CustomChip> -->
-            <!-- </template> -->
+            <template #paymentStatus="{ row }">
+              <CustomChip
+                :text="paymentStatus.get(row.payment.status)?.name || ''"
+                :variant="paymentStatus.get(row.payment.status)?.color as any"
+              ></CustomChip>
+            </template>
             <template #deliverySustentation="{ row }">
               <div
                 class="flex items-center justify-center"
@@ -65,8 +65,7 @@
                 "
                 @click="
                   () => {
-                    if (row.transferenceSustentation)
-                      openDeliveryForTransferModal(row)
+                    openTransferenceSustentationModal(row)
                   }
                 "
               >
@@ -92,11 +91,32 @@
             @pointer-down-outside="(e) => e.preventDefault()"
             @interact-outside="(e) => e.preventDefault()"
           >
-            <DeliveryForm
+            <!-- <DeliveryForm -->
+            <!--   :id="deliveryId" -->
+            <!--   :on-confirm="handleConfirmDelivery" -->
+            <!--   :on-edit="handleEditDelivery" -->
+            <!--   :close-modal="() => (openModalDeliveryTransfer = false)" -->
+            <!-- /> -->
+            <SupportForm
               :id="deliveryId"
               :on-confirm="handleConfirmDelivery"
               :on-edit="handleEditDelivery"
               :close-modal="() => (openModalDeliveryTransfer = false)"
+            />
+          </SheetContent>
+          <SheetContent
+            v-model:open="isTransferenceSustentationFormOpened"
+            class="flex flex-col h-full"
+            @pointer-down-outside="(e) => e.preventDefault()"
+            @interact-outside="(e) => e.preventDefault()"
+          >
+            <SupportForm
+              :id="transferenceSustentationId"
+              :on-confirm="handleConfirmDelivery"
+              :on-edit="handleEditDelivery"
+              :close-modal="
+                () => (isTransferenceSustentationFormOpened = false)
+              "
             />
           </SheetContent>
         </div>
@@ -112,6 +132,7 @@
 </template>
 <script setup lang="ts">
 import DeliveryForm from './DeliveryForm.vue'
+import SupportForm from './SupportForm.vue'
 import CustomTable from '@/components/ui/custom-table/CustomTable.vue'
 import CustomChip from '@/components/ui/custom-chip/CustomChip.vue'
 import CustomPagination from '@/components/ui/custom-pagination/CustomPagination.vue'
@@ -130,6 +151,7 @@ import { goodType } from '~/constants/events'
 
 const filterOptions = ref('[]')
 const openModalDeliveryTransfer = ref(false)
+const isTransferenceSustentationFormOpened = ref(false)
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const {
   confirmDeliverySupport,
@@ -141,6 +163,7 @@ const {
 const { getMyGrants } = useAuthManagement()
 const myGrants = await getMyGrants()
 const deliveryId = ref<string | undefined>(undefined)
+const transferenceSustentationId = ref<string | undefined>(undefined)
 const OFFER_BASE_URL = '/offer-management'
 const selectedMultipleData = ref<{ type: string; ids: string[] }>({
   type: 'empty',
@@ -183,6 +206,73 @@ const openDeliveryForTransferModal = (row: any) => {
   deliveryId.value = 'proban'
   openModalDeliveryTransfer.value = true
   // }
+}
+
+const openTransferenceSustentationModal = (row: any) => {
+  transferenceSustentationId.value = row.transferenceSustentation.id
+  isTransferenceSustentationFormOpened.value = true
+}
+
+const handleConfirmTransferenceSustentation = async (value: any) => {
+  openConfirmModal({
+    title: 'Confirmar Sustento de Entrega',
+    message: `¿Está seguro de que deseas confirmar este Sustento de Entrega?`,
+    callback: async () => {
+      try {
+        const { status } = await confirmDeliverySupport(value)
+        if (status.value === 'success') {
+          refresh()
+          resetMultipleSelect.value?.()
+          updateConfirmModal({
+            title: 'Sustento de Entrega confirmada',
+            message: 'Sustento de Entrega confirmado exitosamente',
+            type: 'success',
+          })
+          openModalDeliveryTransfer.value = false
+        } else {
+          throw new Error('Error al confirmar este Sustento de Entrega')
+        }
+      } catch (error) {
+        updateConfirmModal({
+          title: 'Error al confirmar Sustento de Entrega',
+          message:
+            'No se pudo confirmar Sustento de Entrega. Por favor, intente nuevamente.',
+          type: 'error',
+        })
+      }
+    },
+  })
+}
+
+const handleEditTransferenceSustentation = async (value: any) => {
+  openConfirmModal({
+    title: 'Confirmar Sustento de Entrega',
+    message: `¿Está seguro de que deseas confirmar este Sustento de Entrega?`,
+    callback: async () => {
+      try {
+        const { status } = await confirmDeliverySupport(value)
+        if (status.value === 'success') {
+          refresh()
+          resetMultipleSelect.value?.()
+          updateConfirmModal({
+            title: 'Sustento de Entrega confirmada',
+            message: 'Sustento de Entrega confirmado exitosamente',
+            type: 'success',
+          })
+          openModalDeliveryTransfer.value = false
+        } else {
+          throw new Error('Error al confirmar este Sustento de Entrega')
+        }
+      } catch (error) {
+        updateConfirmModal({
+          title: 'Error al confirmar Sustento de Entrega',
+          message:
+            'No se pudo confirmar Sustento de Entrega. Por favor, intente nuevamente.',
+          type: 'error',
+        })
+      }
+    },
+  })
 }
 
 const handleConfirmDelivery = async (value: { deliverySupportId: string }) => {

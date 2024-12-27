@@ -6,6 +6,8 @@ export interface UserDto {
   documentType: string
   documentIdentifier: string
   phoneNumber: string
+  personType: 'NATURAL_PERSON' | 'JURIDIC_PERSON'
+  maritalStatus?: 'SINGLE' | 'MARRIED' | 'WIDOWED' | 'DIVORCED' | null
   phoneCountryCode: string
   type: UserType
   createdAt: string
