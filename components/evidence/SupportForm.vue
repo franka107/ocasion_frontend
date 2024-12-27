@@ -11,6 +11,7 @@ import type {
   TransferenceSustentationDto,
   DeliveryDetailFile,
 } from '@/types/Evidence.ts'
+import { UserType } from '~/types/Administrators'
 const BASE_SUSTENTATION_MANAGEMENT = '/sustentation-management'
 const props = defineProps<{
   id: string | undefined
@@ -100,6 +101,8 @@ const onSubmit = async (values: any) => {
     props.onConfirm(formattedValues)
   }
 }
+
+const userSession = useUserSession()
 </script>
 
 <template>
@@ -116,7 +119,10 @@ const onSubmit = async (values: any) => {
     <form class="min-h-full" @submit.prevent="onSubmit">
       <section class="flex flex-col gap-4 flex-grow p-5 h-full">
         <div v-if="transferenceSustentationDetail">
-          <section class="">
+          <section
+            v-if="userSession.user.value?.user.type !== UserType.Participant"
+            class=""
+          >
             <h3
               class="tracking-[1px] font-[600] text-[#152A3C] text-[14px] leading-5"
             >
@@ -126,53 +132,6 @@ const onSubmit = async (values: any) => {
             <ParticipantDetailFields
               :participant-id="transferenceSustentationDetail.participantId"
             />
-            <!-- Datos del Participante -->
-            <!-- <div class="flex items-center mb-[8px]"> -->
-            <!--   <div -->
-            <!--     class="font-[700] text-[#20445E] text-[14px] tracking-[0.2px]" -->
-            <!--   > -->
-            <!--     NOMBRE: -->
-            <!--   </div> -->
-            <!--   <div -->
-            <!--     class="text-sm text-[#000000] font-[400] tracking-[0.3px] ml-[4px]" -->
-            <!--   > -->
-            <!--     {{ participantDetail.fullName }} -->
-            <!--   </div> -->
-            <!-- </div> -->
-            <!-- <div class="flex items-center mb-[8px]"> -->
-            <!--   <div -->
-            <!--     class="font-[700] text-[#20445E] text-[14px] tracking-[0.2px]" -->
-            <!--   > -->
-            <!--     DOCUMENTO: -->
-            <!--   </div> -->
-            <!--   <div -->
-            <!--     class="text-sm text-[#000000] font-[400] tracking-[0.3px] ml-[4px]" -->
-            <!--   > -->
-            <!--     {{ participantDetail.document }} -->
-            <!--   </div> -->
-            <!--   <div -->
-            <!--     class="font-[700] text-[#20445E] text-[14px] tracking-[0.2px] ml-[3px]" -->
-            <!--   > -->
-            <!--     TELÉFONO: -->
-            <!--   </div> -->
-            <!--   <div -->
-            <!--     class="text-sm text-[#000000] font-[400] tracking-[0.3px] ml-[4px]" -->
-            <!--   > -->
-            <!--     {{ participantDetail.phone }} -->
-            <!--   </div> -->
-            <!-- </div> -->
-            <!-- <div class="flex items-center mb-[8px]"> -->
-            <!--   <div -->
-            <!--     class="font-[700] text-[#20445E] text-[14px] tracking-[0.2px]" -->
-            <!--   > -->
-            <!--     CORREO: -->
-            <!--   </div> -->
-            <!--   <div -->
-            <!--     class="text-sm text-[#000000] font-[400] tracking-[0.3px] ml-[4px]" -->
-            <!--   > -->
-            <!--     {{ participantDetail.email }} -->
-            <!--   </div> -->
-            <!-- </div> -->
           </section>
           <section class="mb-6">
             <h3
