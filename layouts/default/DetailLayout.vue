@@ -4,11 +4,7 @@
       <!-- Encabezado con el título y el botón de flecha -->
       <div class="flex justify-between items-center">
         <h3
-        class="mb-5 text-sm text-[#676767] transition-all duration-300 w-full"
-        :class="{
-          'transform translate-x-[45%]': !showContent,
-          'translate-x-0': showContent
-        }"
+       class="mb-5 text-sm text-[#676767] text-center mx-auto"
       >
         Datos de la oferta
       </h3>
