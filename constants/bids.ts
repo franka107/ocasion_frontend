@@ -6,7 +6,7 @@ import type {
 export const bidStatus = new Map<string, { name: string; color: string }>([
   ['STARTED', { name: 'Iniciado', color: 'purple' }],
   ['DISCARDED', { name: 'Descartado', color: 'brown' }],
-  ['REJECTED', { name: 'Rechazado', color: 'blue' }],
+  ['REJECTED', { name: 'Rechazado', color: 'red' }],
   ['DEBATED', { name: 'Debatido', color: 'blue' }],
   ['RESERVED', { name: 'Reservada', color: 'blue' }],
   ['ACCEPTED', { name: 'Aceptado', color: 'blue' }],
