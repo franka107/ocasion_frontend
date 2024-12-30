@@ -147,7 +147,7 @@ const props = defineProps<{ eventDetail: EventDto }>()
 const { eventDetail } = toRefs(props)
 
 // Estado reactivo para manejar la visibilidad
-const showContent = ref(true)
+const showContent = ref(false)
 
 // Función para alternar la visibilidad
 const toggleContent = () => {

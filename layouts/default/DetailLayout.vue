@@ -118,7 +118,7 @@ interface OfferDetailForm extends OfferDto {
 
 const formData = ref<OfferDetailForm | null>(null)
 
-const showContent = ref(true)
+const showContent = ref(false)
 
 
 const toggleContent = () => {
