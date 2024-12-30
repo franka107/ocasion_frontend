@@ -208,9 +208,9 @@ export function getMenuList(
       ...(grants.includes(GrantId.PlatformTransferenceMangement)
         ? [
             {
-              href: `/dashboard/platform/evidence`,
+              href: `/dashboard/platform/sustentation`,
               label: 'Evidencias',
-              active: pathname === '/evidence',
+              active: pathname === '/sustentation',
               icon: 'Evidence',
               submenus: [],
             },
@@ -223,39 +223,55 @@ export function getMenuList(
               active: pathname.includes('/attention-tray'),
               icon: 'Tray',
               submenus: [
-                ...(grants.includes(GrantId.PlatformAttentionCanViewRechargeRequest)
+                ...(grants.includes(
+                  GrantId.PlatformAttentionCanViewRechargeRequest,
+                )
                   ? [
                       {
                         href: '/dashboard/platform/attention-tray/top-up-requests',
                         label: 'Solicitudes de recargas',
-                        active: pathname.includes('/attention-tray/top-up-requests'),
+                        active: pathname.includes(
+                          '/attention-tray/top-up-requests',
+                        ),
                       },
                     ]
                   : []),
-                  ...(grants.includes(GrantId.PlatformAttentionCanViewAccountValidation)
+                ...(grants.includes(
+                  GrantId.PlatformAttentionCanViewAccountValidation,
+                )
                   ? [
                       {
                         href: '/dashboard/platform/attention-tray/account-validation',
                         label: 'Validación de cuentas',
-                        active: pathname.includes('/attention-tray/account-validation'),
+                        active: pathname.includes(
+                          '/attention-tray/account-validation',
+                        ),
                       },
                     ]
                   : []),
-                  ...(grants.includes(GrantId.PlatformAttentionCanViewWithDrawalRequest)
+                ...(grants.includes(
+                  GrantId.PlatformAttentionCanViewWithDrawalRequest,
+                )
                   ? [
                       {
                         href: '/dashboard/platform/attention-tray/withdrawal-requests',
                         label: 'Solicitudes de retiros',
-                        active: pathname.includes('/attention-tray/withdrawal-requests'),
+                        active: pathname.includes(
+                          '/attention-tray/withdrawal-requests',
+                        ),
                       },
                     ]
                   : []),
-                  ...(grants.includes(GrantId.PlatformAttentionCanViewDisbursementLots)
+                ...(grants.includes(
+                  GrantId.PlatformAttentionCanViewDisbursementLots,
+                )
                   ? [
                       {
                         href: '/dashboard/platform/attention-tray/disbursement-lots',
                         label: 'Lotes de desembolso',
-                        active: pathname.includes('/attention-tray/disbursement-lots'),
+                        active: pathname.includes(
+                          '/attention-tray/disbursement-lots',
+                        ),
                       },
                     ]
                   : []),
@@ -264,52 +280,64 @@ export function getMenuList(
           ]
         : []),
       ...(grants.includes(GrantId.PlatformReportsManagement)
-      ? [
-          {
-            label: 'Reportes',
-            active: pathname.includes('/reports'),
-            icon: 'Passbook',
-            submenus: [
-              ...(grants.includes(GrantId.PlatformReportsCanViewGlobalTransactions)
-                ? [
-                    {
-                      href: '/dashboard/platform/reports/transactions',
-                      label: 'Transacciones (Global) ',
-                      active: pathname.includes('/reports/transactions'),
-                    },
-                  ]
-                : []),
-                ...(grants.includes(GrantId.PlatformReportsCanViewDisbursementLots)
-                ? [
-                    {
-                      href: '/dashboard/platform/reports/disbursement-batch',
-                      label: 'Lote de desembolso',
-                      active: pathname.includes('/reports/disbursement-batch'),
-                    },
-                  ]
-                : []),
-                ...(grants.includes(GrantId.PlatformReportsCanViewAccountValidations)
-                ? [
-                    {
-                      href: '/dashboard/platform/reports/account-validation',
-                      label: 'Validación de cuentas',
-                      active: pathname.includes('/reports/account-validation'),
-                    },
-                  ]
-                : []),
-                ...(grants.includes(GrantId.PlatformReportsCanViewAccountBalance)
-                ? [
-                    {
-                      href: '/dashboard/platform/reports/account-balance',
-                      label: 'Balance de cuenta',
-                      active: pathname.includes('/reports/account-balance'),
-                    },
-                  ]
-                : []),
-            ],
-          },
-        ]
-      : []),
+        ? [
+            {
+              label: 'Reportes',
+              active: pathname.includes('/reports'),
+              icon: 'Passbook',
+              submenus: [
+                ...(grants.includes(
+                  GrantId.PlatformReportsCanViewGlobalTransactions,
+                )
+                  ? [
+                      {
+                        href: '/dashboard/platform/reports/transactions',
+                        label: 'Transacciones (Global) ',
+                        active: pathname.includes('/reports/transactions'),
+                      },
+                    ]
+                  : []),
+                ...(grants.includes(
+                  GrantId.PlatformReportsCanViewDisbursementLots,
+                )
+                  ? [
+                      {
+                        href: '/dashboard/platform/reports/disbursement-batch',
+                        label: 'Lote de desembolso',
+                        active: pathname.includes(
+                          '/reports/disbursement-batch',
+                        ),
+                      },
+                    ]
+                  : []),
+                ...(grants.includes(
+                  GrantId.PlatformReportsCanViewAccountValidations,
+                )
+                  ? [
+                      {
+                        href: '/dashboard/platform/reports/account-validation',
+                        label: 'Validación de cuentas',
+                        active: pathname.includes(
+                          '/reports/account-validation',
+                        ),
+                      },
+                    ]
+                  : []),
+                ...(grants.includes(
+                  GrantId.PlatformReportsCanViewAccountBalance,
+                )
+                  ? [
+                      {
+                        href: '/dashboard/platform/reports/account-balance',
+                        label: 'Balance de cuenta',
+                        active: pathname.includes('/reports/account-balance'),
+                      },
+                    ]
+                  : []),
+              ],
+            },
+          ]
+        : []),
       ...(grants.includes(GrantId.OrganizationKpisManagement)
         ? [
             {
@@ -395,9 +423,9 @@ export function getMenuList(
       ...(grants.includes(GrantId.OrganizationTransferenceManagement)
         ? [
             {
-              href: `/dashboard/organization/${organizationId}/evidence`,
+              href: `/dashboard/organization/${organizationId}/sustentation`,
               label: 'Evidencias',
-              active: pathname === '/evidence',
+              active: pathname === '/sustentation',
               icon: 'Evidence',
               submenus: [],
             },

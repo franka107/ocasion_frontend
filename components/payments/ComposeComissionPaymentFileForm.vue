@@ -19,10 +19,6 @@ const myGrants = await getMyGrants()
 
 const formSchema = toTypedSchema(
   z.object({
-    // compostPropertyPaymentFiles: z
-    //   .array(z.any())
-    //   .min(1, 'Debe subir al menos un archivo')
-    //   .max(1, 'Puede subir solo un archivo para el voucher de pago del bien'),
     compostComissionPaymentFiles: z
       .array(z.any())
       .min(1, 'Debe subir al menos un archivo')

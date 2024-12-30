@@ -57,6 +57,17 @@ export function useOrganization() {
     return { status, error }
   }
 
+  const viewOrganizationIdAndNameList = async (values: any) => {
+    const { status, error }: any = await useAPI(
+      `${BASE_ORG_URL}/view-organization-id-and-name-list`,
+      {
+        method: 'GET',
+        body: values,
+      } as any,
+    )
+    return { status, error }
+  }
+
   const createOrganization = async (values: any) => {
     const { status, error }: any = await useAPI(
       `${BASE_ORG_URL}/create-organization`,
@@ -86,6 +97,7 @@ export function useOrganization() {
     onSearch,
     suspendOrganization,
     activateOrganization,
+    viewOrganizationIdAndNameList,
     createOrganization,
     editOrganization,
     assignAdministrator,

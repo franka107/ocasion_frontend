@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { CheckIcon, TrashIcon, ClipboardIcon  } from '@radix-icons/vue'
-import { X,ExternalLink } from 'lucide-vue-next'
+import { CheckIcon, TrashIcon, ClipboardIcon } from '@radix-icons/vue'
+import { X, ExternalLink } from 'lucide-vue-next'
 const props = defineProps({
   title: {
     type: String,
@@ -116,15 +116,12 @@ const getFileNameFromPath = (path: string): string => {
   return path.split('/').pop() || 'Unknown file' // Obtén el nombre del archivo desde la URL
 }
 const viewFile = (file: { id: string; path: string }) => {
-
   if (file.path) {
-
     window.open(file.path, '_blank')
   } else {
-    console.error('No se puede abrir el archivo. Ruta no válida.');
+    console.error('No se puede abrir el archivo. Ruta no válida.')
   }
 }
-
 
 // Inicializa los archivos existentes
 onMounted(() => {
@@ -174,6 +171,15 @@ onMounted(() => {
 
     <div class="space-y-2">
       <div
+        v-if="files.length === 0"
+        class="border-2 border-gray-400 rounded-lg flex items-center justify-between p-2"
+      >
+        <span class="text-gray-400 text-sm font-normal leading-5"
+          >No hay archivos</span
+        >
+        <div class="flex items-center space-x-2"></div>
+      </div>
+      <div
         v-for="(file, index) in files"
         :key="index"
         class="border-2 border-[#22c55d] rounded-lg flex items-center justify-between p-2"
@@ -182,7 +188,10 @@ onMounted(() => {
           file.name
         }}</span>
         <div class="flex items-center space-x-2">
-          <ExternalLink class="h-6 w-6 text-blue-500 cursor-pointer" @click="viewFile(file)" />
+          <ExternalLink
+            class="h-6 w-6 text-blue-500 cursor-pointer"
+            @click="viewFile(file)"
+          />
           <CheckIcon class="h-6 w-6 text-[#22c55d]" />
           <TrashIcon
             v-if="!hideRemoveIcon"

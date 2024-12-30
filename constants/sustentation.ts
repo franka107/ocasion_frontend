@@ -2,6 +2,7 @@ import type {
   HeaderItem,
   SearchItem,
 } from '@/components/ui/custom-table/CustomTable.vue'
+import { GlobalType } from '~/types/Common'
 
 export const evidencePlatfStatus = new Map<
   string,
@@ -61,41 +62,86 @@ export const evidencePlatfSearch: SearchItem[] = [
   },
 ]
 
-export const evidencePlatfHeader: HeaderItem[] = [
+// Título de oferta
+//
+// Descripción
+//
+// Categoría del bien
+//
+// Sub categoría del bien
+//
+// Estado
+//
+// Sustentos de Transferencia (Documentos cargados. Vista solo para
+// Organización
+// )
+//
+// Sustentos de Entrega (Documentos cargados. vista para
+// organización
+// y
+// plataforma
+// )
+
+export const sustentationHeaderList = (viewType: GlobalType): HeaderItem[] => [
+  ...(viewType === GlobalType.Platform
+    ? [
+        {
+          key: 'organization.name',
+          label: 'Organización',
+          sortable: true,
+        },
+      ]
+    : []),
   {
-    key: 'organization',
-    label: 'Organización',
-    sortable: true,
-  },
-  {
-    key: 'title',
+    key: 'offer.title',
     label: 'Titulo oferta',
-    sortable: true,
+    sortable: false,
   },
+
   {
-    key: 'description',
+    key: 'offer.description',
     label: 'Descripción',
-    sortable: true,
+    sortable: false,
   },
   {
-    key: 'Category of the good',
+    key: 'eventGoodType',
     sortable: true,
     label: 'Categoría del bien',
   },
+  // {
+  //  key: 'Subcategory of the good',
+  //  label: 'Sub Categoría del bien',
+  //  sortable: true,
+  // },
   {
-    key: 'Subcategory of the good',
-    label: 'Sub Categoría del bien',
-    sortable: true,
-  },
-  {
-    key: 'status',
+    key: 'paymentStatus',
     label: 'Estado abono',
     sortable: true,
   },
-  {
-    key: 'SupportForDelivery',
-    label: 'S. de Entrega',
-    align: 'center',
-    sortable: true,
-  },
+  ...(viewType === GlobalType.Platform
+    ? ([
+        {
+          key: 'transferenceSustentation',
+          label: 'D. Sustento de Transferencia',
+          align: 'center',
+          sortable: false,
+        },
+        {
+          key: 'deliverySustentation',
+          label: 'S. de entrega',
+          // align: 'center',
+          sortable: true,
+        },
+      ] as HeaderItem[])
+    : []),
+  ...(viewType === GlobalType.Organization
+    ? ([
+        {
+          key: 'transferenceSustentation',
+          label: 'D. Sustento de Transferencia',
+          align: 'center',
+          sortable: false,
+        },
+      ] as HeaderItem[])
+    : []),
 ]

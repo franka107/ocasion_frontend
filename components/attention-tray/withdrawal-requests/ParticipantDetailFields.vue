@@ -66,7 +66,7 @@ if (props.participantId) {
 
 <template>
   <div class="flex-grow overflow-y-auto no-scrollbar flex flex-col">
-    <form class="flex flex-col gap-6 flex-grow pb-5 pt-5 gap-y-[24px]">
+    <form class="flex flex-col gap-6 flex-grow pt-5 gap-y-[24px]">
       <section class="flex-grow">
         <div class="grid grid-cols-1 gap-4 mb-[24px]">
           <!-- Nombre  -->

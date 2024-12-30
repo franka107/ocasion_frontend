@@ -11,6 +11,6 @@ export const userTypeToGlobal = (userType: UserType): GlobalType => {
     case UserType.OrganizationAdmin:
       return GlobalType.Organization
     default:
-      throw new Error('Invalid user type')
+      return GlobalType.Participant
   }
 }

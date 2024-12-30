@@ -88,6 +88,10 @@ const onSubmitBid = () => {
     // showModal.value = true
   }
 }
+const eventApi = useEvent()
+const { data: eventDetail } = await eventApi.viewEvent(
+  offer.value.event?.id || '',
+)
 </script>
 <template>
   <section class="flex justify-center">
@@ -146,8 +150,8 @@ const onSubmitBid = () => {
               <div
                 class="flex justify-between mb-[16px] text-[#20445E] text-[12px] leading-[25px]"
               >
-                <p class="font-[600">Nombre evento</p>
-                <p class="font-[400]">00 ofertas</p>
+                <p class="font-[600">Evento: {{ offer.event?.name }}</p>
+                <p class="font-[400]">{{ eventDetail.offerCount }} ofertas</p>
               </div>
               <h2
                 class="text-[#152A3C] text-[16px] font-[600] leading-[24px] pb-[16px] uppercase"

@@ -19,7 +19,7 @@
         </p>
         <div
           v-if="showDetail && notification.messageDetail"
-          class=" w-[720px] text-sm text-[#20445E] pt-4 pb-2 pl-4 bg-[#FAFBFC] rounded-lg"
+          class="w-[720px] text-sm text-[#20445E] pt-4 pb-2 pl-4 bg-[#FAFBFC] rounded-lg"
         >
           <div class="max-w-3xl">
             {{ htmlToText(notification.messageDetail) }}
@@ -51,11 +51,11 @@
           class="w-2 h-2 rounded-full bg-[#20445E] mr-2"
         ></div>
         <button
-          ref="buttonRef"
           v-if="notification.messageDetail"
+          ref="buttonRef"
           class="w-5 h-5 flex items-center justify-center hover:bg-[#d1d7de] transition-colors duration-200 mr-2 border-2 border-[#d1d7de] rounded"
-          @click="toggleDetail"
           title="Ver detalles"
+          @click="toggleDetail"
         >
           <svg
             class="w-4 h-4 transition-transform duration-200 text-[#09314F]"
@@ -79,7 +79,10 @@
           <span class="sr-only">Open menu</span>
         </button>
 
-        <div v-if="isOpen" class="absolute right-0 top-6 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+        <div
+          v-if="isOpen"
+          class="absolute right-0 top-6 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50"
+        >
           <div class="py-1">
             <button
               class="w-full text-left px-4 py-2 text-sm text-[#20445E] hover:bg-gray-50 transition-colors duration-200"
@@ -97,11 +100,7 @@
         </div>
       </div>
     </div>
-    <div
-      v-if="isOpen"
-      class="fixed inset-0 z-40"
-      @click="closeAllMenus"
-    ></div>
+    <div v-if="isOpen" class="fixed inset-0 z-40" @click="closeAllMenus"></div>
   </div>
 </template>
 
@@ -201,6 +200,7 @@ const toggleDetail = (event: Event) => {
 const closeAllMenus = () => {
   isOpen.value = false
   // showDetail.value = false
+  //
 }
 </script>
 

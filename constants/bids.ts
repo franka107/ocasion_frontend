@@ -6,7 +6,7 @@ import type {
 export const bidStatus = new Map<string, { name: string; color: string }>([
   ['STARTED', { name: 'Iniciado', color: 'purple' }],
   ['DISCARDED', { name: 'Descartado', color: 'brown' }],
-  ['REJECTED', { name: 'Rechazado', color: 'blue' }],
+  ['REJECTED', { name: 'Rechazado', color: 'red' }],
   ['DEBATED', { name: 'Debatido', color: 'blue' }],
   ['RESERVED', { name: 'Reservada', color: 'blue' }],
   ['ACCEPTED', { name: 'Aceptado', color: 'blue' }],
@@ -124,7 +124,7 @@ export const bidsParticipantHeader: HeaderItem[] = [
     label: 'Fec. cierre oferta',
   },
   {
-    key: 'type',
+    key: 'eventGoodType',
     label: 'Tipo de activo',
     sortable: true,
   },
@@ -145,15 +145,26 @@ export const bidsParticipantHeader: HeaderItem[] = [
     sortable: true,
   },
   {
-    key: 'status',
-    label: 'Estado abono',
+    key: 'offerStatus',
+    label: 'E. de oferta',
     sortable: true,
   },
   {
-    key: 'documents',
-    label: 'Documentos',
+    key: 'status',
+    label: 'E. de puja',
     sortable: true,
   },
+  {
+    key: 'payment',
+    label: 'D. Sustento de abono',
+    sortable: false,
+  },
+  {
+    key: 'transferenceSustentation',
+    label: 'D. Sustento de Transferencia',
+    sortable: false,
+  },
+
   {
     key: 'actions',
     label: 'Acción',
