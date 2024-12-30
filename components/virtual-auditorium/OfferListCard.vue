@@ -20,7 +20,7 @@ const cardClass = (totalSeconds: number, offer: OfferListItem) => {
       return 'overlay-item'
     }
   } else if (totalSeconds < SHOW_ALERT_ON_SECOND) {
-    return 'animate-twinkle-shadow'
+    return 'animate-twinkle-border'
   }
   return ''
 }
@@ -41,9 +41,9 @@ const offerImage = offer.value.attachedFiles[0].path
       tabindex="0"
       :class="
         cn(
-          `w-full flex flex-col box-content relative shadow-[0px_0px_4px_0px_#0000001A] cursor-pointer max-w-[238px]
-       rounded-lg overflow-hidden border-box bg-primary-50 border-[#ffffff] focus:border-2 focus:border-[#414967]`,
           cardClass(totalSeconds, offer),
+          `w-full border-2 flex flex-col box-content relative shadow-[0px_0px_4px_0px_#0000001A] cursor-pointer max-w-[238px]
+       rounded-lg overflow-hidden border-box bg-primary-50 border-[#ffffff] focus:border-2 focus:!border-[#414967]`,
         )
       "
     >

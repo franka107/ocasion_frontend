@@ -66,4 +66,8 @@ export enum GrantId {
   OrganizationPaymentPropertyCanConfirm = 'ORGANIZATION_PAYMENT_PROPERTY_CAN_CONFIRM',
   OrganizationPaymentPropertyCanObserve = 'ORGANIZATION_PAYMENT_PROPERTY_CAN_OBSERVE',
   OrganizationTransferenceManagement = 'ORGANIZATION_TRANSFERENCE_MANAGEMENT',
+  OrganizationSustentationManagement = 'ORGANIZATION_SUSTENTATION_MANAGEMENT',
+  OrganizationSustentationTransferenceCanEdit = 'ORGANIZATION_SUSTENTATION_TRANSFERENCE_CAN_EDIT',
+  OrganizationSustentationTransferenceCanConfirm = 'ORGANIZATION_SUSTENTATION_TRANSFERENCE_CAN_CONFIRM',
+  PlatformSustentationManagement = 'PLATFORM_SUSTENTATION_MANAGEMENT',
 }

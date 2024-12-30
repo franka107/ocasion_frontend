@@ -2,6 +2,7 @@ import type {
   HeaderItem,
   SearchItem,
 } from '@/components/ui/custom-table/CustomTable.vue'
+import { GlobalType } from '~/types/Common'
 
 export const evidencePlatfStatus = new Map<
   string,
@@ -81,12 +82,16 @@ export const evidencePlatfSearch: SearchItem[] = [
 // plataforma
 // )
 
-export const evidencePlatfHeader: HeaderItem[] = [
-  {
-    key: 'organization.name',
-    label: 'Organización',
-    sortable: true,
-  },
+export const sustentationHeaderList = (viewType: GlobalType): HeaderItem[] => [
+  ...(viewType === GlobalType.Platform
+    ? [
+        {
+          key: 'organization.name',
+          label: 'Organización',
+          sortable: true,
+        },
+      ]
+    : []),
   {
     key: 'offer.title',
     label: 'Titulo oferta',
@@ -113,16 +118,30 @@ export const evidencePlatfHeader: HeaderItem[] = [
     label: 'Estado abono',
     sortable: true,
   },
-  {
-    key: 'transferenceSustentation',
-    label: 'S. de transferencia',
-    align: 'center',
-    sortable: true,
-  },
-  {
-    key: 'deliverySustentation',
-    label: 'S. de entrega',
-    align: 'center',
-    sortable: true,
-  },
+  ...(viewType === GlobalType.Platform
+    ? ([
+        {
+          key: 'transferenceSustentation',
+          label: 'D. Sustento de Transferencia',
+          align: 'center',
+          sortable: false,
+        },
+        {
+          key: 'deliverySustentation',
+          label: 'S. de entrega',
+          // align: 'center',
+          sortable: true,
+        },
+      ] as HeaderItem[])
+    : []),
+  ...(viewType === GlobalType.Organization
+    ? ([
+        {
+          key: 'transferenceSustentation',
+          label: 'D. Sustento de Transferencia',
+          align: 'center',
+          sortable: false,
+        },
+      ] as HeaderItem[])
+    : []),
 ]

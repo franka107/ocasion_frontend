@@ -7,6 +7,7 @@ import type { FileType } from './Disbursement'
 import type { Participant } from './Recharge'
 import type { UserDto } from './Administrators'
 import type { Organization } from '~/models/organizations'
+import type { CustomChipVariants } from '~/components/ui/custom-chip'
 
 export interface EvidenseItem {
   id: string
@@ -84,6 +85,42 @@ export enum ChildSustentationStatus {
   Confirmed = 'CONFIRMED', // Confirmado
 }
 
+export const childSustentationStatusRecord: Record<
+  ChildSustentationStatus,
+  { label: string; color: string; icon: string; iconClass: string }
+> = {
+  [ChildSustentationStatus.Empty]: {
+    label: 'Vacío',
+    color: 'brown',
+    icon: 'Doc-Loupe',
+    iconClass: 'text-[#a1a1a3]',
+  },
+  [ChildSustentationStatus.Expired]: {
+    label: 'Expirado',
+    color: 'orange',
+    icon: 'Doc-Loupe',
+    iconClass: 'text-[#a1a1a3]',
+  },
+  [ChildSustentationStatus.InReview]: {
+    label: 'En revision',
+    color: 'orange',
+    icon: 'Doc-Loupe',
+    iconClass: 'text-blue-500',
+  },
+  [ChildSustentationStatus.Observed]: {
+    label: 'Observado',
+    color: 'orange',
+    icon: 'Doc-Loupe',
+    iconClass: 'text-yellow-500',
+  },
+  [ChildSustentationStatus.Confirmed]: {
+    label: 'Confirmado',
+    color: 'green',
+    icon: 'Doc-Loupe',
+    iconClass: 'text-green-500',
+  },
+}
+
 export interface SustentationDto {
   id: string
   bid?: BidDto
@@ -102,13 +139,23 @@ export interface TransferenceSustentationDto {
   sustentationId: string
   participant: UserDto
   participantId: string
-  soat?: string | null
+  soatFiles?: FileType[] | null
   identifierHolderFiles?: FileType[] | null
   identifierSpouseFiles?: FileType[] | null
   validityOfPowerFiles?: FileType[] | null
   rucCardFiles?: FileType[] | null
   status: ChildSustentationStatus
 }
+
+export type UploadTransferenceSustentationParamsDto = Pick<
+  TransferenceSustentationDto,
+  | 'id'
+  | 'rucCardFiles'
+  | 'soatFiles'
+  | 'validityOfPowerFiles'
+  | 'identifierHolderFiles'
+  | 'identifierSpouseFiles'
+>
 
 export interface DeliveryDetailFile {
   id: string

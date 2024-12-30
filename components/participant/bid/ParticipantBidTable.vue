@@ -7,7 +7,6 @@
           class="mb-4"
           :header="bidsParticipantHeader"
           :search="bidsParticipantSearch"
-          multiple-select
           @on-sort="onSort"
           @on-search="onSearch"
           @on-multiple-select="
@@ -17,8 +16,17 @@
             }
           "
         >
+          <template #offerStatus="{ row }">
+            <CustomChip
+              :text="offerStatusRecord[row.offer.status]?.name || ''"
+              :variant="offerStatusRecord[row.offer.status]?.color as any"
+            ></CustomChip>
+          </template>
           <template #transferenceSustentation="{ row }">
-            <div v-if="row.sustentation" class="flex justify-center">
+            <div
+              v-if="row.sustentation"
+              class="flex justify-center m-auto items-center"
+            >
               <Button
                 variant="ghost"
                 @click="
@@ -32,6 +40,20 @@
                   class="w-6 h-6 text-reminder-600"
                 />
               </Button>
+              <CustomChip
+                :text="
+                  childSustentationStatusRecord[
+                    row.sustentation.transferenceSustentation
+                      .status as ChildSustentationStatus
+                  ].label || ''
+                "
+                :variant="
+                  (childSustentationStatusRecord[
+                    row.sustentation.transferenceSustentation
+                      .status as ChildSustentationStatus
+                  ].color as any) || ''
+                "
+              ></CustomChip>
             </div>
 
             <div v-else>
@@ -39,33 +61,38 @@
                 variant="ghost"
                 size="sm"
                 disabled
-                class="text-[#a1a1a3] h-8 data-[state=open]:bg-accent"
+                class="text-[#a1a1a3] underline h-8 data-[state=open]:bg-accent"
               >
                 <span>Sin información</span>
               </Button>
             </div>
           </template>
-          <template #documents="{ row }">
-            <div v-if="row.payment" class="flex justify-center">
+          <template #payment="{ row }">
+            <div v-if="row.payment" class="flex m-auto items-center">
               <Button variant="ghost" @click="handleCompostSupportFiles(row)">
                 <CustomIcons
                   name="Doc-Transfer"
                   class="w-6 h-6 text-reminder-600"
                 />
               </Button>
+              <CustomChip
+                :text="paymentStatus.get(row.payment.status)?.name || ''"
+                :variant="paymentStatus.get(row.payment.status)?.color as any"
+              ></CustomChip>
             </div>
 
-            <div v-else>
+            <div v-else class="flex justify-center">
               <Button
                 variant="ghost"
                 size="sm"
                 disabled
-                class="text-[#a1a1a3] h-8 data-[state=open]:bg-accent"
+                class="text-[#a1a1a3] underline h-8 data-[state=open]:bg-accent"
               >
                 <span>Sin información</span>
               </Button>
             </div>
           </template>
+
           <template #actions="{ row }">
             <div v-if="row.counterOffer" class="flex justify-center">
               <DropdownMenu>
@@ -116,10 +143,10 @@
           @pointer-down-outside="(e) => e.preventDefault()"
           @interact-outside="(e) => e.preventDefault()"
         >
-          <SupportForm
+          <TransferenceSustentationForm
             :id="transferenceSustentationId"
             :on-confirm="() => {}"
-            :on-edit="() => {}"
+            :on-edit="handleUploadTransferenceSustentationFiles"
             :close-modal="() => (isTransferenceSustentationFormOpened = false)"
           />
         </SheetContent>
@@ -188,7 +215,13 @@ import UploadPaymentSupport from '~/components/participant/bid/UploadPaymentSupp
 import CounterOfferInboundModal from '~/components/bid/CounterOfferInboundModal.vue'
 import type { OrganizationDto } from '~/types/Organization'
 import { goodType } from '~/constants/events'
-import SupportForm from '~/components/evidence/SupportForm.vue'
+import TransferenceSustentationForm from '~/components/evidence/TransferenceSustentationForm.vue'
+import { paymentStatus } from '~/constants/payments'
+import {
+  ChildSustentationStatus,
+  childSustentationStatusRecord,
+} from '~/types/Evidence'
+import { offerStatusRecord } from '~/constants/offer'
 const selectedId = ref('') // Define el id que necesitas pasar
 const selectedPersonStatus = ref<'single' | 'married' | 'legal'>('legal')
 const openTransferModal = ref(false)
@@ -276,6 +309,41 @@ const bidsData = computed(
       ...item,
     })) || [],
 )
+
+const apiSustentation = useAPISustentation()
+
+const handleUploadTransferenceSustentationFiles = async (values: any) => {
+  openConfirmModal({
+    title: 'Actualizar Sustento de transferencia',
+    message:
+      '¿Estás seguro de que deseas actualizar este Sustento de transferencia?',
+    callback: async () => {
+      const { status, error }: any =
+        await apiSustentation.uploadTransferenceSustentationFilesForParticipant(
+          values,
+        )
+      if (status.value === 'success') {
+        isTransferenceSustentationFormOpened.value = false
+        refresh()
+        updateConfirmModal({
+          title: 'Sustento de transferencia actualizado',
+          message: 'Sustento de transferencia ha sido actualizado exitosamente',
+          type: 'success',
+        })
+      } else {
+        const eMsg =
+          error.value.data?.errors?.[0].message ||
+          error.value.data.message ||
+          'Este sustento de transferencia no se pudo actualizar, intentalo más tarde'
+        updateConfirmModal({
+          title: 'Error al actualizar Sustento de transferencia de entrega',
+          message: eMsg,
+          type: 'error',
+        })
+      }
+    },
+  })
+}
 
 const handleRejectBid = async (values: { type: string; ids: string[] }) => {
   openConfirmModal({

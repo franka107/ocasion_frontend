@@ -137,7 +137,7 @@ import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCar
 import { GrantId } from '~/types/Grant'
 import type { IDateModal } from '~/types/Evidence'
 import DeliveryForm from '@/components/evidence/DeliveryForm.vue'
-import SupportForm from '@/components/evidence/SupportForm.vue'
+import SupportForm from '~/components/evidence/TransferenceSustentationForm.vue'
 const route = useRoute()
 const organizationId = route.params.organizationId as string
 const props = defineProps<{ organizationId: string | null }>()

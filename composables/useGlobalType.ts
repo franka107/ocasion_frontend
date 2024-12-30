@@ -7,9 +7,7 @@ export function useUserSessionExtended() {
   }
   const user = userSession.user.value.user
   // code here
-  const globalType = userSession.user.value
-    ? userTypeToGlobal(userSession.user.value?.user.type)
-    : GlobalType.Organization
+  const globalType = userTypeToGlobal(user.type)
 
   const getDefaultOrganization = () => {
     if (globalType === GlobalType.Organization) {

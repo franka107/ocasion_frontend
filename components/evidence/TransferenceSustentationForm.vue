@@ -12,6 +12,7 @@ import type {
   DeliveryDetailFile,
 } from '@/types/Evidence.ts'
 import { UserType } from '~/types/Administrators'
+import { GrantId } from '~/types/Grant'
 const BASE_SUSTENTATION_MANAGEMENT = '/sustentation-management'
 const props = defineProps<{
   id: string | undefined
@@ -24,45 +25,89 @@ const currentMode = ref<'edit' | 'confirm'>('confirm')
 const transferenceSustentationDetail = ref<TransferenceSustentationDto | null>(
   null,
 )
+const { getMyGrants } = useAuthManagement()
+const myGrants = await getMyGrants()
 
 const formSchema = toTypedSchema(
-  z.object({
-    identifierHolderFiles: z
-      .array(z.any())
-      .min(1, 'Debe subir al menos un archivo')
-      .max(
-        1,
-        'Puede subir solo un archivo para el voucher de pago de comisión',
-      ),
-    identifierSpouseFiles: z
-      .array(z.any())
-      .min(1, 'Debe subir al menos un archivo')
-      .max(
-        1,
-        'Puede subir solo un archivo para el voucher de pago de comisión',
-      ),
-    rucCardFiles: z
-      .array(z.any())
-      .min(1, 'Debe subir al menos un archivo')
-      .max(
-        1,
-        'Puede subir solo un archivo para el voucher de pago de comisión',
-      ),
-    soatFiles: z
-      .array(z.any())
-      .min(1, 'Debe subir al menos un archivo')
-      .max(
-        1,
-        'Puede subir solo un archivo para el voucher de pago de comisión',
-      ),
-    validityOfPowerFiles: z
-      .array(z.any())
-      .min(1, 'Debe subir al menos un archivo')
-      .max(
-        1,
-        'Puede subir solo un archivo para el voucher de pago de comisión',
-      ),
-  }),
+  z
+    .object({
+      identifierHolderFiles: z
+        .array(z.any())
+        .min(1, 'Debe subir al menos un archivo')
+        .max(
+          1,
+          'Puede subir solo un archivo para el voucher de pago de comisión',
+        ),
+      identifierSpouseFiles: z.array(z.any()),
+      // .min(1, 'Debe subir al menos un archivo')
+      // .max(
+      //   1,
+      //   'Puede subir solo un archivo para el voucher de pago de comisión',
+      // ),
+      rucCardFiles: z.array(z.any()),
+      // .min(1, 'Debe subir al menos un archivo')
+      // .max(
+      //   1,
+      //   'Puede subir solo un archivo para el voucher de pago de comisión',
+      // ),
+      soatFiles: z
+        .array(z.any())
+        .min(1, 'Debe subir al menos un archivo')
+        .max(
+          1,
+          'Puede subir solo un archivo para el voucher de pago de comisión',
+        ),
+      validityOfPowerFiles: z.array(z.any()),
+      // .min(1, 'Debe subir al menos un archivo')
+      // .max(
+      //   1,
+      //   'Puede subir solo un archivo para el voucher de pago de comisión',
+      // ),
+    })
+    .superRefine((values, ctx) => {
+      // Condición para validar identifierSpouseFiles (cónyuge casado y persona natural)
+      if (
+        transferenceSustentationDetail.value?.participant.maritalStatus ===
+          'MARRIED' &&
+        transferenceSustentationDetail.value?.participant.personType ===
+          'NATURAL_PERSON'
+      ) {
+        if (
+          !values.identifierSpouseFiles ||
+          values.identifierSpouseFiles.length === 0
+        ) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['identifierSpouseFiles'],
+            message: 'Debe subir al menos un archivo para el cónyuge',
+          })
+        }
+      }
+
+      // Condición para validar rucCardFiles y validityOfPowerFiles (persona jurídica)
+      if (
+        transferenceSustentationDetail.value?.participant.personType ===
+        'JURIDIC_PERSON'
+      ) {
+        if (!values.rucCardFiles || values.rucCardFiles.length === 0) {
+          ctx.addIssue({
+            path: ['rucCardFiles'],
+            code: z.ZodIssueCode.custom,
+            message: 'Debe subir al menos un archivo para la ficha RUC',
+          })
+        }
+        if (
+          !values.validityOfPowerFiles ||
+          values.validityOfPowerFiles.length === 0
+        ) {
+          ctx.addIssue({
+            path: ['validityOfPowerFiles'],
+            code: z.ZodIssueCode.custom,
+            message: 'Debe subir al menos un archivo para la vigencia de poder',
+          })
+        }
+      }
+    }),
 )
 
 try {
@@ -77,32 +122,33 @@ try {
 } catch (error) {
   console.error('Error al cargar el detalle de Sustento de Entrega', error)
 }
+
+const userSession = useUserSession()
+if (userSession.user.value?.user.type === UserType.Participant) {
+  currentMode.value = 'edit'
+}
 const form = useForm({
   validationSchema: formSchema,
   initialValues: transferenceSustentationDetail.value,
 })
 
-const onSubmit = async (values: any) => {
-  let formattedValues = null
+const onSubmit = form.handleSubmit(async (values: any) => {
   if (currentMode.value === 'edit') {
     const { valid } = await form.validate()
     if (valid) {
-      const { files } = form.values
-      formattedValues = {
+      const formattedValues = {
         id: props.id,
-        files,
+        ...values,
       }
       props.onEdit(formattedValues)
     }
   } else if (currentMode.value === 'confirm') {
-    formattedValues = {
-      transferenceSupportId: props.id,
+    const formattedValues = {
+      id: props.id,
     }
     props.onConfirm(formattedValues)
   }
-}
-
-const userSession = useUserSession()
+})
 </script>
 
 <template>
@@ -116,7 +162,7 @@ const userSession = useUserSession()
   </SheetHeader>
 
   <div class="flex-grow flex flex-col overflow-y-auto no-scrollbar">
-    <form class="min-h-full" @submit.prevent="onSubmit">
+    <form class="min-h-full" @submit="onSubmit">
       <section class="flex flex-col gap-4 flex-grow p-5 h-full">
         <div v-if="transferenceSustentationDetail">
           <section
@@ -151,6 +197,8 @@ const userSession = useUserSession()
                   <FormControl>
                     <InputFile
                       v-model="form.values.soatFiles"
+                      instructions-text="Cargar máximo hasta 1 archivo (png, jpg, jpeg o pdf)"
+                      :accepted-file-types="['.jpg', '.png', '.jpeg', '.pdf']"
                       title="SOAT"
                       :disabled="currentMode === 'confirm'"
                       :hide-remove-icon="currentMode === 'confirm'"
@@ -179,6 +227,8 @@ const userSession = useUserSession()
                       :disabled="currentMode === 'confirm'"
                       :hide-remove-icon="currentMode === 'confirm'"
                       v-bind="componentField"
+                      instructions-text="Cargar máximo hasta 1 archivo (png, jpg, jpeg o pdf)"
+                      :accepted-file-types="['.jpg', '.png', '.jpeg', '.pdf']"
                     />
                   </FormControl>
                   <FormMessage />
@@ -207,6 +257,8 @@ const userSession = useUserSession()
                     <InputFile
                       v-model="form.values.identifierSpouseFiles"
                       title="Foto legible de DNI del cónyuge"
+                      instructions-text="Cargar máximo hasta 1 archivo (png, jpg, jpeg o pdf)"
+                      :accepted-file-types="['.jpg', '.png', '.jpeg', '.pdf']"
                       :disabled="currentMode === 'confirm'"
                       :hide-remove-icon="currentMode === 'confirm'"
                       v-bind="componentField"
@@ -237,6 +289,8 @@ const userSession = useUserSession()
                       :disabled="currentMode === 'confirm'"
                       :hide-remove-icon="currentMode === 'confirm'"
                       v-bind="componentField"
+                      instructions-text="Cargar máximo hasta 1 archivo (png, jpg, jpeg o pdf)"
+                      :accepted-file-types="['.jpg', '.png', '.jpeg', '.pdf']"
                     />
                   </FormControl>
                   <FormMessage />
@@ -266,6 +320,8 @@ const userSession = useUserSession()
                       :disabled="currentMode === 'confirm'"
                       :hide-remove-icon="currentMode === 'confirm'"
                       v-bind="componentField"
+                      instructions-text="Cargar máximo hasta 1 archivo (png, jpg, jpeg o pdf)"
+                      :accepted-file-types="['.jpg', '.png', '.jpeg', '.pdf']"
                     />
                   </FormControl>
                   <FormMessage />
@@ -278,6 +334,11 @@ const userSession = useUserSession()
       <SheetFooter class="mt-auto flex gap-x-4 px-6">
         <template v-if="currentMode === 'confirm'">
           <Button
+            v-if="
+              myGrants.data.value.includes(
+                GrantId.OrganizationSustentationTransferenceCanEdit,
+              )
+            "
             type="button"
             class="text-[16px] font-[600] bg-white text-primary border border-primary hover:bg-accent w-[200px]"
             size="xll"
@@ -286,6 +347,11 @@ const userSession = useUserSession()
             Editar
           </Button>
           <Button
+            v-if="
+              myGrants.data.value.includes(
+                GrantId.OrganizationSustentationTransferenceCanConfirm,
+              )
+            "
             type="submit"
             class="text-[16px] font-[600] w-[200px]"
             size="xll"
@@ -295,6 +361,11 @@ const userSession = useUserSession()
         </template>
         <template v-else>
           <Button
+            v-if="
+              myGrants.data.value.includes(
+                GrantId.OrganizationSustentationTransferenceCanEdit,
+              ) || userSession.user.value?.user.type === UserType.Participant
+            "
             type="submit"
             :disabled="!form.meta.value.valid"
             class="text-[16px] font-[600] w-full"

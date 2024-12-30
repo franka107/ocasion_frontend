@@ -10,9 +10,9 @@
         <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
           <CustomTable
             :data="evidenceData"
-            :header="evidencePlatfHeader"
+            class="mb-5"
+            :header="sustentationHeaderList(userSession.globalType)"
             :search="evidencePlatfSearch"
-            multiple-select
             @on-sort="onSort"
             @on-search="onSearch"
             @on-multiple-select="
@@ -56,30 +56,79 @@
               </div>
             </template>
             <template #transferenceSustentation="{ row }">
-              <div
-                class="flex items-center justify-center"
-                :class="
-                  !row.deliverySupport?.files?.length
-                    ? 'cursor-not-allowed'
-                    : 'cursor-pointer'
-                "
-                @click="
-                  () => {
-                    openTransferenceSustentationModal(row)
-                  }
-                "
-              >
-                <CustomIcons
-                  :name="
-                    deliverySupportIcons.get(row.deliverySupport?.status)
-                      ?.icon || 'Doc-Loupe'
-                  "
-                  :class="
-                    deliverySupportIcons.get(row.deliverySupport?.status)
-                      ?.class || 'text-[#AFAFB1]'
-                  "
-                />
-              </div>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <div>
+                      <Button
+                        variant="ghost"
+                        @click="
+                          () => {
+                            openTransferenceSustentationModal(row)
+                          }
+                        "
+                      >
+                        <CustomIcons
+                          :name="
+                            childSustentationStatusRecord[
+                              row.transferenceSustentation
+                                .status as ChildSustentationStatus
+                            ].icon || ''
+                          "
+                          :class="
+                            childSustentationStatusRecord[
+                              row.transferenceSustentation
+                                .status as ChildSustentationStatus
+                            ].iconClass || ''
+                          "
+                        />
+                      </Button>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <CustomChip
+                      :text="
+                        childSustentationStatusRecord[
+                          row.transferenceSustentation
+                            .status as ChildSustentationStatus
+                        ].label || ''
+                      "
+                      :variant="
+                        (childSustentationStatusRecord[
+                          row.transferenceSustentation
+                            .status as ChildSustentationStatus
+                        ].color as any) || ''
+                      "
+                    ></CustomChip>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <!-- <div class="flex justify-center m-auto items-center"></div> -->
+
+              <!-- <div -->
+              <!--   class="flex items-center justify-center" -->
+              <!--   :class=" -->
+              <!--     !row.deliverySupport?.files?.length -->
+              <!--       ? 'cursor-not-allowed' -->
+              <!--       : 'cursor-pointer' -->
+              <!--   " -->
+              <!--   @click=" -->
+              <!--     () => { -->
+              <!--       openTransferenceSustentationModal(row) -->
+              <!--     } -->
+              <!--   " -->
+              <!-- > -->
+              <!--   <CustomIcons -->
+              <!--     :name=" -->
+              <!--       deliverySupportIcons.get(row.deliverySupport?.status) -->
+              <!--         ?.icon || 'Doc-Loupe' -->
+              <!--     " -->
+              <!--     :class=" -->
+              <!--       deliverySupportIcons.get(row.deliverySupport?.status) -->
+              <!--         ?.class || 'text-[#AFAFB1]' -->
+              <!--     " -->
+              <!--   /> -->
+              <!-- </div> -->
             </template>
             <template #eventGoodType="{ row }">
               {{ goodType.get(row.event.goodType) }}
@@ -97,11 +146,13 @@
             <!--   :on-edit="handleEditDelivery" -->
             <!--   :close-modal="() => (openModalDeliveryTransfer = false)" -->
             <!-- /> -->
-            <SupportForm
+            <TransferenceSustentationForm
               :id="deliveryId"
-              :on-confirm="handleConfirmDelivery"
-              :on-edit="handleEditDelivery"
-              :close-modal="() => (openModalDeliveryTransfer = false)"
+              :on-confirm="handleConfirmTransferenceSustentationFiles"
+              :on-edit="handleUploadTransferenceSustentationFiles"
+              :close-modal="
+                () => (isTransferenceSustentationFormOpened = false)
+              "
             />
           </SheetContent>
           <SheetContent
@@ -110,10 +161,10 @@
             @pointer-down-outside="(e) => e.preventDefault()"
             @interact-outside="(e) => e.preventDefault()"
           >
-            <SupportForm
+            <TransferenceSustentationForm
               :id="transferenceSustentationId"
-              :on-confirm="handleConfirmDelivery"
-              :on-edit="handleEditDelivery"
+              :on-confirm="handleConfirmTransferenceSustentationFiles"
+              :on-edit="handleUploadTransferenceSustentationFiles"
               :close-modal="
                 () => (isTransferenceSustentationFormOpened = false)
               "
@@ -132,17 +183,22 @@
 </template>
 <script setup lang="ts">
 import DeliveryForm from './DeliveryForm.vue'
-import SupportForm from './SupportForm.vue'
+import TransferenceSustentationForm from './TransferenceSustentationForm.vue'
 import CustomTable from '@/components/ui/custom-table/CustomTable.vue'
 import CustomChip from '@/components/ui/custom-chip/CustomChip.vue'
 import CustomPagination from '@/components/ui/custom-pagination/CustomPagination.vue'
-import type { EvidenseItem, IDateModal } from '@/types/Evidence.ts'
+import {
+  ChildSustentationStatus,
+  childSustentationStatusRecord,
+  type EvidenseItem,
+  type IDateModal,
+} from '@/types/Evidence.ts'
 import {
   evidencePlatfStatus,
   evidencePlatfSearch,
-  evidencePlatfHeader,
+  sustentationHeaderList,
   deliverySupportIcons,
-} from '~/constants/evidencePlatf'
+} from '~/constants/sustentation'
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
 import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
 import { GrantId } from '~/types/Grant'
@@ -150,6 +206,8 @@ import { paymentStatus } from '~/constants/payments'
 import { goodType } from '~/constants/events'
 
 const filterOptions = ref('[]')
+const userSession = useUserSessionExtended()
+
 const openModalDeliveryTransfer = ref(false)
 const isTransferenceSustentationFormOpened = ref(false)
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
@@ -213,30 +271,94 @@ const openTransferenceSustentationModal = (row: any) => {
   isTransferenceSustentationFormOpened.value = true
 }
 
-const handleConfirmTransferenceSustentation = async (value: any) => {
+// const handleConfirmTransferenceSustentation = async (value: any) => {
+//   openConfirmModal({
+//     title: 'Confirmar Sustento de Entrega',
+//     message: `¿Está seguro de que deseas confirmar este Sustento de Entrega?`,
+//     callback: async () => {
+//       try {
+//         const { status } = await confirmDeliverySupport(value)
+//         if (status.value === 'success') {
+//           refresh()
+//           resetMultipleSelect.value?.()
+//           updateConfirmModal({
+//             title: 'Sustento de Entrega confirmada',
+//             message: 'Sustento de Entrega confirmado exitosamente',
+//             type: 'success',
+//           })
+//           openModalDeliveryTransfer.value = false
+//         } else {
+//           throw new Error('Error al confirmar este Sustento de Entrega')
+//         }
+//       } catch (error) {
+//         updateConfirmModal({
+//           title: 'Error al confirmar Sustento de Entrega',
+//           message:
+//             'No se pudo confirmar Sustento de Entrega. Por favor, intente nuevamente.',
+//           type: 'error',
+//         })
+//       }
+//     },
+//   })
+// }
+
+const apiSustentation = useAPISustentation()
+
+const handleConfirmTransferenceSustentationFiles = async (values: any) => {
   openConfirmModal({
-    title: 'Confirmar Sustento de Entrega',
-    message: `¿Está seguro de que deseas confirmar este Sustento de Entrega?`,
+    title: 'Confirmar Sustento de transferencia',
+    message:
+      '¿Estás seguro de que deseas confirmar este Sustento de transferencia?',
     callback: async () => {
-      try {
-        const { status } = await confirmDeliverySupport(value)
-        if (status.value === 'success') {
-          refresh()
-          resetMultipleSelect.value?.()
-          updateConfirmModal({
-            title: 'Sustento de Entrega confirmada',
-            message: 'Sustento de Entrega confirmado exitosamente',
-            type: 'success',
-          })
-          openModalDeliveryTransfer.value = false
-        } else {
-          throw new Error('Error al confirmar este Sustento de Entrega')
-        }
-      } catch (error) {
+      const { status, error }: any =
+        await apiSustentation.confirmTransferenceSustentation(values)
+      if (status.value === 'success') {
+        isTransferenceSustentationFormOpened.value = false
+        refresh()
         updateConfirmModal({
-          title: 'Error al confirmar Sustento de Entrega',
-          message:
-            'No se pudo confirmar Sustento de Entrega. Por favor, intente nuevamente.',
+          title: 'Sustento de transferencia confirmado',
+          message: 'Sustento de transferencia ha sido confirmado exitosamente',
+          type: 'success',
+        })
+      } else {
+        const eMsg =
+          error.value.data?.errors?.[0].message ||
+          error.value.data.message ||
+          'Este sustento de transferencia no se pudo confirmar, intentalo más tarde'
+        updateConfirmModal({
+          title: 'Error al confirmar Sustento de transferencia de entrega',
+          message: eMsg,
+          type: 'error',
+        })
+      }
+    },
+  })
+}
+
+const handleUploadTransferenceSustentationFiles = async (values: any) => {
+  openConfirmModal({
+    title: 'Actualizar Sustento de transferencia',
+    message:
+      '¿Estás seguro de que deseas actualizar este Sustento de transferencia?',
+    callback: async () => {
+      const { status, error }: any =
+        await apiSustentation.uploadTransferenceSustentationFiles(values)
+      if (status.value === 'success') {
+        isTransferenceSustentationFormOpened.value = false
+        refresh()
+        updateConfirmModal({
+          title: 'Sustento de transferencia actualizado',
+          message: 'Sustento de transferencia ha sido actualizado exitosamente',
+          type: 'success',
+        })
+      } else {
+        const eMsg =
+          error.value.data?.errors?.[0].message ||
+          error.value.data.message ||
+          'Este sustento de transferencia no se pudo actualizar, intentalo más tarde'
+        updateConfirmModal({
+          title: 'Error al actualizar Sustento de transferencia de entrega',
+          message: eMsg,
           type: 'error',
         })
       }

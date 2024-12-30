@@ -18,5 +18,5 @@ export interface IDataResponse<T> {
 export enum GlobalType {
   Platform = 'PLATFORM',
   Organization = 'ORGANIZATION',
+  Participant = 'PARTICIPANT',
 }
-

@@ -122,7 +122,7 @@
 </template>
 <script setup lang="ts">
 import DeliveryForm from './DeliveryForm.vue'
-import SupportForm from './SupportForm.vue'
+import SupportForm from './TransferenceSustentationForm.vue'
 import CustomTable from '@/components/ui/custom-table/CustomTable.vue'
 import CustomChip from '@/components/ui/custom-chip/CustomChip.vue'
 import CustomPagination from '@/components/ui/custom-pagination/CustomPagination.vue'
