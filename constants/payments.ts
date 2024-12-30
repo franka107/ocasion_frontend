@@ -4,7 +4,7 @@ import type {
 } from '@/components/ui/custom-table/CustomTable.vue'
 
 export const paymentStatus = new Map<string, { name: string; color: string }>([
-  ['BASE', { name: 'Base', color: 'brown' }],
+  ['BASE', { name: 'Inicial', color: 'brown' }],
   ['OBSERVED', { name: 'Abono observado', color: 'orange' }],
   ['IN_REVIEW', { name: 'En revisión de abono', color: 'blue' }],
   ['CONFIRMED', { name: 'Abono confirmado', color: 'green' }],

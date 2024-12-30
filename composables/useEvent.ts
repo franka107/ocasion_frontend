@@ -44,6 +44,19 @@ export function useEvent() {
     return { status, error, data, refresh }
   }
 
+  const viewEvent = async (id: number | string) => {
+    const { status, error, data, refresh } = await useAPI<EventDto>(
+      `${EVENT_BASE_URL}/view-event-detail`,
+      {
+        method: 'GET',
+        query: {
+          id,
+        },
+      } as any,
+    )
+    return { status, error, data, refresh }
+  }
+
   const cancelEvent = async (values: any) => {
     const { status, error }: any = await useAPI(
       `${EVENT_BASE_URL}/cancel-event`,
@@ -74,6 +87,7 @@ export function useEvent() {
     createEvent,
     editEvent,
     getEvent,
+    viewEvent,
     cancelEvent,
     publishEvent,
   }
