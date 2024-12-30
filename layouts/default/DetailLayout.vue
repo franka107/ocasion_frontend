@@ -4,7 +4,7 @@
       <!-- Encabezado con el título y el botón de flecha -->
       <div class="flex justify-between items-center">
         <h3
-        class="mb-5 text-sm text-[#676767] transition-all duration-300 w-full"
+        class="p-2 text-sm text-[#676767] transition-all duration-300 w-full"
         :class="{
           'transform translate-x-[45%]': !showContent,
           'translate-x-0': showContent
@@ -34,7 +34,7 @@
 
       <!-- Contenido desplegable -->
       <div v-show="showContent" class="transition-all duration-300">
-        <div class="grid md:grid-cols-[2fr_1fr] grid-cols-1 gap-6">
+        <div class="grid md:grid-cols-[2fr_1fr] grid-cols-1 gap-6 mt-4">
           <div>
             <div class="grid grid-cols-[repeat(auto-fill,_minmax(240px,1fr))] md:grid-cols-2 gap-5">
               <InputWithLabel read-field label="Título de la oferta" :model-value="formData.title" />

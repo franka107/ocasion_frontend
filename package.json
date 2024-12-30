@@ -27,6 +27,7 @@
     "date-holidays": "^3.23.12",
     "dayjs": "^1.11.12",
     "embla-carousel-vue": "^8.3.1",
+    "frontend-app": "file:",
     "howler": "^2.2.4",
     "lucide-vue-next": "^0.424.0",
     "nuxt": "^3.13.2",

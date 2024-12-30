@@ -25,7 +25,7 @@
   <div class="py-4 px-10 rounded-xl items-center bg-white w-full">
     <div class="flex justify-between items-center relative">
       <h3
-        class="mb-5 text-sm text-[#676767] transition-all duration-300 w-full"
+        class="p-2 text-sm text-[#676767] transition-all duration-300 w-full"
         :class="{
           'transform translate-x-[45%]': !showContent,
           'translate-x-0': showContent
@@ -33,7 +33,6 @@
       >
         Datos del evento
       </h3>
-
       <button
         @click="toggleContent"
         class="text-gray-500 hover:text-gray-700 focus:outline-none"
@@ -146,10 +145,9 @@ const router = useRouter()
 const props = defineProps<{ eventDetail: EventDto }>()
 const { eventDetail } = toRefs(props)
 
-// Estado reactivo para manejar la visibilidad
-const showContent = ref(false)
 
-// Función para alternar la visibilidad
+const showContent = ref(true)
+
 const toggleContent = () => {
   showContent.value = !showContent.value
 }
