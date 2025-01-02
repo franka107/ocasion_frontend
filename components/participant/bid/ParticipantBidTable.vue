@@ -87,6 +87,72 @@
               </Button>
             </div>
           </template>
+
+          <template #deliverySustentation="{ row }">
+            <div
+              v-if="
+                row.sustentation &&
+                row.sustentation.deliverySustentation &&
+                row.sustentation.deliverySustentation.status !==
+                  ChildSustentationStatus.Pending
+              "
+              class="flex justify-center m-auto items-center"
+            >
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <div>
+                      <Button
+                        variant="ghost"
+                        @click="
+                          () => {
+                            openDeliverySustentationModal(row)
+                          }
+                        "
+                      >
+                        <CustomIcons
+                          name="Doc-Loupe"
+                          :class="
+                            childSustentationStatusRecord[
+                              row.sustentation.deliverySustentation
+                                .status as ChildSustentationStatus
+                            ].iconClass || ''
+                          "
+                        />
+                      </Button>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <CustomChip
+                      :text="
+                        childSustentationStatusRecord[
+                          row.sustentation.deliverySustentation
+                            .status as ChildSustentationStatus
+                        ].label || ''
+                      "
+                      :variant="
+                        (childSustentationStatusRecord[
+                          row.sustentation.deliverySustentation
+                            .status as ChildSustentationStatus
+                        ].color as any) || ''
+                      "
+                    ></CustomChip>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+
+            <div v-else>
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled
+                class="text-[#a1a1a3] underline h-8 data-[state=open]:bg-accent"
+              >
+                <span>Sin información</span>
+              </Button>
+            </div>
+          </template>
           <template #payment="{ row }">
             <div
               v-if="row.payment"
@@ -200,6 +266,20 @@
         </CustomTable>
 
         <SheetContent
+          v-model:open="isDeliverySustentationFormOpened"
+          class="flex flex-col h-full"
+          @pointer-down-outside="(e) => e.preventDefault()"
+          @interact-outside="(e) => e.preventDefault()"
+        >
+          <DeliverySustentationForm
+            :id="deliverySustentationId"
+            readonly
+            :on-confirm="() => {}"
+            :on-edit="() => {}"
+            :close-modal="() => (isDeliverySustentationFormOpened = false)"
+          />
+        </SheetContent>
+        <SheetContent
           v-model:open="isTransferenceSustentationFormOpened"
           class="flex flex-col h-full"
           @pointer-down-outside="(e) => e.preventDefault()"
@@ -285,6 +365,7 @@ import {
 } from '~/types/Evidence'
 import { offerStatusRecord } from '~/constants/offer'
 import { PaymentStatus, paymentStatusRecord } from '~/types/Payment'
+import DeliverySustentationForm from '~/components/evidence/DeliverySustentationForm.vue'
 const selectedId = ref('') // Define el id que necesitas pasar
 const selectedPersonStatus = ref<'single' | 'married' | 'legal'>('legal')
 const openTransferModal = ref(false)
@@ -306,11 +387,18 @@ const handleCompostSupportFiles = (row: any) => {
 
 const isTransferenceSustentationFormOpened = ref(false)
 const transferenceSustentationId = ref<string | undefined>(undefined)
+const isDeliverySustentationFormOpened = ref(false)
+const deliverySustentationId = ref<string | undefined>(undefined)
 
 const openTransferenceSustentationModal = (row: any) => {
   transferenceSustentationId.value =
     row.sustentation.transferenceSustentation.id
   isTransferenceSustentationFormOpened.value = true
+}
+
+const openDeliverySustentationModal = (row: any) => {
+  deliverySustentationId.value = row.sustentation.deliverySustentation.id
+  isDeliverySustentationFormOpened.value = true
 }
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const { rejectOfferBids, acceptOfferBids, page, sortOptions, onSort } =

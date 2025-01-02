@@ -121,7 +121,7 @@
   </section>
 </template>
 <script setup lang="ts">
-import DeliveryForm from './DeliveryForm.vue'
+import DeliveryForm from './DeliverySustentationForm.vue'
 import SupportForm from './TransferenceSustentationForm.vue'
 import CustomTable from '@/components/ui/custom-table/CustomTable.vue'
 import CustomChip from '@/components/ui/custom-chip/CustomChip.vue'

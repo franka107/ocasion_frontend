@@ -30,30 +30,88 @@
             </template>
             <template #deliverySustentation="{ row }">
               <div
-                class="flex items-center justify-center"
-                :class="
-                  !row.deliverySupport?.files?.length
-                    ? 'cursor-not-allowed'
-                    : 'cursor-pointer'
-                "
-                @click="
-                  () => {
-                    if (row.transferenceSustentation)
-                      openDeliveryForTransferModal(row)
-                  }
-                "
+                v-if="row && row.deliverySustentation"
+                class="flex justify-center m-auto items-center"
               >
-                <CustomIcons
-                  :name="
-                    deliverySupportIcons.get(row.deliverySupport?.status)
-                      ?.icon || 'Doc-Loupe'
-                  "
-                  :class="
-                    deliverySupportIcons.get(row.deliverySupport?.status)
-                      ?.class || 'text-[#AFAFB1]'
-                  "
-                />
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <div>
+                        <Button
+                          variant="ghost"
+                          @click="
+                            () => {
+                              openDeliveryForTransferModal(row)
+                            }
+                          "
+                        >
+                          <CustomIcons
+                            name="Doc-Loupe"
+                            :class="
+                              childSustentationStatusRecord[
+                                row.deliverySustentation
+                                  .status as ChildSustentationStatus
+                              ].iconClass || ''
+                            "
+                          />
+                        </Button>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <CustomChip
+                        :text="
+                          childSustentationStatusRecord[
+                            row.deliverySustentation
+                              .status as ChildSustentationStatus
+                          ].label || ''
+                        "
+                        :variant="
+                          (childSustentationStatusRecord[
+                            row.deliverySustentation
+                              .status as ChildSustentationStatus
+                          ].color as any) || ''
+                        "
+                      ></CustomChip>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
+
+              <div v-else>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  disabled
+                  class="text-[#a1a1a3] underline h-8 data-[state=open]:bg-accent"
+                >
+                  <span>Sin información</span>
+                </Button>
+              </div>
+              <!-- <div -->
+              <!--   class="flex items-center justify-center" -->
+              <!--   :class=" -->
+              <!--     !row.deliverySupport?.files?.length -->
+              <!--       ? 'cursor-not-allowed' -->
+              <!--       : 'cursor-pointer' -->
+              <!--   " -->
+              <!--   @click=" -->
+              <!--     () => { -->
+              <!--       if (row.transferenceSustentation) -->
+              <!--         openDeliveryForTransferModal(row) -->
+              <!--     } -->
+              <!--   " -->
+              <!-- > -->
+              <!--   <CustomIcons -->
+              <!--     :name=" -->
+              <!--       deliverySupportIcons.get(row.deliverySupport?.status) -->
+              <!--         ?.icon || 'Doc-Loupe' -->
+              <!--     " -->
+              <!--     :class=" -->
+              <!--       deliverySupportIcons.get(row.deliverySupport?.status) -->
+              <!--         ?.class || 'text-[#AFAFB1]' -->
+              <!--     " -->
+              <!--   /> -->
+              <!-- </div> -->
             </template>
             <template #transferenceSustentation="{ row }">
               <TooltipProvider>
@@ -141,7 +199,7 @@
             @interact-outside="(e) => e.preventDefault()"
           >
             <DeliverySustentationForm
-              :id="transferenceDeliveryId"
+              :id="deliverySustentationId"
               :on-confirm="handleConfirmDeliverySustentationFiles"
               :on-edit="handleUploadDeliverySustentationFiles"
               :close-modal="() => (isDeliverySustentationFormOpened = false)"
@@ -213,7 +271,7 @@ const {
 } = useEvidenceDeliveryAPI()
 const { getMyGrants } = useAuthManagement()
 const myGrants = await getMyGrants()
-const transferenceDeliveryId = ref<string | undefined>(undefined)
+const deliverySustentationId = ref<string | undefined>(undefined)
 const transferenceSustentationId = ref<string | undefined>(undefined)
 const OFFER_BASE_URL = '/offer-management'
 const selectedMultipleData = ref<{ type: string; ids: string[] }>({
@@ -254,7 +312,7 @@ const evidenceData = computed(() =>
 const openDeliveryForTransferModal = (row: any) => {
   // if (row.deliverySupport?.id) {
   // deliveryId.value = row.deliverySupport.id
-  transferenceDeliveryId.value = 'proban'
+  deliverySustentationId.value = row.deliverySustentation.id
   isDeliverySustentationFormOpened.value = true
   // }
 }

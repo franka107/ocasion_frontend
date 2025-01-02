@@ -89,7 +89,7 @@
             @pointer-down-outside="(e) => e.preventDefault()"
             @interact-outside="(e) => e.preventDefault()"
           >
-            <SupportForm
+            <TransferenceSustentationForm
               :id="supportId"
               :on-confirm="handleConfirmTransference"
               :on-edit="handleEditTransference"
@@ -124,7 +124,7 @@
 import CustomTable from '@/components/ui/custom-table/CustomTable.vue'
 import CustomChip from '@/components/ui/custom-chip/CustomChip.vue'
 import CustomPagination from '@/components/ui/custom-pagination/CustomPagination.vue'
-import type { EvidenseItem } from '@/types/Evidence.ts'
+import type { EvidenseItem, IDateModal } from '@/types/Evidence.ts'
 import {
   evidenceStatus,
   evidenceSearch,
@@ -135,9 +135,8 @@ import {
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
 import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
 import { GrantId } from '~/types/Grant'
-import type { IDateModal } from '~/types/Evidence'
-import DeliveryForm from '@/components/evidence/DeliveryForm.vue'
-import SupportForm from '~/components/evidence/TransferenceSustentationForm.vue'
+import DeliveryForm from '~/components/evidence/DeliverySustentationForm.vue'
+import TransferenceSustentationForm from '~/components/evidence/TransferenceSustentationForm.vue'
 const route = useRoute()
 const organizationId = route.params.organizationId as string
 const props = defineProps<{ organizationId: string | null }>()

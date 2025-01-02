@@ -98,8 +98,12 @@ import { ref, computed, defineProps, defineEmits } from 'vue'
 import { useVModel } from '@vueuse/core'
 import {
   CalendarDate,
+  CalendarDateTime,
   DateFormatter,
+  fromDate,
   getLocalTimeZone,
+  parseAbsolute,
+  parseAbsoluteToLocal,
   parseDate,
   parseDateTime,
   type DateValue,
@@ -110,6 +114,8 @@ const dateFormatter = new DateFormatter('es', {
   year: '2-digit',
   month: '2-digit',
   day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
 })
 
 const props = defineProps<{
@@ -137,12 +143,39 @@ const minutes = computed(() => Array.from({ length: 12 }, (_, i) => i * 5))
 
 const dateValue = computed({
   get: () => (modelValue.value ? parseDateTime(modelValue.value) : undefined),
+  get: () => {
+    let value
+    if (modelValue.value) {
+      try {
+        value = parseDateTime(modelValue.value)
+      } catch (err) {
+        value = parseAbsolute(modelValue.value, getLocalTimeZone())
+        // try {
+        // } catch (err) {
+        //   // etc.
+        // }
+      }
+    } else {
+      return undefined
+    }
+    return value
+  },
+  // get: () =>
+  //   modelValue.value
+  //     ? parseAbsolute(modelValue.value, getLocalTimeZone())
+  //     : undefined,
   set: (val) => {
     modelValue.value = val ? val.toString() : undefined
   },
 })
 
 const handleTimeChange = (type: 'hour' | 'minute', value: string) => {
+  // notificationDf.format(
+  //   parseAbsolute(
+  //     notification.createdAt,
+  //     getLocalTimeZone(),
+  //   ).toDate(),
+  // )
   if (dateValue.value) {
     const newDate = dateValue.value.toDate(getLocalTimeZone())
     if (type === 'hour') {
@@ -150,7 +183,22 @@ const handleTimeChange = (type: 'hour' | 'minute', value: string) => {
     } else if (type === 'minute') {
       newDate.setMinutes(parseInt(value))
     }
-    dateValue.value = parseDateTime(newDate.toISOString())
+    // dateValue.value = parseDateTime(newDate.toISOString())
+    // dateValue.value = parseDateTime(
+    //   parseAbsolute(newDate.toISOString(), getLocalTimeZone())
+    //     .toDate()
+    //     .toISOString(),
+    // )
+    const jsDate = newDate
+    const calendarDateTime = new CalendarDateTime(
+      jsDate.getFullYear(),
+      jsDate.getMonth() + 1, // Los meses en JavaScript son base 0
+      jsDate.getDate(),
+      jsDate.getHours(),
+      jsDate.getMinutes(),
+      jsDate.getSeconds(),
+    )
+    dateValue.value = calendarDateTime
   }
 }
 

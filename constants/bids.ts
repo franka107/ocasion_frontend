@@ -165,6 +165,11 @@ export const bidsParticipantHeader: HeaderItem[] = [
     label: 'D. Sustento de Transferencia',
     sortable: false,
   },
+  {
+    key: 'deliverySustentation',
+    label: 'D. Sustento de entrega ',
+    sortable: false,
+  },
 
   {
     key: 'actions',

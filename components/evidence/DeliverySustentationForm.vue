@@ -4,7 +4,14 @@ import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
 import { X } from 'lucide-vue-next'
+import {
+  getLocalTimeZone,
+  parseAbsolute,
+  parseAbsoluteToLocal,
+} from '@internationalized/date'
+import dayjs from 'dayjs'
 import DateTimeInput from '../ui/date-time-input/DateTimeInput.vue'
+import DateInput from '../ui/date-input/DateInput.vue'
 import { SheetClose } from '@/components/ui/sheet' //
 import InputFile from '@/components/common/file/Input.vue'
 
@@ -13,6 +20,7 @@ import { GrantId } from '~/types/Grant'
 const BASE_SUSTENTATION_MANAGEMENT = '/sustentation-management'
 const props = defineProps<{
   id: string | undefined
+  readonly: boolean
   onEdit: (values: any) => void
   onConfirm: (values: any) => void
   closeModal: () => void
@@ -31,7 +39,8 @@ const formSchema = toTypedSchema(
       .max(5, 'Puede subir máximo 6 archivos de evidencia'),
     address: z.string().min(1, 'La dirección es requerida.'),
     comment: z.string().min(1, 'El comentario es requerido.'),
-    deliveredAt: z.string().min(1, 'La fecha de envio es requerida.'),
+    deliveredAtDate: z.string().min(1, 'La fecha de envio es requerida.'),
+    deliveredAtTime: z.string().min(1, 'La fecha de envio es requerida.'),
   }),
 )
 
@@ -43,7 +52,11 @@ try {
     } as any,
   )
 
-  deliverySustentationDetail.value = data.value
+  deliverySustentationDetail.value = {
+    ...data.value,
+    deliveredAtDate: dayjs(data.value.deliveredAt).format('YYYY-MM-DD'),
+    deliveredAtTime: dayjs(data.value.deliveredAt).format('HH:mm'),
+  }
 } catch (error) {
   console.error('Error al cargar el detalle de Sustento de Entrega', error)
 }
@@ -66,6 +79,10 @@ const onSubmit = form.handleSubmit(async (values: any) => {
     if (valid) {
       const formattedValues = {
         id: props.id,
+        deliveredAt: new Date(
+          `${values.deliveredAtDate} ${values.deliveredAtTime}`,
+        ).toISOString(),
+
         ...values,
       }
       props.onEdit(formattedValues)
@@ -93,59 +110,84 @@ const onSubmit = form.handleSubmit(async (values: any) => {
     <form class="min-h-full" @submit="onSubmit">
       <section class="flex flex-col gap-4 flex-grow p-5">
         <div v-if="deliverySustentationDetail">
-          <section
-            v-if="userSession.user.value?.user.type !== UserType.Participant"
-            class=""
-          >
-            <h3
-              class="tracking-[1px] font-[600] text-[#152A3C] text-[14px] leading-5"
-            >
-              DATOS DEL PARTICIPANTE
-            </h3>
-          </section>
           <section class="mb-6">
             <h3
               class="tracking-[1px] font-[600] text-[#152A3C] text-[14px] leading-5 mb-[12px]"
             >
-              DATODS DE LA ENTREGA
+              DATOS DE LA ENTREGA
             </h3>
             <div>
-              <h4
-                class="font-[600] mt-3 text-[#152A3C] text-[12px] leading-5 mb-[12px]"
-              >
-                Fecha y hora de envio
-              </h4>
-              <FormField v-slot="{ componentField }" name="deliveredAt">
-                <FormItem class="w-1/2">
-                  <FormControl>
-                    <DateTimeInput
-                      class="my-2"
-                      label="Fecha y hora de envio"
-                      :value="componentField.modelValue"
-                      @update:model-value="componentField.onChange"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              </FormField>
-              <h4
-                class="font-[600] mt-3 text-[#152A3C] text-[12px] leading-5 mb-[12px]"
-              >
-                Dirección
-              </h4>
+              <!-- <h4 -->
+              <!--   class="font-[600] mt-3 text-[#152A3C] text-[12px] leading-5 mb-[12px]" -->
+              <!-- > -->
+              <!--   Fecha y hora de envio -->
+              <!-- </h4> -->
+              <div class="mb-[12px]">
+                <div class="flex gap-2">
+                  <!-- Fecha -->
+                  <FormField v-slot="{ componentField }" name="deliveredAtDate">
+                    <FormItem class="w-1/2">
+                      <FormControl>
+                        <DateInput
+                          label="Fecha"
+                          :readonly="readonly"
+                          :value="componentField.modelValue"
+                          @update:model-value="componentField.onChange"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  </FormField>
+                  <!-- Hora-->
+                  <FormField v-slot="{ componentField }" name="deliveredAtTime">
+                    <FormItem class="w-1/2">
+                      <FormControl>
+                        <CustomInput
+                          type="text"
+                          label="Hora"
+                          v-bind="componentField"
+                          :readonly="readonly"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  </FormField>
+                </div>
+                <!-- <FormField v-slot="{ componentField }" name="deliveredAt"> -->
+                <!--   <FormItem> -->
+                <!--     <FormControl> -->
+                <!--       <DateInput -->
+                <!--         class="my-2" -->
+                <!--         label="Fecha y hora de envio" -->
+                <!--         :value="componentField.modelValue" -->
+                <!--         @update:model-value="componentField.onChange" -->
+                <!--       /> -->
+                <!--     </FormControl> -->
+                <!--     <FormMessage /> -->
+                <!--   </FormItem> -->
+                <!-- </FormField> -->
+              </div>
+              <!-- <h4 -->
+              <!--   class="font-[600] mt-3 text-[#152A3C] text-[12px] leading-5 mb-[12px]" -->
+              <!-- > -->
+              <!--   Dirección -->
+              <!-- </h4> -->
 
-              <FormField v-slot="{ componentField }" name="address">
-                <FormItem>
-                  <FormControl>
-                    <CustomInput
-                      type="text"
-                      label="Lugar"
-                      v-bind="componentField"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              </FormField>
+              <div class="mb-[12px]">
+                <FormField v-slot="{ componentField }" name="address">
+                  <FormItem>
+                    <FormControl>
+                      <CustomInput
+                        type="text"
+                        label="Dirección"
+                        v-bind="componentField"
+                        :readonly="readonly"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                </FormField>
+              </div>
 
               <h4
                 class="font-[600] mt-3 text-[#152A3C] text-[12px] leading-5 mb-[12px]"
@@ -159,6 +201,7 @@ const onSubmit = form.handleSubmit(async (values: any) => {
                     <Textarea
                       type="text"
                       label="Comentarios"
+                      :readonly="readonly"
                       v-bind="componentField"
                     />
                     <FormMessage />
@@ -178,104 +221,11 @@ const onSubmit = form.handleSubmit(async (values: any) => {
                     <InputFile
                       v-model="form.values.evidenceFiles"
                       title="Evidencia"
-                      :disabled="currentMode === 'confirm'"
+                      :disabled="currentMode === 'confirm' || readonly"
                       :hide-remove-icon="currentMode === 'confirm'"
                       v-bind="componentField"
                       instructions-text="Cargar máximo hasta 5 archivo (png, jpg, o jpeg)"
                       :accepted-file-types="['.jpg', '.png', '.jpeg']"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              </FormField>
-            </div>
-            <div
-              v-if="
-                deliverySustentationDetail.participant.maritalStatus ===
-                  'MARRIED' &&
-                deliverySustentationDetail.participant.personType ===
-                  'NATURAL_PERSON'
-              "
-            >
-              <h4
-                class="font-[600] mt-3 text-[#152A3C] text-[12px] leading-5 mb-[12px]"
-              >
-                Foto legible de DNI del cónyuge (Frontal y dorsal)
-              </h4>
-              <FormField
-                v-slot="{ componentField }"
-                name="identifierSpouseFiles"
-              >
-                <FormItem>
-                  <FormControl>
-                    <InputFile
-                      v-model="form.values.identifierSpouseFiles"
-                      title="Foto legible de DNI del cónyuge"
-                      instructions-text="Cargar máximo hasta 1 archivo (png, jpg, jpeg o pdf)"
-                      :accepted-file-types="['.jpg', '.png', '.jpeg', '.pdf']"
-                      :disabled="currentMode === 'confirm'"
-                      :hide-remove-icon="currentMode === 'confirm'"
-                      v-bind="componentField"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              </FormField>
-            </div>
-
-            <div
-              v-if="
-                deliverySustentationDetail.participant.personType ===
-                'JURIDIC_PERSON'
-              "
-            >
-              <h4
-                class="font-[600] mt-3 text-[#152A3C] text-[12px] leading-5 mb-[12px]"
-              >
-                Ficha RUC de la empresa de labor
-              </h4>
-              <FormField v-slot="{ componentField }" name="rucCardFiles">
-                <FormItem>
-                  <FormControl>
-                    <InputFile
-                      v-model="form.values.rucCardFiles"
-                      title="Ficha RUC de la empresa de labor"
-                      :disabled="currentMode === 'confirm'"
-                      :hide-remove-icon="currentMode === 'confirm'"
-                      v-bind="componentField"
-                      instructions-text="Cargar máximo hasta 1 archivo (png, jpg, jpeg o pdf)"
-                      :accepted-file-types="['.jpg', '.png', '.jpeg', '.pdf']"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              </FormField>
-            </div>
-            <div
-              v-if="
-                deliverySustentationDetail.participant.personType ===
-                'JURIDIC_PERSON'
-              "
-            >
-              <h4
-                class="font-[600] mt-3 text-[#152A3C] text-[12px] leading-5 mb-[12px]"
-              >
-                Vigencia de poder (no superior a 3 meses)
-              </h4>
-              <FormField
-                v-slot="{ componentField }"
-                name="validityOfPowerFiles"
-              >
-                <FormItem>
-                  <FormControl>
-                    <InputFile
-                      v-model="form.values.validityOfPowerFiles"
-                      title="Vigencia de poder (no superior a 3 meses)"
-                      :disabled="currentMode === 'confirm'"
-                      :hide-remove-icon="currentMode === 'confirm'"
-                      v-bind="componentField"
-                      instructions-text="Cargar máximo hasta 1 archivo (png, jpg, jpeg o pdf)"
-                      :accepted-file-types="['.jpg', '.png', '.jpeg', '.pdf']"
                     />
                   </FormControl>
                   <FormMessage />
