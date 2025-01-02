@@ -2,6 +2,7 @@ import type {
   HeaderItem,
   SearchItem,
 } from '@/components/ui/custom-table/CustomTable.vue'
+import type { PaymentStatus } from '~/types/Payment'
 
 export const paymentStatus = new Map<string, { name: string; color: string }>([
   ['BASE', { name: 'Inicial', color: 'brown' }],
@@ -11,6 +12,7 @@ export const paymentStatus = new Map<string, { name: string; color: string }>([
   ['CANCELLED', { name: 'Cancelada', color: 'red' }],
   ['CONCRETED', { name: 'Concretada', color: 'brown' }],
 ])
+
 export const paymentsSearch: SearchItem[] = [
   {
     key: 'quickSearch',
@@ -74,16 +76,6 @@ export const paymentsHeader = (viewType: ViewType): HeaderItem[] => [
       ]
     : []),
 
-  ...(viewType === 'organization'
-    ? [
-        {
-          key: 'compostPropertyPaymentFile',
-          label: 'Sustento pago de propiedad',
-          sortable: false,
-        },
-      ]
-    : []),
-
   {
     key: 'date',
     label: 'Fecha de envio',
@@ -101,6 +93,11 @@ export const paymentsHeader = (viewType: ViewType): HeaderItem[] => [
           label: 'Monto de propiedad',
           sortable: true,
         },
+        {
+          key: 'status',
+          label: 'Estado general de abono',
+          sortable: true,
+        },
       ]
     : []),
 
@@ -114,6 +111,15 @@ export const paymentsHeader = (viewType: ViewType): HeaderItem[] => [
       ]
     : []),
 
+  ...(viewType === 'organization'
+    ? [
+        {
+          key: 'compostPropertyPaymentFile',
+          label: 'Sustento pago de propiedad',
+          sortable: false,
+        },
+      ]
+    : []),
   // {
   //   key: 'compostPropertyPaymentStatus',
   //   label: 'Estado de sustento de pago (propiedad)',
@@ -125,11 +131,7 @@ export const paymentsHeader = (viewType: ViewType): HeaderItem[] => [
   //   label: 'Estado de sustento de pago (comisión)',
   //   sortable: true,
   // },
-  {
-    key: 'status',
-    label: 'Estado general de abono',
-    sortable: true,
-  },
+
   {
     key: 'actions',
     label: 'Acciones',

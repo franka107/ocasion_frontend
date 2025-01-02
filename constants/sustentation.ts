@@ -142,6 +142,12 @@ export const sustentationHeaderList = (viewType: GlobalType): HeaderItem[] => [
           align: 'center',
           sortable: false,
         },
+        {
+          key: 'deliverySustentation',
+          label: 'S. de entrega',
+          // align: 'center',
+          sortable: true,
+        },
       ] as HeaderItem[])
     : []),
 ]

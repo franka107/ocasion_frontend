@@ -4,13 +4,10 @@ import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
 import { X } from 'lucide-vue-next'
-import ParticipantDetailFields from '../attention-tray/withdrawal-requests/ParticipantDetailFields.vue'
+import DateTimeInput from '../ui/date-time-input/DateTimeInput.vue'
 import { SheetClose } from '@/components/ui/sheet' //
 import InputFile from '@/components/common/file/Input.vue'
-import type {
-  TransferenceSustentationDto,
-  DeliveryDetailFile,
-} from '@/types/Evidence.ts'
+
 import { UserType } from '~/types/Administrators'
 import { GrantId } from '~/types/Grant'
 const BASE_SUSTENTATION_MANAGEMENT = '/sustentation-management'
@@ -22,114 +19,45 @@ const props = defineProps<{
 }>()
 const currentMode = ref<'edit' | 'confirm'>('confirm')
 
-const transferenceSustentationDetail = ref<TransferenceSustentationDto | null>(
-  null,
-)
+const deliverySustentationDetail = ref<any | null>(null)
 const { getMyGrants } = useAuthManagement()
 const myGrants = await getMyGrants()
 
 const formSchema = toTypedSchema(
-  z
-    .object({
-      identifierHolderFiles: z
-        .array(z.any())
-        .min(1, 'Debe subir al menos un archivo')
-        .max(
-          1,
-          'Puede subir solo un archivo para el voucher de pago de comisión',
-        ),
-      identifierSpouseFiles: z.array(z.any()),
-      // .min(1, 'Debe subir al menos un archivo')
-      // .max(
-      //   1,
-      //   'Puede subir solo un archivo para el voucher de pago de comisión',
-      // ),
-      rucCardFiles: z.array(z.any()),
-      // .min(1, 'Debe subir al menos un archivo')
-      // .max(
-      //   1,
-      //   'Puede subir solo un archivo para el voucher de pago de comisión',
-      // ),
-      soatFiles: z
-        .array(z.any())
-        .min(1, 'Debe subir al menos un archivo')
-        .max(
-          1,
-          'Puede subir solo un archivo para el voucher de pago de comisión',
-        ),
-      validityOfPowerFiles: z.array(z.any()),
-      // .min(1, 'Debe subir al menos un archivo')
-      // .max(
-      //   1,
-      //   'Puede subir solo un archivo para el voucher de pago de comisión',
-      // ),
-    })
-    .superRefine((values, ctx) => {
-      // Condición para validar identifierSpouseFiles (cónyuge casado y persona natural)
-      if (
-        transferenceSustentationDetail.value?.participant.maritalStatus ===
-          'MARRIED' &&
-        transferenceSustentationDetail.value?.participant.personType ===
-          'NATURAL_PERSON'
-      ) {
-        if (
-          !values.identifierSpouseFiles ||
-          values.identifierSpouseFiles.length === 0
-        ) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ['identifierSpouseFiles'],
-            message: 'Debe subir al menos un archivo para el cónyuge',
-          })
-        }
-      }
-
-      // Condición para validar rucCardFiles y validityOfPowerFiles (persona jurídica)
-      if (
-        transferenceSustentationDetail.value?.participant.personType ===
-        'JURIDIC_PERSON'
-      ) {
-        if (!values.rucCardFiles || values.rucCardFiles.length === 0) {
-          ctx.addIssue({
-            path: ['rucCardFiles'],
-            code: z.ZodIssueCode.custom,
-            message: 'Debe subir al menos un archivo para la ficha RUC',
-          })
-        }
-        if (
-          !values.validityOfPowerFiles ||
-          values.validityOfPowerFiles.length === 0
-        ) {
-          ctx.addIssue({
-            path: ['validityOfPowerFiles'],
-            code: z.ZodIssueCode.custom,
-            message: 'Debe subir al menos un archivo para la vigencia de poder',
-          })
-        }
-      }
-    }),
+  z.object({
+    evidenceFiles: z
+      .array(z.any())
+      .min(1, 'Debe subir al menos un archivo')
+      .max(5, 'Puede subir máximo 6 archivos de evidencia'),
+    address: z.string().min(1, 'La dirección es requerida.'),
+    comment: z.string().min(1, 'El comentario es requerido.'),
+    deliveredAt: z.string().min(1, 'La fecha de envio es requerida.'),
+  }),
 )
 
 try {
-  const { data } = await useAPI<TransferenceSustentationDto>(
-    `${BASE_SUSTENTATION_MANAGEMENT}/view-transference-sustentation-detail`,
+  const { data } = await useAPI<any>(
+    `${BASE_SUSTENTATION_MANAGEMENT}/view-delivery-sustentation-detail`,
     {
       query: { id: props.id },
     } as any,
   )
 
-  transferenceSustentationDetail.value = data.value
+  deliverySustentationDetail.value = data.value
 } catch (error) {
   console.error('Error al cargar el detalle de Sustento de Entrega', error)
 }
 
 const userSession = useUserSession()
-if (userSession.user.value?.user.type === UserType.Participant) {
+if (
+  userSession.user.value?.user.type === UserType.OrganizationUser ||
+  userSession.user.value?.user.type === UserType.OrganizationAdmin
+) {
   currentMode.value = 'edit'
 }
 const form = useForm({
   validationSchema: formSchema,
-  initialValues: transferenceSustentationDetail.value,
+  initialValues: deliverySustentationDetail.value,
 })
 
 const onSubmit = form.handleSubmit(async (values: any) => {
@@ -157,14 +85,14 @@ const onSubmit = form.handleSubmit(async (values: any) => {
       <X class="w-4 h-4 text-muted-foreground" />
     </SheetClose>
     <SheetTitle class="text-xl font-medium text-[#64748B]"
-      >Detalle transferencia de bienes</SheetTitle
+      >Detalle entrega de bien</SheetTitle
     >
   </SheetHeader>
 
   <div class="flex-grow flex flex-col overflow-y-auto no-scrollbar">
     <form class="min-h-full" @submit="onSubmit">
       <section class="flex flex-col gap-4 flex-grow p-5">
-        <div v-if="transferenceSustentationDetail">
+        <div v-if="deliverySustentationDetail">
           <section
             v-if="userSession.user.value?.user.type !== UserType.Participant"
             class=""
@@ -174,38 +102,67 @@ const onSubmit = form.handleSubmit(async (values: any) => {
             >
               DATOS DEL PARTICIPANTE
             </h3>
-
-            <ParticipantDetailFields
-              :participant-id="transferenceSustentationDetail.participantId"
-            />
           </section>
           <section class="mb-6">
             <h3
               class="tracking-[1px] font-[600] text-[#152A3C] text-[14px] leading-5 mb-[12px]"
             >
-              ARCHIVOS SUBIDOS
+              DATODS DE LA ENTREGA
             </h3>
             <div>
               <h4
                 class="font-[600] mt-3 text-[#152A3C] text-[12px] leading-5 mb-[12px]"
               >
-                SOAT (en caso que la unidad no cuente con SOAT vigente)
+                Fecha y hora de envio
               </h4>
-              <!-- Fields -->
-              <FormField v-slot="{ componentField }" name="soatFiles">
+              <FormField v-slot="{ componentField }" name="deliveredAt">
+                <FormItem class="w-1/2">
+                  <FormControl>
+                    <DateTimeInput
+                      class="my-2"
+                      label="Fecha y hora de envio"
+                      :value="componentField.modelValue"
+                      @update:model-value="componentField.onChange"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
+              <h4
+                class="font-[600] mt-3 text-[#152A3C] text-[12px] leading-5 mb-[12px]"
+              >
+                Dirección
+              </h4>
+
+              <FormField v-slot="{ componentField }" name="address">
                 <FormItem>
                   <FormControl>
-                    <InputFile
-                      v-model="form.values.soatFiles"
-                      instructions-text="Cargar máximo hasta 1 archivo (png, jpg, jpeg o pdf)"
-                      :accepted-file-types="['.jpg', '.png', '.jpeg', '.pdf']"
-                      title="SOAT"
-                      :disabled="currentMode === 'confirm'"
-                      :hide-remove-icon="currentMode === 'confirm'"
+                    <CustomInput
+                      type="text"
+                      label="Lugar"
                       v-bind="componentField"
                     />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              </FormField>
+
+              <h4
+                class="font-[600] mt-3 text-[#152A3C] text-[12px] leading-5 mb-[12px]"
+              >
+                Comentarios
+              </h4>
+
+              <FormField v-slot="{ componentField }" name="comment">
+                <FormItem>
+                  <FormControl>
+                    <Textarea
+                      type="text"
+                      label="Comentarios"
+                      v-bind="componentField"
+                    />
+                    <FormMessage />
+                  </FormControl>
                 </FormItem>
               </FormField>
             </div>
@@ -213,22 +170,19 @@ const onSubmit = form.handleSubmit(async (values: any) => {
               <h4
                 class="font-[600] mt-3 text-[#152A3C] text-[12px] leading-5 mb-[12px]"
               >
-                Foto legible de DNI del titular (Frontal y dorsal)
+                Evidencias de entrega
               </h4>
-              <FormField
-                v-slot="{ componentField }"
-                name="identifierHolderFiles"
-              >
+              <FormField v-slot="{ componentField }" name="evidenceFiles">
                 <FormItem>
                   <FormControl>
                     <InputFile
-                      v-model="form.values.identifierHolderFiles"
-                      title="Foto legible de DNI del titular"
+                      v-model="form.values.evidenceFiles"
+                      title="Evidencia"
                       :disabled="currentMode === 'confirm'"
                       :hide-remove-icon="currentMode === 'confirm'"
                       v-bind="componentField"
-                      instructions-text="Cargar máximo hasta 1 archivo (png, jpg, jpeg o pdf)"
-                      :accepted-file-types="['.jpg', '.png', '.jpeg', '.pdf']"
+                      instructions-text="Cargar máximo hasta 5 archivo (png, jpg, o jpeg)"
+                      :accepted-file-types="['.jpg', '.png', '.jpeg']"
                     />
                   </FormControl>
                   <FormMessage />
@@ -237,9 +191,9 @@ const onSubmit = form.handleSubmit(async (values: any) => {
             </div>
             <div
               v-if="
-                transferenceSustentationDetail.participant.maritalStatus ===
+                deliverySustentationDetail.participant.maritalStatus ===
                   'MARRIED' &&
-                transferenceSustentationDetail.participant.personType ===
+                deliverySustentationDetail.participant.personType ===
                   'NATURAL_PERSON'
               "
             >
@@ -271,7 +225,7 @@ const onSubmit = form.handleSubmit(async (values: any) => {
 
             <div
               v-if="
-                transferenceSustentationDetail.participant.personType ===
+                deliverySustentationDetail.participant.personType ===
                 'JURIDIC_PERSON'
               "
             >
@@ -299,7 +253,7 @@ const onSubmit = form.handleSubmit(async (values: any) => {
             </div>
             <div
               v-if="
-                transferenceSustentationDetail.participant.personType ===
+                deliverySustentationDetail.participant.personType ===
                 'JURIDIC_PERSON'
               "
             >
@@ -336,7 +290,10 @@ const onSubmit = form.handleSubmit(async (values: any) => {
           <Button
             v-if="
               myGrants.data.value.includes(
-                GrantId.OrganizationSustentationTransferenceCanEdit,
+                GrantId.OrganizationSustentationDeliveryCanEdit,
+              ) ||
+              myGrants.data.value.includes(
+                GrantId.PlatformSustentationDeliveryCanEdit,
               )
             "
             type="button"
@@ -349,7 +306,7 @@ const onSubmit = form.handleSubmit(async (values: any) => {
           <Button
             v-if="
               myGrants.data.value.includes(
-                GrantId.OrganizationSustentationTransferenceCanConfirm,
+                GrantId.PlatformSustentationDeliveryCanConfirm,
               )
             "
             type="submit"
@@ -363,8 +320,11 @@ const onSubmit = form.handleSubmit(async (values: any) => {
           <Button
             v-if="
               myGrants.data.value.includes(
-                GrantId.OrganizationSustentationTransferenceCanEdit,
-              ) || userSession.user.value?.user.type === UserType.Participant
+                GrantId.OrganizationSustentationDeliveryCanEdit,
+              ) ||
+              myGrants.data.value.includes(
+                GrantId.PlatformSustentationDeliveryCanEdit,
+              )
             "
             type="submit"
             :disabled="!form.meta.value.valid"

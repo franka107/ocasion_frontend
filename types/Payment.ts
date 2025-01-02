@@ -2,6 +2,7 @@ import type { BidDto } from './Bids'
 import type { EventDto } from './Event'
 import type { OfferDto } from './Offer'
 import type { OrganizationDto } from './Organization'
+import type { Color } from '~/constants/ui'
 
 export enum PaymentStatus {
   Concreted = 'CONCRETED', // Concretedo
@@ -10,6 +11,30 @@ export enum PaymentStatus {
   Base = 'BASE', // Observado
   Confirmed = 'CONFIRMED', // Confirmado
   Cancelled = 'CANCELLED', // Cancelado
+}
+
+export enum CompostPaymentStatus {
+  InReview = 'IN_REVIEW', // En revision
+  Observed = 'OBSERVED', // Observado
+  Confirmed = 'CONFIRMED', // Confirmado
+}
+
+export const compostPaymentStatusRecord: Record<
+  CompostPaymentStatus,
+  { label: string; color: Color }
+> = {
+  [CompostPaymentStatus.InReview]: {
+    label: 'En revisión',
+    color: 'blue',
+  },
+  [CompostPaymentStatus.Observed]: {
+    label: 'Observado',
+    color: 'yellow',
+  },
+  [CompostPaymentStatus.Confirmed]: {
+    label: 'Confirmado',
+    color: 'green',
+  },
 }
 
 export const paymentStatusRecord: Record<
@@ -24,9 +49,9 @@ export const paymentStatusRecord: Record<
   },
   [PaymentStatus.InReview]: {
     label: 'En revisión',
-    color: 'orange',
+    color: 'blue',
     icon: 'Doc-Transfer',
-    iconClass: 'text-orange-500',
+    iconClass: 'text-blue-500',
   },
   [PaymentStatus.Observed]: {
     label: 'Observado',

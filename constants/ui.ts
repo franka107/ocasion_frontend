@@ -1,0 +1,10 @@
+export type Color =
+  | 'default'
+  | 'blue'
+  | 'yellow'
+  | 'green'
+  | 'purple'
+  | 'red'
+  | 'orange'
+  | 'brown'
+  | 'destructive'

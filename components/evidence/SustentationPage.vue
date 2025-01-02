@@ -135,24 +135,16 @@
             </template>
           </CustomTable>
           <SheetContent
-            v-model:open="openModalDeliveryTransfer"
+            v-model:open="isDeliverySustentationFormOpened"
             class="flex flex-col h-full"
             @pointer-down-outside="(e) => e.preventDefault()"
             @interact-outside="(e) => e.preventDefault()"
           >
-            <!-- <DeliveryForm -->
-            <!--   :id="deliveryId" -->
-            <!--   :on-confirm="handleConfirmDelivery" -->
-            <!--   :on-edit="handleEditDelivery" -->
-            <!--   :close-modal="() => (openModalDeliveryTransfer = false)" -->
-            <!-- /> -->
-            <TransferenceSustentationForm
-              :id="deliveryId"
-              :on-confirm="handleConfirmTransferenceSustentationFiles"
-              :on-edit="handleUploadTransferenceSustentationFiles"
-              :close-modal="
-                () => (isTransferenceSustentationFormOpened = false)
-              "
+            <DeliverySustentationForm
+              :id="transferenceDeliveryId"
+              :on-confirm="handleConfirmDeliverySustentationFiles"
+              :on-edit="handleUploadDeliverySustentationFiles"
+              :close-modal="() => (isDeliverySustentationFormOpened = false)"
             />
           </SheetContent>
           <SheetContent
@@ -182,8 +174,9 @@
   </section>
 </template>
 <script setup lang="ts">
-import DeliveryForm from './DeliveryForm.vue'
+import DeliveryForm from './DeliverySustentationForm.vue'
 import TransferenceSustentationForm from './TransferenceSustentationForm.vue'
+import DeliverySustentationForm from './DeliverySustentationForm.vue'
 import CustomTable from '@/components/ui/custom-table/CustomTable.vue'
 import CustomChip from '@/components/ui/custom-chip/CustomChip.vue'
 import CustomPagination from '@/components/ui/custom-pagination/CustomPagination.vue'
@@ -208,7 +201,7 @@ import { goodType } from '~/constants/events'
 const filterOptions = ref('[]')
 const userSession = useUserSessionExtended()
 
-const openModalDeliveryTransfer = ref(false)
+const isDeliverySustentationFormOpened = ref(false)
 const isTransferenceSustentationFormOpened = ref(false)
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const {
@@ -220,7 +213,7 @@ const {
 } = useEvidenceDeliveryAPI()
 const { getMyGrants } = useAuthManagement()
 const myGrants = await getMyGrants()
-const deliveryId = ref<string | undefined>(undefined)
+const transferenceDeliveryId = ref<string | undefined>(undefined)
 const transferenceSustentationId = ref<string | undefined>(undefined)
 const OFFER_BASE_URL = '/offer-management'
 const selectedMultipleData = ref<{ type: string; ids: string[] }>({
@@ -261,8 +254,8 @@ const evidenceData = computed(() =>
 const openDeliveryForTransferModal = (row: any) => {
   // if (row.deliverySupport?.id) {
   // deliveryId.value = row.deliverySupport.id
-  deliveryId.value = 'proban'
-  openModalDeliveryTransfer.value = true
+  transferenceDeliveryId.value = 'proban'
+  isDeliverySustentationFormOpened.value = true
   // }
 }
 
@@ -326,7 +319,7 @@ const handleConfirmTransferenceSustentationFiles = async (values: any) => {
           error.value.data.message ||
           'Este sustento de transferencia no se pudo confirmar, intentalo más tarde'
         updateConfirmModal({
-          title: 'Error al confirmar Sustento de transferencia de entrega',
+          title: 'Error al confirmar Sustento de transferencia',
           message: eMsg,
           type: 'error',
         })
@@ -334,6 +327,67 @@ const handleConfirmTransferenceSustentationFiles = async (values: any) => {
     },
   })
 }
+
+const handleConfirmDeliverySustentationFiles = async (values: any) => {
+  openConfirmModal({
+    title: 'Confirmar Sustento de entrega',
+    message: '¿Estás seguro de que deseas confirmar este Sustento de entrega?',
+    callback: async () => {
+      const { status, error }: any =
+        await apiSustentation.confirmDeliverySustentation(values)
+      if (status.value === 'success') {
+        isDeliverySustentationFormOpened.value = false
+        refresh()
+        updateConfirmModal({
+          title: 'Sustento de entrega confirmado',
+          message: 'Sustento de entrega ha sido confirmado exitosamente',
+          type: 'success',
+        })
+      } else {
+        const eMsg =
+          error.value.data?.errors?.[0].message ||
+          error.value.data.message ||
+          'Este sustento de entrega no se pudo confirmar, intentalo más tarde'
+        updateConfirmModal({
+          title: 'Error al confirmar Sustento de entrega',
+          message: eMsg,
+          type: 'error',
+        })
+      }
+    },
+  })
+}
+
+// const handleConfirmDeliverySustentationFiles = async (value: any) => {
+//   openConfirmModal({
+//     title: 'Confirmar Sustento de Entrega',
+//     message: `¿Está seguro de que deseas confirmar este Sustento de Entrega?`,
+//     callback: async () => {
+//       try {
+//         const { status } = await confirmDeliverySupport(value)
+//         if (status.value === 'success') {
+//           refresh()
+//           resetMultipleSelect.value?.()
+//           updateConfirmModal({
+//             title: 'Sustento de Entrega confirmada',
+//             message: 'Sustento de Entrega confirmado exitosamente',
+//             type: 'success',
+//           })
+//           isDeliverySustentationFormOpened.value = false
+//         } else {
+//           throw new Error('Error al confirmar este Sustento de Entrega')
+//         }
+//       } catch (error) {
+//         updateConfirmModal({
+//           title: 'Error al confirmar Sustento de Entrega',
+//           message:
+//             'No se pudo confirmar Sustento de Entrega. Por favor, intente nuevamente.',
+//           type: 'error',
+//         })
+//       }
+//     },
+//   })
+// }
 
 const handleUploadTransferenceSustentationFiles = async (values: any) => {
   openConfirmModal({
@@ -366,61 +420,31 @@ const handleUploadTransferenceSustentationFiles = async (values: any) => {
   })
 }
 
-const handleEditTransferenceSustentation = async (value: any) => {
+const handleUploadDeliverySustentationFiles = async (values: any) => {
   openConfirmModal({
-    title: 'Confirmar Sustento de Entrega',
-    message: `¿Está seguro de que deseas confirmar este Sustento de Entrega?`,
+    title: 'Actualizar Sustento de entrega',
+    message: '¿Estás seguro de que deseas actualizar este Sustento de entrega?',
     callback: async () => {
-      try {
-        const { status } = await confirmDeliverySupport(value)
-        if (status.value === 'success') {
-          refresh()
-          resetMultipleSelect.value?.()
-          updateConfirmModal({
-            title: 'Sustento de Entrega confirmada',
-            message: 'Sustento de Entrega confirmado exitosamente',
-            type: 'success',
-          })
-          openModalDeliveryTransfer.value = false
-        } else {
-          throw new Error('Error al confirmar este Sustento de Entrega')
-        }
-      } catch (error) {
+      const { status, error }: any =
+        await apiSustentation.uploadDeliverySustentationFilesForOrganization(
+          values,
+        )
+      if (status.value === 'success') {
+        isDeliverySustentationFormOpened.value = false
+        refresh()
         updateConfirmModal({
-          title: 'Error al confirmar Sustento de Entrega',
-          message:
-            'No se pudo confirmar Sustento de Entrega. Por favor, intente nuevamente.',
-          type: 'error',
+          title: 'Sustento de entrega actualizado',
+          message: 'Sustento de entrega ha sido actualizado exitosamente',
+          type: 'success',
         })
-      }
-    },
-  })
-}
-
-const handleConfirmDelivery = async (value: { deliverySupportId: string }) => {
-  openConfirmModal({
-    title: 'Confirmar Sustento de Entrega',
-    message: `¿Está seguro de que deseas confirmar este Sustento de Entrega?`,
-    callback: async () => {
-      try {
-        const { status } = await confirmDeliverySupport(value)
-        if (status.value === 'success') {
-          refresh()
-          resetMultipleSelect.value?.()
-          updateConfirmModal({
-            title: 'Sustento de Entrega confirmada',
-            message: 'Sustento de Entrega confirmado exitosamente',
-            type: 'success',
-          })
-          openModalDeliveryTransfer.value = false
-        } else {
-          throw new Error('Error al confirmar este Sustento de Entrega')
-        }
-      } catch (error) {
+      } else {
+        const eMsg =
+          error.value.data?.errors?.[0].message ||
+          error.value.data.message ||
+          'Este sustento de entrega no se pudo actualizar, intentalo más tarde'
         updateConfirmModal({
-          title: 'Error al confirmar Sustento de Entrega',
-          message:
-            'No se pudo confirmar Sustento de Entrega. Por favor, intente nuevamente.',
+          title: 'Error al actualizar Sustento de  entrega',
+          message: eMsg,
           type: 'error',
         })
       }
@@ -435,7 +459,7 @@ const handleEditDelivery = async (values: any) => {
     callback: async () => {
       const { status, error }: any = await editDeliverySupport(values)
       if (status.value === 'success') {
-        openModalDeliveryTransfer.value = false
+        isDeliverySustentationFormOpened.value = false
         refresh()
         updateConfirmModal({
           title: 'Sustento de Entrega actualizado',

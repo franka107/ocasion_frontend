@@ -70,4 +70,7 @@ export enum GrantId {
   OrganizationSustentationTransferenceCanEdit = 'ORGANIZATION_SUSTENTATION_TRANSFERENCE_CAN_EDIT',
   OrganizationSustentationTransferenceCanConfirm = 'ORGANIZATION_SUSTENTATION_TRANSFERENCE_CAN_CONFIRM',
   PlatformSustentationManagement = 'PLATFORM_SUSTENTATION_MANAGEMENT',
+  PlatformSustentationDeliveryCanConfirm = 'PLATFORM_SUSTENTATION_DELIVERY_CAN_CONFIRM',
+  PlatformSustentationDeliveryCanEdit = 'PLATFORM_SUSTENTATION_DELIVERY_CAN_EDIT',
+  OrganizationSustentationDeliveryCanEdit = 'ORGANIZATION_SUSTENTATION_DELIVERY_CAN_EDIT',
 }

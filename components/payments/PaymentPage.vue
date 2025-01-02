@@ -26,24 +26,76 @@
               </div>
             </template>
             <template #compostPropertyPaymentFile="{ row }">
-              <Button
-                variant="ghost"
-                size="icon"
-                class="flex items-center justify-center rounded-full"
-                :disabled="!row.compostPropertyPaymentFile"
-                @click="handleCompostPropertyPaymentFile(row)"
-              >
-                <CustomIcons
-                  :name="
-                    compostPaymentStatus.get(row.compostPropertyPaymentStatus)
-                      ?.icon || 'Doc-Loupe'
-                  "
-                  :class="
-                    compostPaymentStatus.get(row.compostPropertyPaymentStatus)
-                      ?.class || 'text-gray-500'
-                  "
-                />
-              </Button>
+              <!-- <Button -->
+              <!--   variant="ghost" -->
+              <!--   size="icon" -->
+              <!--   class="flex items-center justify-center rounded-full" -->
+              <!--   :disabled="!row.compostPropertyPaymentFile" -->
+              <!--   @click="handleCompostPropertyPaymentFile(row)" -->
+              <!-- > -->
+              <!--   <CustomIcons -->
+              <!--     :name=" -->
+              <!--       compostPaymentStatus.get(row.compostPropertyPaymentStatus) -->
+              <!--         ?.icon || 'Doc-Loupe' -->
+              <!--     " -->
+              <!--     :class=" -->
+              <!--       compostPaymentStatus.get(row.compostPropertyPaymentStatus) -->
+              <!--         ?.class || 'text-gray-500' -->
+              <!--     " -->
+              <!--   /> -->
+              <!-- </Button> -->
+
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <div>
+                      <Button
+                        variant="ghost"
+                        :disabled="!row.compostPropertyPaymentFile"
+                        @click="
+                          () => {
+                            handleCompostPropertyPaymentFile(row)
+                          }
+                        "
+                      >
+                        <!-- <CustomIcons -->
+                        <!--   :name=" -->
+                        <!--     paymentStatusRecord[ -->
+                        <!--       row.payment.status as PaymentStatus -->
+                        <!--     ].icon || '' -->
+                        <!--   " -->
+                        <!--   :class=" -->
+                        <!--     paymentStatusRecord[ -->
+                        <!--       row.payment.status as PaymentStatus -->
+                        <!--     ].iconClass || '' -->
+                        <!--   " -->
+                        <CustomIcons
+                          :name="'Doc-Loupe'"
+                          :class="`text-${
+                            compostPaymentStatusRecord[
+                              row.compostPropertyPaymentStatus as CompostPaymentStatus
+                            ]?.color || 'disabled'
+                          }-500`"
+                        />
+                      </Button>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <CustomChip
+                      :text="
+                        compostPaymentStatusRecord[
+                          row.compostPropertyPaymentStatus as CompostPaymentStatus
+                        ]?.label || 'Pendiente'
+                      "
+                      :variant="
+                        (compostPaymentStatusRecord[
+                          row.compostPropertyPaymentStatus as CompostPaymentStatus
+                        ]?.color || 'brown') as any
+                      "
+                    ></CustomChip>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </template>
             <template #compostComissionPaymentFile="{ row }">
               <Button
@@ -240,6 +292,7 @@
 </template>
 <script setup lang="ts">
 import BidModal from '../bid/BidModal.vue'
+import type { CustomChipVariants } from '../ui/custom-chip'
 import ComposeComissionPaymentFileForm from './ComposeComissionPaymentFileForm.vue'
 import ComposePropertyPaymentFileForm from './ComposePropertyPaymentFileForm.vue'
 import ObserveComissionPaymentForm from './ObserveComissionPaymentForm.vue'
@@ -247,7 +300,11 @@ import ObservePropertyPaymentForm from './ObservePropertyPaymentForm.vue'
 import CustomTable from '@/components/ui/custom-table/CustomTable.vue'
 import CustomChip from '@/components/ui/custom-chip/CustomChip.vue'
 import CustomPagination from '@/components/ui/custom-pagination/CustomPagination.vue'
-import type { PaymentDto } from '@/types/Payment.ts'
+import {
+  CompostPaymentStatus,
+  compostPaymentStatusRecord,
+  type PaymentDto,
+} from '@/types/Payment.ts'
 import {
   paymentsHeader,
   paymentStatus,

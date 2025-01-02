@@ -123,20 +123,6 @@
                             ].iconClass || ''
                           "
                         />
-                        <!-- <CustomIcons -->
-                        <!--   :name=" -->
-                        <!--     childSustentationStatusRecord[ -->
-                        <!--       row.sustentation.transferenceSustentation -->
-                        <!--         .status as ChildSustentationStatus -->
-                        <!--     ].icon || '' -->
-                        <!--   " -->
-                        <!--   :class=" -->
-                        <!--     childSustentationStatusRecord[ -->
-                        <!--       row.sustentation.transferenceSustentation -->
-                        <!--         .status as ChildSustentationStatus -->
-                        <!--     ].iconClass || '' -->
-                        <!--   " -->
-                        <!-- /> -->
                       </Button>
                     </div>
                   </TooltipTrigger>

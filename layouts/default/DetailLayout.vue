@@ -4,17 +4,17 @@
       <!-- Encabezado con el título y el botón de flecha -->
       <div class="flex justify-between items-center">
         <h3
-        class="p-2 text-sm text-[#676767] transition-all duration-300 w-full"
-        :class="{
-          'transform translate-x-[45%]': !showContent,
-          'translate-x-0': showContent
-        }"
-      >
-        Datos de la oferta
-      </h3>
+          class="p-2 text-sm text-[#676767] transition-all duration-300 w-full"
+          :class="{
+            'transform translate-x-[45%]': !showContent,
+            'translate-x-0': showContent,
+          }"
+        >
+          Datos de la oferta
+        </h3>
         <button
-          @click="toggleContent"
           class="text-gray-500 hover:text-gray-700 focus:outline-none"
+          @click="toggleContent"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -36,15 +36,43 @@
       <div v-show="showContent" class="transition-all duration-300">
         <div class="grid md:grid-cols-[2fr_1fr] grid-cols-1 gap-6 mt-4">
           <div>
-            <div class="grid grid-cols-[repeat(auto-fill,_minmax(240px,1fr))] md:grid-cols-2 gap-5">
-              <InputWithLabel read-field label="Título de la oferta" :model-value="formData.title" />
-              <InputWithLabel read-field label="Marca" :model-value="formData.carBrand?.name" />
-              <div class="grid grid-cols-[repeat(auto-fill,_minmax(120px,1fr))] md:grid-cols-2 gap-5">
-                <InputWithLabel read-field label="Modelo" :model-value="formData.carModel?.name" />
-                <InputWithLabel read-field label="Año" :model-value="formData.year" />
+            <div
+              class="grid grid-cols-[repeat(auto-fill,_minmax(240px,1fr))] md:grid-cols-2 gap-5"
+            >
+              <InputWithLabel
+                read-field
+                label="Título de la oferta"
+                :model-value="formData.title"
+              />
+              <InputWithLabel
+                read-field
+                label="Marca"
+                :model-value="formData.carBrand?.name"
+              />
+              <div
+                class="grid grid-cols-[repeat(auto-fill,_minmax(120px,1fr))] md:grid-cols-2 gap-5"
+              >
+                <InputWithLabel
+                  read-field
+                  label="Modelo"
+                  :model-value="formData.carModel?.name"
+                />
+                <InputWithLabel
+                  read-field
+                  label="Año"
+                  :model-value="formData.year"
+                />
               </div>
-              <InputWithLabel read-field label="Tasación" :model-value="formData.appraisal" />
-              <InputWithLabel read-field label="Descripción" :model-value="formData.description" />
+              <InputWithLabel
+                read-field
+                label="Tasación"
+                :model-value="formData.appraisal"
+              />
+              <InputWithLabel
+                read-field
+                label="Descripción"
+                :model-value="formData.description"
+              />
               <InputWithLabel
                 read-field
                 label="Departamento"
@@ -65,15 +93,40 @@
                 label="Dirección"
                 :model-value="formData.address?.addressLine1"
               />
+
+              <FakeInput read-field label="Estado">
+                <CustomChip
+                  :text="
+                    offerStatusRecord[formData.status as OfferStatus].name || ''
+                  "
+                  :variant="
+                    offerStatusRecord[formData.status as OfferStatus]
+                      .color as any
+                  "
+                ></CustomChip>
+              </FakeInput>
             </div>
           </div>
           <div>
-            <h3 class="mb-5 text-sm text-[#676767]">Archivos subidos</h3>
+            <h3 class="mb-5 text-sm text-[#676767]">Fotos y videos subidos</h3>
             <FormField name="attachedFiles">
               <FormItem>
                 <FormControl>
                   <InputFile
                     v-model="formData.attachedFiles"
+                    disabled
+                    hide-remove-icon
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+            <h3 class="mb-5 mt-5 text-sm text-[#676767]">Archivos anexos</h3>
+            <FormField name="attachedFiles">
+              <FormItem>
+                <FormControl>
+                  <InputFile
+                    v-model="formData.annexesFiles"
                     disabled
                     hide-remove-icon
                   />
@@ -90,9 +143,11 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import type { OfferDto } from '@/types/Offer'
+import type { OfferDto, OfferStatus } from '@/types/Offer'
 import InputWithLabel from '~/components/auth/inputWithLabel.vue'
 import InputFile from '@/components/common/file/Input.vue'
+import FakeInput from '~/components/auth/FakeInput.vue'
+import { offerStatusRecord } from '~/constants/offer'
 
 const router = useRouter()
 const props = defineProps<{
@@ -118,8 +173,7 @@ interface OfferDetailForm extends OfferDto {
 
 const formData = ref<OfferDetailForm | null>(null)
 
-const showContent = ref(false)
-
+const showContent = ref(true)
 
 const toggleContent = () => {
   showContent.value = !showContent.value
@@ -137,7 +191,6 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-
 button svg {
   transition: transform 0.2s ease-in-out;
   border: 0.5px solid gray;
