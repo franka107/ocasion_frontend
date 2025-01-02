@@ -144,11 +144,11 @@ export const bidsParticipantHeader: HeaderItem[] = [
     align: 'right',
     sortable: true,
   },
-  {
-    key: 'offerStatus',
-    label: 'E. de oferta',
-    sortable: true,
-  },
+  // {
+  //   key: 'offerStatus',
+  //   label: 'E. de oferta',
+  //   sortable: true,
+  // },
   {
     key: 'status',
     label: 'E. de puja',
@@ -157,6 +157,7 @@ export const bidsParticipantHeader: HeaderItem[] = [
   {
     key: 'payment',
     label: 'D. Sustento de abono',
+    align: 'center',
     sortable: false,
   },
   {

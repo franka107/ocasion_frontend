@@ -312,6 +312,7 @@ const onSearch = (item: { [key: string]: string }) => {
         ]
       : []),
   ])
+  page.value = 1
 }
 
 const selectedBid = ref<BidDto | null>(null)

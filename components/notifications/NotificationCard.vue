@@ -19,11 +19,12 @@
         </p>
         <div
           v-if="showDetail && notification.messageDetail"
-          class="w-[720px] text-sm text-[#20445E] pt-4 pb-2 pl-4 bg-[#FAFBFC] rounded-lg"
+          class="w-[720px] text-sm text-[#20445E] pt-4 pb-4 pl-4 pr-4 rounded-lg"
         >
-          <div class="max-w-3xl">
-            {{ htmlToText(notification.messageDetail) }}
-          </div>
+          <div v-html="notification.messageDetail"></div>
+          <!-- <div class="max-w-3xl"> -->
+          <!--   {{ htmlToText(notification.messageDetail) }} -->
+          <!-- </div> -->
         </div>
         <p
           class="font-normal text-sm leading-[20px] tracking-[0.25px] text-[#20445E] mt-1"

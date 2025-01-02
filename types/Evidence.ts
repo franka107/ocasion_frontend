@@ -78,10 +78,8 @@ export interface DeliveryDetail {
   files: DeliveryDetailFile[]
 }
 export enum ChildSustentationStatus {
-  Empty = 'EMPTY',
-  Expired = 'EXPIRED',
+  Pending = 'PENDING',
   InReview = 'IN_REVIEW', // En revision
-  Observed = 'OBSERVED', // Observado
   Confirmed = 'CONFIRMED', // Confirmado
 }
 
@@ -89,34 +87,22 @@ export const childSustentationStatusRecord: Record<
   ChildSustentationStatus,
   { label: string; color: string; icon: string; iconClass: string }
 > = {
-  [ChildSustentationStatus.Empty]: {
-    label: 'Vacío',
+  [ChildSustentationStatus.Pending]: {
+    label: 'Pendiente',
     color: 'brown',
-    icon: 'Doc-Loupe',
-    iconClass: 'text-[#a1a1a3]',
-  },
-  [ChildSustentationStatus.Expired]: {
-    label: 'Expirado',
-    color: 'orange',
-    icon: 'Doc-Loupe',
+    icon: 'Doc-Transfer',
     iconClass: 'text-[#a1a1a3]',
   },
   [ChildSustentationStatus.InReview]: {
     label: 'En revision',
     color: 'orange',
-    icon: 'Doc-Loupe',
+    icon: 'Doc-Transfer',
     iconClass: 'text-blue-500',
-  },
-  [ChildSustentationStatus.Observed]: {
-    label: 'Observado',
-    color: 'orange',
-    icon: 'Doc-Loupe',
-    iconClass: 'text-yellow-500',
   },
   [ChildSustentationStatus.Confirmed]: {
     label: 'Confirmado',
     color: 'green',
-    icon: 'Doc-Loupe',
+    icon: 'Doc-Transfer',
     iconClass: 'text-green-500',
   },
 }

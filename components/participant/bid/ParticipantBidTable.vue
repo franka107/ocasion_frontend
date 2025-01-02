@@ -27,33 +27,53 @@
               v-if="row.sustentation"
               class="flex justify-center m-auto items-center"
             >
-              <Button
-                variant="ghost"
-                @click="
-                  () => {
-                    openTransferenceSustentationModal(row)
-                  }
-                "
-              >
-                <CustomIcons
-                  name="Doc-Transfer"
-                  class="w-6 h-6 text-reminder-600"
-                />
-              </Button>
-              <CustomChip
-                :text="
-                  childSustentationStatusRecord[
-                    row.sustentation.transferenceSustentation
-                      .status as ChildSustentationStatus
-                  ].label || ''
-                "
-                :variant="
-                  (childSustentationStatusRecord[
-                    row.sustentation.transferenceSustentation
-                      .status as ChildSustentationStatus
-                  ].color as any) || ''
-                "
-              ></CustomChip>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <div>
+                      <Button
+                        variant="ghost"
+                        @click="
+                          () => {
+                            openTransferenceSustentationModal(row)
+                          }
+                        "
+                      >
+                        <CustomIcons
+                          :name="
+                            childSustentationStatusRecord[
+                              row.sustentation.transferenceSustentation
+                                .status as ChildSustentationStatus
+                            ].icon || ''
+                          "
+                          :class="
+                            childSustentationStatusRecord[
+                              row.sustentation.transferenceSustentation
+                                .status as ChildSustentationStatus
+                            ].iconClass || ''
+                          "
+                        />
+                      </Button>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <CustomChip
+                      :text="
+                        childSustentationStatusRecord[
+                          row.sustentation.transferenceSustentation
+                            .status as ChildSustentationStatus
+                        ].label || ''
+                      "
+                      :variant="
+                        (childSustentationStatusRecord[
+                          row.sustentation.transferenceSustentation
+                            .status as ChildSustentationStatus
+                        ].color as any) || ''
+                      "
+                    ></CustomChip>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
 
             <div v-else>
@@ -68,17 +88,73 @@
             </div>
           </template>
           <template #payment="{ row }">
-            <div v-if="row.payment" class="flex m-auto items-center">
-              <Button variant="ghost" @click="handleCompostSupportFiles(row)">
-                <CustomIcons
-                  name="Doc-Transfer"
-                  class="w-6 h-6 text-reminder-600"
-                />
-              </Button>
-              <CustomChip
-                :text="paymentStatus.get(row.payment.status)?.name || ''"
-                :variant="paymentStatus.get(row.payment.status)?.color as any"
-              ></CustomChip>
+            <div
+              v-if="row.payment"
+              class="flex m-auto justify-center items-center"
+            >
+              <!-- <Button variant="ghost" @click="handleCompostSupportFiles(row)"> -->
+              <!--   <CustomIcons -->
+              <!--     name="Doc-Transfer" -->
+              <!--     class="w-6 h-6 text-reminder-600" -->
+              <!--   /> -->
+              <!-- </Button> -->
+
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <div>
+                      <Button
+                        variant="ghost"
+                        @click="
+                          () => {
+                            handleCompostSupportFiles(row)
+                          }
+                        "
+                      >
+                        <CustomIcons
+                          :name="
+                            paymentStatusRecord[
+                              row.payment.status as PaymentStatus
+                            ].icon || ''
+                          "
+                          :class="
+                            paymentStatusRecord[
+                              row.payment.status as PaymentStatus
+                            ].iconClass || ''
+                          "
+                        />
+                        <!-- <CustomIcons -->
+                        <!--   :name=" -->
+                        <!--     childSustentationStatusRecord[ -->
+                        <!--       row.sustentation.transferenceSustentation -->
+                        <!--         .status as ChildSustentationStatus -->
+                        <!--     ].icon || '' -->
+                        <!--   " -->
+                        <!--   :class=" -->
+                        <!--     childSustentationStatusRecord[ -->
+                        <!--       row.sustentation.transferenceSustentation -->
+                        <!--         .status as ChildSustentationStatus -->
+                        <!--     ].iconClass || '' -->
+                        <!--   " -->
+                        <!-- /> -->
+                      </Button>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <CustomChip
+                      :text="
+                        paymentStatusRecord[row.payment.status as PaymentStatus]
+                          ?.label || ''
+                      "
+                      :variant="
+                        (paymentStatusRecord[
+                          row.payment.status as PaymentStatus
+                        ]?.color || '') as any
+                      "
+                    ></CustomChip>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
 
             <div v-else class="flex justify-center">
@@ -222,6 +298,7 @@ import {
   childSustentationStatusRecord,
 } from '~/types/Evidence'
 import { offerStatusRecord } from '~/constants/offer'
+import { PaymentStatus, paymentStatusRecord } from '~/types/Payment'
 const selectedId = ref('') // Define el id que necesitas pasar
 const selectedPersonStatus = ref<'single' | 'married' | 'legal'>('legal')
 const openTransferModal = ref(false)
