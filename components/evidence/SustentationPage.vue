@@ -22,7 +22,7 @@
               }
             "
           >
-            <template #offer="{ row }">
+            <template #offerId="{ row }">
               <Button as-child variant="link">
                 <NuxtLink
                   :to="
@@ -31,7 +31,7 @@
                       : `/dashboard/organization/${route.params.organizationId}/events/${row.offer.eventId}/offers/${row.offer.id}/bids`
                   "
                 >
-                  {{ row.offer.title }}
+                  {{ row.offer.id }}
                 </NuxtLink>
               </Button>
             </template>

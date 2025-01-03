@@ -38,9 +38,14 @@ export const paymentsSearch: SearchItem[] = [
 ]
 export const paymentsHeader = (viewType: ViewType): HeaderItem[] => [
   {
-    key: 'offer.id',
+    key: 'offerId',
     label: 'Cód. Oferta',
-    sortable: true,
+    sortable: false,
+  },
+  {
+    key: 'offer.title',
+    label: 'Título de oferta',
+    sortable: false,
   },
   {
     key: 'event',

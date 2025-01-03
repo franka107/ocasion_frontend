@@ -9,6 +9,9 @@ module.exports = {
     'bg-[#EFF6FF]',
     'text-[#2563EB]', // Azul para EVENTO
     'bg-[#E0F2FE]',
+    'text-yellow-500',
+    'text-green-500',
+    'text-blue-500',
     'text-[#0284C7]', // Azul claro para ABONO y PAYMENT
     'bg-[#FDF2F8]',
     'text-[#DB2777]', // Rosa para OFERTA

@@ -94,8 +94,14 @@ export const sustentationHeaderList = (viewType: GlobalType): HeaderItem[] => [
     : []),
 
   {
-    key: 'offer',
-    label: 'Titulo de oferta',
+    key: 'offerId',
+    label: 'Cod. oferta',
+    align: 'center',
+    sortable: false,
+  },
+  {
+    key: 'offer.title',
+    label: 'Título oferta',
     sortable: false,
   },
 
@@ -106,13 +112,13 @@ export const sustentationHeaderList = (viewType: GlobalType): HeaderItem[] => [
   },
   {
     key: 'eventGoodType',
-    sortable: true,
+    sortable: false,
     label: 'Categoría del bien',
   },
   {
     key: 'offer.carBrand.name',
     label: 'Sub Categoría del bien',
-    sortable: true,
+    sortable: false,
   },
   // {
   //   key: 'paymentStatus',

@@ -54,8 +54,18 @@ try {
 
   deliverySustentationDetail.value = {
     ...data.value,
-    deliveredAtDate: dayjs(data.value.deliveredAt).format('YYYY-MM-DD'),
-    deliveredAtTime: dayjs(data.value.deliveredAt).format('HH:mm'),
+    // deliveredAtDate: data.value.deliveredAt
+    //   ? dayjs(data.value.deliveredAt).format('YYYY-MM-DD')
+    //   : dayjs(new Date()).format('YYYY-MM-DD'),
+    // deliveredAtTime: data.value.deliveredAt
+    //   ? dayjs(data.value.deliveredAt).format('HH:mm')
+    //   : dayjs(new Date()).format('HH:mm'),
+    deliveredAtDate: data.value.deliveredAt
+      ? dayjs(data.value.deliveredAt).format('YYYY-MM-DD')
+      : null,
+    deliveredAtTime: data.value.deliveredAt
+      ? dayjs(data.value.deliveredAt).format('HH:mm')
+      : null,
   }
 } catch (error) {
   console.error('Error al cargar el detalle de Sustento de Entrega', error)

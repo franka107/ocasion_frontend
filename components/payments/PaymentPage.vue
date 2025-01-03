@@ -14,6 +14,19 @@
             @on-sort="onSort"
             @on-search="onSearch"
           >
+            <template #offerId="{ row }">
+              <Button as-child variant="link">
+                <NuxtLink
+                  :to="
+                    globalType === GlobalType.Platform
+                      ? `/dashboard/platform/events/${row.offer.eventId}/offers/${row.offer.id}/bids`
+                      : `/dashboard/organization/${route.params.organizationId}/events/${row.offer.eventId}/offers/${row.offer.id}/bids`
+                  "
+                >
+                  {{ row.offer.id }}
+                </NuxtLink>
+              </Button>
+            </template>
             <template #bid="{ row }">
               <div
                 class="w-10 h-10 flex items-center justify-center rounded-full bg-[#0B38590A]"
@@ -55,17 +68,6 @@
                           }
                         "
                       >
-                        <!-- <CustomIcons -->
-                        <!--   :name=" -->
-                        <!--     paymentStatusRecord[ -->
-                        <!--       row.payment.status as PaymentStatus -->
-                        <!--     ].icon || '' -->
-                        <!--   " -->
-                        <!--   :class=" -->
-                        <!--     paymentStatusRecord[ -->
-                        <!--       row.payment.status as PaymentStatus -->
-                        <!--     ].iconClass || '' -->
-                        <!--   " -->
                         <CustomIcons
                           :name="'Doc-Loupe'"
                           :class="`text-${
@@ -312,6 +314,7 @@ import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCar
 import { GrantId } from '~/types/Grant'
 import { compostPaymentStatus } from '~/constants/evidenceOrg'
 import type { BidDto } from '~/types/Bids'
+import { GlobalType } from '~/types/Common'
 const props = defineProps<{
   type: 'organization' | 'platform'
   organizationId: string | null
@@ -348,6 +351,7 @@ const disableMultipleSelect = computed(
     selectedMultipleData.value.type === 'empty' &&
     selectedMultipleData.value.ids.length === 0,
 )
+const { user, globalType } = useUserSessionExtended()
 const onSearch = (item: { [key: string]: string }) => {
   filterOptions.value = JSON.stringify([
     { field: 'status', type: 'equal', value: item.status || '' },
@@ -371,6 +375,7 @@ const onSearch = (item: { [key: string]: string }) => {
 
 const selectedBid = ref<BidDto | null>(null)
 const isBidModalOpen = ref(false)
+const route = useRoute()
 
 const openBidDetail = (row: PaymentDto) => {
   selectedBid.value = row.bid

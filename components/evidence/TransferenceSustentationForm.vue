@@ -117,10 +117,10 @@ const stepsTitle = computed(() => {
         transferenceSustentationDetail.value?.participant.maritalStatus ===
         'MARRIED'
       ) {
-        return 'Pasos a seguir para persona soltera:'
+        return 'Pasos a seguir para persona casada:'
       }
-      return 'Pasos a seguir para persona casada:'
 
+      return 'Pasos a seguir para persona soltera:'
     case 'JURIDIC_PERSON':
       return 'Pasos a seguir para persona jurídica:'
     default:

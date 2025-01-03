@@ -79,24 +79,29 @@ export const evidenceSearch: SearchItem[] = [
 
 export const evidenceHeader: HeaderItem[] = [
   {
-    key: 'title',
-    label: 'Titulo oferta',
-    sortable: true,
+    key: 'offerTitle',
+    label: 'Cod. oferta',
+    sortable: false,
+  },
+  {
+    key: 'offerTitle',
+    label: 'Título oferta',
+    sortable: false,
   },
   {
     key: 'description',
     label: 'Descripción',
-    sortable: true,
+    sortable: false,
   },
   {
     key: 'Category of the good',
-    sortable: true,
+    sortable: false,
     label: 'Categoría del bien',
   },
   {
     key: 'Subcategory of the good',
     label: 'Sub Categoría del bien',
-    sortable: true,
+    sortable: false,
   },
   {
     key: 'status',
