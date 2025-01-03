@@ -12,6 +12,7 @@ import {
 import dayjs from 'dayjs'
 import DateTimeInput from '../ui/date-time-input/DateTimeInput.vue'
 import DateInput from '../ui/date-input/DateInput.vue'
+import ParticipantDetailFields from '../attention-tray/withdrawal-requests/ParticipantDetailFields.vue'
 import { SheetClose } from '@/components/ui/sheet' //
 import InputFile from '@/components/common/file/Input.vue'
 
@@ -117,9 +118,25 @@ const onSubmit = form.handleSubmit(async (values: any) => {
   </SheetHeader>
 
   <div class="flex-grow flex flex-col overflow-y-auto no-scrollbar">
-    <form class="h-full" @submit="onSubmit">
-      <section class="flex flex-col gap-4 flex-grow p-5 h-full">
+    <form class="" @submit="onSubmit">
+      <section class="flex flex-col gap-4 flex-grow p-5 min-h-full">
         <div v-if="deliverySustentationDetail">
+          <section
+            v-if="userSession.user.value?.user.type !== UserType.Participant"
+            class=""
+          >
+            <h3
+              class="tracking-[1px] font-[600] text-[#152A3C] text-[14px] leading-5"
+            >
+              DATOS DEL PARTICIPANTE
+            </h3>
+
+            <ParticipantDetailFields
+              :participant-id="
+                deliverySustentationDetail.sustentation.bid.userId
+              "
+            />
+          </section>
           <section class="mb-6">
             <h3
               class="tracking-[1px] font-[600] text-[#152A3C] text-[14px] leading-5 mb-[12px]"
