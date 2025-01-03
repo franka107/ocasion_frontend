@@ -38,28 +38,31 @@ export const deliverySupportIcons = new Map<
   ['DELIVERED', { icon: 'Doc-Loupe', class: 'text-blue' }], // Entregado
 ])
 
-export const evidencePlatfSearch: SearchItem[] = [
+export const evidencePlatfSearch = (globalType: GlobalType): SearchItem[] => [
   {
-    key: 'organization',
+    key: 'quickSearch',
     type: 'text',
-    placeholder: 'Buscar organización, oferta',
+    placeholder:
+      globalType === GlobalType.Platform
+        ? 'Buscar por Org./Cód./Tít. Oferta'
+        : 'Buscar por Cód./Tít. Oferta',
     elementClass: 'min-w-[400px]',
     position: 1,
   },
-  {
-    key: 'status',
-    type: 'select',
-    placeholder: 'Filtrar estados',
-    items: [
-      ...Array.from(evidencePlatfStatus).map(([key, value]) => ({
-        text: value.name,
-        value: key,
-      })),
-      { text: 'Todos', value: ' ' },
-    ],
-    elementClass: 'min-w-[400px]',
-    position: 2,
-  },
+  // {
+  //   key: 'status',
+  //   type: 'select',
+  //   placeholder: 'Filtrar estados',
+  //   items: [
+  //     ...Array.from(evidencePlatfStatus).map(([key, value]) => ({
+  //       text: value.name,
+  //       value: key,
+  //     })),
+  //     { text: 'Todos', value: ' ' },
+  //   ],
+  //   elementClass: 'min-w-[400px]',
+  //   position: 2,
+  // },
 ]
 
 // Título de oferta

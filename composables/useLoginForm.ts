@@ -37,6 +37,7 @@ export function useLoginForm() {
     INVALID_CREDENTIALS: 'AUTH.INVALID_CREDENTIALS',
     MAX_ATTEMPTS_LIMIT_EXCEED: 'AUTH.MAX_ATTEMPTS_LIMIT_EXCEED',
     USER_IS_SUSPENDED: 'AUTH.USER_IS_SUSPENDED',
+    PASSWORD_EXPIRED: 'AUTH.PASSWORD_EXPIRED',
   }
 
   const validate = () => {
@@ -117,6 +118,7 @@ export function useLoginForm() {
     console.log(`Probando ${JSON.stringify(errorBack)}`)
     errors.value.api = errorBack.message
 
+    const metadata = errorBack.metadata
     switch (errorBack.code) {
       case AUTH_ERRORS.INVALID_CREDENTIALS:
         dialogState.value.isIncorrectCredentialsOpen = true
@@ -126,6 +128,11 @@ export function useLoginForm() {
         break
       case AUTH_ERRORS.USER_IS_SUSPENDED:
         dialogState.value.isSuspendedDialogOpen = true
+        break
+      case AUTH_ERRORS.PASSWORD_EXPIRED:
+        router.push(
+          `/auth/update-password?hash=${metadata.hash}&reason=expiration`,
+        )
         break
       default:
         dialogState.value.isCommonErrorDialogOpen = true

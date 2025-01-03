@@ -10,7 +10,7 @@
             class="mb-4"
             :data="paymentsData"
             :header="paymentsHeader(props.type)"
-            :search="paymentsSearch"
+            :search="paymentsSearch(userSession.globalType)"
             @on-sort="onSort"
             @on-search="onSearch"
           >
@@ -315,6 +315,7 @@ import { GrantId } from '~/types/Grant'
 import { compostPaymentStatus } from '~/constants/evidenceOrg'
 import type { BidDto } from '~/types/Bids'
 import { GlobalType } from '~/types/Common'
+const userSession = useUserSessionExtended()
 const props = defineProps<{
   type: 'organization' | 'platform'
   organizationId: string | null

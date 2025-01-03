@@ -4,7 +4,7 @@
   >
     <h2
       :class="[
-        'text-[40px] font-roboto font-semibold text-[#20445e]',
+        'text-[40px] font-roboto font-semibold text-[#20445e] mb-2',
         titleClass,
       ]"
     >
@@ -49,8 +49,6 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
-
 const props = defineProps({
   title: String,
   subtitle: String,
@@ -61,5 +59,5 @@ const props = defineProps({
   showPasswordRequirements: Boolean,
   isActive: Boolean,
   isLoading: Boolean,
-});
+})
 </script>

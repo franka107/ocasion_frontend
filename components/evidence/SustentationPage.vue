@@ -12,7 +12,7 @@
             :data="evidenceData"
             class="mb-5"
             :header="sustentationHeaderList(userSession.globalType)"
-            :search="evidencePlatfSearch"
+            :search="evidencePlatfSearch(userSession.globalType)"
             @on-sort="onSort"
             @on-search="onSearch"
             @on-multiple-select="
@@ -304,11 +304,26 @@ const disableMultipleSelect = computed(
     selectedMultipleData.value.type === 'empty' &&
     selectedMultipleData.value.ids.length === 0,
 )
+
 const onSearch = (item: { [key: string]: string }) => {
   filterOptions.value = JSON.stringify([
-    { field: 'title', type: 'like', value: item.title || '' },
-    { field: 'status', type: 'equal', value: item.status || '' },
+    // { field: 'status', type: 'equal', value: item.status || '' },
+    {
+      field: 'quickSearch',
+      type: 'equal',
+      value: item.quickSearch || '',
+    },
+    ...(userSession.globalType === GlobalType.Organization
+      ? [
+          {
+            field: 'organization.id',
+            type: 'equal',
+            value: userSession.getDefaultOrganization().id,
+          },
+        ]
+      : []),
   ])
+  page.value = 1
 }
 
 const { data, refresh }: any = await useAPI(

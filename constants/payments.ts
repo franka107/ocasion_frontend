@@ -2,6 +2,7 @@ import type {
   HeaderItem,
   SearchItem,
 } from '@/components/ui/custom-table/CustomTable.vue'
+import { GlobalType } from '~/types/Common'
 import type { PaymentStatus } from '~/types/Payment'
 
 export const paymentStatus = new Map<string, { name: string; color: string }>([
@@ -13,11 +14,14 @@ export const paymentStatus = new Map<string, { name: string; color: string }>([
   ['CONCRETED', { name: 'Concretada', color: 'brown' }],
 ])
 
-export const paymentsSearch: SearchItem[] = [
+export const paymentsSearch = (globalType: GlobalType): SearchItem[] => [
   {
     key: 'quickSearch',
     type: 'text',
-    placeholder: 'Buscar por Org/ Cód. Oferta',
+    placeholder:
+      globalType === GlobalType.Platform
+        ? 'Buscar por Org./Cód./Tít. Oferta'
+        : 'Buscar por Cód./Tít. Oferta',
     elementClass: 'min-w-[500px]',
     position: 1,
   },
@@ -50,7 +54,7 @@ export const paymentsHeader = (viewType: ViewType): HeaderItem[] => [
   {
     key: 'event',
     label: 'Evento',
-    sortable: true,
+    sortable: false,
   },
   {
     key: 'bid',

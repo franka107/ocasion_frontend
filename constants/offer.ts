@@ -71,7 +71,7 @@ export const offerStatusRecord: Record<
   },
   [OfferStatus.PendingOfDelivery]: {
     name: 'Pendiente de entrega',
-    color: 'red',
+    color: 'green',
     flowPosition: 14,
   },
   [OfferStatus.Delivered]: {

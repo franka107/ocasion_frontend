@@ -1,13 +1,27 @@
 <template>
   <AuthForm logo-subtitle="Acceso">
     <BaseForm
-      title="Crear una nueva contraseña"
+      :title="
+        reason === 'expiration'
+          ? 'Cambio de contraseña'
+          : 'Crear una nueva contraseña'
+      "
       submit-text="Continuar"
       :submit-class="submitButtonClass"
       :is-active="isActive"
       class="relative"
       @submit="handleSubmit"
     >
+      <Alert
+        v-if="reason === 'expiration'"
+        variant="warning"
+        class="w-full mb-6 mt-2"
+      >
+        <AlertTitle>Caducidad de contraseña</AlertTitle>
+        <AlertDescription>
+          Tu contraseña expiró, cambia tu contraseña para continuar.
+        </AlertDescription>
+      </Alert>
       <div class="mb-6 relative">
         <InputWithLabel
           id="password"
@@ -114,6 +128,7 @@ import InputWithLabel from '~/components/auth/inputWithLabel.vue'
 import Dialog from '~/components/auth/dialogForm.vue'
 import messageIcon from '~/assets/icon/png/check-icon.png'
 import { useValidationForm } from '~/composables/useValidateForm'
+import AlertTitle from '~/components/ui/alert/AlertTitle.vue'
 
 const { password, validationResult } = useValidationForm()
 const confirmPassword = ref('')
@@ -132,6 +147,7 @@ const passwordRequirements = [
 const route = useRoute()
 const queryParams = route.query
 const hash = queryParams.hash
+const reason: 'expiration' | null = queryParams.reason
 
 const areDifferentPasswords = computed(
   () => password.value !== confirmPassword.value,
