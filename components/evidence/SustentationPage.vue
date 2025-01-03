@@ -519,10 +519,11 @@ const handleUploadDeliverySustentationFiles = async (values: any) => {
     title: 'Actualizar Sustento de entrega',
     message: '¿Estás seguro de que deseas actualizar este Sustento de entrega?',
     callback: async () => {
-      const { status, error }: any =
-        await apiSustentation.uploadDeliverySustentationFilesForOrganization(
-          values,
-        )
+      const uploadDelivery =
+        userSession.globalType === GlobalType.Organization
+          ? apiSustentation.uploadDeliverySustentationFilesForOrganization
+          : apiSustentation.uploadDeliverySustentationFilesForPlatform
+      const { status, error }: any = await uploadDelivery(values)
       if (status.value === 'success') {
         isDeliverySustentationFormOpened.value = false
         refresh()

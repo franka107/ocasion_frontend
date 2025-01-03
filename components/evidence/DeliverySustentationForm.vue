@@ -157,7 +157,7 @@ const onSubmit = form.handleSubmit(async (values: any) => {
                       <FormControl>
                         <DateInput
                           label="Fecha"
-                          :readonly="readonly"
+                          :disabled="currentMode === 'confirm' || readonly"
                           :value="componentField.modelValue"
                           @update:model-value="componentField.onChange"
                         />
@@ -173,7 +173,7 @@ const onSubmit = form.handleSubmit(async (values: any) => {
                           type="time"
                           label="Hora"
                           v-bind="componentField"
-                          :readonly="readonly"
+                          :disabled="currentMode === 'confirm' || readonly"
                         />
                       </FormControl>
                       <FormMessage />
@@ -208,7 +208,7 @@ const onSubmit = form.handleSubmit(async (values: any) => {
                         type="text"
                         label="Dirección"
                         v-bind="componentField"
-                        :readonly="readonly"
+                        :disabled="currentMode === 'confirm' || readonly"
                       />
                     </FormControl>
                     <FormMessage />
@@ -223,7 +223,7 @@ const onSubmit = form.handleSubmit(async (values: any) => {
                       <Textarea
                         type="text"
                         label="Comentarios"
-                        :readonly="readonly"
+                        :disabled="currentMode === 'confirm' || readonly"
                         v-bind="componentField"
                       />
                       <FormMessage />
