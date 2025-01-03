@@ -5,9 +5,6 @@
       <PaymentsPaymentSummary />
 
       <div class="w-full flex flex-col mt-5">
-        <span class="text-yellow-500"></span>
-        <span class="text-green-500"></span>
-        <span class="text-blue-500"></span>
         <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
           <CustomTable
             class="mb-4"

@@ -4,14 +4,14 @@ import type {
 } from '@/components/ui/custom-table/CustomTable.vue'
 
 export const bidStatus = new Map<string, { name: string; color: string }>([
-  ['STARTED', { name: 'Iniciado', color: 'purple' }],
-  ['DISCARDED', { name: 'Descartado', color: 'brown' }],
-  ['REJECTED', { name: 'Cancelado', color: 'red' }],
-  ['DEBATED', { name: 'Debatido', color: 'blue' }],
-  ['RESERVED', { name: 'Reservada', color: 'blue' }],
-  ['ACCEPTED', { name: 'Aceptado', color: 'blue' }],
-  ['WINNER', { name: 'Ganador', color: 'green' }],
-  ['BASE', { name: 'Base', color: 'blue' }],
+  ['STARTED', { name: 'Puja Iniciada', color: 'purple' }],
+  ['DISCARDED', { name: 'Puja Descartada', color: 'brown' }],
+  ['REJECTED', { name: 'Puja Cancelada', color: 'red' }],
+  ['DEBATED', { name: 'Puja Debatida', color: 'blue' }],
+  ['RESERVED', { name: 'Puja Reservada', color: 'blue' }],
+  ['ACCEPTED', { name: 'Puja Aceptada', color: 'blue' }],
+  ['WINNER', { name: 'Puja Ganadora', color: 'green' }],
+  ['BASE', { name: 'Puja Base', color: 'blue' }],
 ])
 
 export const bidsSearch: SearchItem[] = [
@@ -40,9 +40,9 @@ export const bidsSearch: SearchItem[] = [
 
 export const bidsHeader: HeaderItem[] = [
   {
-    key: 'code',
+    key: 'offerId',
     label: 'Código',
-    sortable: true,
+    align: 'center',
   },
   {
     key: 'createdAt',

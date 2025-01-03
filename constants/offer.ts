@@ -147,7 +147,8 @@ export const offerHeader: HeaderItem[] = [
   {
     key: 'id',
     label: 'N°',
-    sortable: true,
+    sortable: false,
+    align: 'center',
   },
   {
     key: 'title',

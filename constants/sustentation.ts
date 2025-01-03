@@ -92,9 +92,10 @@ export const sustentationHeaderList = (viewType: GlobalType): HeaderItem[] => [
         },
       ]
     : []),
+
   {
-    key: 'offer.title',
-    label: 'Titulo oferta',
+    key: 'offer',
+    label: 'Titulo de oferta',
     sortable: false,
   },
 
@@ -108,27 +109,27 @@ export const sustentationHeaderList = (viewType: GlobalType): HeaderItem[] => [
     sortable: true,
     label: 'Categoría del bien',
   },
-  // {
-  //  key: 'Subcategory of the good',
-  //  label: 'Sub Categoría del bien',
-  //  sortable: true,
-  // },
   {
-    key: 'paymentStatus',
-    label: 'Estado abono',
+    key: 'offer.carBrand.name',
+    label: 'Sub Categoría del bien',
     sortable: true,
   },
+  // {
+  //   key: 'paymentStatus',
+  //   label: 'Estado abono',
+  //   sortable: true,
+  // },
   ...(viewType === GlobalType.Platform
     ? ([
         {
           key: 'transferenceSustentation',
-          label: 'D. Sustento de Transferencia',
+          label: 'D. Sustento de transferencia',
           align: 'center',
           sortable: false,
         },
         {
           key: 'deliverySustentation',
-          label: 'S. de entrega',
+          label: 'D. Sustento de entrega',
           // align: 'center',
           sortable: true,
         },
@@ -138,7 +139,7 @@ export const sustentationHeaderList = (viewType: GlobalType): HeaderItem[] => [
     ? ([
         {
           key: 'transferenceSustentation',
-          label: 'D. Sustento de Transferencia',
+          label: 'D. Sustento de transferencia',
           align: 'center',
           sortable: false,
         },

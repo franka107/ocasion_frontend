@@ -17,6 +17,19 @@
             }
           "
         >
+          <template #offerId="{ row }">
+            <Button as-child variant="link">
+              <NuxtLink
+                :to="
+                  globalType === GlobalType.Platform
+                    ? `/dashboard/platform/events/${route.params.eventId}/offers/${row.offer.id}/bids`
+                    : `/dashboard/organization/${route.params.organizationId}/events/${route.params.eventId}/offers/${row.offer.id}/bids`
+                "
+              >
+                {{ row.offer.id }}
+              </NuxtLink>
+            </Button>
+          </template>
           <template #action-button>
             <div class="flex flex-row space-x-2">
               <Button
@@ -171,6 +184,7 @@ import { GrantId } from '~/types/Grant'
 import { ComparisonOperator, offerStatusCheckPosition } from '~/constants/offer'
 import { eventStatusCheckPosition } from '~/constants/events'
 import { EventStatus } from '~/types/Event'
+import { GlobalType } from '~/types/Common'
 
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const { rejectOfferBids, acceptOfferBids, page, sortOptions, onSort } =
@@ -184,6 +198,7 @@ const openAppraisalHistoryModal = ref(false)
 const appraisalHistoryModal = ref<IAmountHistoryModal>({ offerId: '' })
 const bidsId = ref<number | undefined>(undefined)
 const route = useRoute()
+const { user, globalType } = useUserSessionExtended()
 const selectedMultipleData = ref<{ type: string; ids: string[] }>({
   type: 'empty',
   ids: [],

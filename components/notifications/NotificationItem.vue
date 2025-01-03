@@ -21,12 +21,12 @@
             )
           }}
         </p>
-        <span
-          class="inline-flex font-inter font-semibold items-center justify-center sm:px-7 w-[52px] rounded-3xl text-xs sm:text-sm whitespace-nowrap"
-          :class="NotificationColorMap[notification.tag]"
+        <Badge
+          variant="outline"
+          :class="notificationTagRecord[notification.tag].tagClass"
         >
-          {{ NotiificationStringMap[notification.tag] }}
-        </span>
+          {{ notificationTagRecord[notification.tag].label }}
+        </Badge>
       </div>
 
       <div class="flex items-center relative mr-4 mt-4">
@@ -73,9 +73,9 @@ import {
   parseAbsolute,
 } from '@internationalized/date'
 import {
-  NotiificationStringMap,
   NotificationTag,
   type Notification,
+  notificationTagRecord,
 } from '~/types/Notification'
 
 const emit = defineEmits(['onRemove', 'onReaded'])
@@ -133,11 +133,5 @@ const handleDelete = async () => {
     console.error('Error al eliminar la notificación:', error)
   }
   closeMenu()
-}
-const NotificationColorMap = {
-  [NotificationTag.Event]: 'bg-[#EFF6FF] text-[#2563EB]',
-  [NotificationTag.Offer]: 'bg-[#FDF2F8] text-[#DB2777]',
-  [NotificationTag.Delivery]: 'bg-[#F0FDF4] text-[#16A34A]',
-  [NotificationTag.Alert]: 'bg-[#FEF3C7] text-[#B45309]',
 }
 </script>

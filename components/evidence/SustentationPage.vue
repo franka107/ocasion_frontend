@@ -22,6 +22,19 @@
               }
             "
           >
+            <template #offer="{ row }">
+              <Button as-child variant="link">
+                <NuxtLink
+                  :to="
+                    globalType === GlobalType.Platform
+                      ? `/dashboard/platform/events/${row.offer.eventId}/offers/${row.offer.id}/bids`
+                      : `/dashboard/organization/${route.params.organizationId}/events/${row.offer.eventId}/offers/${row.offer.id}/bids`
+                  "
+                >
+                  {{ row.offer.title }}
+                </NuxtLink>
+              </Button>
+            </template>
             <template #paymentStatus="{ row }">
               <CustomChip
                 :text="paymentStatus.get(row.payment.status)?.name || ''"
@@ -255,8 +268,14 @@ import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCar
 import { GrantId } from '~/types/Grant'
 import { paymentStatus } from '~/constants/payments'
 import { goodType } from '~/constants/events'
+import { GlobalType } from '~/types/Common'
 
-const filterOptions = ref('[]')
+const session = useUserSessionExtended()
+const filterOptions = ref(
+  session.globalType === GlobalType.Organization
+    ? `[{ "field": "organization.id", "type": "equal", "value": "${session.getDefaultOrganization().id}" }]`
+    : '[]',
+)
 const userSession = useUserSessionExtended()
 
 const isDeliverySustentationFormOpened = ref(false)
@@ -274,6 +293,7 @@ const myGrants = await getMyGrants()
 const deliverySustentationId = ref<string | undefined>(undefined)
 const transferenceSustentationId = ref<string | undefined>(undefined)
 const OFFER_BASE_URL = '/offer-management'
+const route = useRoute()
 const selectedMultipleData = ref<{ type: string; ids: string[] }>({
   type: 'empty',
   ids: [],
@@ -317,6 +337,7 @@ const openDeliveryForTransferModal = (row: any) => {
   // }
 }
 
+const { user, globalType } = useUserSessionExtended()
 const openTransferenceSustentationModal = (row: any) => {
   transferenceSustentationId.value = row.transferenceSustentation.id
   isTransferenceSustentationFormOpened.value = true

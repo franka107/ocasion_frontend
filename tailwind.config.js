@@ -3,7 +3,24 @@ const animate = require('tailwindcss-animate')
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ['class'],
-  safelist: ['dark', 'text-disabled-500'],
+  safelist: [
+    'dark',
+    'text-disabled-500',
+    'bg-[#EFF6FF]',
+    'text-[#2563EB]', // Azul para EVENTO
+    'bg-[#E0F2FE]',
+    'text-[#0284C7]', // Azul claro para ABONO y PAYMENT
+    'bg-[#FDF2F8]',
+    'text-[#DB2777]', // Rosa para OFERTA
+    'bg-[#FDE68A]',
+    'text-[#D97706]', // Amarillo para FINANZAS
+    'bg-gray-100',
+    'text-gray-500', // Gris predeterminado para GENERAL
+    'bg-[#FEF3F2]',
+    'text-[#B91C1C]', // Rojo claro para SUSTENTO
+    'bg-[#F0FDF4]',
+    'text-[#16A34A]', // Verde para SUSTENTO DE ENTREGA
+  ],
   prefix: '',
 
   theme: {

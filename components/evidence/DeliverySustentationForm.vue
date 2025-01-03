@@ -107,8 +107,8 @@ const onSubmit = form.handleSubmit(async (values: any) => {
   </SheetHeader>
 
   <div class="flex-grow flex flex-col overflow-y-auto no-scrollbar">
-    <form class="min-h-full" @submit="onSubmit">
-      <section class="flex flex-col gap-4 flex-grow p-5">
+    <form class="h-full" @submit="onSubmit">
+      <section class="flex flex-col gap-4 flex-grow p-5 h-full">
         <div v-if="deliverySustentationDetail">
           <section class="mb-6">
             <h3
@@ -143,7 +143,7 @@ const onSubmit = form.handleSubmit(async (values: any) => {
                     <FormItem class="w-1/2">
                       <FormControl>
                         <CustomInput
-                          type="text"
+                          type="time"
                           label="Hora"
                           v-bind="componentField"
                           :readonly="readonly"
@@ -189,25 +189,21 @@ const onSubmit = form.handleSubmit(async (values: any) => {
                 </FormField>
               </div>
 
-              <h4
-                class="font-[600] mt-3 text-[#152A3C] text-[12px] leading-5 mb-[12px]"
-              >
-                Comentarios
-              </h4>
-
-              <FormField v-slot="{ componentField }" name="comment">
-                <FormItem>
-                  <FormControl>
-                    <Textarea
-                      type="text"
-                      label="Comentarios"
-                      :readonly="readonly"
-                      v-bind="componentField"
-                    />
-                    <FormMessage />
-                  </FormControl>
-                </FormItem>
-              </FormField>
+              <div class="mt-5">
+                <FormField v-slot="{ componentField }" name="comment">
+                  <FormItem>
+                    <FormControl>
+                      <Textarea
+                        type="text"
+                        label="Comentarios"
+                        :readonly="readonly"
+                        v-bind="componentField"
+                      />
+                      <FormMessage />
+                    </FormControl>
+                  </FormItem>
+                </FormField>
+              </div>
             </div>
             <div>
               <h4

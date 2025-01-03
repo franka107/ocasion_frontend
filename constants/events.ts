@@ -213,7 +213,8 @@ export const eventListHeaders = (viewType: ViewType): HeaderItem[] => {
     {
       key: 'id',
       label: 'Código',
-      sortable: true,
+      align: 'center',
+      sortable: false,
     },
     {
       key: 'name',

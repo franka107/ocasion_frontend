@@ -235,14 +235,17 @@
           ></CustomChip>
         </template>
         <template #id="{ row }">
-          <NuxtLink
-            :to="globalType === GlobalType.Platform
-              ? `/dashboard/platform/events/${route.params.eventId}/offers/${row.id}/bids`
-              : `/dashboard/organization/${route.params.organizationId}/events/${route.params.eventId}/offers/${row.id}/bids`"
-            class="text-[#0000EE] hover:text-[#0000CD] hover:decoration-[#0000EE] hover:decoration-2 hover:underline font-medium cursor-pointer"
-          >
-            {{ row.id }}
-          </NuxtLink>
+          <Button as-child variant="link">
+            <NuxtLink
+              :to="
+                globalType === GlobalType.Platform
+                  ? `/dashboard/platform/events/${route.params.eventId}/offers/${row.id}/bids`
+                  : `/dashboard/organization/${route.params.organizationId}/events/${route.params.eventId}/offers/${row.id}/bids`
+              "
+            >
+              {{ row.id }}
+            </NuxtLink>
+          </Button>
         </template>
       </CustomTable>
       <AttachmentsModal

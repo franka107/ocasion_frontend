@@ -1,10 +1,12 @@
 <template>
   <div class="w-full">
-    <div class="w-full flex flex-row flex-wrap md:flex-nowrap py-6 gap-4 justify-between">
+    <div
+      class="w-full flex flex-row flex-wrap md:flex-nowrap py-6 gap-4 justify-between"
+    >
       <div class="flex flex-wrap justify-start gap-4 flex-grow">
-        <template v-for="(item, i) in displayableSearch" :index="i">
+        <template v-for="(item, i) in displayableSearch">
           <template v-if="item">
-            <div :class="cn('flex flex-col w-[200px]', item.width)">
+            <div :key="i" :class="cn('flex flex-col w-[200px]', item.width)">
               <label
                 v-if="item.label"
                 class="text-sm font-medium text-gray-700 mb-[6px]"
@@ -83,7 +85,8 @@
             variant="default"
             class="text-[#F97316] bg-white hover:text-white hover:bg-[#F97316] mr-[8px]"
             @click="displayHiddenFilters = !displayHiddenFilters"
-            >Mas filtros</Button>
+            >Mas filtros</Button
+          >
           <slot name="action-button">
             <!-- Default button in case no prop is passed -->
           </slot>
@@ -248,7 +251,11 @@ const props = withDefaults(defineProps<Props>(), {
 const { search } = toRefs(props)
 
 const displayHiddenFilters = ref(false)
-const displayableSearch = computed(() => displayHiddenFilters.value ? search.value : search.value?.filter((item) => !item.isHidden) || [])
+const displayableSearch = computed(() =>
+  displayHiddenFilters.value
+    ? search.value
+    : search.value?.filter((item) => !item.isHidden) || [],
+)
 
 const emit = defineEmits(['onSort', 'onSearch', 'onMultipleSelect'])
 

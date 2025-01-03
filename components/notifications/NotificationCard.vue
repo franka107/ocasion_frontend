@@ -38,12 +38,13 @@
             )
           }}
         </p>
-        <span
-          class="inline-flex font-inter font-semibold items-center justify-center sm:px-7 w-[52px] rounded-3xl text-xs sm:text-sm whitespace-nowrap"
-          :class="NotificationColorMap[notification.tag]"
+
+        <Badge
+          variant="outline"
+          :class="notificationTagRecord[notification.tag].tagClass"
         >
-          {{ NotiificationStringMap[notification.tag] }}
-        </span>
+          {{ notificationTagRecord[notification.tag].label }}
+        </Badge>
       </div>
 
       <div class="flex items-center mr-6 relative mt-10">
@@ -113,8 +114,8 @@ import {
   parseAbsolute,
 } from '@internationalized/date'
 import {
-  NotiificationStringMap,
   NotificationTag,
+  notificationTagRecord,
   type Notification,
 } from '~/types/Notification'
 import { htmlToText } from '~/utils/htmlUtils'

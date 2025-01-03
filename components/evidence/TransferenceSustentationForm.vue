@@ -110,6 +110,24 @@ const formSchema = toTypedSchema(
     }),
 )
 
+const stepsTitle = computed(() => {
+  switch (transferenceSustentationDetail.value?.participant.personType) {
+    case 'NATURAL_PERSON':
+      if (
+        transferenceSustentationDetail.value?.participant.maritalStatus ===
+        'MARRIED'
+      ) {
+        return 'Pasos a seguir para persona soltera:'
+      }
+      return 'Pasos a seguir para persona casada:'
+
+    case 'JURIDIC_PERSON':
+      return 'Pasos a seguir para persona jurídica:'
+    default:
+      return 'Pasos a seguir:'
+  }
+})
+
 try {
   const { data } = await useAPI<TransferenceSustentationDto>(
     `${BASE_SUSTENTATION_MANAGEMENT}/view-transference-sustentation-detail`,
@@ -163,174 +181,199 @@ const onSubmit = form.handleSubmit(async (values: any) => {
 
   <div class="flex-grow flex flex-col overflow-y-auto no-scrollbar">
     <form class="min-h-full" @submit="onSubmit">
-      <section class="flex flex-col gap-4 flex-grow p-5">
-        <div v-if="transferenceSustentationDetail">
-          <section
-            v-if="userSession.user.value?.user.type !== UserType.Participant"
-            class=""
+      <div class="min-h-full">
+        <section class="px-5 pt-5 flex-grow">
+          <div
+            class="h-auto flex flex-col leading-[20px] justify-between mb-4 md:mb-6 text-[#20445E] bg-[#E6F0F8] rounded-[8px] p-4"
           >
-            <h3
-              class="tracking-[1px] font-[600] text-[#152A3C] text-[14px] leading-5"
-            >
-              DATOS DEL PARTICIPANTE
-            </h3>
-
-            <ParticipantDetailFields
-              :participant-id="transferenceSustentationDetail.participantId"
-            />
-          </section>
-          <section class="mb-6">
-            <h3
-              class="tracking-[1px] font-[600] text-[#152A3C] text-[14px] leading-5 mb-[12px]"
-            >
-              ARCHIVOS SUBIDOS
-            </h3>
             <div>
-              <h4
-                class="font-[600] mt-3 text-[#152A3C] text-[12px] leading-5 mb-[12px]"
+              <h2 class="text-2 md:text-4 font-[700] mb-4">{{ stepsTitle }}</h2>
+              <ul
+                class="text-[12px] md:text-[14px] tracking-[0.5px] font-[400]"
               >
-                SOAT (en caso que la unidad no cuente con SOAT vigente)
-              </h4>
-              <!-- Fields -->
-              <FormField v-slot="{ componentField }" name="soatFiles">
-                <FormItem>
-                  <FormControl>
-                    <InputFile
-                      v-model="form.values.soatFiles"
-                      instructions-text="Cargar máximo hasta 1 archivo (png, jpg, jpeg o pdf)"
-                      :accepted-file-types="['.jpg', '.png', '.jpeg', '.pdf']"
-                      title="SOAT"
-                      :disabled="currentMode === 'confirm'"
-                      :hide-remove-icon="currentMode === 'confirm'"
-                      v-bind="componentField"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              </FormField>
+                <li>
+                  1. Carga de documentos solicitados (deben estar vigentes)
+                </li>
+                <li>2. Programación de la firma en notaría</li>
+                <li>3. Toma de firma para transferencia del bien</li>
+                <li>4. Entrega del bien</li>
+              </ul>
             </div>
-            <div>
-              <h4
-                class="font-[600] mt-3 text-[#152A3C] text-[12px] leading-5 mb-[12px]"
-              >
-                Foto legible de DNI del titular (Frontal y dorsal)
-              </h4>
-              <FormField
-                v-slot="{ componentField }"
-                name="identifierHolderFiles"
-              >
-                <FormItem>
-                  <FormControl>
-                    <InputFile
-                      v-model="form.values.identifierHolderFiles"
-                      title="Foto legible de DNI del titular"
-                      :disabled="currentMode === 'confirm'"
-                      :hide-remove-icon="currentMode === 'confirm'"
-                      v-bind="componentField"
-                      instructions-text="Cargar máximo hasta 1 archivo (png, jpg, jpeg o pdf)"
-                      :accepted-file-types="['.jpg', '.png', '.jpeg', '.pdf']"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              </FormField>
-            </div>
-            <div
-              v-if="
-                transferenceSustentationDetail.participant.maritalStatus ===
-                  'MARRIED' &&
-                transferenceSustentationDetail.participant.personType ===
-                  'NATURAL_PERSON'
-              "
+            <p class="text-[12px] tracking-[0.5px] pt-4">
+              <span class="font-[700]">Nota:</span> Realizar la carga de
+              documentos en un plazo de 4 días útiles.
+            </p>
+          </div>
+        </section>
+        <section class="flex flex-col gap-4 flex-grow px-5">
+          <div v-if="transferenceSustentationDetail">
+            <section
+              v-if="userSession.user.value?.user.type !== UserType.Participant"
+              class=""
             >
-              <h4
-                class="font-[600] mt-3 text-[#152A3C] text-[12px] leading-5 mb-[12px]"
+              <h3
+                class="tracking-[1px] font-[600] text-[#152A3C] text-[14px] leading-5"
               >
-                Foto legible de DNI del cónyuge (Frontal y dorsal)
-              </h4>
-              <FormField
-                v-slot="{ componentField }"
-                name="identifierSpouseFiles"
-              >
-                <FormItem>
-                  <FormControl>
-                    <InputFile
-                      v-model="form.values.identifierSpouseFiles"
-                      title="Foto legible de DNI del cónyuge"
-                      instructions-text="Cargar máximo hasta 1 archivo (png, jpg, jpeg o pdf)"
-                      :accepted-file-types="['.jpg', '.png', '.jpeg', '.pdf']"
-                      :disabled="currentMode === 'confirm'"
-                      :hide-remove-icon="currentMode === 'confirm'"
-                      v-bind="componentField"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              </FormField>
-            </div>
+                DATOS DEL PARTICIPANTE
+              </h3>
 
-            <div
-              v-if="
-                transferenceSustentationDetail.participant.personType ===
-                'JURIDIC_PERSON'
-              "
-            >
-              <h4
-                class="font-[600] mt-3 text-[#152A3C] text-[12px] leading-5 mb-[12px]"
+              <ParticipantDetailFields
+                :participant-id="transferenceSustentationDetail.participantId"
+              />
+            </section>
+            <section class="mb-6">
+              <h3
+                class="tracking-[1px] font-[600] text-[#152A3C] text-[14px] leading-5 mb-[12px]"
               >
-                Ficha RUC de la empresa de labor
-              </h4>
-              <FormField v-slot="{ componentField }" name="rucCardFiles">
-                <FormItem>
-                  <FormControl>
-                    <InputFile
-                      v-model="form.values.rucCardFiles"
-                      title="Ficha RUC de la empresa de labor"
-                      :disabled="currentMode === 'confirm'"
-                      :hide-remove-icon="currentMode === 'confirm'"
-                      v-bind="componentField"
-                      instructions-text="Cargar máximo hasta 1 archivo (png, jpg, jpeg o pdf)"
-                      :accepted-file-types="['.jpg', '.png', '.jpeg', '.pdf']"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              </FormField>
-            </div>
-            <div
-              v-if="
-                transferenceSustentationDetail.participant.personType ===
-                'JURIDIC_PERSON'
-              "
-            >
-              <h4
-                class="font-[600] mt-3 text-[#152A3C] text-[12px] leading-5 mb-[12px]"
+                ARCHIVOS SUBIDOS
+              </h3>
+              <div>
+                <h4
+                  class="font-[600] mt-3 text-[#152A3C] text-[12px] leading-5 mb-[12px]"
+                >
+                  SOAT (en caso que la unidad no cuente con SOAT vigente)
+                </h4>
+                <!-- Fields -->
+                <FormField v-slot="{ componentField }" name="soatFiles">
+                  <FormItem>
+                    <FormControl>
+                      <InputFile
+                        v-model="form.values.soatFiles"
+                        instructions-text="Cargar máximo hasta 1 archivo (png, jpg, jpeg o pdf)"
+                        :accepted-file-types="['.jpg', '.png', '.jpeg', '.pdf']"
+                        title="SOAT"
+                        :disabled="currentMode === 'confirm'"
+                        :hide-remove-icon="currentMode === 'confirm'"
+                        v-bind="componentField"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                </FormField>
+              </div>
+              <div>
+                <h4
+                  class="font-[600] mt-3 text-[#152A3C] text-[12px] leading-5 mb-[12px]"
+                >
+                  Foto legible de DNI del titular (Frontal y dorsal)
+                </h4>
+                <FormField
+                  v-slot="{ componentField }"
+                  name="identifierHolderFiles"
+                >
+                  <FormItem>
+                    <FormControl>
+                      <InputFile
+                        v-model="form.values.identifierHolderFiles"
+                        title="Foto legible de DNI del titular"
+                        :disabled="currentMode === 'confirm'"
+                        :hide-remove-icon="currentMode === 'confirm'"
+                        v-bind="componentField"
+                        instructions-text="Cargar máximo hasta 1 archivo (png, jpg, jpeg o pdf)"
+                        :accepted-file-types="['.jpg', '.png', '.jpeg', '.pdf']"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                </FormField>
+              </div>
+              <div
+                v-if="
+                  transferenceSustentationDetail.participant.maritalStatus ===
+                    'MARRIED' &&
+                  transferenceSustentationDetail.participant.personType ===
+                    'NATURAL_PERSON'
+                "
               >
-                Vigencia de poder (no superior a 3 meses)
-              </h4>
-              <FormField
-                v-slot="{ componentField }"
-                name="validityOfPowerFiles"
+                <h4
+                  class="font-[600] mt-3 text-[#152A3C] text-[12px] leading-5 mb-[12px]"
+                >
+                  Foto legible de DNI del cónyuge (Frontal y dorsal)
+                </h4>
+                <FormField
+                  v-slot="{ componentField }"
+                  name="identifierSpouseFiles"
+                >
+                  <FormItem>
+                    <FormControl>
+                      <InputFile
+                        v-model="form.values.identifierSpouseFiles"
+                        title="Foto legible de DNI del cónyuge"
+                        instructions-text="Cargar máximo hasta 1 archivo (png, jpg, jpeg o pdf)"
+                        :accepted-file-types="['.jpg', '.png', '.jpeg', '.pdf']"
+                        :disabled="currentMode === 'confirm'"
+                        :hide-remove-icon="currentMode === 'confirm'"
+                        v-bind="componentField"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                </FormField>
+              </div>
+
+              <div
+                v-if="
+                  transferenceSustentationDetail.participant.personType ===
+                  'JURIDIC_PERSON'
+                "
               >
-                <FormItem>
-                  <FormControl>
-                    <InputFile
-                      v-model="form.values.validityOfPowerFiles"
-                      title="Vigencia de poder (no superior a 3 meses)"
-                      :disabled="currentMode === 'confirm'"
-                      :hide-remove-icon="currentMode === 'confirm'"
-                      v-bind="componentField"
-                      instructions-text="Cargar máximo hasta 1 archivo (png, jpg, jpeg o pdf)"
-                      :accepted-file-types="['.jpg', '.png', '.jpeg', '.pdf']"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              </FormField>
-            </div>
-          </section>
-        </div>
-      </section>
+                <h4
+                  class="font-[600] mt-3 text-[#152A3C] text-[12px] leading-5 mb-[12px]"
+                >
+                  Ficha RUC de la empresa de labor
+                </h4>
+                <FormField v-slot="{ componentField }" name="rucCardFiles">
+                  <FormItem>
+                    <FormControl>
+                      <InputFile
+                        v-model="form.values.rucCardFiles"
+                        title="Ficha RUC de la empresa de labor"
+                        :disabled="currentMode === 'confirm'"
+                        :hide-remove-icon="currentMode === 'confirm'"
+                        v-bind="componentField"
+                        instructions-text="Cargar máximo hasta 1 archivo (png, jpg, jpeg o pdf)"
+                        :accepted-file-types="['.jpg', '.png', '.jpeg', '.pdf']"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                </FormField>
+              </div>
+              <div
+                v-if="
+                  transferenceSustentationDetail.participant.personType ===
+                  'JURIDIC_PERSON'
+                "
+              >
+                <h4
+                  class="font-[600] mt-3 text-[#152A3C] text-[12px] leading-5 mb-[12px]"
+                >
+                  Vigencia de poder (no superior a 3 meses)
+                </h4>
+                <FormField
+                  v-slot="{ componentField }"
+                  name="validityOfPowerFiles"
+                >
+                  <FormItem>
+                    <FormControl>
+                      <InputFile
+                        v-model="form.values.validityOfPowerFiles"
+                        title="Vigencia de poder (no superior a 3 meses)"
+                        :disabled="currentMode === 'confirm'"
+                        :hide-remove-icon="currentMode === 'confirm'"
+                        v-bind="componentField"
+                        instructions-text="Cargar máximo hasta 1 archivo (png, jpg, jpeg o pdf)"
+                        :accepted-file-types="['.jpg', '.png', '.jpeg', '.pdf']"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                </FormField>
+              </div>
+            </section>
+          </div>
+        </section>
+      </div>
       <SheetFooter class="mt-auto flex gap-x-4 px-6">
         <template v-if="currentMode === 'confirm'">
           <Button

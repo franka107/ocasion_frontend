@@ -49,14 +49,17 @@
             }}</span>
           </template>
           <template #id="{ row }">
-            <NuxtLink
-              class="text-[#0000EE] hover:text-[#0000CD] hover:decoration-[#0000EE] hover:decoration-2 hover:underline font-medium cursor-pointer"
-              :to="props.organizationId
-                ? `/dashboard/organization/${props.organizationId}/events/${row.id}`
-                : `/dashboard/platform/events/${row.id}`"
-            >
-              {{ row.id }}
-            </NuxtLink>
+            <Button as-child variant="link">
+              <NuxtLink
+                :to="
+                  props.organizationId
+                    ? `/dashboard/organization/${props.organizationId}/events/${row.id}`
+                    : `/dashboard/platform/events/${row.id}`
+                "
+              >
+                {{ row.id }}
+              </NuxtLink>
+            </Button>
           </template>
           <template #actions="{ row }">
             <div class="flex justify-center">
@@ -272,7 +275,6 @@ const [eventListData, organizationSummaryData] = await Promise.all([
 const { data, refresh } = eventListData
 
 const organizationSummary = organizationSummaryData.data.value
-// fix typing
 const eventsData = computed(() =>
   data.value?.data.map((item: any) => ({
     ...item,
