@@ -61,7 +61,7 @@ export const notificationTagRecord: Record<
     tagClass: 'bg-[#FEF3F2] text-[#B91C1C]', // Rojo claro
   },
   [NotificationTag.GodDeliverySustentation]: {
-    label: 'Sustento de entrega',
+    label: 'Sustento',
     tagClass: 'bg-[#F0FDF4] text-[#16A34A]', // Verde
   },
 }
