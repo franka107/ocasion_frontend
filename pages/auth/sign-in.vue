@@ -22,6 +22,7 @@ const errorDialogMessage = ref('')
 const closeSuccessDialog = () => {
   isSuccessDialogOpen.value = false
 }
+const { landingUrl } = useRuntimeConfig().public
 
 const closeErrorDialog = () => {
   isErrorDialogOpen.value = false
@@ -401,8 +402,20 @@ const showJuridicPersonFields = computed(
                 >He leído, conozco las condiciones para el tratamiento de mis
                 datos personales y doy mi consentimiento, en su caso, tal y como
                 se describe en
-                <b>Aviso de privacidad y Términos de uso</b></label
-              >
+                <a
+                  target="_blank"
+                  class="font-bold hover:underline"
+                  :href="`${landingUrl}/privacy-and-policy`"
+                  >Aviso de privacidad</a
+                >
+                y
+                <a
+                  target="_blank"
+                  class="font-bold hover:underline"
+                  :href="`${landingUrl}/terms-and-conditions`"
+                  >Términos de uso</a
+                >
+              </label>
             </FormControl>
             <FormMessage />
           </FormItem>
