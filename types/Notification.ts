@@ -53,15 +53,15 @@ export const notificationTagRecord: Record<
     tagClass: 'bg-gray-100 text-gray-500', // Gris predeterminado
   },
   [NotificationTag.Sustentation]: {
-    label: 'Sustento',
+    label: 'Entrega',
     tagClass: 'bg-[#FEF3F2] text-[#B91C1C]', // Rojo claro
   },
   [NotificationTag.GodTransferenceSustentation]: {
-    label: 'Sustento de transferencia',
+    label: 'Transferencia',
     tagClass: 'bg-[#FEF3F2] text-[#B91C1C]', // Rojo claro
   },
   [NotificationTag.GodDeliverySustentation]: {
-    label: 'Sustento',
+    label: 'Entrega',
     tagClass: 'bg-[#F0FDF4] text-[#16A34A]', // Verde
   },
 }
