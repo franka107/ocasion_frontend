@@ -203,6 +203,15 @@ const onSubmit = form.handleSubmit(async (values: any) => {
               <span class="font-[700]">Nota:</span> Realizar la carga de
               documentos en un plazo de 4 días útiles.
             </p>
+            <p class="text-[12px] tracking-[0.5px] pt-2">
+              <span class="font-[700]">Nota:</span> En caso algún sustento sea
+              observado por parte de
+              {{
+                transferenceSustentationDetail?.sustentation.organization?.name
+              }}
+              o DeOcasión, tendrá 02 días útiles tras la notificación para
+              susbsanarlas
+            </p>
           </div>
         </section>
         <section class="flex flex-col gap-4 flex-grow px-5">
