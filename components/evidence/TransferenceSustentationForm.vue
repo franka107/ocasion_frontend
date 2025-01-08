@@ -210,7 +210,7 @@ const onSubmit = form.handleSubmit(async (values: any) => {
                 transferenceSustentationDetail?.sustentation.organization?.name
               }}
               o DeOcasión, tendrá 02 días útiles tras la notificación para
-              susbsanarlas
+              subsanarlas.
             </p>
           </div>
         </section>

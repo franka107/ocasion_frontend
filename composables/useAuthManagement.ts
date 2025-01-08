@@ -23,9 +23,43 @@ export function useAuthManagement() {
     return { status, error, data: data.value ? data : emptyGrants, refresh }
   }
 
+  const login = async (values: { email: string; password: string }) => {
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: values.email, password: values.password }),
+    })
+
+    return response
+  }
+
   const authSignIn = async (values: any) => {
     const { status, error }: any = await useAPI(
       `${AUTH_MANAGEMENT_BASE_URL}/register-participant`,
+      {
+        method: 'POST',
+        body: values,
+      } as any,
+    )
+
+    return { status, error }
+  }
+
+  const registerParticipantByOtp = async (values: any) => {
+    const { status, error, data }: any = await useAPI(
+      `${AUTH_MANAGEMENT_BASE_URL}/register-participant-by-otp`,
+      {
+        method: 'POST',
+        body: values,
+      } as any,
+    )
+
+    return { status, error, data }
+  }
+
+  const validateOtp = async (values: any) => {
+    const { status, error }: any = await useAPI(
+      `${AUTH_MANAGEMENT_BASE_URL}/validate-otp`,
       {
         method: 'POST',
         body: values,
@@ -60,5 +94,14 @@ export function useAuthManagement() {
     dialogState.value[dialogName] = false
   }
 
-  return { getMyGrants, authSignIn, dialogState, handleApiError, closeDialog }
+  return {
+    getMyGrants,
+    authSignIn,
+    dialogState,
+    handleApiError,
+    closeDialog,
+    validateOtp,
+    login,
+    registerParticipantByOtp,
+  }
 }

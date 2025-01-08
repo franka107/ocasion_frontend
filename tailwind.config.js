@@ -3,6 +3,7 @@ const animate = require('tailwindcss-animate')
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ['class'],
+  content: ['./design-system/**/*.{js,jsx,ts,tsx,vue}'],
   safelist: [
     'dark',
     'text-disabled-500',
@@ -103,7 +104,7 @@ module.exports = {
         bluePrimary: '#20445E',
         gray: {
           100: '#E6E6E7',
-          200: '#F3F4F6',
+          200: '#e5e7eb',
           300: '#E5E7EB',
           400: '#D1D5DB',
           500: '#68686C',

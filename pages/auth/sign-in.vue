@@ -13,7 +13,7 @@ import priorityHigh from '~/assets/icon/png/priority-high.png'
 import CheckBox from '~/components/ui/checkbox/Checkbox.vue'
 
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
-const { authSignIn } = useAuthManagement()
+const authManagement = useAuthManagement()
 
 const isSuccessDialogOpen = ref(false)
 const isErrorDialogOpen = ref(false)
@@ -127,6 +127,8 @@ const onSubmit = form.handleSubmit(async (values: RegisterForm) => {
         values.personType === 'NATURAL_PERSON'
           ? representative.documentIdentifier
           : values.ruc,
+      legalRepresentativeDocumentType: representative.documentType,
+      legalRepresentativeDocumentIdentifier: representative.documentIdentifier,
     }
 
     await handleSignIn(formattedValues)
@@ -134,11 +136,13 @@ const onSubmit = form.handleSubmit(async (values: RegisterForm) => {
     isSubmitting.value = false
   }
 })
+const router = useRouter()
 
 const handleSignIn = async (values: any) => {
-  const { status, error }: any = await authSignIn(values)
+  const { status, error, data }: any =
+    await authManagement.registerParticipantByOtp(values)
   if (status.value === 'success') {
-    isSuccessDialogOpen.value = true
+    router.push(`/auth/validate-otp?id=${data.value.id}`)
   } else {
     const eMsg =
       error.value.data?.errors?.[0].message ||
