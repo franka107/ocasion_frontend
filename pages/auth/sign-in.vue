@@ -3,6 +3,8 @@ import { ref, watch, defineProps } from 'vue'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
+import { EyeClosedIcon, EyeOpenIcon } from '@radix-icons/vue'
+import { differenceInYears, isValid, parse } from 'date-fns'
 import Dialog from '~/components/auth/dialogForm.vue'
 import NuxtLayout from '~/components/auth/authForm.vue'
 import BaseForm from '~/components/auth/baseForm.vue'
@@ -11,6 +13,8 @@ import CustomSelect from '~/components/ui/custom-select/CustomSelect.vue'
 import messageIcon from '~/assets/icon/png/check-icon.png'
 import priorityHigh from '~/assets/icon/png/priority-high.png'
 import CheckBox from '~/components/ui/checkbox/Checkbox.vue'
+import Button from '~/components/ui/button/Button.vue'
+import DateInput from '~/components/ui/date-input/DateInput.vue'
 
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const authManagement = useAuthManagement()
@@ -27,74 +31,147 @@ const { landingUrl } = useRuntimeConfig().public
 const closeErrorDialog = () => {
   isErrorDialogOpen.value = false
 }
+const showPassword = ref(false)
 const isSubmitting = ref(false)
-const registerFormSchema = z.object({
-  personType: z.enum(['NATURAL_PERSON', 'JURIDIC_PERSON']),
 
-  firstName: z.string().min(1, 'El nombre es requerido').optional(),
-  lastName: z.string().min(1, 'El apellido es requerido').optional(),
-  maritalStatus: z
-    .enum(['SINGLE', 'MARRIED', 'WIDOWED', 'DIVORCED'])
-    .optional(),
-  gender: z.enum(['MALE', 'FEMALE']).optional(),
-  birthDate: z
-    .string()
-    .nonempty('La fecha de nacimiento es requerida')
-    .optional(),
+const togglePassword = () => {
+  showPassword.value = !showPassword.value
+}
+const registerFormSchema = z
+  .object({
+    personType: z.enum(['NATURAL_PERSON', 'JURIDIC_PERSON']),
 
-  businessName: z
-    .string()
-    .min(1, 'El nombre del negocio es requerido')
-    .optional(),
-  ruc: z
-    .string()
-    .regex(/^\d{11}$/, 'El RUC debe contener 11 dígitos')
-    .optional(),
-  legalRepresentative: z
-    .string()
-    .min(1, 'El representante legal es requerido')
-    .optional(),
-  taxAddress: z.string().min(1, 'El Domicilio Fiscal es requerida').optional(),
+    firstName: z.string().min(1, 'El nombre es requerido').optional(),
+    lastName: z.string().min(1, 'El apellido es requerido').optional(),
+    maritalStatus: z
+      .enum(['SINGLE', 'MARRIED', 'WIDOWED', 'DIVORCED'])
+      .optional(),
+    gender: z.enum(['MALE', 'FEMALE']).optional(),
+    birthDate: z
+      .string()
+      .nonempty('La fecha de nacimiento es requerida')
+      .optional(),
 
-  email: z.string().email('Debe ser un correo electrónico válido'),
-  phoneNumber: z
-    .string()
-    .min(9, 'El número de teléfono debe tener al menos 9 dígitos'),
-  representative: z
-    .object({
-      documentType: z.enum(['DNI', 'CE', 'PT']),
-      documentIdentifier: z
-        .string()
-        .regex(/^\d+$/, 'El documento debe contener solo dígitos.')
-        .min(1, 'El documento del representante es requerido'),
-    })
-    .partial()
-    .superRefine((schema, ctx) => {
-      if (
-        schema.documentType === 'DNI' &&
-        schema.documentIdentifier?.length !== 8
-      ) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'El dni debe contener 8 digitos',
-          path: ['documentIdentifier'],
-        })
-      }
-      if (
-        schema.documentType !== 'DNI' &&
-        schema.documentIdentifier?.length !== 9
-      ) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `El ${schema.documentType} debe contener 9 digitos`,
-          path: ['documentIdentifier'],
-        })
-      }
-    }),
-  areConditionsAccepted: z
-    .boolean()
-    .refine((val) => val === true, 'Debe aceptar los términos y condiciones'),
-})
+    businessName: z
+      .string()
+      .min(1, 'El nombre del negocio es requerido')
+      .optional(),
+    ruc: z
+      .string()
+      .regex(/^\d{11}$/, 'El RUC debe contener 11 dígitos')
+      .optional(),
+    legalRepresentative: z
+      .string()
+      .min(1, 'El representante legal es requerido')
+      .optional(),
+    taxAddress: z
+      .string()
+      .min(1, 'El Domicilio Fiscal es requerida')
+      .optional(),
+
+    email: z.string().email('Debe ser un correo electrónico válido'),
+    phoneNumber: z
+      .string()
+      .min(9, 'El número de teléfono debe tener al menos 9 dígitos'),
+    representative: z
+      .object({
+        documentType: z.enum(['DNI', 'CE', 'PT']),
+        documentIdentifier: z
+          .string()
+          .regex(/^\d+$/, 'El documento debe contener solo dígitos.')
+          .min(1, 'El documento del representante es requerido'),
+        password: z
+          .string()
+          .min(8, 'La contraseña debe tener al menos 8 caracteres')
+          .regex(/[a-z]/, {
+            message: 'Debe contener al menos una letra minúscula (a-z)',
+          })
+          .regex(/[A-Z]/, {
+            message: 'Debe contener al menos una letra mayúscula (A-Z)',
+          })
+          .regex(/[0-9]/, { message: 'Debe contener al menos un número (0-9)' })
+          .regex(/[@$!%*#?&]/, {
+            message: 'Debe contener al menos un carácter especial (@$!%*#?&)',
+          }),
+        passwordRepeated: z
+          .string()
+          .min(8, 'La contraseña debe tener al menos 8 caracteres')
+          .regex(/[a-z]/, {
+            message: 'Debe contener al menos una letra minúscula (a-z)',
+          })
+          .regex(/[A-Z]/, {
+            message: 'Debe contener al menos una letra mayúscula (A-Z)',
+          })
+          .regex(/[0-9]/, { message: 'Debe contener al menos un número (0-9)' })
+          .regex(/[@$!%*#?&]/, {
+            message: 'Debe contener al menos un carácter especial (@$!%*#?&)',
+          }),
+      })
+      .partial()
+      .superRefine((schema, ctx) => {
+        if (schema.password !== schema.passwordRepeated) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `La contraseñas no son iguales`,
+            path: ['password'],
+          })
+        }
+        if (
+          schema.documentType === 'DNI' &&
+          schema.documentIdentifier?.length !== 8
+        ) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'El dni debe contener 8 digitos',
+            path: ['documentIdentifier'],
+          })
+        }
+        if (
+          schema.documentType !== 'DNI' &&
+          schema.documentIdentifier?.length !== 9
+        ) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `El ${schema.documentType} debe contener 9 digitos`,
+            path: ['documentIdentifier'],
+          })
+        }
+      }),
+    areConditionsAccepted: z
+      .boolean()
+      .refine((val) => val === true, 'Debe aceptar los términos y condiciones'),
+  })
+  .superRefine((schema, ctx) => {
+    if (!schema.birthDate || schema.birthDate === '') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'La fecha de nacimiento es requerida',
+        path: ['birthDate'],
+      })
+      return
+    }
+
+    // Intenta parsear la fecha en formato dd-MM-yyyy
+    const parsedDate = parse(schema.birthDate, 'yyyy-MM-dd', new Date())
+    if (!isValid(parsedDate)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `El formato de la fecha debe ser dd-MM-yyyy ${schema.birthDate}`,
+        path: ['birthDate'],
+      })
+      return
+    }
+
+    // Verifica si el usuario tiene al menos 18 años
+    const age = differenceInYears(new Date(), parsedDate)
+    if (age < 18) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Debes ser mayor de 18 años',
+        path: ['birthDate'],
+      })
+    }
+  })
 
 type RegisterForm = z.infer<typeof registerFormSchema>
 
@@ -128,6 +205,7 @@ const onSubmit = form.handleSubmit(async (values: RegisterForm) => {
           ? representative.documentIdentifier
           : values.ruc,
       legalRepresentativeDocumentType: representative.documentType,
+      password: representative.password,
       legalRepresentativeDocumentIdentifier: representative.documentIdentifier,
     }
 
@@ -140,7 +218,10 @@ const router = useRouter()
 
 const handleSignIn = async (values: any) => {
   const { status, error, data }: any =
-    await authManagement.registerParticipantByOtp(values)
+    await authManagement.registerParticipantByOtp({
+      ...values,
+      password: values.password,
+    })
   if (status.value === 'success') {
     router.push(`/auth/validate-otp?id=${data.value.id}`)
   } else {
@@ -200,7 +281,7 @@ const showJuridicPersonFields = computed(
         </FormField>
 
         <template v-if="showNaturalPersonFields">
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- Nombre -->
             <FormField v-slot="{ componentField }" name="firstName">
               <FormItem>
@@ -265,10 +346,10 @@ const showJuridicPersonFields = computed(
             <FormField v-slot="{ componentField }" name="birthDate">
               <FormItem>
                 <FormControl>
-                  <CustomInput
-                    type="date"
+                  <DateInput
                     label="Fecha de Nacimiento"
-                    v-bind="componentField"
+                    :value="componentField.modelValue"
+                    @update:model-value="componentField.onChange"
                   />
                 </FormControl>
                 <FormMessage />
@@ -328,7 +409,7 @@ const showJuridicPersonFields = computed(
           </FormField>
         </template>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField v-slot="{ componentField }" name="phoneNumber">
             <FormItem>
               <FormControl>
@@ -391,6 +472,60 @@ const showJuridicPersonFields = computed(
               <FormMessage />
             </FormItem>
           </FormField>
+
+          <FormField v-slot="{ componentField }" name="representative.password">
+            <FormItem>
+              <FormControl>
+                <CustomInput
+                  :type="showPassword ? 'text' : 'password'"
+                  label="Contraseña"
+                  v-bind="componentField"
+                >
+                  <template #iconRight>
+                    <div class="mr-1" @click="togglePassword">
+                      <EyeClosedIcon
+                        v-if="!showPassword"
+                        class="h-4 w-4 text-gray-500 hover:cursor-pointer"
+                      />
+                      <EyeOpenIcon
+                        v-else
+                        class="h-4 w-4 text-gray-500 hover:cursor-pointer"
+                      />
+                    </div>
+                  </template>
+                </CustomInput>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+          <FormField
+            v-slot="{ componentField }"
+            name="representative.passwordRepeated"
+          >
+            <FormItem>
+              <FormControl>
+                <CustomInput
+                  :type="showPassword ? 'text' : 'password'"
+                  label="Repite tu contraseña"
+                  v-bind="componentField"
+                >
+                  <template #iconRight>
+                    <div class="mr-1" @click="togglePassword">
+                      <EyeClosedIcon
+                        v-if="!showPassword"
+                        class="h-4 w-4 text-gray-500 hover:cursor-pointer"
+                      />
+                      <EyeOpenIcon
+                        v-else
+                        class="h-4 w-4 text-gray-500 hover:cursor-pointer"
+                      />
+                    </div>
+                  </template>
+                </CustomInput>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
         </div>
 
         <!-- Aceptación de Condiciones -->
@@ -398,12 +533,13 @@ const showJuridicPersonFields = computed(
           <FormItem class="flex items-center gap-2">
             <FormControl>
               <Checkbox
+                id="areConditionsAccepted"
                 :checked="componentField.modelValue"
                 v-bind="componentField"
                 @update:checked="componentField.onChange"
               />
-              <label class="text-[14px]"
-                >He leído, conozco las condiciones para el tratamiento de mis
+              <label class="text-[14px]" for="areConditionsAccepted">
+                He leído, conozco las condiciones para el tratamiento de mis
                 datos personales y doy mi consentimiento, en su caso, tal y como
                 se describe en
                 <a
@@ -421,8 +557,8 @@ const showJuridicPersonFields = computed(
                 >
               </label>
             </FormControl>
-            <FormMessage />
           </FormItem>
+          <FormMessage />
         </FormField>
       </div>
     </BaseForm>

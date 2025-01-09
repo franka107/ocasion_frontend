@@ -33,6 +33,16 @@ export function useAuthManagement() {
     return response
   }
 
+  const loginByOtp = async (values: any) => {
+    const response = await fetch('/api/auth/login-by-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values),
+    })
+
+    return response
+  }
+
   const authSignIn = async (values: any) => {
     const { status, error }: any = await useAPI(
       `${AUTH_MANAGEMENT_BASE_URL}/register-participant`,
@@ -58,7 +68,7 @@ export function useAuthManagement() {
   }
 
   const validateOtp = async (values: any) => {
-    const { status, error }: any = await useAPI(
+    const { status, error, data }: any = await useAPI(
       `${AUTH_MANAGEMENT_BASE_URL}/validate-otp`,
       {
         method: 'POST',
@@ -66,7 +76,19 @@ export function useAuthManagement() {
       } as any,
     )
 
-    return { status, error }
+    return { status, error, data }
+  }
+
+  const resendOtp = async (values: any) => {
+    const { status, error, data }: any = await useAPI(
+      `${AUTH_MANAGEMENT_BASE_URL}/resend-otp`,
+      {
+        method: 'POST',
+        body: values,
+      } as any,
+    )
+
+    return { status, error, data }
   }
 
   const handleApiError = (errorBack: any) => {
@@ -100,7 +122,9 @@ export function useAuthManagement() {
     dialogState,
     handleApiError,
     closeDialog,
+    resendOtp,
     validateOtp,
+    loginByOtp,
     login,
     registerParticipantByOtp,
   }

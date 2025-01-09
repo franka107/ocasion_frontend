@@ -91,7 +91,6 @@ export function useLoginForm() {
 
   const handleLoginRouting = (user: any) => {
     const userType: UserType = user.type
-    console.log('userType', userType)
     switch (userType) {
       case UserType.SuperAdmin:
       case UserType.PlatformUser:

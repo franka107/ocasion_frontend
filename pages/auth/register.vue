@@ -103,4 +103,3 @@ watch(password, (newVal) => {
   showPasswordRequirements.value = newVal.length > 0
 })
 </script>
-

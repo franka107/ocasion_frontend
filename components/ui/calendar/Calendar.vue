@@ -118,8 +118,8 @@ const formatter = useDateFormatter('es')
             <SelectItem
               v-for="yearValue in createDecade({
                 dateObj: date,
-                startIndex: -10,
-                endIndex: 10,
+                startIndex: -90,
+                endIndex: 20,
               })"
               :key="yearValue.toString()"
               :value="yearValue.year.toString()"
