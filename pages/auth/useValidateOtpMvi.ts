@@ -45,6 +45,7 @@ export const useValidateOtpMvi = () => {
       otp: form.values.otp?.join(''),
       userId: route.query.id,
     })
+    // Te
     if (status.value === 'success') {
       alertDialog.value = {
         message: 'Código validado correctamente',
