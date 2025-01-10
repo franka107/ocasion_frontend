@@ -15,10 +15,10 @@ const cardClass = (totalSeconds: number, offer: OfferListItem) => {
   const BID_WINNER_STATUS = 'WINNER'
 
   if (totalSeconds <= 0) {
-    if(user.value?.user.id === offer.bids[0]?.userId) {
+    if (user.value?.user.id === offer.bids[0]?.userId) {
       return 'overlay-item border-2 border-green-400'
     } else {
-      return 'overlay-item border-2 border-gray-400'
+      return 'overlay-item border-2 border-[#ffffff]'
     }
   } else if (totalSeconds < SHOW_ALERT_ON_SECOND) {
     return 'animate-twinkle-border'
@@ -42,9 +42,9 @@ const offerImage = offer.value.attachedFiles[0].path
       tabindex="0"
       :class="
         cn(
-          cardClass(totalSeconds, offer),
           `w-full border-2 flex flex-col box-content relative shadow-[0px_0px_4px_0px_#0000001A] cursor-pointer max-w-[238px]
        rounded-lg overflow-hidden border-box bg-primary-50 border-[#ffffff] focus:border-2 focus:!border-[#414967]`,
+          cardClass(totalSeconds, offer),
         )
       "
     >
