@@ -1,3 +1,4 @@
+import { goodType } from './events'
 import type {
   HeaderItem,
   SearchItem,
@@ -99,6 +100,20 @@ export const bidsParticipantSearch: SearchItem[] = [
     items: [
       ...Array.from(bidStatus).map(([key, value]) => ({
         text: value.name,
+        value: key,
+      })),
+      { text: 'Todos', value: ' ' },
+    ],
+    elementClass: 'min-w-[400px]',
+    position: 2,
+  },
+  {
+    key: 'eventGoodType',
+    type: 'select',
+    placeholder: 'Tipo de activo',
+    items: [
+      ...Array.from(goodType).map(([key, value]) => ({
+        text: value,
         value: key,
       })),
       { text: 'Todos', value: ' ' },

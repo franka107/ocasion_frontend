@@ -430,6 +430,11 @@ const filterOptions = ref(`[]`)
 const onSearch = (item: { [key: string]: string }) => {
   filterOptions.value = JSON.stringify([
     { field: 'offer.title', type: 'like', value: item.title || '' },
+    {
+      field: 'event.goodType',
+      type: 'equal',
+      value: item.eventGoodType || '',
+    },
     { field: 'status', type: 'equal', value: item.status || '' },
   ])
 }
