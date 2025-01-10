@@ -105,7 +105,7 @@ const activeTab = ref(0)
 const currentApiUrl = computed(() => tabs[activeTab.value].apiUrl)
 const tabs = [
   {
-    label: `Ofertas ${data.value.inProgressCount}`,
+    label: `Ofertas Activas ${data.value.inProgressCount}`,
     apiUrl: 'find-offers-paginated-for-participant',
   },
   {
