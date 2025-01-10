@@ -7,6 +7,13 @@ export default defineEventHandler(async (event) => {
       loggedInAt: new Date(),
       // Any extra fields
     })
+
+    setCookie(event, 'isLoggedIn', JSON.stringify(true), {
+      domain: '.localhost',
+      sameSite: 'lax',
+      secure: false,
+      httpOnly: true,
+    })
     return body
   } catch (error: any) {
     throw createError({

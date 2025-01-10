@@ -121,6 +121,4 @@ const onSubmit = form.handleSubmit((values) => {
   console.log('FilterModal onSubmit')
   props.onSubmit(values)
 })
-
-const handleClear = () => {}
 </script>

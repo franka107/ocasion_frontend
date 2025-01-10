@@ -1,5 +1,5 @@
 export default defineEventHandler(async (event) => {
-  const { apiUrl } = useRuntimeConfig(event).public
+  const { apiUrl, globalDomain } = useRuntimeConfig(event).public
   const body = await readBody(event)
   try {
     const user: any = await $fetch(apiUrl + '/auth-management/login-user', {
@@ -14,6 +14,13 @@ export default defineEventHandler(async (event) => {
       user,
       loggedInAt: new Date(),
       // Any extra fields
+    })
+
+    setCookie(event, 'isLoggedIn', JSON.stringify(true), {
+      domain: globalDomain,
+      sameSite: 'lax',
+      secure: false,
+      httpOnly: true,
     })
     return user
   } catch (error: any) {

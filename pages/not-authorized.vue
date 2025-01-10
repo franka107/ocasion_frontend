@@ -29,6 +29,9 @@ const router = useRouter()
 const handleSignOut = async () => {
   await clear()
   router.push('/auth/login')
+  await fetch('/api/auth/logout', {
+    method: 'POST',
+  })
 }
 
 const handleBackClick = () => {

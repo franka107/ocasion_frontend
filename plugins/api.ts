@@ -3,7 +3,7 @@ import { BackendErrors } from '~/constants/backend-errors'
 
 export default defineNuxtPlugin((nuxtApp) => {
   const { apiUrl } = useRuntimeConfig().public
-  const { session, user, clear } = useUserSession()
+  const { session, user } = useUserSession()
 
   const api = $fetch.create({
     baseURL: String(apiUrl),

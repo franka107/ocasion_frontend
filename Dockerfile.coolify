@@ -1,0 +1,24 @@
+FROM node:22.4.1-alpine3.20
+
+WORKDIR /usr/src/app
+
+RUN apk add --no-cache bash
+
+COPY package.json yarn.lock ./
+
+RUN yarn install --frozen-lockfile
+
+COPY . .
+
+
+RUN yarn build
+
+EXPOSE 3000
+
+# Copia y da permisos a los scripts de inicio
+COPY startup.sh /opt/startup.sh
+RUN chmod +x  /opt/startup.sh && \
+  sed -i 's/\r//g' /opt/startup.sh
+
+CMD ["/opt/startup.sh"]
+

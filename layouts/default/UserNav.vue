@@ -43,6 +43,9 @@ const { clear, user } = useUserSession()
 
 const handleSignOut = async () => {
   await clear()
+  await fetch('/api/auth/logout', {
+    method: 'POST',
+  })
 
   router.push('/auth/login')
 }
