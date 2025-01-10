@@ -133,6 +133,7 @@ const notificationDf = new DateFormatter('es', {
   minute: '2-digit',
   day: '2-digit',
   month: 'long',
+  year: 'numeric',
 })
 
 const { removeNotifications, removeNotification, readNotification } =
