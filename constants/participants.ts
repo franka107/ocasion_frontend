@@ -13,9 +13,9 @@ export const userType = new Map<string, string>([
 
 export const participantSearch = (): SearchItem[] => [
   {
-    key: 'fullName',
+    key: 'commonName',
     type: 'text',
-    placeholder: 'Buscar por nombre y apellidos',
+    placeholder: 'Buscar por Nombre, Razón Social',
     position: 1,
   },
   {
@@ -57,23 +57,18 @@ export const participantsHeader: HeaderItem[] = [
     sortable: true,
   },
   {
-    key: 'document',
+    key: 'documentIdentifier',
     label: 'Documento',
     sortable: true,
   },
   {
-    key: 'cellphone',
+    key: 'phoneNumber',
     label: 'Celular',
     sortable: true,
   },
   {
     key: 'email',
     label: 'Correo',
-    sortable: true,
-  },
-  {
-    key: 'organization',
-    label: 'Organización',
     sortable: true,
   },
   {

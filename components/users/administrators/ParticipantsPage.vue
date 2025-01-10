@@ -58,7 +58,7 @@ const BASE_ADM_URL = '/user-management'
 const onSearch = (item: { [key: string]: string }) => {
   const filters = [
     { field: 'type', type: 'equal', value: 'PARTICIPANT' || '' },
-    { field: 'fullName', type: 'like', value: item.fullName || '' },
+    { field: 'commonName', type: 'like', value: item.commonName || '' },
     { field: 'email', type: 'like', value: item.email || '' },
     { field: 'phoneNumber', type: 'like', value: item.phoneNumber || '' },
     { field: 'status', type: 'equal', value: item.status || '' },
@@ -83,13 +83,14 @@ const { data }: any = await useAPI(
   } as any,
 )
 
-const adminsData = computed(() =>
-  data.value.data.map((item: IAdminsLItem) => ({
-    fullName: `${item.firstName} ${item.lastName}`,
-    document: `${item.documentType} - ${item.documentIdentifier}`,
-    cellphone: item.phoneNumber,
-    organization: item.organizations.map((org) => org.name).join(', '),
-    ...item,
-  })),
+const adminsData = computed(
+  () => data.value.data,
+  // data.value.data.map((item: IAdminsLItem) => ({
+  //   fullName: `${item.firstName} ${item.lastName}`,
+  //   document: `${item.documentType} - ${item.documentIdentifier}`,
+  //   cellphone: item.phoneNumber,
+  //   organization: item.organizations.map((org) => org.name).join(', '),
+  //   ...item,
+  // })),
 )
 </script>
