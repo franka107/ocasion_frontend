@@ -9,15 +9,16 @@ watch(offer, () => {
   key.value++
   endMiliseconds.value = getRemainingTime(offer.value.endTime)
 })
+const { clear, user } = useUserSession()
 const cardClass = (totalSeconds: number, offer: OfferListItem) => {
   const SHOW_ALERT_ON_SECOND = 120
   const BID_WINNER_STATUS = 'WINNER'
 
   if (totalSeconds <= 0) {
-    if (offer.bids[0]?.status === BID_WINNER_STATUS) {
+    if(user.value?.user.id === offer.bids[0]?.userId) {
       return 'overlay-item border-2 border-green-400'
     } else {
-      return 'overlay-item'
+      return 'overlay-item border-2 border-gray-400'
     }
   } else if (totalSeconds < SHOW_ALERT_ON_SECOND) {
     return 'animate-twinkle-shadow'
