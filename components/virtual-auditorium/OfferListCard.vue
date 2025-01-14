@@ -18,6 +18,8 @@ watch(offer, () => {
   endMiliseconds.value = getRemainingTime(offer.value.endTime)
 })
 const { clear, user } = useUserSession()
+const emit = defineEmits(['click'])
+
 const cardClass = (totalSeconds: number, offer: OfferListItem) => {
   const SHOW_ALERT_ON_SECOND = 120
   const BID_WINNER_STATUS = 'WINNER'
@@ -56,6 +58,7 @@ const offerImage = offer.value.attachedFiles[0].path
             cardClass(totalSeconds, offer),
           )
         "
+        @click="$emit('click', $event)"
       >
         <!-- Contador en cajitas -->
         <div
