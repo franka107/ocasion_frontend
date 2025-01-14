@@ -4,12 +4,18 @@
   >
     <div class="flex items-start w-full border-t border-gray-200">
       <div class="ml-16 mt-12">
-        <input
+        <!-- <input
           type="checkbox"
           :checked="isSelected"
           class="mr-4 form-checkbox h-5 w-5 text-[#09314F] border-2 gap-2 border-[#09314F] rounded focus:ring-[#09314F]"
           @change="toggleSelection"
-        />
+        /> -->
+        <button @click="props.onSelectItem(props.multipleSelectKey)">
+          <CustomIcons
+            :name="props.getSelectIcon(props.multipleSelectKey)"
+            class="w-12 h-12"
+          />
+        </button>
       </div>
       <div class="flex-1 space-y-1 py-2 mt-6">
         <p
@@ -123,9 +129,13 @@ import { htmlToText } from '~/utils/htmlUtils'
 const props = defineProps<{
   notification: Notification
   isSelected?: boolean
+  multipleSelect?: boolean
+  multipleSelectKey?: string
+  onSelectItem?: any
+  getSelectIcon?: any
 }>()
 
-const emit = defineEmits(['onRemove', 'onSelect', 'onReaded'])
+const emit = defineEmits(['onRemove', 'onSelect', 'onReaded', 'onMultipleSelect'])
 const isOpen = ref(false)
 
 const notificationDf = new DateFormatter('es', {
@@ -181,12 +191,6 @@ const handleDelete = async () => {
     console.error('Error al eliminar la notificación:', error)
   }
   closeMenu()
-}
-const NotificationColorMap = {
-  [NotificationTag.Event]: 'bg-[#EFF6FF] text-[#2563EB]',
-  [NotificationTag.Offer]: 'bg-[#FDF2F8] text-[#DB2777]',
-  [NotificationTag.Delivery]: 'bg-[#F0FDF4] text-[#16A34A]',
-  [NotificationTag.Alert]: 'bg-[#FEF3C7] text-[#B45309]',
 }
 
 const showDetail = ref(false)

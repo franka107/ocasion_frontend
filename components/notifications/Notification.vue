@@ -213,7 +213,7 @@ const handleButtonClick = () => {
   if (isAdmin.value) {
     showConfirmationDialog.value = true
   } else {
-    router.push('/dashboard/participant/my-notifications/Notification')
+    router.push('/dashboard/participant/my-notifications/notifications')
   }
 }
 

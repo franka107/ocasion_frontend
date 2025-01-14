@@ -100,6 +100,21 @@ export function useNotificationAPI() {
     return { status, error, data, refresh }
   }
 
+  const removeAllNotificationsByParticipant = async (values: {
+    type: string
+    ids: string[]
+  }) => {
+    const { status, error } = await useAPI<void>(
+      `${NOTIFICATION_BASE_URL}/remove-all-notifications-by-participant`,
+      {
+        method: 'POST',
+        body: {
+          values,
+        },
+      } as any,
+    )
+    return { status, error }
+  }
 
   const readNotification = async (id: string) => {
     const { status, error, data, refresh } = await useAPI<void>(
@@ -114,7 +129,6 @@ export function useNotificationAPI() {
     return { status, error, data, refresh }
   }
 
-
   return {
     findNotificationsPaginated,
     listenDomainEvents,
@@ -125,5 +139,6 @@ export function useNotificationAPI() {
     page,
     sortOptions,
     onSort,
+    removeAllNotificationsByParticipant,
   }
 }
