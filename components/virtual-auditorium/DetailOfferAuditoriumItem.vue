@@ -34,7 +34,7 @@ const props = defineProps<{
         USD ${{ offerDetail.initialValue }}
       </p>
     </div>
-    <BidHistory :bids="offerDetail.bids" type="complete" />
+    <BidHistory :bids="offerDetail.bids" winner-bid type="complete" />
     <!-- <div class="grid gap-y-[16px] font-[400] text-[#152A3C] text-[14px] mt-4"> -->
     <!--   <div class="flex text-[14px] leading-[12px] gap-x-[8px]"> -->
     <!--     <h3 class="font-[700] uppercase">Puja ganadora</h3> -->

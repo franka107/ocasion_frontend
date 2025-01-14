@@ -3,7 +3,6 @@ import type { BidDto } from '~/types/Bids'
 
 const props = defineProps<{
   bids: BidDto[]
-  winnerBid?: number
   type?: 'complete' | 'resumed' // La propiedad 'type' ahora es opcional
 }>()
 
@@ -15,14 +14,37 @@ const finalType = computed(() => type.value ?? 'resumed')
 const additionalBidsCount = computed(() =>
   finalType.value === 'resumed' ? bids.value.length - 4 : 0,
 )
+
+// Excluir la puja ganadora de la lista de "Pujas anteriores"
+const bidsToShow = computed(() =>
+  finalType.value === 'resumed' ? bids.value.slice(1, 5) : bids.value.slice(1),
+)
 </script>
 
 <template>
   <div class="text-primary-950 text-sm">
     <!-- Puja ganadora -->
-    <p v-if="winnerBid" class="mb-4">
-      <span class="uppercase font-bold text-lg">Puja ganadora</span>
-      <span class="text-xl font-semibold">USD {{ bids[0].amount }}</span>
+    <p class="uppercase font-bold">Puja ganadora</p>
+    <p
+      class="my-4 flex justify-between items-center bg-primary-100 p-2 rounded-lg"
+    >
+      <!-- <span class="uppercase font-bold text-lg">{{ -->
+      <!--   bids[0].guaranteedAmount.pseudonym -->
+      <!-- }}</span> -->
+      <span
+        :class="{
+          'font-bold': user?.user.id === bids[0].userId,
+          uppercase: true,
+          'text-lg': true,
+        }"
+      >
+        {{
+          `${bids[0].guaranteedAmount?.pseudonym || 'PUJA BASE'} ${user?.user.id === bids[0].userId ? '(YO)' : ''}`
+        }}
+      </span>
+      <span class="text-xl font-semibold text-primary-700"
+        >USD ${{ bids[0].amount }}</span
+      >
     </p>
 
     <!-- Lista de pujas -->
@@ -31,7 +53,7 @@ const additionalBidsCount = computed(() =>
 
       <!-- Pujas anteriores según el tipo -->
       <li
-        v-for="(item, i) in finalType === 'resumed' ? bids.slice(0, 4) : bids"
+        v-for="(item, i) in bidsToShow"
         :key="i"
         class="flex justify-between items-center w-full !py-1"
       >
@@ -65,24 +87,10 @@ const additionalBidsCount = computed(() =>
 </template>
 
 <style scoped>
+/* Mejorar la visualización de la puja ganadora */
+
 /* Añadir separación y mejorar legibilidad de la lista de pujas */
 li {
   padding: 8px 0;
-}
-
-span.float-right {
-  font-weight: 600;
-}
-
-.text-center {
-  text-align: center;
-}
-
-.text-primary-600 {
-  color: #3b82f6;
-}
-
-.text-primary-950 {
-  color: #111827;
 }
 </style>
