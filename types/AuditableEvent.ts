@@ -4,6 +4,7 @@ export enum AuditableEvent {
   BidRejected = 'BID_REJECTED',
   BidDiscarded = 'BID_DISCARDED',
   BidCreated = 'BID_CREATED',
+  BidCancelled = 'BID_CANCELLED',
 }
 
 export type AuditableEventBidCounterOfferMade = {
@@ -57,6 +58,9 @@ export const auditableEventRecord: Record<AuditableEvent, { label: string }> = {
   [AuditableEvent.BidCounterOfferMade]: {
     label: 'Puja Contraofertada',
   },
+  [AuditableEvent.BidCancelled]: {
+    label: 'Puja Cancelada',
+  },
   [AuditableEvent.BidAccepted]: {
     label: 'Puja Aceptada',
   },
@@ -67,7 +71,7 @@ export const auditableEventRecord: Record<AuditableEvent, { label: string }> = {
     label: 'Puja creada',
   },
   [AuditableEvent.BidDiscarded]: {
-    label: 'Puja descartada',
+    label: 'Puja Descartada',
   },
 }
 
