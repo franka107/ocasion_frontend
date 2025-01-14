@@ -1,5 +1,6 @@
 import type { UserDto } from './Administrators'
 import type { BidDto } from './Bids'
+import type { FileType } from './Disbursement'
 import type { EventDto } from './Event'
 import type { Organization } from '~/models/organizations'
 
@@ -79,8 +80,8 @@ export interface OfferDto {
   address: Address
   appraisal: number
   counterProposalAmount?: any
-  annexesFiles: AnnexesFile[]
-  attachedFiles: AttachedFile[]
+  annexesFiles: FileType[]
+  attachedFiles: FileType[]
   status: OfferStatus
   endTime?: string
   createdAt: string
