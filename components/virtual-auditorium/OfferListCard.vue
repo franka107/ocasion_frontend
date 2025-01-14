@@ -148,7 +148,7 @@ const offerImage = offer.value.attachedFiles[0].path
         </DialogDescription>
       </DialogHeader>
       <div>
-        <Album :files="offer.attachedFiles" />
+        <Album orientation="horizontal" :files="offer.attachedFiles" />
       </div>
     </DialogContent>
   </Dialog>

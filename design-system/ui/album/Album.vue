@@ -4,6 +4,7 @@ import type { FileType } from '~/types/Disbursement'
 
 const props = defineProps<{
   files: FileType[]
+  orientation?: 'vertical' | 'horizontal'
 }>()
 
 const attachedMedia = computed(() =>
@@ -19,14 +20,28 @@ const selectedMedia = ref(attachedMedia.value[0])
 const selectMedia = (media: (typeof attachedMedia.value)[0]) => {
   selectedMedia.value = media
 }
+
+// Clases condicionales según la orientación
+const containerClass = computed(() => {
+  return props.orientation === 'horizontal'
+    ? 'flex-row gap-6'
+    : 'flex-col-reverse gap-4'
+})
+
+const mediaPanelClass = computed(() => {
+  return props.orientation === 'horizontal'
+    ? 'flex flex-col overflow-x-auto max-h-[480px]'
+    : 'flex flex-row overflow-y-auto max-w-full'
+})
 </script>
 
 <template>
   <div class="flex justify-center w-full max-w-[1440px] mx-auto">
-    <section class="grid grid-cols-1 lg:grid-cols-[auto_2fr] gap-6 w-full">
-      <!-- Columna Izquierda: Panel scrollable -->
+    <section class="flex w-full" :class="containerClass">
+      <!-- Panel scrollable -->
       <div
-        class="flex flex-col w-full max-h-[480px] overflow-y-auto bg-white border border-gray-200 rounded-lg p-4 gap-4"
+        class="bg-white border border-gray-200 rounded-lg p-4"
+        :class="mediaPanelClass"
       >
         <div
           v-for="(media, index) in attachedMedia"
@@ -58,7 +73,7 @@ const selectMedia = (media: (typeof attachedMedia.value)[0]) => {
         </div>
       </div>
 
-      <!-- Columna Central: Imagen grande y detalles -->
+      <!-- Imagen grande -->
       <div class="rounded-lg overflow-hidden w-full max-h-[480px]">
         <template v-if="selectedMedia.isVideo">
           <video
@@ -80,9 +95,9 @@ const selectMedia = (media: (typeof attachedMedia.value)[0]) => {
 </template>
 
 <style scoped>
-/* Estilo personalizado para un enfoque claro en el elemento seleccionado */
+/* Estilo personalizado para ítems seleccionados */
 .carousel-item-active {
-  border: 2px solid #3b82f6; /* Border azul para ítems seleccionados */
+  border: 2px solid #3b82f6; /* Azul para ítems seleccionados */
   transition: all 0.3s ease-in-out;
 }
 </style>

@@ -43,8 +43,8 @@ const props = defineProps<{
         <h3 class="leading-[14px] font-[700] uppercase">Pujas anteriores</h3>
         <div v-for="bid in offerDetail.bids" :key="bid.id">
           <div class="flex justify-between leading-[10px] font-[400]">
-            <p>{{ bid?.user?.commonName || '-' }}</p>
-            <span>USD {{ bid.amount }}</span>
+            <p>{{ bid?.user?.commonName || 'PUJA BASE' }}</p>
+            <span>USD ${{ bid.amount }}</span>
           </div>
         </div>
       </div>

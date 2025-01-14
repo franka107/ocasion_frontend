@@ -15,10 +15,10 @@ const { bids } = toRefs(props)
       ><span> USD {{ bids[0].amount }}</span>
     </p>
     <ul class="space-y-3 overflow-y-auto max-w-[276px]">
-      <li class="uppercase font-bold">Puja anteriores</li>
-      <li v-for="(item, i) in bids" :key="i">
+      <li class="uppercase font-bold">Pujas anteriores</li>
+      <li v-for="(item, i) in bids.slice(0, 3)" :key="i">
         <span :class="{ 'font-bold': user?.user.id === item.userId }">{{
-          `${item.guaranteedAmount?.pseudonym || '-'} ${user?.user.id === item.userId ? '(YO)' : ''}` ||
+          `${item.guaranteedAmount?.pseudonym || 'PUJA BASE'} ${user?.user.id === item.userId ? '(YO)' : ''}` ||
           '-'
         }}</span
         ><span class="float-right">USD ${{ item.amount }}</span>

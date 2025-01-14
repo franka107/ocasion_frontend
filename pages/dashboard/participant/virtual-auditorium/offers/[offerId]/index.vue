@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import dayjs from 'dayjs'
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
 import DetailOfferAuditoriumItem from '@/components/virtual-auditorium/DetailOfferAuditoriumItem.vue'
 import {
@@ -9,7 +10,7 @@ import {
   CarouselPrevious,
 } from '~/components/ui/carousel'
 import type { OfferDto } from '~/types/Offer'
-import dayjs from 'dayjs'
+import Album from '~/design-system/ui/album/Album.vue'
 const { landingUrl } = useRuntimeConfig().public
 const route = useRoute()
 const activeTab = ref<string>('info')
@@ -67,8 +68,8 @@ const isLooping = computed(() => attachedMedia.value.length >= 4)
   <ContentLayout
     title="Detalle oferta"
     subtitle="Detalle oferta"
-    showArrow
-    customClass="lg:px-[16px]"
+    show-arrow
+    custom-class="lg:px-[16px]"
   >
     <div class="flex text-[12px] font-[400] mb-[16px]">
       <h1 class="text-[#86868A] hover:text-[#225B82] cursor-pointer">
@@ -124,78 +125,14 @@ const isLooping = computed(() => attachedMedia.value.length >= 4)
       <div
         class="h-full md:h-[625px] bg-white border border-[#F3F8FC] rounded-lg px-[16px] pt-[24px] pb-[26px] w-full shadow-[0px_0px_4px_0px_#0000001A] mb-[24px]"
       >
-        <section class="flex justify-center mx-auto max-w-[1116px]">
+        <section class="flex justify-center mx-auto">
           <div class="max-w-7xl w-full">
             <div class="flex flex-col md:flex-row gap-[24px]">
               <!-- Columna Izquierda-->
-              <div class="flex flex-col justify-center w-full md:w-[63%]">
-                <div class="w-full" style="max-width: 692px">
-                  <div
-                    class="w-full h-full max-w-[692px] max-h-[480px] rounded-2xl overflow-hidden"
-                  >
-                    <template v-if="selectedMedia.isVideo">
-                      <video
-                        :src="selectedMedia.src"
-                        controls
-                        class="w-full h-full object-cover"
-                      ></video>
-                    </template>
-                    <template v-else>
-                      <img
-                        :src="selectedMedia.src"
-                        :alt="selectedMedia.alt"
-                        class="w-full h-full object-cover"
-                      />
-                    </template>
-                  </div>
-                </div>
-                <div class="flex w-full items-center" style="max-width: 692px">
-                  <div
-                    class="flex justify-center md:w-full w-[62vw] mt-[16px] mx-auto"
-                  >
-                    <Carousel
-                      class="relative w-full max-w-xs h-auto md:h-[52%]"
-                      :opts="{ align: 'start', loop: isLooping }"
-                    >
-                      <CarouselContent>
-                        <CarouselItem
-                          v-for="(media, index) in attachedMedia"
-                          :key="index"
-                          :class="{
-                            'basis-1/4': attachedMedia.length > 3,
-                            'basis-1/3':
-                              attachedMedia.length <= 3 &&
-                              attachedMedia.length > 1,
-                            'basis-1/1': attachedMedia.length <= 1,
-                          }"
-                        >
-                          <div class="p-1" @click="selectMedia(media)">
-                            <Card class="rounded-[0px]">
-                              <CardContent class=" p-0">
-                                <template v-if="media.isVideo">
-                                  <video
-                                    :src="media.src"
-                                    class="w-full h-full object-cover max-w-[65px] max-h-[50px] rounded-0"
-                                  ></video>
-                                </template>
-                                <template v-else>
-                                  <img
-                                    :src="media.src"
-                                    :alt="media.alt"
-                                    class="w-[65px] h-[50px] object-cover rounded-0"
-                                  />
-                                </template>
-                              </CardContent>
-                            </Card>
-                          </div>
-                        </CarouselItem>
-                      </CarouselContent>
-                      <CarouselPrevious v-if="showArrows" />
-                      <CarouselNext v-if="showArrows" />
-                    </Carousel>
-                  </div>
-                </div>
-              </div>
+              <Album
+                orientation="vertical"
+                :files="offerDetail.attachedFiles"
+              />
               <!-- Columna Derecha: Información -->
               <div
                 class="w-full h-full min-h-[478px] md:w-[37%] flex flex-col shadow-[0px_0px_4px_0px_#0000001A] p-[16px] rounded-[12px]"
@@ -210,8 +147,8 @@ const isLooping = computed(() => attachedMedia.value.length >= 4)
                         ? 'text-bluePrimary'
                         : 'text-[#D0D0D1]'
                     "
-                    @click="activeTab = 'info'"
                     class="hover:underline hover:underline-offset-[22px] hover:text-bluePrimary leading-[24px]"
+                    @click="activeTab = 'info'"
                   >
                     Información
                   </button>
@@ -221,8 +158,8 @@ const isLooping = computed(() => attachedMedia.value.length >= 4)
                         ? 'text-bluePrimary'
                         : 'text-[#D0D0D1]'
                     "
-                    @click="activeTab = 'description'"
                     class="hover:underline hover:underline-offset-[22px] hover:text-bluePrimary leading-[24px]"
+                    @click="activeTab = 'description'"
                   >
                     Descripción
                   </button>
@@ -232,15 +169,15 @@ const isLooping = computed(() => attachedMedia.value.length >= 4)
                         ? 'text-bluePrimary'
                         : 'text-[#D0D0D1]'
                     "
-                    @click="activeTab = 'annex'"
                     class="hover:underline hover:underline-offset-[22px] hover:text-bluePrimary leading-[24px]"
+                    @click="activeTab = 'annex'"
                   >
                     Anexos
                   </button>
                 </div>
                 <div>
                   <div v-if="activeTab === 'info'">
-                    <DetailOfferAuditoriumItem :offerDetail="offerDetail" />
+                    <DetailOfferAuditoriumItem :offer-detail="offerDetail" />
                   </div>
                   <div v-if="activeTab === 'description'">
                     <p
@@ -283,4 +220,3 @@ const isLooping = computed(() => attachedMedia.value.length >= 4)
   text-overflow: ellipsis;
 }
 </style>
-
