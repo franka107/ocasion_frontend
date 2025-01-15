@@ -12,12 +12,36 @@ const props = defineProps<{
     onPassword: (values: any) => void;
     onRestore: (email: string) => void;
 }>()
+const BASE_USER_URL = '/auth-management'
+
+const { data: userDetail, refresh }: any = await useAPI<any>(
+  `${BASE_USER_URL}/get-my-info`,
+  {
+    query: {},
+    default: () => ({}),
+  },
+)
+const { clear, user } = useUserSession()
+const router = useRouter()
+
+// console.log('USER',userDetail)
 const isChange = ref(false)
 const formSchema = toTypedSchema(
     z.object({
-        currentPassword: z.string().min(1, 'La contraseña actual es requerida'),
-        newPassword:z.string().min(1, 'La contraseña nueva es requerida'),
-        confirmPassword: z.string().min(1, 'La confirmación de la contraseña es requerida'),
+        currentPassword: z.string().min(1, 'La contraseña actual es requerida')
+        ,
+        newPassword:z.string().min(8, 'La contraseña debe tener al menos 8 caracteres')
+        .regex(/[a-z]/, {
+            message: 'Debe contener al menos una letra minúscula (a-z)',
+          })
+          .regex(/[A-Z]/, {
+            message: 'Debe contener al menos una letra mayúscula (A-Z)',
+          })
+          .regex(/[0-9]/, { message: 'Debe contener al menos un número (0-9)' })
+          .regex(/[@$!%*#?&]/, {
+            message: 'Debe contener al menos un carácter especial (@$!%*#?&)',
+          }),
+        confirmPassword: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres'),
     }).refine((data) => data.newPassword === data.confirmPassword, {
         message: 'Las contraseñas no coinciden',
         path: ['confirmPassword'],
@@ -31,11 +55,21 @@ const form = useForm({
         confirmPassword: '',
     }
 })
+
+const handleSignOut = async () => {
+  await clear()
+  router.push('/auth/login')
+  await fetch('/api/auth/logout', {
+    method: 'POST',
+  })
+}
+
 const onSubmit = form.handleSubmit(async (values: any) => {
     const formattedValues = {
         ...values,
     }
     props.onPassword(formattedValues)
+
 })
 const startChange = () => {
     isChange.value = true
