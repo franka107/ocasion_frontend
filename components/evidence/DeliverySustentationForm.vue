@@ -159,6 +159,12 @@ const onSubmit = form.handleSubmit(async (values: any) => {
                           label="Fecha"
                           :disabled="currentMode === 'confirm' || readonly"
                           :value="componentField.modelValue"
+                          :max-value="
+                            parseAbsolute(
+                              new Date().toISOString(),
+                              getLocalTimeZone(),
+                            )
+                          "
                           @update:model-value="componentField.onChange"
                         />
                       </FormControl>
@@ -244,6 +250,7 @@ const onSubmit = form.handleSubmit(async (values: any) => {
                     <InputFile
                       v-model="form.values.evidenceFiles"
                       title="Evidencia"
+                      :limit-files="5"
                       :disabled="currentMode === 'confirm' || readonly"
                       :hide-remove-icon="currentMode === 'confirm'"
                       v-bind="componentField"

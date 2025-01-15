@@ -52,16 +52,17 @@ const form = useForm({
   initialValues: {},
 })
 
-if (props.participantId) {
-  const { data } = await useAPI<any>(`/user-management/get-user-detail`, {
+const { data: userDetail } = await useAPI<any>(
+  `/user-management/get-user-detail`,
+  {
     method: 'GET',
     query: {
       id: props.participantId,
     },
-  } as any)
-  console.log(data.value)
-  form.setValues(data.value)
-}
+  } as any,
+)
+console.log(userDetail.value)
+form.setValues(userDetail.value)
 </script>
 
 <template>
@@ -70,7 +71,11 @@ if (props.participantId) {
       <section class="flex-grow">
         <div class="grid grid-cols-1 gap-4 mb-[24px]">
           <!-- Nombre  -->
-          <FormField v-slot="{ componentField }" name="firstName">
+          <FormField
+            v-if="userDetail.personType === 'NATURAL_PERSON'"
+            v-slot="{ componentField }"
+            name="firstName"
+          >
             <FormItem>
               <FormControl>
                 <CustomInput
@@ -84,7 +89,29 @@ if (props.participantId) {
             </FormItem>
           </FormField>
           <!-- Apellidos  -->
-          <FormField v-slot="{ componentField }" name="lastName">
+
+          <FormField
+            v-if="userDetail.personType === 'JURIDIC_PERSON'"
+            v-slot="{ componentField }"
+            name="commonName"
+          >
+            <FormItem>
+              <FormControl>
+                <CustomInput
+                  type="text"
+                  label="Razon Social"
+                  v-bind="componentField"
+                  disabled
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+          <FormField
+            v-if="userDetail.personType === 'NATURAL_PERSON'"
+            v-slot="{ componentField }"
+            name="lastName"
+          >
             <FormItem>
               <FormControl>
                 <CustomInput
@@ -109,6 +136,7 @@ if (props.participantId) {
                       { id: 'DNI', name: 'DNI' },
                       { id: 'CE', name: 'CE' },
                       { id: 'PT', name: 'PT' },
+                      { id: 'RUC', name: 'RUC' },
                     ]"
                     placeholder="Tipo de Documento"
                     disabled
@@ -160,7 +188,11 @@ if (props.participantId) {
           </FormField>
           <div class="flex gap-2">
             <!-- Sexo -->
-            <FormField v-slot="{ componentField }" name="gender">
+            <FormField
+              v-if="userDetail.personType === 'NATURAL_PERSON'"
+              v-slot="{ componentField }"
+              name="gender"
+            >
               <FormItem class="w-1/2">
                 <FormControl>
                   <CustomSelect
@@ -177,7 +209,11 @@ if (props.participantId) {
               </FormItem>
             </FormField>
             <!-- Estado Civil -->
-            <FormField v-slot="{ componentField }" name="maritalStatus">
+            <FormField
+              v-if="userDetail.personType === 'NATURAL_PERSON'"
+              v-slot="{ componentField }"
+              name="maritalStatus"
+            >
               <FormItem class="w-1/2">
                 <FormControl>
                   <CustomSelect
@@ -197,7 +233,11 @@ if (props.participantId) {
             </FormField>
           </div>
           <!-- Fecha de Nacimiento -->
-          <FormField v-slot="{ componentField }" name="birthDate">
+          <FormField
+            v-if="userDetail.personType === 'NATURAL_PERSON'"
+            v-slot="{ componentField }"
+            name="birthDate"
+          >
             <FormItem>
               <FormControl>
                 <CustomInput
