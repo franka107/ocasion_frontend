@@ -9,6 +9,7 @@ import DialogTitle from '~/design-system/ui/dialog/DialogTitle.vue'
 import DialogDescription from '~/design-system/ui/dialog/DialogDescription.vue'
 import DialogFooter from '~/design-system/ui/dialog/DialogFooter.vue'
 import Album from '~/design-system/ui/album/Album.vue'
+import Thumbnails from '~/design-system/ui/thumbnails/Thumbnails.vue'
 const props = defineProps<{ offer: OfferListItem }>()
 const { offer } = toRefs(props)
 const key = ref(0)
@@ -148,7 +149,7 @@ const offerImage = offer.value.attachedFiles[0].path
         </DialogDescription>
       </DialogHeader>
       <div>
-        <Album orientation="horizontal" :files="offer.attachedFiles" />
+        <Thumbnails orientation="horizontal" :files="offer.attachedFiles" />
       </div>
     </DialogContent>
   </Dialog>

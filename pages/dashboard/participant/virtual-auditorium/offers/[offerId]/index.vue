@@ -11,6 +11,7 @@ import {
 } from '~/components/ui/carousel'
 import type { OfferDto } from '~/types/Offer'
 import Album from '~/design-system/ui/album/Album.vue'
+import Thumbnails from '~/design-system/ui/thumbnails/Thumbnails.vue'
 const { landingUrl } = useRuntimeConfig().public
 const route = useRoute()
 const activeTab = ref<string>('info')
@@ -129,13 +130,14 @@ const isLooping = computed(() => attachedMedia.value.length >= 4)
           <div class="max-w-7xl w-full">
             <div class="flex flex-col md:flex-row gap-[24px]">
               <!-- Columna Izquierda-->
-              <Album
-                orientation="vertical"
-                :files="offerDetail.attachedFiles"
-              />
+              <!-- <Album -->
+              <!--   orientation="vertical" -->
+              <!--   :files="offerDetail.attachedFiles" -->
+              <!-- /> -->
+              <Thumbnails class="w-full" :files="offerDetail.attachedFiles" />
               <!-- Columna Derecha: Información -->
               <div
-                class="w-full h-full min-h-[478px] md:w-[37%] flex flex-col shadow-[0px_0px_4px_0px_#0000001A] p-[16px] rounded-[12px]"
+                class="w-full h-full md:w-[40%] flex flex-col shadow-[0px_0px_4px_0px_#0000001A] p-[16px] rounded-[12px]"
               >
                 <!-- Tabs -->
                 <div
