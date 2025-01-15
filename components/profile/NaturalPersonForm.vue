@@ -52,9 +52,15 @@ const onSubmit = form.handleSubmit(async (values: any) => {
     ...values,
   }
   props.onEdit(formattedValues)
+
+  resetValues()
 })
 const startEditing = () => {
   isEditing.value = true
+}
+
+const resetValues = () => {
+  isEditing.value = false
 }
 const cancelEdit = () => {
   isEditing.value = false;
