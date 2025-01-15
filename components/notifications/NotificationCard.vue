@@ -135,7 +135,7 @@ const props = defineProps<{
   getSelectIcon?: any
 }>()
 
-const emit = defineEmits(['onRemove', 'onSelect', 'onReaded', 'onMultipleSelect'])
+const emit = defineEmits(['onRemove', 'onSelect', 'onReaded'])
 const isOpen = ref(false)
 
 const notificationDf = new DateFormatter('es', {

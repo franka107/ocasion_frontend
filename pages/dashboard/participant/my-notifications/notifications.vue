@@ -65,6 +65,14 @@
               >
                 Eliminar notificaciónes
               </Button>
+              <Button
+                variant="default"
+                :disabled="disableMultipleSelect"
+                class="bg-white text-primary border border-primary hover:bg-accent"
+                @click="handleMarkAsReadNotifications(selectedMultipleData)"
+              >
+                Marcar como leídas
+              </Button>
               </div>
             </div>
             <div
@@ -123,12 +131,6 @@
                     @on-select="handleNotificationSelection"
                     @on-remove="refresh"
                     @on-readed="refresh"
-                    @on-multiple-select="
-                      ({ ids, type, resetMultipleSelect: onResetMultipleSelect }) => {
-                        selectedMultipleData = { ids, type }
-                        resetMultipleSelect = onResetMultipleSelect
-                      }
-                    "
                     :multiple-select="true"
                     :multiple-select-key="notification.id"
                     :on-select-item="onSelectItem"
@@ -172,7 +174,7 @@ const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const { page } = useNotificationAPI()
 const filterOptions = ref(JSON.stringify([]))
 const sortOptions = ref('[]')
-const { removeAllNotificationsByParticipant } = useNotificationAPI()
+const { removeAllNotificationsByParticipant, markAllNotificationsAsReadByParticipant } = useNotificationAPI()
 
 const [eventListData] = await Promise.all([
   useAPI<IDataResponse<Notification>>(
@@ -250,6 +252,42 @@ watch([filterType, sortType], async () => {
   }
 })
 
+const handleMarkAsReadNotifications = async (values: { type: string; ids: string[]}) => {
+  openConfirmModal({
+    title: 'Marcar notificaciones como leídas',
+    message: `¿Está seguro de marcar las notificaciones seleccionadas como leídas?`,
+    callback: async () => {
+      const { status, error } = await markAllNotificationsAsReadByParticipant({
+        ...values
+      })
+
+      if (status.value === 'success') {
+        refresh()
+        selectedMultipleData.value.type = 'empty' 
+        selectedMultipleData.value.ids = [],
+        resetMultipleSelect.value = resetMultipleSelectBox
+        resetMultipleSelect.value?.()
+        
+        updateConfirmModal({
+          title: 'Notificacion(es) marcada(s) como leída(s)',
+          message: 'La(s) notificación(es) ha sido marcada(s) como leída(s) exitosamente',
+          type: 'success',
+        })
+      } else {
+        const eMsg =
+          error.value?.data?.errors?.[0].message ||
+          error.value?.data.message ||
+          'No se pudo marcar notificación(es) como leída(s). Por favor, intente nuevamente.'
+        updateConfirmModal({
+          title: 'Error al marcar notificación(es) como leída(s)',
+          message: eMsg,
+          type: 'error',
+        })
+      }
+    },
+  })
+}
+
 const handleDeleteNotifications = async (values: { type: string; ids: string[]}) => {
   openConfirmModal({
     title: 'Eliminar notificaciones',
@@ -261,7 +299,11 @@ const handleDeleteNotifications = async (values: { type: string; ids: string[]})
 
       if (status.value === 'success') {
         refresh()
+        selectedMultipleData.value.type = 'empty' 
+        selectedMultipleData.value.ids = [],
+        resetMultipleSelect.value = resetMultipleSelectBox
         resetMultipleSelect.value?.()
+
         updateConfirmModal({
           title: 'Notificacion(es) eliminada(s)',
           message: 'La(s) notificación(es) ha sido eliminada(s) exitosamente',
@@ -288,7 +330,7 @@ const useMultipleSelect = () => {
     'Checkbox-Checked' | 'Checkbox' | 'Checkbox-Indeterminate'
   >('Checkbox')
 
-  const resetMultipleSelect = () => {
+  const resetMultipleSelectBox = () => {
     generalCheckbox.value = 'empty'
     selectedIdItems.value = []
     checkboxGeneralIcon.value = 'Checkbox'
@@ -336,6 +378,7 @@ const useMultipleSelect = () => {
     }
   }
   return {
+    resetMultipleSelectBox,
     selectedIdItems,
     generalCheckbox,
     checkboxGeneralIcon,
@@ -346,6 +389,7 @@ const useMultipleSelect = () => {
 }
 
 const {
+  resetMultipleSelectBox,
   checkboxGeneralIcon,
   changeGeneralCheckbox,
   onSelectItem,

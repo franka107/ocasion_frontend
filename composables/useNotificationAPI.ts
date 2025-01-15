@@ -100,6 +100,22 @@ export function useNotificationAPI() {
     return { status, error, data, refresh }
   }
 
+  const markAllNotificationsAsReadByParticipant = async (values: {
+    type: string
+    ids: string[]
+  }) => {
+    const { status, error } = await useAPI<void>(
+      `${NOTIFICATION_BASE_URL}/mark-all-notifications-as-read-by-participant`,
+      {
+        method: 'POST',
+        body: {
+          values,
+        },
+      } as any,
+    )
+    return { status, error }
+  }
+
   const removeAllNotificationsByParticipant = async (values: {
     type: string
     ids: string[]
@@ -140,5 +156,6 @@ export function useNotificationAPI() {
     sortOptions,
     onSort,
     removeAllNotificationsByParticipant,
+    markAllNotificationsAsReadByParticipant,
   }
 }
