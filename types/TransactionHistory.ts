@@ -11,7 +11,7 @@ export enum TransactionHistoryCurrency {
 }
 
 export enum TransactionHistoryType {
-  Charge = 'CHANGE',
+  Charge = 'CHARGE',
   Discharge = 'DISCHARGE',
 }
 
@@ -19,6 +19,7 @@ export enum TransactionHistoryMotive {
   WalletTopUp = 'WALLET_TOP_UP', // Recarga de monedero
   PenaltyDischarge = 'PENALTY_DISCHARGE', // Cobro de penalidad
   BalanceWithdraw = 'BALANCE_WITHDRAW', // Retirod de saldo
+  GuaranteeSeparation = 'GUARANTEE_SEPERATION', // Separacion de garantia (Experimental)
 }
 
 export interface TransactionHistoryDto {
@@ -80,6 +81,9 @@ export const transactionHistoryMotiveMap: Record<
   },
   [TransactionHistoryMotive.BalanceWithdraw]: {
     label: 'Retiro de saldo',
+  },
+  [TransactionHistoryMotive.GuaranteeSeparation]: {
+    label: 'Seperación de garantía',
   },
 }
 

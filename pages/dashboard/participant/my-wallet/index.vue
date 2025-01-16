@@ -17,6 +17,14 @@
           @on-sort="onSort"
           @on-search="onSearch"
         >
+          <template #type="{ row }">
+            <span>
+              {{
+                transactionHistoryTypeMap[row.type as TransactionHistoryType]
+                  ?.label || ''
+              }}
+            </span>
+          </template>
           <template #status="{ row }">
             <CustomChip
               :text="
@@ -67,6 +75,7 @@ import {
   transactionHistoryMotiveMap,
   TransactionHistoryStatus,
   transactionHistoryStatusMap,
+  TransactionHistoryType,
   transactionHistoryTypeMap,
   type TransactionHistoryDto,
 } from '~/types/TransactionHistory'
@@ -124,7 +133,6 @@ const transactionHistoryData = computed(
       // ...item,
       ...item,
       createdAt: format(item.createdAt, 'dd/MM/yyyy'),
-      type: transactionHistoryTypeMap[item.type]?.label,
       motive: transactionHistoryMotiveMap[item.motive]?.label,
       currency: transactionHistoryCurrencyMap[item.currency]?.label,
       amount: item.amount.toFixed(2),
