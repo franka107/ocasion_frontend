@@ -6,9 +6,10 @@ const props = defineProps<{
   purseId: string | any
   title: string
 }>()
+const { landingUrl } = useRuntimeConfig().public
 
 const purseDetails = ref<
-  Array<{ id: string; amount: number; eventName: string }>
+  Array<{ id: string; amount: number; eventName: string, eventId: string }>
 >([])
 
 const fetchPurseDetails = async (purseId: string) => {
@@ -28,12 +29,14 @@ const fetchPurseDetails = async (purseId: string) => {
       id: item.id,
       amount: item.amount,
       eventName: item.event.name,
+      eventId: item.eventId,
     }))
   } catch (error) {
     console.error('Error al cargar los detalles del monedero', error)
   }
 }
 await fetchPurseDetails(props.purseId)
+
 </script>
 
 <template>
@@ -79,9 +82,12 @@ await fetchPurseDetails(props.purseId)
                 $ {{ item.amount }}
               </div>
             </div>
-            <button class="flex text-[#F97316] font-[400] text-[14px]">
+            <a
+              :href="`${landingUrl}/events/${item.eventId}`"
+              target="_blank"
+              class="flex text-[#F97316] font-[400] text-[14px]">
               Ver evento
-            </button>
+            </a>
           </div>
         </li>
       </ul>

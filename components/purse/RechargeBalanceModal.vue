@@ -51,6 +51,7 @@ const onSubmit = form.handleSubmit((values) => {
         sustentationFile: values.attachedFiles[0],
         transferedAt: new Date(values.transferedAt).toISOString(),
       })
+      emit('update:modelValue', false) // Cierra el modal al enviar.
       if (status.value === 'success') {
         openUserModal.value = false
         updateConfirmModal({
@@ -72,7 +73,6 @@ const onSubmit = form.handleSubmit((values) => {
     },
   })
 
-  emit('update:modelValue', false) // Cierra el modal al enviar.
 })
 </script>
 
@@ -91,7 +91,7 @@ const onSubmit = form.handleSubmit((values) => {
         <AlertDialogHeader class="border-b border-primary">
           <AlertDialogTitle
             class="text-xl tracking-[-0.5px] text-primary text-start font-[600] px-6 pb-[18px]"
-            >Retirar saldo</AlertDialogTitle
+            >Recargar saldo</AlertDialogTitle
           >
         </AlertDialogHeader>
         <p class="text-[18px] font-[600] text-[#152A3C] px-6">
@@ -138,6 +138,8 @@ const onSubmit = form.handleSubmit((values) => {
                   :disabled=true
                   placeholder="0.00"
                   static-label
+                  default-value="1000"
+                  readonly
                   label="Ingresa monto"
                 />
               </FormControl>
@@ -148,12 +150,22 @@ const onSubmit = form.handleSubmit((values) => {
           <FormField v-slot="{ componentField }" name="currency">
             <FormItem>
               <FormControl>
-                <CustomSelect
+                <!-- <CustomSelect
                   v-bind="componentField"
                   :disabled=true
                   :items="[{ id: 'USD', name: 'USD' }]"
                   static-label
                   placeholder="Moneda"
+                /> -->
+                <CustomInput
+                  v-bind="componentField"
+                  type="text"
+                  :disabled=true
+                  placeholder="Moneda"
+                  static-label
+                  default-value="USD"
+                  readonly
+                  label="Moneda"
                 />
               </FormControl>
               <FormMessage />
@@ -250,7 +262,7 @@ const onSubmit = form.handleSubmit((values) => {
             class="text-[16px] font-[600] mt-[16px]"
             :disabled="!form.meta.value.valid"
           >
-            Retirar saldo
+            Recargar saldo
           </Button>
         </AlertDialogFooter>
       </form>

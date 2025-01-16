@@ -21,7 +21,7 @@ const formSchema = toTypedSchema(
       .number()
       .min(10, 'El monto debe ser al menos 10.00.')
       .max(1000, 'El monto no puede exceder 1,000.00.'),
-    currency: z.string().min(1, 'Seleccione una moneda.'),
+    currency: z.string().default("USD"),
     bank: z.string().min(1, 'Seleccione un banco.'),
     accountType: z.string().min(1, 'Seleccione un tipo de cuenta.'),
     destinationAccount: z
@@ -42,15 +42,19 @@ const form = useForm({
     currency: 'USD',
   }
 })
+
+
 const { requestWithdrawal } = useWithdrawalRequests()
 const onSubmit = form.handleSubmit((values) => {
   console.log('Formulario enviado con los valores:', values)
-  requestWithdrawal(values)
+  // requestWithdrawal(values)
   openConfirmModal({
     title: 'Solicitud de retiro',
     message: '¿Estás seguro de que deseas realizar una solicitud de retiro?',
     callback: async () => {
       const { status, error }: any = await  requestWithdrawal(values)
+
+      emit('update:modelValue', false) // Cierra el modal al enviar.
       if (status.value === 'success') {
         openUserModal.value = false
         updateConfirmModal({
@@ -73,7 +77,6 @@ const onSubmit = form.handleSubmit((values) => {
   })
   
 
-  emit('update:modelValue', false) // Cierra el modal al enviar.
 })
 </script>
 
@@ -119,12 +122,22 @@ const onSubmit = form.handleSubmit((values) => {
           <FormField v-slot="{ componentField }" name="currency">
             <FormItem>
               <FormControl>
-                <CustomSelect
+                <!-- <CustomSelect
                   v-bind="componentField"
                   :disabled=true
                   :items="[{ id: 'USD', name: 'USD' }]"
                   static-label
                   placeholder="Moneda"
+                /> -->
+                <CustomInput
+                  v-bind="componentField"
+                  type="text"
+                  :disabled=true
+                  placeholder="Moneda"
+                  static-label
+                  default-value="USD"
+                  readonly
+                  label="Moneda"
                 />
               </FormControl>
               <FormMessage />
