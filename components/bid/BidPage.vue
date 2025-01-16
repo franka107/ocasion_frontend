@@ -3,7 +3,7 @@
     <section>
       <EventDetails :event-detail="eventDetail" />
       <!-- Detalles de la oferta -->
-      <DetailLayout :id="props.offerId" class="mt-6" />
+      <DetailLayout v-if="props.offerId" :id="props.offerId" class="mt-6" />
       <div>
         <BidTable :event-id="props.eventId" :offer-id="props.offerId" />
       </div>
