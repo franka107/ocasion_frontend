@@ -12,7 +12,10 @@ import {
 import InputFile from '@/components/common/file/Input.vue'
 
 const emit = defineEmits(['update:modelValue'])
+const { openConfirmModal, updateConfirmModal } = useConfirmModal()
+const openUserModal = ref(false)
 const props = defineProps<{ modelValue: boolean }>()
+const { landingUrl } = useRuntimeConfig().public
 const formSchema = toTypedSchema(
   z.object({
     operationNumber: z
@@ -21,8 +24,8 @@ const formSchema = toTypedSchema(
     transferedAt: z.string().nonempty('La fecha de transderencia es requerida'),
     amount: z
       .number()
-      .positive('Debe ser un monto positivo.')
-      .lte(999999, 'El monto no puede exceder los 6 dígitos.'),
+      .min(10, 'El monto debe ser al menos 10.00.')
+      .max(1000, 'El monto no puede exceder 1,000.00.'),
     currency: z.string().min(1, 'Seleccione una moneda.'),
     attachedFiles: z
       .array(z.any())
@@ -32,15 +35,43 @@ const formSchema = toTypedSchema(
 )
 const form = useForm({
   validationSchema: formSchema,
+  initialValues: {
+    currency: 'USD',
+    amount: 1000,
+  }
 })
 const { requestRecharge } = useTopUpRequests()
 const onSubmit = form.handleSubmit((values) => {
-  console.log('Formulario enviado con los valores:', values)
-  requestRecharge({
-    ...values,
-    sustentationFile: values.attachedFiles[0],
-    transferedAt: new Date(values.transferedAt).toISOString(),
+  openConfirmModal({
+    title: 'Solicitud de recarga',
+    message: '¿Estás seguro de que deseas realizar una solicitud de recarga?',
+    callback: async () => {
+      const { status, error }: any = await requestRecharge({
+        ...values,
+        sustentationFile: values.attachedFiles[0],
+        transferedAt: new Date(values.transferedAt).toISOString(),
+      })
+      if (status.value === 'success') {
+        openUserModal.value = false
+        updateConfirmModal({
+          title: 'Solicitud de recarga realizada',
+          message: 'La solicitud de recarga ha sido realizada exitosamente',
+          type: 'success',
+        })
+      } else {
+        const eMsg =
+          error.value.data?.errors?.[0].message ||
+          error.value.data.message ||
+          'No se pudo realizar la solicitud de recarga, intentalo más tarde'
+        updateConfirmModal({
+          title: 'Error al realizar la solicitud de recarga',
+          message: eMsg,
+          type: 'error',
+        })
+      }
+    },
   })
+
   emit('update:modelValue', false) // Cierra el modal al enviar.
 })
 </script>
@@ -104,6 +135,7 @@ const onSubmit = form.handleSubmit((values) => {
                 <CustomInput
                   v-bind="componentField"
                   type="number"
+                  :disabled=true
                   placeholder="0.00"
                   static-label
                   label="Ingresa monto"
@@ -118,6 +150,7 @@ const onSubmit = form.handleSubmit((values) => {
               <FormControl>
                 <CustomSelect
                   v-bind="componentField"
+                  :disabled=true
                   :items="[{ id: 'USD', name: 'USD' }]"
                   static-label
                   placeholder="Moneda"
@@ -164,9 +197,12 @@ const onSubmit = form.handleSubmit((values) => {
                 <label
                   class="font-[400] text-[14px] m-[0px] space-y-0 text-[#152A3C]"
                   >Aceptar
-                  <span class="font-[600] text-[#F97316]"
-                    >terminos y condiciones</span
-                  >
+                  <a
+                    target="_blank"
+                    class="font-[600] text-[#F97316] hover:underline"
+                    :href="`${landingUrl}/terms-and-conditions`">
+                    terminos y condiciones
+                  </a>
                 </label>
               </FormControl>
               <FormMessage />

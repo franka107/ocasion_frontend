@@ -6,7 +6,12 @@
           Archivos adjuntos
         </DialogTitle>
         <DialogDescription class="text-sm text-gray-500">
-          Visualiza las imágenes cargadas en esta oferta.
+          <template v-if="description">
+            {{ description }}
+          </template>
+          <template v-else>
+            Visualiza las imágenes cargadas en esta oferta.
+          </template>
         </DialogDescription>
       </DialogHeader>
       <div class="grid gap-4 py-4">
@@ -80,6 +85,7 @@ const props = defineProps<{
     path: string; // URL del archivo
     name: string; // Nombre del archivo
   }>;
+  description?: string;
 }>();
 
 const emit = defineEmits<{

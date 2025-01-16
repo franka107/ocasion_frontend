@@ -12,12 +12,15 @@ import {
 
 const emit = defineEmits(['update:modelValue'])
 const props = defineProps<{ modelValue: boolean }>()
+const { landingUrl } = useRuntimeConfig().public
+const { openConfirmModal, updateConfirmModal } = useConfirmModal()
+const openUserModal = ref(false)
 const formSchema = toTypedSchema(
   z.object({
     amount: z
       .number()
-      .positive('Debe ser un monto positivo.')
-      .lte(999999, 'El monto no puede exceder los 6 dígitos.'),
+      .min(10, 'El monto debe ser al menos 10.00.')
+      .max(1000, 'El monto no puede exceder 1,000.00.'),
     currency: z.string().min(1, 'Seleccione una moneda.'),
     bank: z.string().min(1, 'Seleccione un banco.'),
     accountType: z.string().min(1, 'Seleccione un tipo de cuenta.'),
@@ -26,7 +29,8 @@ const formSchema = toTypedSchema(
       .regex(/^\d{10,20}$/, 'Ingrese un número de cuenta válido.'),
     destinationCCI: z
       .string()
-      .regex(/^\d{10,20}$/, 'Ingrese un número de cuenta válido.'),
+      .regex(/^\d+$/, "El CCI debe contener solo números.")
+      .length(20, "El CCI debe tener exactamente 20 dígitos."),
     acceptedTermsAndConditions: z
       .boolean()
       .refine((val) => val === true, 'Debe aceptar los términos y condiciones'),
@@ -34,11 +38,40 @@ const formSchema = toTypedSchema(
 )
 const form = useForm({
   validationSchema: formSchema,
+  initialValues: {
+    currency: 'USD',
+  }
 })
 const { requestWithdrawal } = useWithdrawalRequests()
 const onSubmit = form.handleSubmit((values) => {
   console.log('Formulario enviado con los valores:', values)
   requestWithdrawal(values)
+  openConfirmModal({
+    title: 'Solicitud de retiro',
+    message: '¿Estás seguro de que deseas realizar una solicitud de retiro?',
+    callback: async () => {
+      const { status, error }: any = await  requestWithdrawal(values)
+      if (status.value === 'success') {
+        openUserModal.value = false
+        updateConfirmModal({
+          title: 'Solicitud de retiro realizada',
+          message: 'La solicitud de retiro ha sido realizada exitosamente',
+          type: 'success',
+        })
+      } else {
+        const eMsg =
+          error.value.data?.errors?.[0].message ||
+          error.value.data.message ||
+          'No se pudo realizar la solicitud de retiro, intentalo más tarde'
+        updateConfirmModal({
+          title: 'Error al realizar la solicitud de retiro',
+          message: eMsg,
+          type: 'error',
+        })
+      }
+    },
+  })
+  
 
   emit('update:modelValue', false) // Cierra el modal al enviar.
 })
@@ -88,6 +121,7 @@ const onSubmit = form.handleSubmit((values) => {
               <FormControl>
                 <CustomSelect
                   v-bind="componentField"
+                  :disabled=true
                   :items="[{ id: 'USD', name: 'USD' }]"
                   static-label
                   placeholder="Moneda"
@@ -103,8 +137,8 @@ const onSubmit = form.handleSubmit((values) => {
                 <CustomSelect
                   v-bind="componentField"
                   :items="[
-                    { id: 'BBVA', name: 'Bbva' },
-                    { id: 'BCP', name: 'Bcp' },
+                    { id: 'BBVA', name: 'BBVA' },
+                    { id: 'BCP', name: 'BCP' },
                     { id: 'SCOTIABANK', name: 'Scotiabank' },
                   ]"
                   static-label
@@ -180,9 +214,12 @@ const onSubmit = form.handleSubmit((values) => {
                 <label
                   class="font-[400] text-[14px] m-[0px] space-y-0 text-[#152A3C]"
                   >Aceptar
-                  <span class="font-[600] text-[#F97316]"
-                    >terminos y condiciones</span
-                  >
+                  <a
+                    target="_blank"
+                    class="font-[600] text-[#F97316] hover:underline"
+                    :href="`${landingUrl}/terms-and-conditions`">
+                    terminos y condiciones
+                  </a>
                 </label>
               </FormControl>
               <FormMessage />

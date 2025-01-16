@@ -12,6 +12,8 @@ import {
 import type { OfferDto } from '~/types/Offer'
 import Album from '~/design-system/ui/album/Album.vue'
 import Thumbnails from '~/design-system/ui/thumbnails/Thumbnails.vue'
+import type { FileType } from '~/types/Disbursement'
+import AttachmentsModal from '~/components/events/AttachmentsModal.vue'
 const { landingUrl } = useRuntimeConfig().public
 const route = useRoute()
 const activeTab = ref<string>('info')
@@ -26,7 +28,9 @@ offerDetail.value = offerDetail.value
 const eventEndDate = offerDetail.value.event
   ? `${dayjs(offerDetail.value.event.endDate).format('DD/MM/YY')} ${dayjs().hour(offerDetail.value.event.closingTime).minute(0).format('hh:mm a')}`
   : ''
-const annexesFiles = computed(() => offerDetail.value.annexesFiles || [])
+const selectAnnexesFiles = ref<FileType[]>([])
+const showAttachmentsModal = ref(false)
+
 const downloadFile = (filePath: string, fileName: string) => {
   fetch(filePath)
     .then((response) => {
@@ -64,6 +68,11 @@ const selectMedia = (media: { src: string; alt: string; isVideo: boolean }) => {
 const showArrows = computed(() => attachedMedia.value.length > 4)
 const isLooping = computed(() => attachedMedia.value.length >= 4)
 // const attachedFiles = computed(() => offerDetail.value?.attachedFiles || [])
+
+const openAttachmentsModal = () => {
+  selectAnnexesFiles.value = offerDetail.value.attachedFiles || []
+  showAttachmentsModal.value = true
+}
 </script>
 <template>
   <ContentLayout
@@ -109,18 +118,21 @@ const isLooping = computed(() => attachedMedia.value.length >= 4)
               </div>
             </div>
             <div class="flex flex-col md:flex-row gap-x-4 w-auto">
-              <NuxtLink
-                type="button"
-                :href="offerDetail.event?.termsAndConditionsFiles[0]?.path"
-                target="_blank"
-                class="font-[600] text-sm md:text-base text-[#F97316] bg-white px-4 py-2 rounded hover:bg-[#F97316] hover:text-white"
-              >
-                Términos y condiciones</NuxtLink
-              >
+              <Button
+              type="button"
+              @click="openAttachmentsModal"
+              class="font-[600] text-sm md:text-base text-[#F97316] bg-white px-4 py-2 rounded hover:bg-[#F97316] hover:text-white"
+              >Términos y condiciones</Button
+            >     
             </div>
           </div>
         </div>
       </div>
+      <AttachmentsModal
+        v-model:is-open="showAttachmentsModal"
+        :attachments="selectAnnexesFiles"
+        description="Visualiza los terminos y condiciones cargado para esta oferta"
+      />
     </section>
     <section class="w-full max-w-[1324px] h-full max-h-[625px] mx-auto">
       <div
@@ -193,7 +205,7 @@ const isLooping = computed(() => attachedMedia.value.length >= 4)
                       class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-x-[16px] mt-[16px] gap-y-[16px] text-[14px] font-[600] text-[#20445E]"
                     >
                       <div
-                        v-for="(file, index) in annexesFiles"
+                        v-for="(file, index) in selectAnnexesFiles"
                         :key="file.id"
                         class="text-ellipsis overflow-hidden flex items-center justify-between rounded-[8px] bg-[#F3F8FC] w-full max-w-[389px] h-[70px] p-[12px]"
                       >
