@@ -40,7 +40,6 @@ const form = useForm({
   validationSchema: formSchema,
   initialValues: {
     currency: 'USD',
-    amount: 1000,
     transferedAt: dayjs(new Date()).format('YYYY-MM-DD'),
   },
 })
@@ -141,11 +140,8 @@ const onSubmit = form.handleSubmit((values) => {
                 <CustomInput
                   v-bind="componentField"
                   type="number"
-                  :disabled="true"
                   placeholder="0.00"
                   static-label
-                  default-value="1000"
-                  readonly
                   label="Ingresa monto"
                 />
               </FormControl>

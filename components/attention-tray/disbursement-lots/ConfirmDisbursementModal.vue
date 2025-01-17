@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import InputFile from '@/components/common/file/Input.vue';
 import { useDisbursement } from '@/composables/useDisbursement'
+import { getLocalTimeZone, parseAbsolute } from '@internationalized/date';
 const props = defineProps<{
   id: string
   paymentSupportFile: {}
@@ -101,7 +102,16 @@ const handleFilesChange = (files: File[]) => {
                 <FormField v-slot="{ componentField }" name="disbursedAt">
                     <FormItem>
                         <FormControl>
-                            <CustomInput staticLabel type="date" label="Fecha de desembolso" v-bind="componentField" />
+                            <DateInput
+                              label="Fecha de desembolso"
+                              static-label
+                              :value="componentField.modelValue"
+                              :max-value="
+                                parseAbsolute(new Date().toISOString(), getLocalTimeZone())
+                              "
+                              @update:model-value="componentField.onChange"
+                            />
+                            <!-- <CustomInput staticLabel type="date" label="Fecha de desembolso" v-bind="componentField" /> -->
                         </FormControl>
                         <FormMessage />
                     </FormItem>

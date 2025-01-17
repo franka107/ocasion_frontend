@@ -178,6 +178,7 @@ const openWithdrawalDetails = (row: any) => {
    data.value?.data.map((item: DisbursementLot) => ({   
      ...item,
      createdAt:dayjs(item.createdAt).format('YYYY-MM-DD'),
+     totalAmount: `$ ${item.totalAmount.toFixed(2)}`,
    })),
  )
  const confirmModalInfo = ref<any>({
