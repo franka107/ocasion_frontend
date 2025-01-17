@@ -9,16 +9,21 @@
       <Button
         class="text-[16px] font-[600] bg-white text-primary border border-primary hover:bg-accent w-[97px] mr-[8px]"
         @click="
-        () => { isWithdrawModalOpen = true}
-          ">
+          () => {
+            isWithdrawModalOpen = true
+          }
+        "
+      >
         Retirar
       </Button>
       <Button
         variant="default"
         class="w-[97px] text-[16px]"
         @click="
-        () => { isRechargeModalOpen = true}
-          "
+          () => {
+            isRechargeModalOpen = true
+          }
+        "
       >
         Recargar
       </Button>
@@ -70,12 +75,8 @@
       title="Detalle de saldo garantizado"
     />
   </SheetContent>
-  <WithdrawCashModal
-    v-model="isWithdrawModalOpen"
-  />
-  <RechargeBalanceModal
-    v-model="isRechargeModalOpen"
-  />
+  <WithdrawCashModal v-model="isWithdrawModalOpen" />
+  <RechargeBalanceModal v-model="isRechargeModalOpen" />
 </template>
 
 <script setup lang="ts">

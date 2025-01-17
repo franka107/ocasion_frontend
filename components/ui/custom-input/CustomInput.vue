@@ -1,87 +1,91 @@
 <script setup lang="ts">
-import type { HTMLAttributes } from "vue";
-import { useVModel } from "@vueuse/core";
-import { cn } from "@/lib/utils";
-import { type InputVariants, inputVariant, labelVariant } from ".";
+import type { HTMLAttributes } from 'vue'
+import { useVModel } from '@vueuse/core'
+import { type InputVariants, inputVariant, labelVariant } from '.'
+import { cn } from '@/lib/utils'
 
 const props = withDefaults(
   defineProps<{
-    defaultValue?: string | number;
-    modelValue?: string | number;
-    label?: string;
-    size?: InputVariants["size"];
-    class?: HTMLAttributes["class"];
-    type?: string;
-    readonly?: boolean;
-    disabled?: boolean;
-    labelOffset?: boolean;
-    staticLabel?: boolean;
-    showTooltip?: boolean; 
-    tooltipContent?: string;
-    showPasswordIcon?: boolean; 
+    defaultValue?: string | number
+    modelValue?: string | number
+    label?: string
+    size?: InputVariants['size']
+    class?: HTMLAttributes['class']
+    type?: string
+    readonly?: boolean
+    disabled?: boolean
+    labelOffset?: boolean
+    staticLabel?: boolean
+    showTooltip?: boolean
+    tooltipContent?: string
+    showPasswordIcon?: boolean
   }>(),
   {
-    size: "base",
-    type: "text",
+    size: 'base',
+    type: 'text',
     readonly: false,
     disabled: false,
     labelOffset: false,
     staticLabel: false,
-    showTooltip: false, 
-    tooltipContent: "",
+    showTooltip: false,
+    tooltipContent: '',
     showPasswordIcon: false,
   },
-);
+)
 
 const emits = defineEmits<{
-  (e: "update:modelValue", payload: string | number): void;
-}>();
+  (e: 'update:modelValue', payload: string | number): void
+}>()
 
-const modelValue = useVModel(props, "modelValue", emits, {
+const modelValue = useVModel(props, 'modelValue', emits, {
   passive: true,
   defaultValue: props.defaultValue,
-});
-const active = ref(false);
-const isFocus = ref(false);
+})
+const active = ref(false)
+const isFocus = ref(false)
 watch(
   [modelValue, isFocus],
   () => {
     if (isFocus.value) {
-      active.value = true;
-      return;
+      active.value = true
+      return
     }
-    //active.value = !!modelValue.value;
+    // active.value = !!modelValue.value;
     active.value =
       modelValue.value !== undefined &&
       modelValue.value !== null &&
-      modelValue.value !== "";
+      modelValue.value !== ''
   },
   { immediate: true },
-);
-const showPassword = ref(false);
+)
+const showPassword = ref(false)
 const togglePasswordVisibility = () => {
-  showPassword.value = !showPassword.value;
-};
-
+  showPassword.value = !showPassword.value
+}
 </script>
 
 <template>
-  <div :class="[
+  <div
+    :class="[
       'relative',
-      { 'flex flex-col gap-y-1.5 ': props.staticLabel, 'flex items-center': !props.staticLabel }
-    ]">
-     <label
+      {
+        'flex flex-col gap-y-1.5 ': props.staticLabel,
+        'flex items-center': !props.staticLabel,
+      },
+    ]"
+  >
+    <label
       v-if="props.staticLabel"
       for="staticLabel"
       :class="[
         'text-4 font-[500]',
         props.disabled ? 'opacity-50 ' : 'text-[#0F172A]',
-        'flex items-center' // Para colocar el tooltip al lado del label
+        'flex items-center', // Para colocar el tooltip al lado del label
       ]"
     >
       {{ label }}
       <span class="text-[#F6313C] ml-1">*</span>
-      
+
       <!-- Mostrar el tooltip solo si showTooltip es true -->
       <div v-if="props.showTooltip && props.tooltipContent" class="ml-2">
         <TooltipProvider>
@@ -94,10 +98,13 @@ const togglePasswordVisibility = () => {
             <TooltipContent
               side="bottom"
               align="start"
-              class="w-[414px] px-[13px] bg-[#F3F8FC] "
+              class="w-[414px] px-[13px] bg-[#F3F8FC]"
             >
               <ul class="text-[14px] text-[#152A3C] leading-[20px]">
-                <li v-for="(item, index) in tooltipContent.split('\n')" :key="index">
+                <li
+                  v-for="(item, index) in tooltipContent.split('\n')"
+                  :key="index"
+                >
                   {{ item.trim() }}
                 </li>
               </ul>
@@ -107,7 +114,7 @@ const togglePasswordVisibility = () => {
       </div>
     </label>
     <label
-       v-else
+      v-else
       :for="label"
       :class="
         cn(
@@ -124,20 +131,25 @@ const togglePasswordVisibility = () => {
         <input
           v-model="modelValue"
           :name="label"
-          @focus="isFocus = true"
-          @blur="isFocus = false"
-          :type="type === 'password' ? (showPassword ? 'text' : 'password') : type"
+          :type="
+            type === 'password' ? (showPassword ? 'text' : 'password') : type
+          "
           :readonly="readonly"
           :disabled="disabled"
           :class="cn(inputVariant({ size }), 'pr-10', props.class)"
-        >
+          @focus="isFocus = true"
+          @blur="isFocus = false"
+        />
 
         <!-- Icono de ojo para contraseñas -->
         <span
-          @click="togglePasswordVisibility"
           class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
+          @click="togglePasswordVisibility"
         >
-          <CustomIcons :name="showPassword ? 'EyeIcon' : 'EyeIconClosed'" class="w-5 h-5 text-gray-400" />
+          <CustomIcons
+            :name="showPassword ? 'EyeIcon' : 'EyeIconClosed'"
+            class="w-5 h-5 text-gray-400"
+          />
         </span>
 
         <!-- Icono derecho -->
@@ -155,13 +167,13 @@ const togglePasswordVisibility = () => {
       <input
         v-model="modelValue"
         :name="label"
-        @focus="isFocus = true"
-        @blur="isFocus = false"
         :type="type"
         :readonly="readonly"
         :disabled="disabled"
         :class="cn(inputVariant({ size }), props.class)"
-      >
+        @focus="isFocus = true"
+        @blur="isFocus = false"
+      />
 
       <!-- Icono derecho si está presente -->
       <span

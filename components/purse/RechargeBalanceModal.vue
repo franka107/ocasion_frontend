@@ -2,6 +2,9 @@
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import { z } from 'zod'
+import { getLocalTimeZone, parseAbsolute } from '@internationalized/date'
+import dayjs from 'dayjs'
+import DateInput from '../ui/date-input/DateInput.vue'
 import {
   AlertDialog,
   AlertDialogContent,
@@ -21,7 +24,7 @@ const formSchema = toTypedSchema(
     operationNumber: z
       .string()
       .regex(/^\d{10,20}$/, 'Ingrese numero de operacion válido.'),
-    transferedAt: z.string().nonempty('La fecha de transderencia es requerida'),
+    transferedAt: z.string().min(1, 'La fecha de envio es requerida.'),
     amount: z
       .number()
       .min(10, 'El monto debe ser al menos 10.00.')
@@ -38,7 +41,8 @@ const form = useForm({
   initialValues: {
     currency: 'USD',
     amount: 1000,
-  }
+    transferedAt: dayjs(new Date()).format('YYYY-MM-DD'),
+  },
 })
 const { requestRecharge } = useTopUpRequests()
 const onSubmit = form.handleSubmit((values) => {
@@ -72,14 +76,13 @@ const onSubmit = form.handleSubmit((values) => {
       }
     },
   })
-
 })
 </script>
 
 <template>
   <AlertDialog
     :open="modelValue"
-    class="z-[30]"
+    class=""
     @update:open="(event) => emit('update:modelValue', event)"
   >
     <AlertDialogContent class="z-[98] h-auto max-w-[670px] px-0">
@@ -118,11 +121,14 @@ const onSubmit = form.handleSubmit((values) => {
           <FormField v-slot="{ componentField }" name="transferedAt">
             <FormItem>
               <FormControl>
-                <CustomInput
-                  static-label
-                  type="date"
+                <DateInput
                   label="Fecha de transferencia"
-                  v-bind="componentField"
+                  static-label
+                  :value="componentField.modelValue"
+                  :max-value="
+                    parseAbsolute(new Date().toISOString(), getLocalTimeZone())
+                  "
+                  @update:model-value="componentField.onChange"
                 />
               </FormControl>
               <FormMessage />
@@ -135,7 +141,7 @@ const onSubmit = form.handleSubmit((values) => {
                 <CustomInput
                   v-bind="componentField"
                   type="number"
-                  :disabled=true
+                  :disabled="true"
                   placeholder="0.00"
                   static-label
                   default-value="1000"
@@ -152,7 +158,7 @@ const onSubmit = form.handleSubmit((values) => {
               <FormControl>
                 <!-- <CustomSelect
                   v-bind="componentField"
-                  :disabled=true
+                  :disabled="true"
                   :items="[{ id: 'USD', name: 'USD' }]"
                   static-label
                   placeholder="Moneda"
@@ -160,7 +166,7 @@ const onSubmit = form.handleSubmit((values) => {
                 <CustomInput
                   v-bind="componentField"
                   type="text"
-                  :disabled=true
+                  :disabled="true"
                   placeholder="Moneda"
                   static-label
                   default-value="USD"
@@ -212,7 +218,8 @@ const onSubmit = form.handleSubmit((values) => {
                   <a
                     target="_blank"
                     class="font-[600] text-[#F97316] hover:underline"
-                    :href="`${landingUrl}/terms-and-conditions`">
+                    :href="`${landingUrl}/terms-and-conditions`"
+                  >
                     terminos y condiciones
                   </a>
                 </label>

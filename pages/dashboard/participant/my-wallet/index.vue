@@ -3,7 +3,9 @@
     <CustomSimpleCard title="Abonos" class="mb-6" sub-title="..." />
     <section>
       <PurseDetails />
-      <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto mt-4">
+      <div
+        class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto mt-4 pb-3"
+      >
         <div
           class="px-0 py-[31.5px] text-[#262F45] text-[18px] font-[700] border-b-[1px] border-[#E2E8F0]"
         >
