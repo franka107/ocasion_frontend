@@ -31,7 +31,8 @@
                    align="start"
                    class="bg-primary text-white"
                  >
-                   <DropdownMenuItem 
+                 <template v-if="row.status === 'PENDING'">
+                  <DropdownMenuItem 
                        @click=" () => {
                          openModalConfirm = true
                          confirmModalInfo = {
@@ -46,13 +47,14 @@
                    </DropdownMenuItem>               
                    <DropdownMenuSeparator />
                    <DropdownMenuItem
-                       :disabled="row.status === 'ACTIVE'"
                        @click="handleAnnul(row)"
                      >
                       Anular lote
                        <CustomIcons name="X" class="ml-auto" />
                      </DropdownMenuItem>
                    <DropdownMenuSeparator />
+                 </template>
+                   
                      <DropdownMenuItem @click="openWithdrawalDetails(row)">
                        Detalle 
                        <CustomIcons name="EyeIcon" class="ml-auto" />
