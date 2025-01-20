@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex justify-between items-center pt-[24px] pb-[28px] px-10 rounded-xl bg-white w-full"
+    class="flex flex-col md:flex-row justify-between items-center pt-[24px] pb-[28px] px-10 rounded-xl bg-white w-full"
   >
     <h1 class="text-[20px] font-[700] leading-[28px] text-primary">
       Mi monedero

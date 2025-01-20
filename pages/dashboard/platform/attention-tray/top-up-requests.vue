@@ -23,7 +23,7 @@
                 dayjs(row.createdAt).format('YYYY-MM-DD')
               }}</span>
               <span class="text-xs text-gray-500">{{
-                dayjs(row.createdAt).format('HH:mm')
+                dayjs(row.createdAt).format('hh:mm a')
               }}</span>
             </div>
           </template>

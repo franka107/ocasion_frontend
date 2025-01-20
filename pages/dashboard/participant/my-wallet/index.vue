@@ -19,13 +19,30 @@
           @on-sort="onSort"
           @on-search="onSearch"
         >
+          <template #createdAt="{ row }">
+            <DateLabel :value="row.createdAt" />
+          </template>
+          <template #amount="{ row }">
+            <span
+              :class="[
+                `text-${transactionHistoryTypeMap[row.type as TransactionHistoryType]?.color}-500`,
+              ]"
+            >
+              {{ row.type === TransactionHistoryType.Charge ? '+' : '-'
+              }}{{ row.amount.toFixed(2) }}</span
+            >
+          </template>
           <template #type="{ row }">
-            <span>
-              {{
+            <CustomChip
+              :text="
                 transactionHistoryTypeMap[row.type as TransactionHistoryType]
                   ?.label || ''
-              }}
-            </span>
+              "
+              :variant="
+                transactionHistoryTypeMap[row.type as TransactionHistoryType]
+                  ?.color as any
+              "
+            ></CustomChip>
           </template>
           <template #status="{ row }">
             <CustomChip
@@ -81,6 +98,7 @@ import {
   transactionHistoryTypeMap,
   type TransactionHistoryDto,
 } from '~/types/TransactionHistory'
+import DateLabel from '~/design-system/ui/data-label/DateLabel.vue'
 const { page, sortOptions, onSort, createEvent, editEvent, cancelEvent } =
   useEvent()
 const { getMyGrants } = useAuthManagement()
@@ -134,10 +152,8 @@ const transactionHistoryData = computed(
       // total: item.amount + 200,
       // ...item,
       ...item,
-      createdAt: format(item.createdAt, 'dd/MM/yyyy'),
       motive: transactionHistoryMotiveMap[item.motive]?.label,
       currency: transactionHistoryCurrencyMap[item.currency]?.label,
-      amount: item.amount.toFixed(2),
     })) || [],
 )
 </script>

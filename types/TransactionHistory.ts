@@ -1,5 +1,6 @@
 import { record } from 'zod'
 import type { UserDto } from './Administrators'
+import type { Color } from '~/constants/ui'
 
 export enum TransactionHistoryStatus {
   Authorized = 'AUTHORIZED',
@@ -50,13 +51,15 @@ export const transactionHistoryStatusMap: Record<
 
 export const transactionHistoryTypeMap: Record<
   TransactionHistoryType,
-  { label: string }
+  { label: string; color: Color }
 > = {
   [TransactionHistoryType.Charge]: {
     label: 'Ingreso',
+    color: 'green',
   },
   [TransactionHistoryType.Discharge]: {
     label: 'Egreso',
+    color: 'red',
   },
 }
 
@@ -83,7 +86,7 @@ export const transactionHistoryMotiveMap: Record<
     label: 'Retiro de saldo',
   },
   [TransactionHistoryMotive.GuaranteeSeparation]: {
-    label: 'Seperación de garantía',
+    label: 'Separación de garantía',
   },
 }
 
