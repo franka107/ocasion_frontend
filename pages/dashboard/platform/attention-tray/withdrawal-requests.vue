@@ -122,6 +122,7 @@
           :id="generateDisbursementForm.id"
           v-model="openModalGenerate"
           :bank="generateDisbursementForm.bank"
+          :retire-requests="selectedMultipleData"
           :on-submit="handleGenerateDisbursement"
           :refresh-table="refresh"
         />

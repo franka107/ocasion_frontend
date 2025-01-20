@@ -24,6 +24,7 @@ const props = defineProps<{
   id?: string
   modelValue: boolean
   bank: string
+  retireRequests: { type: string; ids: string[] }
   onSubmit: (values: any) => void
   refreshTable: () => void
 }>()
@@ -91,11 +92,12 @@ const handlePreview = async (values: any) => {
     bank: values.bank,
     chargeAccount: values.chargeAccount,
   }
-  const { status, error, data }: any = await generatelPreviewDisbursement(valuesToSend)
-  if(status.value === 'success') {
+  const { status, error, data }: any =
+    await generatelPreviewDisbursement(valuesToSend)
+  if (status.value === 'success') {
     showDetailPreview.value = true
     detailPreviewInfo.value = data.value
-  } else {  
+  } else {
     const eMsg =
       error.value.data?.errors?.[0].message ||
       error.value.data.message ||
@@ -110,7 +112,9 @@ const handlePreview = async (values: any) => {
 const handleSubmit = async () => {
   const valuesToSend = {
     ...form.values,
-    id: detailPreviewInfo.value.id
+    id: detailPreviewInfo.value.id,
+    // QUACK
+    batchRetireRequests: props.retireRequests,
   }
   openConfirmModal({
     title: 'Resumen del desembolso',
@@ -118,7 +122,7 @@ const handleSubmit = async () => {
       ¿Está seguro de generar el lote del desembolso?
     `,
     callback: async () => {
-      const { status, error  }: any = await generatelDisbursement(valuesToSend)
+      const { status, error }: any = await generatelDisbursement(valuesToSend)
       if (status.value === 'success') {
         showDetailPreview.value = false
         detailPreviewInfo.value = {}
@@ -151,9 +155,9 @@ const handleSubmit = async () => {
     class="z-[30]"
     @update:open="(event) => emit('update:modelValue', event)"
   >
-    <AlertDialogContent 
-     class="z-[98] h-auto w-full px-0"
-     :class="[showDetailPreview ? 'max-w-[450px]' : 'max-w-[670px]']"
+    <AlertDialogContent
+      class="z-[98] h-auto w-full px-0"
+      :class="[showDetailPreview ? 'max-w-[450px]' : 'max-w-[670px]']"
     >
       <form
         v-show="!showDetailPreview"
@@ -255,31 +259,39 @@ const handleSubmit = async () => {
           </Button>
         </AlertDialogFooter>
       </form>
-      <div v-show="showDetailPreview" class=" mx-auto" >
+      <div v-show="showDetailPreview" class="mx-auto">
         <div class="flex flex-col items-center px-6">
           <CustomIcons name="Icon-USD" class="w-[48px] h-[48px] pb-[16px]" />
-          <h2 class="text-[#152A3C] text-[16px] font-[600] pb-[12px]">Resumen del desembolso</h2>
-          <p class="text-[#68686C] text-[14px] font-[500] pb-[20px]">¿Está seguro de generar el lote del desembolso? </p>
+          <h2 class="text-[#152A3C] text-[16px] font-[600] pb-[12px]">
+            Resumen del desembolso
+          </h2>
+          <p class="text-[#68686C] text-[14px] font-[500] pb-[20px]">
+            ¿Está seguro de generar el lote del desembolso?
+          </p>
         </div>
         <div class="flex flex-col items-left px-6 pb-[32px]">
           <div class="flex font-[500] text-[14px]">
-            <h3 class="text-[#225B82]">Cod Lote: </h3>
+            <h3 class="text-[#225B82]">Cod Lote:</h3>
             <p class="text-[#68686C]">{{ detailPreviewInfo.id }}</p>
           </div>
           <div class="flex font-[500] text-[14px]">
-            <h3 class="text-[#225B82]">N° solicitudes: </h3>
-            <p class="text-[#68686C]">{{ detailPreviewInfo.retireRequestsCount }}</p>
+            <h3 class="text-[#225B82]">N° solicitudes:</h3>
+            <p class="text-[#68686C]">
+              {{ detailPreviewInfo.retireRequestsCount }}
+            </p>
           </div>
           <div class="flex font-[500] text-[14px]">
-            <h3 class="text-[#225B82]">Suma de monto a desembolsar: </h3>
-            <p class="text-[#68686C]">{{ detailPreviewInfo.sumOfAmountToBeDisbursed }}</p>
+            <h3 class="text-[#225B82]">Suma de monto a desembolsar:</h3>
+            <p class="text-[#68686C]">
+              {{ detailPreviewInfo.sumOfAmountToBeDisbursed }}
+            </p>
           </div>
           <div class="flex font-[500] text-[14px]">
-            <h3 class="text-[#225B82]">Banco de origen: </h3>
+            <h3 class="text-[#225B82]">Banco de origen:</h3>
             <p class="text-[#68686C]">{{ detailPreviewInfo.bank }}</p>
           </div>
           <div class="flex font-[500] text-[14px]">
-            <h3 class="text-[#225B82]">Cuenta de origen: </h3>
+            <h3 class="text-[#225B82]">Cuenta de origen:</h3>
             <p class="text-[#68686C]">{{ detailPreviewInfo.chargeAccount }}</p>
           </div>
         </div>
@@ -293,9 +305,9 @@ const handleSubmit = async () => {
             Cancelar
           </Button>
           <Button
-            @click="handleSubmit"
             size="xl"
             class="text-[16px] font-[600]"
+            @click="handleSubmit"
           >
             Confirmar
           </Button>
