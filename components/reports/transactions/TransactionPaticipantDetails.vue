@@ -1,7 +1,9 @@
 <template>
  <div class="w-full gap-x-4 mb-6">
   <div class="w-[100%] bg-white rounded-xl px-[24px] ">
-    <h2 class="font-[700] text-[#152A3C] text-[24px] pt-[8px]" >Nombre del participante</h2> 
+    <h2 class="font-[700] text-[#152A3C] text-[24px] pt-[8px]" >
+      {{ participant.commonName }}
+    </h2> 
     <div
       class="flex flex-wrap md:flex-nowrap justify-center gap-y-[32px] gap-x-[32px] py-6"
     >
@@ -31,6 +33,8 @@
   </div>
 </template>
 <script setup lang="ts">
+import ComparisonModule from '~/components/kpis/ComparisonModule.vue';
+
 const route = useRoute();
 const { data: purseDetail, refresh } = await useAPI<any>(
   `/finance/wallet-management/view-wallet-balance?userId=${route.params.id}`,
@@ -39,6 +43,17 @@ const { data: purseDetail, refresh } = await useAPI<any>(
     default: () => ({}),
   },
 )
+
+const { data: participant } = await useAPI<any>(
+  `/user-management/get-user-detail?id=${route.params.id}`,
+  {
+    query: {},
+    default: () => ({}),
+  },
+)
+
+
+
 const cardsData = ref([
   {
     subtitle: 'Saldo disponible',

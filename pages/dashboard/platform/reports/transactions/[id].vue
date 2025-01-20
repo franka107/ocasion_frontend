@@ -95,12 +95,13 @@
   } = useTransactionParticipant()
   const BASE_TRANS_URL = '/finance/transaction-history-management'
 
-  const { data, refresh } = await useAPI<IDataResponse<TransactionHistoryListItem>>(() => `${BASE_TRANS_URL}/view-transaction-histories-paginated`, {
+  const { data, refresh } = await useAPI<IDataResponse<TransactionHistoryListItem>>(() => `${BASE_TRANS_URL}/view-transaction-histories-paginated-participant`, {
     query: {
       limit: 8,
       page,
       filterOptions,
       sortOptions,
+      userId: route.params.id || '',
     },
   } as any)
 
