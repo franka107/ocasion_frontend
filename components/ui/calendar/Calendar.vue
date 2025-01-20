@@ -87,7 +87,7 @@ const formatter = useDateFormatter('es')
           <SelectTrigger aria-label="Select month" class="w-[60%]">
             <SelectValue placeholder="Select month" />
           </SelectTrigger>
-          <SelectContent class="max-h-[200px]">
+          <SelectContent class="max-h-[200px] z-[200]">
             <SelectItem
               v-for="month in createYear({ dateObj: date })"
               :key="month.toString()"
@@ -114,7 +114,7 @@ const formatter = useDateFormatter('es')
           <SelectTrigger aria-label="Select year" class="w-[40%]">
             <SelectValue placeholder="Select year" />
           </SelectTrigger>
-          <SelectContent class="max-h-[200px]">
+          <SelectContent class="max-h-[200px] z-[200]">
             <SelectItem
               v-for="yearValue in createDecade({
                 dateObj: date,
