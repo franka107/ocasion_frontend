@@ -406,7 +406,7 @@ const [
   { data, refresh: refreshOfferTable },
 ]: any = await Promise.all([
   getEvent(route.params.eventId as string),
-  useAPI(`${OFFER_BASE_URL}/find-offers-paginated`, {
+  useAPI(`${OFFER_BASE_URL}/view-paginated-offers`, {
     query: {
       limit: 8,
       page,
