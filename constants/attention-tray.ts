@@ -7,7 +7,10 @@ export const rechargeStatus = new Map<string, { name: string; color: string }>([
   ['REJECTED', { name: 'Rechazado', color: 'red' }],
   ['APPROVED', { name: 'Aprobado', color: 'blue' }],
 ])
-export const disbursementStatus = new Map<string,{ name: string; color: string }>([
+export const disbursementStatus = new Map<
+  string,
+  { name: string; color: string }
+>([
   ['PENDING', { name: 'Pendiente', color: 'orange' }],
   ['CONFIRMED_DEPOSIT', { name: 'Deposito confirmado', color: 'blue' }],
   ['ANNULED_DEPOSIT', { name: 'Deposito anulado', color: 'red' }],
@@ -16,11 +19,11 @@ export const accountStatus = new Map<string, { name: string; color: string }>([
   ['PENDING', { name: 'Pendiente', color: 'orange' }],
   ['REJECTED', { name: 'Rechazado', color: 'red' }],
   ['APPROVED', { name: 'Aprobado', color: 'blue' }],
-]);
+])
 
 export const bankType = new Map<string, string>([
   ['BBVA', 'BBVA'],
-  ['BCP', 'Bcp'],
+  ['BCP', 'BCP'],
   ['SCOTIABANK', 'Scotiabank'],
 ])
 export const paymentMethodType = new Map<string, string>([
@@ -80,12 +83,12 @@ export const accountSearch: SearchItem[] = [
     type: 'select',
     placeholder: 'Banco',
     items: [
-        ...Array.from(bankType).map(([key, value]) => ({
-          text: value,
-          value: key,
-        })),
-        { text: 'Todos', value: ' ' },
-      ],
+      ...Array.from(bankType).map(([key, value]) => ({
+        text: value,
+        value: key,
+      })),
+      { text: 'Todos', value: ' ' },
+    ],
     elementClass: 'min-w-[400px]',
   },
 ]
@@ -112,22 +115,34 @@ export const withdrawalRequestsSearch: SearchItem[] = [
 ]
 export const disbursementSearch: SearchItem[] = [
   {
+    key: 'id',
+    type: 'text',
+    label: 'Código de lote',
+    placeholder: 'Buscar código de lote',
+    elementClass: 'min-w-[400px]',
+    position: 2,
+  },
+  {
     key: 'bank',
     type: 'select',
     placeholder: 'Banco',
     items: [
-        ...Array.from(bankType).map(([key, value]) => ({
-          text: value,
-          value: key,
-        })),
-        { text: 'Todos', value: ' ' },
-      ],
+      ...Array.from(bankType).map(([key, value]) => ({
+        text: value,
+        value: key,
+      })),
+      { text: 'Todos', value: ' ' },
+    ],
     elementClass: 'min-w-[400px]',
+    label: 'Filtrar po Banco',
   },
+
   {
-    key: 'transfer',
-    type: 'date',
-    placeholder: 'Fecha de transferencia',
+    key: 'createdAt',
+    type: 'date-range',
+    placeholder: 'Fecha de creación',
+    label: 'Fecha de creación',
+    width: 'w-auto',
     position: 2,
   },
   {
@@ -143,6 +158,7 @@ export const disbursementSearch: SearchItem[] = [
     ],
     elementClass: 'min-w-[400px]',
     position: 2,
+    label: 'Filtrar por estados',
   },
 ]
 export const rechargeHeader: HeaderItem[] = [

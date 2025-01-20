@@ -256,7 +256,7 @@ export const transactionsHeader: HeaderItem[] = [
   },
   {
     key: 'actions',
-    label: '',
+    label: 'Acciones',
     sortable: false,
     align: 'center',
   },
