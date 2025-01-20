@@ -167,7 +167,7 @@ export const rechargeHeader: HeaderItem[] = [
     label: 'N° Transación',
   },
   {
-    key: 'updatedAt',
+    key: 'createdAt',
     label: 'Fec. Solicitud',
   },
   {

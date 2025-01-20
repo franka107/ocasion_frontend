@@ -15,6 +15,19 @@
           @on-sort="onSort"
           @on-search="onSearch"
         >
+          <template #createdAt="{ row }">
+            <div
+              class="flex-col hover:text-gray-900 transition-colors duration-200 flex items-center space-x-2"
+            >
+              <span class="">{{
+                dayjs(row.createdAt).format('YYYY-MM-DD')
+              }}</span>
+              <span class="text-xs text-gray-500">{{
+                dayjs(row.createdAt).format('HH:mm')
+              }}</span>
+            </div>
+          </template>
+
           <template #actions="{ row }">
             <div class="flex justify-center">
               <DropdownMenu>
@@ -52,15 +65,15 @@
           <template #livelihood="{ row }">
             <div class="flex items-center justify-center">
               <NuxtLink
-                  v-if="row.sustentationFile?.path"
-                  :to="row.sustentationFile.path"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="flex items-center justify-center"
-                >
-                  <CustomIcons name="Doc-Loupe" />
-                </NuxtLink>
-                <span v-else>-</span>
+                v-if="row.sustentationFile?.path"
+                :to="row.sustentationFile.path"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center justify-center"
+              >
+                <CustomIcons name="Doc-Loupe" />
+              </NuxtLink>
+              <span v-else>-</span>
             </div>
           </template>
           <template #status="{ row }">
@@ -97,11 +110,11 @@
         >
           <EditRequestForm
             :id="rechargeId"
-            :onsubmit="handleUpdate"     
-            @update:model-value="openEditModal = false"      
+            :onsubmit="handleUpdate"
+            @update:model-value="openEditModal = false"
           />
         </SheetContent>
-      <!-- Modal de Detalle Participante Natural -->
+        <!-- Modal de Detalle Participante Natural -->
         <SheetContent
           v-model:open="openParticipantModal"
           class="flex flex-col h-full"
@@ -123,12 +136,12 @@
           <JuridicDetailForm :participant-id="rechargeId" />
         </SheetContent>
         <!-- Modal para rechazar recarga -->
-       <ModalRejectRecharge
+        <ModalRejectRecharge
           :id="selectedRejectInfo.id"
           v-model="openRejectModal"
           :refresh-table="refreshRecharTable"
           @update:model-value="openRejectModal = false"
-        /> 
+        />
       </div>
       <CustomPagination
         v-model:page="page"
@@ -179,26 +192,29 @@ const openModal = (rowId: number) => {
   openDetailModal.value = true
 }
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
-//Modal de rechazo
+// Modal de rechazo
 const selectedRejectInfo = ref<any>({
-  id:'',
+  id: '',
   rejection: null,
   comment: null,
 })
 
 const openParticipantDetail = (row: any) => {
-  rechargeId.value = row.participantId;
+  rechargeId.value = row.participantId
 
   if (row.participant?.personType === 'NATURAL_PERSON') {
-    console.log('Abriendo detalle del participante natural:', row.participantId);
-    openParticipantModal.value = true;
+    console.log('Abriendo detalle del participante natural:', row.participantId)
+    openParticipantModal.value = true
   } else if (row.participant?.personType === 'JURIDIC_PERSON') {
-    console.log('Abriendo detalle del participante jurídico:', row.participantId);
-    openJuridicModal.value = true;
+    console.log(
+      'Abriendo detalle del participante jurídico:',
+      row.participantId,
+    )
+    openJuridicModal.value = true
   } else {
-    console.error('Tipo de persona desconocido:', row.participant?.personType);
+    console.error('Tipo de persona desconocido:', row.participant?.personType)
   }
-};
+}
 
 // Data y API
 const {
@@ -210,9 +226,11 @@ const {
   authorizeRechargeRequest,
   rejectRechargeRequest,
 } = useTopUpRequests()
-const { autorizationRecharge, updateRecharge  } = IuseRecharge()
+const { autorizationRecharge, updateRecharge } = IuseRecharge()
 const BASE_RECHAR_URL = '/finance/recharge-request-management'
-const { data, refresh: refreshRecharTable } = await useAPI<IDataResponse<IRecharge>>(() => `${BASE_RECHAR_URL}/view-paginated-recharge-requests`, {
+const { data, refresh: refreshRecharTable } = await useAPI<
+  IDataResponse<IRecharge>
+>(() => `${BASE_RECHAR_URL}/view-paginated-recharge-requests`, {
   query: {
     limit: 8,
     page,
@@ -231,44 +249,44 @@ const rechargeData = computed(() =>
 )
 
 // Manejo de acciones detalle solicitud
-const handleAuthorize = async (values:any) => {
+const handleAuthorize = async (values: any) => {
   openConfirmModal({
     title: 'Autorizar recarga',
     message: '¿Estás seguro deseas confirmar este lote de desembolso?',
     callback: async () => {
-      const { status, error } = await autorizationRecharge(values);
+      const { status, error } = await autorizationRecharge(values)
       if (status.value === 'success') {
         openEditModal.value = false
-        refreshRecharTable();
+        refreshRecharTable()
         updateConfirmModal({
           title: 'Recarga autorizada',
           message: 'Se ha autorizado la recarga',
           type: 'success',
-        });
+        })
       } else {
         const eMsg =
           error?.value?.data?.errors?.[0]?.message ||
           error?.value?.data?.message ||
-          'La recarga no se pudo confirmar, inténtalo más tarde';
+          'La recarga no se pudo confirmar, inténtalo más tarde'
 
         updateConfirmModal({
           title: 'Error al confirmar recarga',
           message: eMsg,
           type: 'error',
-        });
+        })
       }
     },
-  });
-};
+  })
+}
 
 const handleOpenRejectModal = (details: any) => {
   selectedRejectInfo.value = {
     id: details.id,
     rejection: details.rejectionReason || null,
     comment: details.comment || null,
-  };
-  openRejectModal.value = true;
-};
+  }
+  openRejectModal.value = true
+}
 // Manejo de acciones editar solicitud
 const handleUpdateRequest = async (row: any) => {
   rechargeId.value = row.id
