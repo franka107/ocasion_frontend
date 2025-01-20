@@ -69,7 +69,7 @@
       <CustomPagination
         v-model:page="page"
         class="mt-5 mb-[19px]"
-        :total="total"
+        :total="data?.count"
         :limit="limit"
       />
     </section>
@@ -102,8 +102,7 @@ import DateLabel from '~/design-system/ui/data-label/DateLabel.vue'
 const { page, sortOptions, onSort, createEvent, editEvent, cancelEvent } =
   useEvent()
 const { getMyGrants } = useAuthManagement()
-const myGrants = await getMyGrants()
-const limit = ref(8)
+const limit = ref(10)
 
 const filterOptions = ref(JSON.stringify([]))
 
@@ -139,7 +138,6 @@ const { data, refresh }: any = await useAPI(
     },
   } as any,
 )
-const total = ref(data.value?.count || 0)
 const transactionHistoryData = computed(
   () =>
     data.value?.data.map((item: TransactionHistoryDto, index: number) => ({
