@@ -1,3 +1,7 @@
+import { createResolver } from '@nuxt/kit'
+
+const { resolve } = createResolver(import.meta.url)
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
@@ -11,6 +15,7 @@ export default defineNuxtConfig({
       landingUrl: process.env.NUXT_LANDING_URL,
     },
   },
+
   sound: {
     sounds: {
       scan: true,
@@ -24,8 +29,7 @@ export default defineNuxtConfig({
   modules: [
     '@nuxtjs/tailwindcss',
     'shadcn-nuxt',
-    'nuxt-auth-utils',
-    // 'nuxt-svgo',
+    'nuxt-auth-utils', // 'nuxt-svgo',
     [
       '@nuxtjs/google-fonts',
       {
@@ -35,9 +39,9 @@ export default defineNuxtConfig({
         },
       },
     ],
-
     'nuxt-countdown',
     '@vueuse/nuxt',
+    '@nuxt/fonts',
   ],
   shadcn: {
     /**
@@ -51,9 +55,13 @@ export default defineNuxtConfig({
     componentDir: './components/ui',
   },
   ssr: false,
+  css: [
+    resolve('./assets/scss/_variables.scss'),
+    resolve('./assets/scss/app.scss'),
+  ],
   app: {
-    // pageTransition: { name: 'page', mode: 'out-in' },
-    // layoutTransition: { name: 'layout', mode: 'out-in' },
+    pageTransition: { name: 'page', mode: 'out-in' },
+    layoutTransition: { name: 'layout', mode: 'out-in' },
 
     head: {
       link: [

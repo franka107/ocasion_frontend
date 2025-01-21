@@ -3,7 +3,7 @@ const animate = require('tailwindcss-animate')
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ['class'],
-  content: ['./design-system/**/*.{js,jsx,ts,tsx,vue}'],
+  content: ['./design-system/**/*.{js,jsx,ts,tsx,vue}', './app.vue'],
   safelist: [
     'dark',
     'text-disabled-500',
@@ -26,7 +26,6 @@ module.exports = {
     'text-[#16A34A]', // Verde para SUSTENTO DE ENTREGA
   ],
   prefix: '',
-
   theme: {
     container: {
       center: true,
@@ -122,9 +121,10 @@ module.exports = {
         btn: '8px',
       },
       fontFamily: {
-        sans: ['Roboto', 'Inter', 'sans-serif'],
-        inter: ['Inter', 'sans-serif'],
-        roboto: ['Roboto', 'sans-serif'], // Añadir la fuente Roboto
+        custom: ['Geist'],
+        // sans: ['Roboto', 'Inter', 'sans-serif'],
+        // inter: ['Inter', 'sans-serif'],
+        // roboto: ['Roboto', 'sans-serif'], // Añadir la fuente Roboto
       },
       fontWeight: {
         regular: 400,

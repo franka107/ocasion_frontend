@@ -7,7 +7,7 @@
         :table="table"
         :filters="filters"
         :status="status"
-      :create-button-label="props.createButtonLabel"
+        :create-button-label="props.createButtonLabel"
         :on-create="onCreate"
       >
         <slot />
@@ -17,8 +17,8 @@
           <TableHeader>
             <TableRow
               v-for="headerGroup in table.getHeaderGroups()"
-              class="border-dashed border-black"
               :key="headerGroup.id"
+              class="border-dashed border-black"
             >
               <TableHead v-for="header in headerGroup.headers" :key="header.id">
                 <FlexRender
@@ -33,14 +33,14 @@
             <template v-if="table.getRowModel().rows?.length">
               <TableRow
                 v-for="row in table.getRowModel().rows"
-                class="h-12"
                 :key="row.id"
+                class="h-12"
                 :data-state="row.getIsSelected() && 'selected'"
               >
                 <TableCell
-                  class=""
                   v-for="cell in row.getVisibleCells()"
                   :key="cell.id"
+                  class=""
                 >
                   <FlexRender
                     :render="cell.column.columnDef.cell"
@@ -70,7 +70,7 @@ import type {
   PaginationState,
   SortingState,
   VisibilityState,
-} from "@tanstack/vue-table";
+} from '@tanstack/vue-table'
 import {
   FlexRender,
   getCoreRowModel,
@@ -80,68 +80,64 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useVueTable,
-} from "@tanstack/vue-table";
+} from '@tanstack/vue-table'
 
-import DataTablePagination from "./DataTablePagination.vue";
-import DataTableToolbar from "./DataTableToolbar.vue";
-
-import { ref } from "vue";
+import { ref } from 'vue'
+import DataTablePagination from './DataTablePagination.vue'
+import DataTableToolbar from './DataTableToolbar.vue'
 
 type Pagination = {
-  limit: number;
-  number: number;
-};
+  limit: number
+  number: number
+}
 
 type NoResultsComponent = {
   new (): {
     $props: {
-      [key: string]: any;
-    };
-  };
-};
+      [key: string]: any
+    }
+  }
+}
 
 interface DataTableProps<TData, TValue> {
-  data: any[];
-  columns: ColumnDef<TData, TValue>[];
+  data: any[]
+  columns: ColumnDef<TData, TValue>[]
   filters: {
-    field: string;
-    placeholder: string;
-  }[];
-  status: any;
-  createButtonLabel: string;
-  noDataComponent?: NoResultsComponent;
-  onCreate: () => any;
+    field: string
+    placeholder: string
+  }[]
+  status: any
+  createButtonLabel: string
+  noDataComponent?: NoResultsComponent
+  onCreate: () => any
 }
-const props = defineProps<DataTableProps<any, any>>();
+const props = defineProps<DataTableProps<any, any>>()
 
-const sorting = ref<SortingState>([]);
-const columnFilters = ref<ColumnFiltersState>([]);
-const columnVisibility = ref<VisibilityState>({});
-const rowSelection = ref({});
-const pagination = ref<PaginationState>({ pageIndex: 1, pageSize: 10 });
-
-console.log("Data:", props.data);
-console.log("Columns:", props.columns);
+const sorting = ref<SortingState>([])
+const columnFilters = ref<ColumnFiltersState>([])
+const columnVisibility = ref<VisibilityState>({})
+const rowSelection = ref({})
+const pagination = ref<PaginationState>({ pageIndex: 1, pageSize: 10 })
 
 const table = useVueTable({
   get data() {
-    return props.data;
+    return props.data
   },
   get columns() {
-    return props.columns;
+    return props.columns
   },
   state: {
     get sorting() {
-      return sorting.value;
+      return sorting.value
     },
     get columnFilters() {
-      return columnFilters.value;
+      return columnFilters.value
     },
     get columnVisibility() {
-      return columnVisibility.value;
+      return columnVisibility.value
     },
     get rowSelection() {
-      return rowSelection.value;
+      return rowSelection.value
     },
   },
   enableRowSelection: true,
@@ -158,5 +154,5 @@ const table = useVueTable({
   getSortedRowModel: getSortedRowModel(),
   getFacetedRowModel: getFacetedRowModel(),
   getFacetedUniqueValues: getFacetedUniqueValues(),
-});
+})
 </script>

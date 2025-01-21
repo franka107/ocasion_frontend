@@ -1,78 +1,77 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
- 
+
 @layer base {
   :root {
     --background: 255 0 255;
     --foreground: 0 0% 3.9%;
- 
+
     --muted: 0 0% 96.1%;
     --muted-foreground: 0 0% 45.1%;
- 
+
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 3.9%;
- 
+
     --card: 0 0% 100%;
     --card-foreground: 0 0% 3.9%;
- 
+
     --border: 0 0% 89.8%;
     --input: 0 0% 89.8%;
- 
+
     --primary: 205 84% 12%;
     --primary-foreground: 0 0% 98%;
 
-    
     --purple: 205 84% 12%;
     --purple-foreground: 0 0% 98%;
- 
+
     --secondary: 0 84% 60%;
     --secondary-foreground: 0 0% 9%;
- 
+
     --accent: 0 0% 96.1%;
     --accent-foreground: 0 0% 9%;
- 
+
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
- 
+
     --ring: 0 0% 3.9%;
- 
+
     --radius: 0.5rem;
     --tw-ring-offset-color: white;
   }
- 
+
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
- 
+
     --muted: 0 0% 14.9%;
     --muted-foreground: 0 0% 63.9%;
- 
+
     --popover: 0 0% 3.9%;
     --popover-foreground: 0 0% 98%;
- 
+
     --card: 0 0% 3.9%;
     --card-foreground: 0 0% 98%;
- 
+
     --border: 0 0% 14.9%;
     --input: 0 0% 14.9%;
- 
+
     --primary: 0 0% 98%;
     --primary-foreground: 0 0% 9%;
- 
+
     --secondary: 0 0% 14.9%;
     --secondary-foreground: 0 0% 98%;
- 
+
     --accent: 0 0% 14.9%;
     --accent-foreground: 0 0% 98%;
- 
+
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
- 
+
     --ring: 0 0% 83.1%;
   }
 }
- 
+
 @layer base {
   * {
     @apply border-border;
@@ -85,31 +84,34 @@
 @layer utilities {
   /* Hide scrollbar for Chrome, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {
-      display: none;
+    display: none;
   }
- /* Hide scrollbar for IE, Edge and Firefox */
+  /* Hide scrollbar for IE, Edge and Firefox */
   .no-scrollbar {
-      -ms-overflow-style: none;  /* IE and Edge */
-      scrollbar-width: none;  /* Firefox */
-}
-/* Agrega esto en tu archivo CSS global o en el archivo de estilos de tu proyecto */
-@layer components {
-  .fade-enter-active, .fade-leave-active {
-    transition: opacity 3 s ease;
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
   }
-  .fade-enter, .fade-leave-to /* .fade-leave-active en <2.1.8 */ {
-    opacity: 0;
+  /* Agrega esto en tu archivo CSS global o en el archivo de estilos de tu proyecto */
+  @layer components {
+    .fade-enter-active,
+    .fade-leave-active {
+      transition: opacity 3 s ease;
+    }
+    .fade-enter, .fade-leave-to /* .fade-leave-active en <2.1.8 */ {
+      opacity: 0;
+    }
   }
-}
-@layer base {
-  .fade-enter-active, .fade-leave-active {
-    transition: opacity 0.5s ease-in-out;
+  @layer base {
+    .fade-enter-active,
+    .fade-leave-active {
+      transition: opacity 0.5s ease-in-out;
+    }
+    .fade-enter, .fade-leave-to /* .fade-leave-active en <2.1.8 */ {
+      opacity: 0;
+    }
   }
-  .fade-enter, .fade-leave-to /* .fade-leave-active en <2.1.8 */ {
-    opacity: 0;
-  }
-}
 }
 html {
-  font-family: Roboto, "Open Sans", sans-serif;
+  font-family: Geist, 'Open Sans', sans-serif;
 }
+
