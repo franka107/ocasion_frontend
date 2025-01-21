@@ -116,7 +116,7 @@ const parsedTransactionHistoryList = computed(() => transactionHistoryList.data.
       ...item,
       fullName: item.wallet.user.firstName + ' ' + item.wallet.user.lastName,
       document: `${item.wallet.user.documentType} ${item.wallet.user.documentIdentifier}`,
-      typeOfOperation: transactionHistoryMotiveMap[item.motive as TransactionHistoryMotive].label,
+      motive: transactionHistoryMotiveMap[item.motive as TransactionHistoryMotive].label,
       dateOfOperation: dayjs(item.createdAt).format('YYYY-MM-DD'),
       amount: formatCurrency(item.amount, item.currency),
       status: item.status,

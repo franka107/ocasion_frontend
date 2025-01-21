@@ -39,15 +39,17 @@ export const transactionsSearch: SearchItem[] = [
   {
     key: 'quickSearch',
     type: 'text',
-    placeholder: 'Buscar participante, n° transacción o  n° DNI',
+    placeholder: 'Buscar',
     width: 'max-w-xs w-full',
     elementClass: 'w-full',
+    label: 'Buscar participante, n° transacción o  n° DNI',
   },
   {
     key: 'createdAt',
     type: 'date-range',
     placeholder: 'Fecha de operación',
     width: 'w-auto',
+    label: 'Fecha de operación',
   },
   {
     key: 'status',
@@ -60,6 +62,7 @@ export const transactionsSearch: SearchItem[] = [
       { text: 'Todos', value: ' ' },
     ],
     placeholder: 'Estado',
+    label: 'Buscar por estado',
   },
   {
     key: 'motive',
@@ -74,6 +77,7 @@ export const transactionsSearch: SearchItem[] = [
     ],
     isHidden: true,
     placeholder: 'Tipo de operación',
+    label: 'Buscar por tipo de operación',
   },
 ]
 
@@ -123,15 +127,17 @@ export const disbursementSearch: SearchItem[] = [
   {
     key: 'quickSearch',
     type: 'text',
-    placeholder: 'Buscar participante, n° transacción o  n° DOI',
+    placeholder: 'Buscar ',
     width: 'max-w-xs w-full',
     elementClass: 'w-full',
+    label: 'Buscar participante, n° transacción o  n° DOI',
   },
   {
     key: 'createdAt',
     type: 'date-range',
     placeholder: 'Fecha de registro',
     width: 'w-auto',
+    label: 'Fecha de registro',
   },
   {
     key: 'bank',
@@ -146,6 +152,7 @@ export const disbursementSearch: SearchItem[] = [
     ],
     elementClass: 'min-w-[400px]',
     position: 3,
+    label: 'Buscar por banco',
   },
   {
     key: 'status',
@@ -159,21 +166,24 @@ export const disbursementSearch: SearchItem[] = [
     ],
     isHidden: true,
     placeholder: 'Estado',
+    label: 'Buscar por estado',
   },
 ]
 export const validationSearch: SearchItem[] = [
   {
     key: 'quickSearch',
     type: 'text',
-    placeholder: 'Buscar participante, n° transacción o  n° DOI',
+    placeholder: 'Buscar',
     width: 'max-w-xs w-full',
     elementClass: 'w-full',
+    label: 'Buscar participante, n° transacción o  n° DOI',
   },
   {
     key: 'createdAt',
     type: 'date-range',
     placeholder: 'Fecha de solicitud',
     width: 'w-auto',
+    label: 'Fecha de solicitud',
   },
   {
     key: 'status',
@@ -187,6 +197,7 @@ export const validationSearch: SearchItem[] = [
     ],
     isHidden: true,
     placeholder: 'Estado',
+    label: 'Buscar por estado',
   },
   {
     key: 'bank',
@@ -200,6 +211,7 @@ export const validationSearch: SearchItem[] = [
     ],
     isHidden: true,
     placeholder: 'Banco',
+    label: 'Buscar por banco',
   },
 ]
 export const balanceSearch: SearchItem[] = [
@@ -209,12 +221,14 @@ export const balanceSearch: SearchItem[] = [
     placeholder: 'Buscar participante, documento',
     width: 'max-w-xs w-full',
     elementClass: 'w-full',
+    label: 'Buscar por participante o documento',
   },
   {
     key: 'quickSearchPeriod',
     type: 'text',
     placeholder: 'Periodo',
     width: 'w-auto',
+    label: 'Buscar por periodo',
   },
 ]
 
@@ -232,7 +246,7 @@ export const transactionsHeader: HeaderItem[] = [
     label: 'Documento',
   },
   {
-    key: 'typeOfOperation',
+    key: 'motive',
     label: 'Tipo de operación',
     sortable: true,
   },
@@ -377,13 +391,14 @@ export const transactionsParticipantHeader: HeaderItem[] = [
     label: 'N° Transación',
   },
   {
-    key: 'typeOfOperation',
+    key: 'motive',
     label: 'Tipo de operación',
     sortable: true,
   },
   {
-    key: 'dateOfOperation',
+    key: 'createdAt',
     label: 'Fecha de operación',
+    sortable: true,
   },
   {
     key: 'amount',
