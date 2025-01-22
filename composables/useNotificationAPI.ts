@@ -10,6 +10,11 @@ export type FilterOption = {
   value: any
 }
 
+export type SortOption = {
+  field: string
+  order: 'asc' | 'desc'
+}
+
 export type QueryPaginatedParams = {
   limit: number
   page: number

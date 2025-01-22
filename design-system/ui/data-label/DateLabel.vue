@@ -3,7 +3,7 @@
     <span class="text-sm font-medium text-gray-900">{{
       parsedDate.format('DD-MM-YYYY')
     }}</span>
-    <div class="flex items-center space-x-1">
+    <div class="flex justify-center items-center space-x-1">
       <ClockIcon class="h-3 w-3 text-gray-400" />
       <span class="text-xs text-gray-600">{{
         parsedDate.format('HH:mm')
