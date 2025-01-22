@@ -402,7 +402,7 @@ const openDeliverySustentationModal = (row: any) => {
 }
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const { rejectOfferBids, acceptOfferBids, page, sortOptions, onSort } =
-  useBidAPI()
+  useBidService()
 const { uploadCompostSupportFiles } = usePaymentAPI()
 const findBidHistories = '/audit/find-bid-histories'
 const { getMyGrants } = useAuthManagement()

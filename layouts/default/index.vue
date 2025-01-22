@@ -124,6 +124,8 @@ const router = useRouter()
 
 const handleSignOut = async () => {
   await userSession.clear()
+  await userSession.fetch()
+  // delay 20 ms
   router.push('/auth/login')
 }
 </script>

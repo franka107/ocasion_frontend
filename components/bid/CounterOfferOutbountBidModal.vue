@@ -17,7 +17,7 @@ const props = defineProps<{
   refreshTable: () => void
 }>()
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
-const { counterOfferBid } = useBidAPI()
+const { counterOfferBid } = useBidService()
 const formSchema = toTypedSchema(
   z.object({
     counterOfferAmount: z

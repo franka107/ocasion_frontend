@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Expand, Maximize, Trash } from 'lucide-vue-next'
 import Button from '../ui/button/Button.vue'
-import type { OfferListItem } from '~/types/Offer'
+import type { OfferDto, OfferListItem } from '~/types/Offer'
 import { getRemainingTime } from '@/utils/countDown'
 import Dialog from '~/design-system/ui/dialog/Dialog.vue'
 import DialogTrigger from '~/design-system/ui/dialog/DialogTrigger.vue'
@@ -10,7 +10,7 @@ import DialogDescription from '~/design-system/ui/dialog/DialogDescription.vue'
 import DialogFooter from '~/design-system/ui/dialog/DialogFooter.vue'
 import Album from '~/design-system/ui/album/Album.vue'
 import Thumbnails from '~/design-system/ui/thumbnails/Thumbnails.vue'
-const props = defineProps<{ offer: OfferListItem }>()
+const props = defineProps<{ offer: OfferDto }>()
 const { offer } = toRefs(props)
 const key = ref(0)
 const endMiliseconds = ref(getRemainingTime(offer.value.endTime))

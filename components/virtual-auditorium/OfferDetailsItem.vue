@@ -1,31 +1,20 @@
 <script setup lang="ts">
 import { ref, computed, watch, toRefs } from 'vue'
-import type { Socket } from 'socket.io-client'
+import { toast } from '../ui/toast'
 import BidHistory from './BidHistory.vue'
-import type { OfferListItem } from '~/types/Offer'
+import type { OfferDto, OfferListItem } from '~/types/Offer'
 import { getRemainingTime } from '@/utils/countDown'
 import ConfirmBidDialog from '~/components/virtual-auditorium/ConfirmBidDialog.vue'
+import AlertBanner from '~/design-system/ui/alert-banner/AlertBanner.vue'
 
 const props = defineProps<{
-  offer: OfferListItem
-  onPlaceBid: ({ offerId, amount }: { offerId: string; amount: number }) => void
-  socket: Socket
+  offer: OfferDto
 }>()
 
-const subscribeError = ref(false)
-props.socket.on('error', (data) => {
-  const ERROR_NOT_SUBSCRIBED = data.errors.find(
-    (error: { code: string }) =>
-      error.code === 'AUCTION_MANAGEMENT.USER_NOT_SUBSCRIBED',
-  )
-  if (ERROR_NOT_SUBSCRIBED) {
-    showModal.value = true
-    subscribeError.value = true
-  }
-})
+const bidService = useBidService()
 
 const { offer } = toRefs(props)
-const useCountDown = (offer: Ref<OfferListItem>) => {
+const useCountDown = (offer: Ref<OfferDto>) => {
   const endMiliseconds = computed(() => getRemainingTime(offer.value.endTime))
   const countDownkey = ref(0)
   watch(offer, () => {
@@ -81,11 +70,48 @@ const {
   isDisabledButton,
 } = offerNewBid()
 
-const showModal = ref(false)
-const onSubmitBid = () => {
+const showSubscribeToOfferDialog = ref(false)
+const errorBanner = ref<null | { message: string }>(null)
+const onSubmitBid = async () => {
   if (!invalidBidAmount.value) {
-    props.onPlaceBid({ offerId: offer.value.id, amount: bidValue.value })
-    // showModal.value = true
+    // props.onPlaceBid({ offerId: offer.value.id, amount: bidValue.value })
+    const { status, error } = await bidService.placeBid({
+      offerId: offer.value.id,
+      amount: bidValue.value,
+      parentBidId: offer.value.bids[0]?.id,
+    })
+
+    if (status.value !== 'success') {
+      errorBanner.value = null
+      const errors = error.value?.data?.errors || []
+      const userNotSubscribedError = errors.find(
+        (error: { code: string; message: string }) =>
+          error.code === 'AUCTION_MANAGEMENT.USER_NOT_SUBSCRIBED',
+      )
+      if (userNotSubscribedError) {
+        showSubscribeToOfferDialog.value = true
+      } else {
+        const mainError = errors[0]
+        errorBanner.value = { message: mainError.message }
+
+        // toast({
+        //   title: 'Problema al pujar',
+        //   description: mainError.message,
+        //   variant: 'default',
+        //   class: 'border-red',
+        // })
+
+        // action: h(
+        //   ToastAction,
+        //   {
+        //     altText: 'Try again',
+        //   },
+        //   {
+        //     default: () => 'Try again',
+        //   },
+        // ),
+      }
+    } // showModal.value = true
   }
 }
 const eventApi = useEvent()
@@ -95,10 +121,19 @@ const { data: eventDetail } = await eventApi.viewEvent(
 </script>
 <template>
   <section class="flex justify-center">
+    <AlertBanner
+      v-if="errorBanner != null"
+      :message="errorBanner.message"
+      @retry="onSubmitBid"
+      @close="
+        () => {
+          errorBanner = null
+        }
+      "
+    />
     <ConfirmBidDialog
-      v-if="subscribeError"
-      v-model="showModal"
-      :on-place-bid="onPlaceBid"
+      v-model="showSubscribeToOfferDialog"
+      :on-place-bid="onSubmitBid"
       :bid="bidValue"
       :event-id="offer.event?.id || ''"
       :offer-id="offer.id"

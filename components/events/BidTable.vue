@@ -188,7 +188,7 @@ import { GlobalType } from '~/types/Common'
 
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const { rejectOfferBids, acceptOfferBids, page, sortOptions, onSort } =
-  useBidAPI()
+  useBidService()
 const findBidHistories = '/audit/find-bid-histories'
 const { getMyGrants } = useAuthManagement()
 const myGrants = await getMyGrants()

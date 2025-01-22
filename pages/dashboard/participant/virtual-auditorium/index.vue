@@ -97,7 +97,7 @@ interface IOfferTypeCount {
 }
 
 const { data } = await useAPI<IOfferTypeCount>(
-  () => `/offer-management/find-offers-type-count`,
+  () => `/offer-management/view-offers-type-count`,
   {} as any,
 )
 

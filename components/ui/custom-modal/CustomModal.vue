@@ -23,10 +23,11 @@ const emit = defineEmits(['update:modelValue', 'close-auto-focus'])
 <template>
   <Dialog
     :open="props.modelValue"
+    class="z-[200]"
     @update:open="(value) => emit('update:modelValue', value)"
   >
     <DialogContent
-      class="sm:max-w-[460px] gap-y-0 max-w-[90%]"
+      class="z-[200] sm:max-w-[460px] gap-y-0 max-w-[90%]"
       @close-auto-focus="emit('close-auto-focus')"
     >
       <DialogHeader class="gap-y-0">

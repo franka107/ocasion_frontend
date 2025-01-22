@@ -1,6 +1,8 @@
+import type { PlaceBidParamsDto } from '~/types/Bids'
+
 const BID_BASE_URL = '/bid-management'
 
-export function useBidAPI() {
+export function useBidService() {
   const page = ref(1)
   const sortOptions = ref('[]')
   const onSort = (sortObject: { [key: string]: string }[]) => {
@@ -50,11 +52,20 @@ export function useBidAPI() {
     return { status, error }
   }
 
+  const placeBid = async (params: PlaceBidParamsDto) => {
+    const { status, error }: any = await useAPI(`${BID_BASE_URL}/place-bid`, {
+      method: 'POST',
+      body: params,
+    } as any)
+    return { status, error }
+  }
+
   return {
     rejectOfferBids,
     acceptOfferBids,
     page,
     sortOptions,
+    placeBid,
     onSort,
     counterOfferBid,
   }

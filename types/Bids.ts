@@ -1,6 +1,12 @@
 import type { UserDto } from './Administrators'
 import type { OfferDto } from './Offer'
 
+export interface PlaceBidParamsDto {
+  offerId: string
+  amount: number
+  parentBidId: string
+}
+
 export enum BidStatus {
   Started = 'STARTED', // Iniciado
   Discarded = 'DISCARDED', // Descartado

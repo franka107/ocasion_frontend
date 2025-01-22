@@ -6,13 +6,7 @@ const props = withDefaults(
   defineProps<{
     modelValue: boolean
     description?: string
-    onPlaceBid: ({
-      offerId,
-      amount,
-    }: {
-      offerId: string
-      amount: number
-    }) => void
+    onPlaceBid: () => Promise<void>
     bid: number
     offerId: string
     eventId: string
@@ -46,6 +40,7 @@ console.log('data', data, status)
 //     class: 'border-red',
 //   })
 // }
+const confirmModal = useConfirmModal()
 
 const onSubmit = async () => {
   try {
@@ -59,7 +54,7 @@ const onSubmit = async () => {
       const eMsg =
         error.value?.data?.errors?.[0].message ||
         error.value?.data?.message ||
-        'No se pudo continuar con la puja. \nTe recomendamos intentarlo nuevamente.'
+        'No se pudo continuar con la puja. \nTe reco mendamos intentarlo nuevamente.'
       toast({
         title: 'Problema en la puja',
         description: eMsg,
@@ -68,7 +63,8 @@ const onSubmit = async () => {
       })
     }
     pseudonym.value = data.value.pseudonym
-    await onPlaceBid.value({ offerId: props.offerId, amount: props.bid })
+    // await onPlaceBid.value({ offerId: props.offerId, amount: props.bid })
+    await onPlaceBid.value()
     successSubmit.value = true
     title.value = 'Separación confirmada'
     icon.value = 'AccountOutline'

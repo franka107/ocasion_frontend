@@ -4,7 +4,7 @@ import { ToastAction, useToast } from '../ui/toast'
 import OfferList from '~/components/virtual-auditorium/OfferList.vue'
 import OfferDetailsItem from '~/components/virtual-auditorium/OfferDetailsItem.vue'
 import CustomPagination from '~/components/ui/custom-pagination/CustomPagination.vue'
-import type { OfferListItem } from '~/types/Offer'
+import type { OfferDto, OfferListItem } from '~/types/Offer'
 import type { IDataResponse } from '~/types/Common'
 
 /* Mover a un componente */
@@ -15,17 +15,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-const { socket } = useSocketIo()
-
-const onPlaceBid = ({
-  offerId,
-  amount,
-}: {
-  offerId: string
-  amount: number
-}) => {
-  socket.emit('placeBid', { offerId, amount })
-}
+// const { socket } = useSocketIo()
+const socketPlaceBidService = useSocketPlaceBidService()
+const bidService = useBidService()
 
 const OFFER_BASE_URL = '/offer-management'
 const options = ['Todos', 'Finalizado', 'Por vencer']
@@ -38,54 +30,138 @@ const filterOptions = ref('[]')
 
 const { toast } = useToast()
 
-const selectedOffer = ref<OfferListItem | undefined>(undefined)
-const { data: offerListData, refresh } = await useAPI<
-  IDataResponse<OfferListItem>
->(() => `${OFFER_BASE_URL}/${apiUrl?.value}`, {
-  query: {
-    limit: 8,
-    page,
-    filterOptions,
-    sortOptions,
+const selectedOffer = ref<OfferDto | undefined>(undefined)
+const { data: offerListData, refresh } = await useAPI<IDataResponse<OfferDto>>(
+  () => `${OFFER_BASE_URL}/${apiUrl?.value}`,
+  {
+    query: {
+      limit: 8,
+      page,
+      filterOptions,
+      sortOptions,
+    },
+  } as any,
+)
+const offerList = computed<OfferDto[]>(() => offerListData.value.data)
+
+const connectedRooms = ref<Set<string>>(new Set())
+
+// Función para unirse a una sala
+function joinOfferRoom(offerId: string) {
+  if (!connectedRooms.value.has(offerId)) {
+    socketPlaceBidService.joinOfferRoom(offerId)
+    connectedRooms.value.add(offerId)
+  }
+}
+
+// Función para salir de una sala
+function leaveOfferRoom(offerId: string) {
+  if (connectedRooms.value.has(offerId)) {
+    socketPlaceBidService.leaveOfferRoom(offerId)
+    connectedRooms.value.delete(offerId)
+  }
+}
+
+watch(
+  () => offerList.value.map((offer) => offer.id), // Array de IDs actuales
+  (newOfferIds, oldOfferIds) => {
+    const newSet = new Set(newOfferIds)
+    const oldSet = new Set(oldOfferIds)
+
+    // Salir de salas que ya no están visibles
+    for (const offerId of oldSet) {
+      if (!newSet.has(offerId)) {
+        leaveOfferRoom(offerId)
+      }
+    }
+
+    // Unirse a salas nuevas
+    for (const offerId of newSet) {
+      if (!oldSet.has(offerId)) {
+        joinOfferRoom(offerId)
+      }
+    }
   },
-} as any)
-const offerList = computed<OfferListItem[]>(() => offerListData.value.data)
+  { immediate: true },
+)
+
+// Limpiar conexiones al desmontar
+onUnmounted(() => {
+  connectedRooms.value.forEach((offerId) => leaveOfferRoom(offerId))
+})
+
+// socketPlaceBidService.joinOfferRoom('offerId')
+
 watch([apiUrl], () => {
   page.value = 1
   selectedOffer.value = undefined
   refresh()
 })
 
-socket.on('error', (data) => {
-  const mainError = data.errors[0]
-  if (mainError.code === 'AUCTION_MANAGEMENT.USER_NOT_SUBSCRIBED') {
-    return
-  }
-  toast({
-    title: 'Problema al pujar',
-    description: mainError.message,
-    variant: 'default',
-    class: 'border-red',
-    // action: h(
-    //   ToastAction,
-    //   {
-    //     altText: 'Try again',
-    //   },
-    //   {
-    //     default: () => 'Try again',
-    //   },
-    // ),
-  })
-})
-socket.on('offerUpdated', (newOffer: OfferListItem) => {
+// socket.on('error', (data) => {
+//   const mainError = data.errors[0]
+//   if (mainError.code === 'AUCTION_MANAGEMENT.USER_NOT_SUBSCRIBED') {
+//     return
+//   }
+//   toast({
+//     title: 'Problema al pujar',
+//     description: mainError.message,
+//     variant: 'default',
+//     class: 'border-red',
+//     // action: h(
+//     //   ToastAction,
+//     //   {
+//     //     altText: 'Try again',
+//     //   },
+//     //   {
+//     //     default: () => 'Try again',
+//     //   },
+//     // ),
+//   })
+// })
+// socket.on('offerUpdated', (newOffer: OfferListItem) => {
+//   const offerIndex = offerList.value.findIndex(
+//     (offerItem) => offerItem.id === newOffer.id,
+//   )
+//   console.log(newOffer)
+//   if (offerIndex !== -1) {
+//     offerList.value[offerIndex] = newOffer
+//     if (selectedOffer.value?.id === offerList.value[offerIndex].id) {
+//       selectedOffer.value = newOffer
+//     }
+//   }
+// })
+
+// socketPlaceBidService.onNewBidPlaced((newBid) => {
+//   const offerIndex = offerList.value.findIndex(
+//     (offerItem) => offerItem.id === newBid.offerId,
+//   )
+//   if (offerIndex !== -1) {
+//     offerList.value[offerIndex].bids.unshift(newBid)
+//     if (selectedOffer.value?.id === offerList.value[offerIndex].id) {
+//       selectedOffer.value = offerList.value[offerIndex]
+//     }
+//   }
+// })
+
+// props.socket.on('error', (data) => {
+//   const ERROR_NOT_SUBSCRIBED = data.errors.find(
+//     (error: { code: string }) =>
+//       error.code === 'AUCTION_MANAGEMENT.USER_NOT_SUBSCRIBED',
+//   )
+//   if (ERROR_NOT_SUBSCRIBED) {
+//     showModal.value = true
+//     subscribeError.value = true
+//   }
+// })
+socketPlaceBidService.onNewBidPlaced((offer) => {
   const offerIndex = offerList.value.findIndex(
-    (offerItem) => offerItem.id === newOffer.id,
+    (offerItem) => offerItem.id === offer.id,
   )
-  console.log(newOffer)
   if (offerIndex !== -1) {
-    offerList.value[offerIndex] = newOffer
+    offerList.value[offerIndex] = offer
     if (selectedOffer.value?.id === offerList.value[offerIndex].id) {
-      selectedOffer.value = newOffer
+      selectedOffer.value = offer
     }
   }
 })
@@ -93,10 +169,10 @@ socket.on('offerUpdated', (newOffer: OfferListItem) => {
 const isMobile = ref(false)
 
 const checkIfMobile = () => {
-  isMobile.value = window.innerWidth < 1280 
+  isMobile.value = window.innerWidth < 1280
 }
 window.addEventListener('resize', checkIfMobile)
-checkIfMobile() 
+checkIfMobile()
 
 onUnmounted(() => {
   window.removeEventListener('resize', checkIfMobile)
@@ -115,9 +191,9 @@ const closeModal = () => {
 }
 
 const openDetails = (offer: OfferListItem) => {
-  selectedOffer.value = offer 
+  selectedOffer.value = offer
   if (isMobile.value) {
-    isModalOpen.value = true 
+    isModalOpen.value = true
   }
 }
 </script>
@@ -149,12 +225,7 @@ const openDetails = (offer: OfferListItem) => {
           </SelectContent>
         </Select>
       </div>
-      <OfferList
-        :offer-list="offerList"
-        @on-select-offer="
-          openDetails
-        "
-      />
+      <OfferList :offer-list="offerList" @on-select-offer="openDetails" />
       <CustomPagination
         v-model:page="page"
         class="mt-8"
@@ -166,17 +237,17 @@ const openDetails = (offer: OfferListItem) => {
       v-if="selectedOffer && !isMobile"
       class="hidden xl:block w-full max-w-[350px]"
       :offer="selectedOffer"
-      :on-place-bid="onPlaceBid"
-      :socket="socket"
     />
 
     <!-- Modal OfferDetailItem móvil -->
     <AlertDialog
       :open="isModalOpen"
-      class="z-[30] xl:hidden"
+      class="z-[10] xl:hidden"
       @update:open="closeModal"
     >
-      <AlertDialogContent class="z-[98] max-w-[400px] px-0 py-4  overflow-y-auto max-h-[calc(100vh-80px)] custom-scrollbar">
+      <AlertDialogContent
+        class="z-[98] max-w-[400px] px-0 py-4 overflow-y-auto max-h-[calc(100vh-80px)] custom-scrollbar"
+      >
         <AlertDialogHeader
           class="flex flex-row justify-between items-center border-b border-primary"
         >
@@ -189,12 +260,7 @@ const openDetails = (offer: OfferListItem) => {
           </SheetClose>
         </AlertDialogHeader>
         <div class="px-4">
-          <OfferDetailsItem
-            v-if="selectedOffer"
-            :offer="selectedOffer"
-            :socket="socket"
-            :on-place-bid="onPlaceBid"
-          />
+          <OfferDetailsItem v-if="selectedOffer" :offer="selectedOffer" />
         </div>
         <AlertDialogFooter class="px-4 mt-4 flex justify-end gap-4">
           <Button

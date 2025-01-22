@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import OfferListCard from '~/components/virtual-auditorium/OfferListCard.vue'
-import type { OfferListItem } from '~/types/Offer'
+import type { OfferDto, OfferListItem } from '~/types/Offer'
 
-const props = defineProps<{ offerList: OfferListItem[] }>()
+const props = defineProps<{ offerList: OfferDto[] }>()
 const emit = defineEmits(['onSelectOffer'])
 </script>
 <template>
@@ -20,4 +20,3 @@ const emit = defineEmits(['onSelectOffer'])
     </div>
   </section>
 </template>
-

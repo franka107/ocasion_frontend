@@ -28,14 +28,14 @@ export enum OfferStatus {
 export interface OfferListItem {
   id: string
   title: string
-  carModel: Model
-  carBrand: Brand
+  carModel: ModelDto
+  carBrand: BrandDto
   year: number
   initialValue: number
   description: string
   address: Address
   appraisal: number
-  bids: Bid[]
+  bids: BidDto[]
   bidHistories: BidHistory[]
   annexesFiles: AnnexesFile[]
   event?: EventDto
@@ -72,8 +72,8 @@ export interface BidHistory {
 export interface OfferDto {
   id: string
   title: string
-  carModel: Model
-  carBrand: Brand
+  carModel: ModelDto
+  carBrand: BrandDto
   year: number
   initialValue: number
   description: string
@@ -93,15 +93,15 @@ export interface OfferDto {
   eventId?: string
 }
 
-export interface Model {
+export interface BrandDto {
   id: string
   name: string
-  carBrand: Brand
 }
 
-export interface Brand {
+export interface ModelDto {
   id: string
   name: string
+  carBrand: BrandDto
 }
 
 export interface Address {
