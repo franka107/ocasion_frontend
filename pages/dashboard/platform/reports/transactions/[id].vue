@@ -108,8 +108,8 @@
   const transactionsData = computed(() =>
     data.value?.data.map((item: TransactionHistoryListItem) => ({
       ...item,
-      dateOfOperation: dayjs(item.createdAt).format('YYYY-MM-DD'),
-      typeOfOperation: transactionHistoryMotiveMap[item.motive as TransactionHistoryMotive].label,
+      createdAt: dayjs(item.createdAt).format('YYYY-MM-DD'),
+      motive: transactionHistoryMotiveMap[item.motive as TransactionHistoryMotive].label,
     })),
   )
   
