@@ -210,7 +210,7 @@ import CustomIcons from '@/components/ui/custom-icons/CustomIcons.vue'
 export interface DataItem {
   [key: string]: any
 }
-interface SearchSelectItem {
+export interface SearchSelectItem {
   value: string
   text: string
 }

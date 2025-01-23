@@ -128,10 +128,12 @@
         />
       </div>
       <CustomPagination
+        v-if="data"
         v-model:page="page"
         class="mt-5 mb-[19px]"
-        :total="1"
-        :limit="1"
+        :total="data.count"
+        :limit="data.limit"
+        @page-change="refresh"
       />
     </div>
   </ContentLayout>
@@ -139,6 +141,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import dayjs from 'dayjs'
+import { da } from 'date-fns/locale'
 import CustomTable from '~/components/ui/custom-table/CustomTable.vue'
 import CustomChip from '~/components/ui/custom-chip/CustomChip.vue'
 import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue'
