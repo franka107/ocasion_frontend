@@ -3,11 +3,25 @@
     <div class="w-full flex flex-col">
       <Card>
         <CardContent>
+          <LoadingScreen
+            v-if="
+              invoiceTableMvi.store.value.kind === InvoiceTableStoreKind.Loading
+            "
+            class="pt-6"
+          />
+
           <CustomTable
+            v-if="
+              invoiceTableMvi.store.value.kind === InvoiceTableStoreKind.Success
+            "
             :data="paginatedInvoices.data.value.data"
             class="mb-4"
             :header="invoiceTableMvi.tableHeaders"
-            :search="invoiceTableMvi.tableSearch"
+            :search="
+              invoiceTableMvi.tableSearch(
+                invoiceTableMvi.store.value.organizationList,
+              )
+            "
             @on-sort="invoiceTableMvi.onSort"
             @on-search="invoiceTableMvi.onSearch"
           >
@@ -49,7 +63,10 @@
         </CardContent>
       </Card>
       <CustomPagination
-        v-if="paginatedInvoices.data.value.data"
+        v-if="
+          invoiceTableMvi.store.value.kind === InvoiceTableStoreKind.Success &&
+          paginatedInvoices.data.value.data
+        "
         v-model:page="invoiceTableMvi.page.value"
         class="mt-5 mb-[19px]"
         :total="paginatedInvoices.data.value.count"
@@ -62,16 +79,20 @@
 
 <script setup lang="ts">
 import CardContent from '../ui/card/CardContent.vue'
-import { useInvoiceTableMvi } from './useInvoiceTable'
+import { InvoiceTableStoreKind, useInvoiceTableMvi } from './useInvoiceTable'
 import DateLabel from '~/design-system/ui/data-label/DateLabel.vue'
 import Card from '~/design-system/ui/card/Card.vue'
 import OfferLabel from '~/design-system/ui/offer-label/OfferLabel.vue'
 import EventLabel from '~/design-system/ui/event-label/EventLabel.vue'
 import { goodType } from '~/constants/events'
 import MoneyLabel from '~/design-system/ui/money-label/MoneyLabel.vue'
+import LoadingScreen from '~/design-system/ui/loading/LoadingScreen.vue'
 
 const invoiceTableMvi = useInvoiceTableMvi()
 const { landingUrl } = useRuntimeConfig().public
 
+onMounted(() => {
+  invoiceTableMvi.onMounted()
+})
 const paginatedInvoices = await invoiceTableMvi.viewPaginatedInvoices()
 </script>
