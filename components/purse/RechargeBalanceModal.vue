@@ -29,11 +29,14 @@ const formSchema = toTypedSchema(
       .number()
       .min(10, 'El monto debe ser al menos 10.00.')
       .max(1000, 'El monto no puede exceder 1,000.00.'),
-    currency: z.string().min(1, 'Seleccione una moneda.'),
+    currency: z.string().default('USD'),
     attachedFiles: z
       .array(z.any())
       .min(1, 'Debe subir al menos un archivo')
       .max(3, 'Puede subir un máximo de 3 archivos'),
+    termsAndConditions: z
+      .boolean()
+      .refine((val) => val === true, 'Debe aceptar los términos y condiciones'),
   }),
 )
 const form = useForm({
@@ -76,6 +79,20 @@ const onSubmit = form.handleSubmit((values) => {
     },
   })
 })
+
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    if (newValue) {
+      form.resetForm({
+        values: {
+          currency: 'USD',
+          transferedAt: dayjs(new Date()).format('YYYY-MM-DD'),
+        },
+      })
+    }
+  },
+)
 </script>
 
 <template>
@@ -163,11 +180,11 @@ const onSubmit = form.handleSubmit((values) => {
                   v-bind="componentField"
                   type="text"
                   :disabled="true"
-                  placeholder="Moneda"
                   static-label
-                  default-value="USD"
+                  value="USD"
                   readonly
                   label="Moneda"
+                  v-model="form.values.currency"
                 />
               </FormControl>
               <FormMessage />

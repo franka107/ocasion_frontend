@@ -77,7 +77,7 @@ export const transactionHistoryMotiveMap: Record<
   { label: string }
 > = {
   [TransactionHistoryMotive.WalletTopUp]: {
-    label: 'Recarga de monedero',
+    label: 'Recarga de saldo',
   },
   [TransactionHistoryMotive.PenaltyDischarge]: {
     label: 'Cobro de penalidad',

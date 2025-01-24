@@ -154,4 +154,5 @@ const transactionHistoryData = computed(
       currency: transactionHistoryCurrencyMap[item.currency]?.label,
     })) || [],
 )
+
 </script>
