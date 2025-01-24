@@ -37,15 +37,18 @@ export type InvoiceTableStoreRoot = (
 
 export const useInvoiceTableMvi = async () => {
   const page = ref(1)
-  const limit = ref(10)
-  const sortOptions = ref(`[]`)
-  const filterOptions = ref(`[]`)
+  const limit = ref(5)
+  const filterOptions = ref<FilterOption[]>([])
+  const sortOptions = ref<SortOption[]>([])
   const billingManagementService = useBillingManagementService()
   const organizationManagementService = useOrganization()
   const goodTypeOptions = Object.keys(goodTypeRecord).map((key) => ({
     text: goodTypeRecord[key as GoodType].label,
     value: key,
   }))
+
+  const filterOptionsRaw = computed(() => JSON.stringify(filterOptions.value))
+  const sortOptionsRaw = computed(() => JSON.stringify(sortOptions.value))
 
   const store = ref<InvoiceTableStoreRoot>({
     kind: InvoiceTableStoreKind.Loading,
@@ -70,12 +73,13 @@ export const useInvoiceTableMvi = async () => {
   }
 
   const onSort = (sortObject: SortOption[]) => {
-    consola.info(`sortObject ${sortObject}`)
-    sortOptions.value = JSON.stringify(sortObject)
+    consola.info(`sortObject ${JSON.stringify(sortObject)}`)
+
+    sortOptions.value = sortObject
   }
 
   const onSearch = (item: { [key: string]: string }) => {
-    filterOptions.value = JSON.stringify([
+    filterOptions.value = [
       { field: 'quickSearch', type: 'like', value: item.quickSearch || '' },
       {
         field: 'event.goodType',
@@ -87,61 +91,69 @@ export const useInvoiceTableMvi = async () => {
         type: 'equal',
         value: item.organizationId || '',
       },
-    ])
+    ]
   }
 
   const tableHeaders: HeaderItem[] = [
     {
       key: 'offerEndTime',
+      realKey: 'offer.endTime',
       label: 'F. de cierre de oferta',
       sortable: true,
       align: 'center',
     },
     {
       key: 'paymentCreatedAt',
+      realKey: 'payment.createdAt',
       sortable: true,
       label: 'F. de pago',
       align: 'center',
     },
     {
       key: 'offerLabel',
+      realKey: 'offer.title',
       sortable: true,
       label: 'Oferta',
       align: 'center',
     },
     {
       key: 'eventLabel',
+      realKey: 'event.name',
       sortable: true,
       label: 'Evento',
       align: 'center',
     },
     {
       key: 'organization.name',
+      realKey: 'organization.name',
       sortable: true,
       label: 'Organización',
       align: 'center',
     },
     {
       key: 'eventGoodType',
+      realKey: 'event.goodType',
       sortable: true,
       label: 'Tipo de activo',
       align: 'center',
     },
     {
       key: 'bidAmount',
+      realKey: 'bid.amount',
       sortable: true,
       label: 'Valor de la puja',
       align: 'center',
     },
     {
       key: 'paymentComissionAmount',
+      realKey: 'payment.comissionAmount',
       sortable: true,
       label: 'Comisión',
       align: 'center',
     },
     {
       key: 'invoiceFile',
-      sortable: true,
+      sortable: false,
       label: 'Recibo/Boleta',
       align: 'center',
     },
@@ -178,8 +190,8 @@ export const useInvoiceTableMvi = async () => {
   const paginatedInvoices =
     await billingManagementService.viewPaginatedInvoices({
       limit,
-      filterOptions,
-      sortOptions,
+      filterOptions: filterOptionsRaw,
+      sortOptions: sortOptionsRaw,
       page,
     })
 
