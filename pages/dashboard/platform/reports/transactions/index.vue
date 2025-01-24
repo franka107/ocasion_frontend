@@ -52,13 +52,13 @@
             <template #livelihood="{ row }">
               <div class="flex items-center justify-center">
               <component
-                :is="row.sustentationFile?.path ? 'a' : 'NuxtLink'"
-                :href="row.sustentationFile?.path || '/fallback-route'"
+                :is="row.rechargeRequest?.sustentationFile?.path ? 'a' : 'NuxtLink'"
+                :href="row.rechargeRequest?.sustentationFile?.path || '/fallback-route'"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="flex items-center justify-center"
               >
-                <CustomIcons v-if="row.sustentationFile?.path" name="Doc-Loupe" />
+                <CustomIcons v-if="row.rechargeRequest?.sustentationFile?.path" name="Doc-Loupe" />
                 <span v-else>-</span>
               </component>
               </div>
@@ -123,5 +123,6 @@ const parsedTransactionHistoryList = computed(() => transactionHistoryList.data.
     }
   })
 )
+
 </script>
   

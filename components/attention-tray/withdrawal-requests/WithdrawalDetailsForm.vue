@@ -61,7 +61,6 @@ if (props.id) {
       id: props.id,
     },
   } as any)
-  console.log(data.value)
   form.setValues(data.value)
 }
 
