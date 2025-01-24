@@ -14,7 +14,7 @@
             v-if="
               invoiceTableMvi.store.value.kind === InvoiceTableStoreKind.Success
             "
-            :data="paginatedInvoices.data.value.data"
+            :data="invoiceTableMvi.paginatedInvoices.data.value.data"
             class="mb-4"
             :header="invoiceTableMvi.tableHeaders"
             :search="
@@ -65,13 +65,13 @@
       <CustomPagination
         v-if="
           invoiceTableMvi.store.value.kind === InvoiceTableStoreKind.Success &&
-          paginatedInvoices.data.value.data
+          invoiceTableMvi.paginatedInvoices.data.value.data
         "
         v-model:page="invoiceTableMvi.page.value"
         class="mt-5 mb-[19px]"
-        :total="paginatedInvoices.data.value.count"
-        :limit="paginatedInvoices.data.value.limit"
-        @page-change="paginatedInvoices.refresh"
+        :total="invoiceTableMvi.paginatedInvoices.data.value.count"
+        :limit="invoiceTableMvi.paginatedInvoices.data.value.limit"
+        @page-change="invoiceTableMvi.paginatedInvoices.refresh"
       />
     </div>
   </section>
@@ -88,11 +88,10 @@ import { goodType } from '~/constants/events'
 import MoneyLabel from '~/design-system/ui/money-label/MoneyLabel.vue'
 import LoadingScreen from '~/design-system/ui/loading/LoadingScreen.vue'
 
-const invoiceTableMvi = useInvoiceTableMvi()
+const invoiceTableMvi = await useInvoiceTableMvi()
 const { landingUrl } = useRuntimeConfig().public
 
 onMounted(() => {
   invoiceTableMvi.onMounted()
 })
-const paginatedInvoices = await invoiceTableMvi.viewPaginatedInvoices()
 </script>

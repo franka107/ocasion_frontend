@@ -1,5 +1,9 @@
 // vars
-@import 'variables';
+//@import 'variables';
+@use 'variables' as *;
+// components
+//@import 'animations/transitions';
+@use 'animations/transitions' as *;
 
 // components
 // component::scrollbar
@@ -33,6 +37,3 @@ html.dark {
     background-color: theme('colors.slate.400');
   }
 }
-
-// components
-@import 'animations/transitions';

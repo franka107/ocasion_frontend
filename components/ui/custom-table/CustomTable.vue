@@ -205,6 +205,7 @@
 </template>
 <script setup lang="ts">
 import { cva } from 'class-variance-authority'
+import consola from 'consola'
 import CustomIcons from '@/components/ui/custom-icons/CustomIcons.vue'
 
 export interface DataItem {
@@ -231,6 +232,7 @@ export interface HeaderItem {
   sortable?: boolean
   align?: 'center' | 'left' | 'right' | undefined
   search?: SearchItem
+  realKey?: string
 }
 interface Props {
   data: DataItem[]
@@ -348,22 +350,24 @@ const {
 const sortStates = reactive<{ [key: string]: string | undefined }>({})
 const sortObject = reactive<{ [key: string]: string }[]>([])
 const onSort = (item: HeaderItem) => {
-  const order = sortStates[item.key]
-  sortStates[item.key] =
+  const baseKey = item.realKey || item.key
+  consola.info('onSort', baseKey)
+  const order = sortStates[baseKey]
+  sortStates[baseKey] =
     order === undefined ? 'asc' : order === 'asc' ? 'desc' : undefined
   Object.assign(sortStates, {
-    [item.key]:
+    [baseKey]:
       order === undefined ? 'asc' : order === 'asc' ? 'desc' : undefined,
   })
-  const index = sortObject.findIndex((sortItem) => sortItem.field === item.key)
+  const index = sortObject.findIndex((sortItem) => sortItem.field === baseKey)
   if (index !== -1) {
-    if (!sortStates[item.key]) {
+    if (!sortStates[baseKey]) {
       sortObject.splice(index, 1)
     } else {
-      sortObject[index].order = String(sortStates[item.key])
+      sortObject[index].order = String(sortStates[baseKey])
     }
   } else {
-    sortObject.push({ field: item.key, order: String(sortStates[item.key]) })
+    sortObject.push({ field: baseKey, order: String(sortStates[baseKey]) })
   }
   emit('onSort', sortObject)
 }

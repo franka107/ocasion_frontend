@@ -10,7 +10,7 @@ import {
   type FilterOption,
   type SortOption,
 } from '~/composables/useNotificationAPI'
-import { goodType } from '~/constants/events'
+import { GoodType, goodType, goodTypeRecord } from '~/constants/events'
 import type { OrganizationDto } from '~/types/Organization'
 
 export enum InvoiceTableStoreKind {
@@ -35,13 +35,20 @@ export type InvoiceTableStoreRoot = (
   limit: number
 }
 
-export const useInvoiceTableMvi = () => {
+export const useInvoiceTableMvi = async () => {
   const page = ref(1)
-  const limit = ref(10)
-  const sortOptions = ref<SortOption[]>([])
+  const limit = ref(5)
   const filterOptions = ref<FilterOption[]>([])
+  const sortOptions = ref<SortOption[]>([])
   const billingManagementService = useBillingManagementService()
   const organizationManagementService = useOrganization()
+  const goodTypeOptions = Object.keys(goodTypeRecord).map((key) => ({
+    text: goodTypeRecord[key as GoodType].label,
+    value: key,
+  }))
+
+  const filterOptionsRaw = computed(() => JSON.stringify(filterOptions.value))
+  const sortOptionsRaw = computed(() => JSON.stringify(sortOptions.value))
 
   const store = ref<InvoiceTableStoreRoot>({
     kind: InvoiceTableStoreKind.Loading,
@@ -66,73 +73,87 @@ export const useInvoiceTableMvi = () => {
   }
 
   const onSort = (sortObject: SortOption[]) => {
+    consola.info(`sortObject ${JSON.stringify(sortObject)}`)
+
     sortOptions.value = sortObject
   }
 
   const onSearch = (item: { [key: string]: string }) => {
     filterOptions.value = [
-      { field: 'offer.title', type: 'like', value: item.title || '' },
+      { field: 'quickSearch', type: 'like', value: item.quickSearch || '' },
       {
         field: 'event.goodType',
         type: 'equal',
         value: item.eventGoodType || '',
       },
-      { field: 'status', type: 'equal', value: item.status || '' },
+      {
+        field: 'organization.id',
+        type: 'equal',
+        value: item.organizationId || '',
+      },
     ]
   }
 
   const tableHeaders: HeaderItem[] = [
     {
       key: 'offerEndTime',
+      realKey: 'offer.endTime',
       label: 'F. de cierre de oferta',
       sortable: true,
       align: 'center',
     },
     {
       key: 'paymentCreatedAt',
+      realKey: 'payment.createdAt',
       sortable: true,
       label: 'F. de pago',
       align: 'center',
     },
     {
       key: 'offerLabel',
+      realKey: 'offer.title',
       sortable: true,
       label: 'Oferta',
       align: 'center',
     },
     {
       key: 'eventLabel',
+      realKey: 'event.name',
       sortable: true,
       label: 'Evento',
       align: 'center',
     },
     {
       key: 'organization.name',
+      realKey: 'organization.name',
       sortable: true,
       label: 'Organización',
       align: 'center',
     },
     {
       key: 'eventGoodType',
+      realKey: 'event.goodType',
       sortable: true,
       label: 'Tipo de activo',
       align: 'center',
     },
     {
       key: 'bidAmount',
+      realKey: 'bid.amount',
       sortable: true,
       label: 'Valor de la puja',
       align: 'center',
     },
     {
       key: 'paymentComissionAmount',
+      realKey: 'payment.comissionAmount',
       sortable: true,
       label: 'Comisión',
       align: 'center',
     },
     {
       key: 'invoiceFile',
-      sortable: true,
+      sortable: false,
       label: 'Recibo/Boleta',
       align: 'center',
     },
@@ -143,23 +164,19 @@ export const useInvoiceTableMvi = () => {
       key: 'quickSearch',
       type: 'text',
       placeholder: 'T. oferta/N. de evento',
-      position: 1,
     },
     {
-      key: 'goodType',
+      key: 'eventGoodType',
       type: 'select',
       placeholder: 'Filtrar estados',
       items: [
-        ...Array.from(goodType).map(([key, value]) => ({
-          text: value,
-          value: key,
-        })),
-        { text: 'Todos', value: '' },
+        ...goodTypeOptions,
+        { text: 'Todos', value: ' ' },
       ] as SearchSelectItem[],
-      position: 2,
+      // isHidden: true,
     },
     {
-      key: 'organization.id',
+      key: 'organizationId',
       type: 'select',
       placeholder: 'Organización',
       items: organizationList.map((org) => ({
@@ -170,18 +187,16 @@ export const useInvoiceTableMvi = () => {
     },
   ]
 
-  const viewPaginatedInvoices = () => {
-    return billingManagementService.viewPaginatedInvoices({
-      limit: limit.value,
-      filterOptions: filterOptions.value,
-      sortOptions: sortOptions.value,
-      page: page.value,
+  const paginatedInvoices =
+    await billingManagementService.viewPaginatedInvoices({
+      limit,
+      filterOptions: filterOptionsRaw,
+      sortOptions: sortOptionsRaw,
+      page,
     })
-  }
 
   return {
     tableHeaders,
-    viewPaginatedInvoices,
     tableSearch,
     page,
     sortOptions,
@@ -190,5 +205,6 @@ export const useInvoiceTableMvi = () => {
     onSearch,
     store,
     onMounted,
+    paginatedInvoices,
   }
 }
