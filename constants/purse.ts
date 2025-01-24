@@ -54,13 +54,14 @@ export const transactionHistorySearch: SearchItem[] = [
       },
     ],
     elementClass: 'min-w-[250px]',
-  }
+  },
 ]
 export const transactionHistoryHeader: HeaderItem[] = [
   {
     key: 'createdAt',
     label: 'Fecha de operación',
     sortable: true,
+    align: 'center',
   },
   {
     key: 'type',
