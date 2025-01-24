@@ -5,10 +5,10 @@ const BILLING_MANAGEMENT_BASE_URL = '/billing-management'
 
 export function useBillingManagementService() {
   const viewPaginatedInvoicesForParticipant = (params: {
-    limit: number
-    filterOptions: FilterOption[]
-    sortOptions: SortOption[]
-    page: number
+    limit: Ref<number>
+    filterOptions: Ref<string>
+    sortOptions: Ref<string>
+    page: Ref<number>
   }) => {
     return useAPI(
       `${BILLING_MANAGEMENT_BASE_URL}/view-paginated-invoices-for-participant`,
@@ -16,8 +16,8 @@ export function useBillingManagementService() {
         method: 'GET',
         query: {
           limit: params.limit,
-          filterOptions: JSON.stringify(params.filterOptions),
-          sortOptions: JSON.stringify(params.sortOptions),
+          filterOptions: params.filterOptions,
+          sortOptions: params.sortOptions,
           page: params.page,
         },
         default: () => {

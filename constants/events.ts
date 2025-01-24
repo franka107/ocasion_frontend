@@ -118,6 +118,29 @@ export const eventTimes = new Map<string, string>([
   ['24', '24:00'],
   // ----
 ])
+
+export enum GoodType {
+  RealEstate = 'REAL_ESTATE', // Inmuebles
+  CarsAndMotorcycles = 'CARS_AND_MOTORCYCLES', // Autos y motos
+  TrucksAndBuses = 'TRUCKS_AND_BUSES', // Camiones y buses
+  ConstructionOrAgriculturalMachinery = 'CONSTRUCTION_AGRICULTURAL_MACHINERY', // Maquinaria de Construcción
+  ScrapMaterial = 'SCRAP_MATERIAL', // Chatarra, materiales y residuos
+  IndustrialMachineryAndEquipment = 'INDUSTRIAL_MACHINERY_AND_EQUIPMENT', // Industrial, maquinaria y equipos
+}
+
+export const goodTypeRecord: Record<GoodType, { label: string }> = {
+  [GoodType.RealEstate]: { label: 'Inmuebles' },
+  [GoodType.CarsAndMotorcycles]: { label: 'Autos y motos' },
+  [GoodType.TrucksAndBuses]: { label: 'Camiones y buses' },
+  [GoodType.ConstructionOrAgriculturalMachinery]: {
+    label: 'Maquinaria de Construcción y/o Agrícola',
+  },
+  [GoodType.ScrapMaterial]: { label: 'Chatarra, materiales y residuos' },
+  [GoodType.IndustrialMachineryAndEquipment]: {
+    label: 'Industrial, maquinaria y equipo',
+  },
+}
+
 export const goodType = new Map<string, string>([
   ['REAL_ESTATE', 'Inmuebles'],
   ['CARS_AND_MOTORCYCLES', 'Autos y motos'],

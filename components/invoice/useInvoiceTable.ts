@@ -10,7 +10,7 @@ import {
   type FilterOption,
   type SortOption,
 } from '~/composables/useNotificationAPI'
-import { goodType } from '~/constants/events'
+import { GoodType, goodType, goodTypeRecord } from '~/constants/events'
 import type { OrganizationDto } from '~/types/Organization'
 
 export enum InvoiceTableStoreKind {
@@ -35,13 +35,17 @@ export type InvoiceTableStoreRoot = (
   limit: number
 }
 
-export const useInvoiceTableMvi = () => {
+export const useInvoiceTableMvi = async () => {
   const page = ref(1)
   const limit = ref(10)
-  const sortOptions = ref<SortOption[]>([])
-  const filterOptions = ref<FilterOption[]>([])
+  const sortOptions = ref(`[]`)
+  const filterOptions = ref(`[]`)
   const billingManagementService = useBillingManagementService()
   const organizationManagementService = useOrganization()
+  const goodTypeOptions = Object.keys(goodTypeRecord).map((key) => ({
+    text: goodTypeRecord[key as GoodType].label,
+    value: key,
+  }))
 
   const store = ref<InvoiceTableStoreRoot>({
     kind: InvoiceTableStoreKind.Loading,
@@ -66,19 +70,24 @@ export const useInvoiceTableMvi = () => {
   }
 
   const onSort = (sortObject: SortOption[]) => {
-    sortOptions.value = sortObject
+    consola.info(`sortObject ${sortObject}`)
+    sortOptions.value = JSON.stringify(sortObject)
   }
 
   const onSearch = (item: { [key: string]: string }) => {
-    filterOptions.value = [
-      { field: 'offer.title', type: 'like', value: item.title || '' },
+    filterOptions.value = JSON.stringify([
+      { field: 'quickSearch', type: 'like', value: item.quickSearch || '' },
       {
         field: 'event.goodType',
         type: 'equal',
         value: item.eventGoodType || '',
       },
-      { field: 'status', type: 'equal', value: item.status || '' },
-    ]
+      {
+        field: 'organization.id',
+        type: 'equal',
+        value: item.organizationId || '',
+      },
+    ])
   }
 
   const tableHeaders: HeaderItem[] = [
@@ -143,23 +152,19 @@ export const useInvoiceTableMvi = () => {
       key: 'quickSearch',
       type: 'text',
       placeholder: 'T. oferta/N. de evento',
-      position: 1,
     },
     {
-      key: 'goodType',
+      key: 'eventGoodType',
       type: 'select',
       placeholder: 'Filtrar estados',
       items: [
-        ...Array.from(goodType).map(([key, value]) => ({
-          text: value,
-          value: key,
-        })),
-        { text: 'Todos', value: '' },
+        ...goodTypeOptions,
+        { text: 'Todos', value: ' ' },
       ] as SearchSelectItem[],
-      position: 2,
+      // isHidden: true,
     },
     {
-      key: 'organization.id',
+      key: 'organizationId',
       type: 'select',
       placeholder: 'Organización',
       items: organizationList.map((org) => ({
@@ -170,18 +175,16 @@ export const useInvoiceTableMvi = () => {
     },
   ]
 
-  const viewPaginatedInvoices = () => {
-    return billingManagementService.viewPaginatedInvoices({
-      limit: limit.value,
-      filterOptions: filterOptions.value,
-      sortOptions: sortOptions.value,
-      page: page.value,
+  const paginatedInvoices =
+    await billingManagementService.viewPaginatedInvoices({
+      limit,
+      filterOptions,
+      sortOptions,
+      page,
     })
-  }
 
   return {
     tableHeaders,
-    viewPaginatedInvoices,
     tableSearch,
     page,
     sortOptions,
@@ -190,5 +193,6 @@ export const useInvoiceTableMvi = () => {
     onSearch,
     store,
     onMounted,
+    paginatedInvoices,
   }
 }
