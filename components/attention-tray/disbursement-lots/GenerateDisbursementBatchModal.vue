@@ -2,6 +2,7 @@
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import { z } from 'zod'
+import { getLocalTimeZone, parseAbsolute } from '@internationalized/date'
 import {
   AlertDialog,
   AlertDialogContent,
@@ -17,8 +18,23 @@ import {
   paymentMediumType,
 } from '@/constants/attention-tray'
 import MoneyLabel from '~/design-system/ui/money-label/MoneyLabel.vue'
-const { generatelPreviewDisbursement, generatelDisbursement } =
-  useDisbursement()
+import { Bank } from '~/types/Disbursement'
+const {
+  generatelPreviewDisbursement,
+  generatelDisbursement,
+  viewAvailableBankAccounts,
+} = useDisbursement()
+
+const availableBankAccounts = ref<string[]>([])
+
+const handleBankChange = async (bank: string) => {
+  const viewAvailableBankAccountsResponse = await viewAvailableBankAccounts(
+    bank as Bank,
+  )
+  availableBankAccounts.value = viewAvailableBankAccountsResponse?.data
+    .value as string[]
+}
+
 const emit = defineEmits(['update:modelValue'])
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const props = defineProps<{
@@ -63,7 +79,13 @@ const detailPreviewInfo = ref<DetailPreviewInfo>({})
 const formSchema = toTypedSchema(
   z.object({
     paymentMethod: z.string().min(1, 'Seleccione una forma de pago.'),
+
     bank: z.string().min(1, 'Seleccione un banco'),
+
+    disbursedAt: z
+      .string()
+      .nonempty('La fecha de desembolso es requerida')
+      .optional(),
     currency: z.string().min(1, 'Seleccione una moneda.'),
     chargeAccount: z
       .string()
@@ -74,6 +96,7 @@ const formSchema = toTypedSchema(
 const form = useForm({
   validationSchema: formSchema,
 })
+
 const onSubmit = form.handleSubmit((values) => {
   const { paymentMethod, bank, currency, chargeAccount, paymentMedium } = values
   console.log('Formulario enviado con los valores:', values)
@@ -91,6 +114,7 @@ const handlePreview = async (values: any) => {
   const valuesToSend = {
     bank: values.bank,
     chargeAccount: values.chargeAccount,
+    disbursedAt: values.disbursedAt,
   }
   const { status, error, data }: any =
     await generatelPreviewDisbursement(valuesToSend)
@@ -191,6 +215,11 @@ const handleSubmit = async () => {
                   v-bind="componentField"
                   :items="banksOptions"
                   placeholder="Banco"
+                  @update:model-value="
+                    (value) => {
+                      handleBankChange(value)
+                    }
+                  "
                 />
               </FormControl>
               <FormMessage />
@@ -210,14 +239,33 @@ const handleSubmit = async () => {
             </FormItem>
           </FormField>
           <!-- Cuenta cargo -->
+          <!-- <FormField v-slot="{ componentField }" name="chargeAccount"> -->
+          <!--   <FormItem> -->
+          <!--     <FormControl> -->
+          <!--       <CustomInput -->
+          <!--         v-bind="componentField" -->
+          <!--         type="text" -->
+          <!--         placeholder="0000 0000 0000 0000" -->
+          <!--         label="Cuenta cargo" -->
+          <!--       /> -->
+          <!--     </FormControl> -->
+          <!--     <FormMessage /> -->
+          <!--   </FormItem> -->
+          <!-- </FormField> -->
+
           <FormField v-slot="{ componentField }" name="chargeAccount">
-            <FormItem>
+            <FormItem class="">
               <FormControl>
-                <CustomInput
+                <CustomSelect
                   v-bind="componentField"
-                  type="text"
-                  placeholder="0000 0000 0000 0000"
-                  label="Cuenta cargo"
+                  :disabled="!form.values.bank"
+                  :items="
+                    availableBankAccounts.map((e) => ({
+                      id: e,
+                      name: e,
+                    })) || []
+                  "
+                  placeholder="Cuenta cargo"
                 />
               </FormControl>
               <FormMessage />
@@ -227,11 +275,30 @@ const handleSubmit = async () => {
           <FormField v-slot="{ componentField }" name="paymentMedium">
             <FormItem>
               <FormControl>
-                <CustomSelect
-                  v-bind="componentField"
-                  :items="paymentMediumOptions"
-                  placeholder="Medio de pago"
+                <div class="mt-[6px]">
+                  <CustomSelect
+                    v-bind="componentField"
+                    :items="paymentMediumOptions"
+                    placeholder="Medio de pago"
+                  />
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="disbursedAt">
+            <FormItem>
+              <FormControl>
+                <DateInput
+                  label="Fecha de desembolso"
+                  :value="componentField.modelValue"
+                  :min-value="
+                    parseAbsolute(new Date().toISOString(), getLocalTimeZone())
+                  "
+                  @update:model-value="componentField.onChange"
                 />
+                <!-- <CustomInput staticLabel type="date" label="Fecha de desembolso" v-bind="componentField" /> -->
               </FormControl>
               <FormMessage />
             </FormItem>

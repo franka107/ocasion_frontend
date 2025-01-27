@@ -286,7 +286,7 @@ export const disbursementHeader: HeaderItem[] = [
     label: 'Cod lote',
   },
   {
-    key: 'withdrawalRequestCount',
+    key: 'retireRequestsCount',
     label: 'Cant. solicitud retiro',
   },
   {

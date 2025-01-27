@@ -1,5 +1,5 @@
-import type { DisbursementLot } from '~/types/Disbursement'
 import dayjs from 'dayjs'
+import type { Bank, DisbursementLot } from '~/types/Disbursement'
 const BASE_DIS_URL = '/finance/disbursement-management'
 
 export function useDisbursement() {
@@ -43,7 +43,7 @@ export function useDisbursement() {
   const confirmDisbursement = async (values: {
     id: string
     paymentSupportFile: {}
-    disbursedAt: {}
+    // disbursedAt: {}
   }) => {
     const { status, error } = await useAPI(
       `${BASE_DIS_URL}/confirm-disbursement-lot`,
@@ -64,6 +64,24 @@ export function useDisbursement() {
     )
     return { data, status, error }
   }
+
+  const viewAvailableBankAccounts = async (bank: Bank) => {
+    try {
+      const response = await useAPI(
+        `${BASE_DIS_URL}/view-available-bank-accounts`,
+        {
+          default: () => [],
+          query: {
+            bank,
+          },
+        },
+      )
+      return response
+    } catch (error) {
+      console.error('Error al cargar cuentas disponibles:', error)
+    }
+  }
+
   const generatelDisbursement = async (values: any) => {
     const { status, error } = await useAPI(
       `${BASE_DIS_URL}/generate-disbursement-lot`,
@@ -136,5 +154,6 @@ export function useDisbursement() {
     generatelPreviewDisbursement,
     generatelDisbursement,
     handleExport,
+    viewAvailableBankAccounts,
   }
 }

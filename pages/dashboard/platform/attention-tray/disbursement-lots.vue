@@ -66,15 +66,15 @@
           </template>
           <template #archive="{ row }">
             <div class="flex items-center justify-center">
-              <NuxtLink
+              <Button
                 v-if="row.voucherGeneratedFile?.path"
-                :to="row.voucherGeneratedFile.path"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="flex items-center justify-center"
+                class="flex items-center justify-center rounded-full"
+                variant="outline"
+                size="icon"
+                @click="downloadFile(row.voucherGeneratedFile)"
               >
                 <CustomIcons name="Doc-Loupe" />
-              </NuxtLink>
+              </Button>
               <span v-else>-</span>
             </div>
           </template>
@@ -124,7 +124,11 @@ import CustomTable, {
 import CustomChip from '~/components/ui/custom-chip/CustomChip.vue'
 import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue'
 import CustomPagination from '~/components/ui/custom-pagination/CustomPagination.vue'
-import type { IGenerateForm, DisbursementLot } from '~/types/Disbursement'
+import type {
+  IGenerateForm,
+  DisbursementLot,
+  FileType,
+} from '~/types/Disbursement'
 import {
   disbursementStatus,
   disbursementHeader,
@@ -161,6 +165,32 @@ const initialSearchValues: SearchValues = {}
 
 if (route.query.disbursementLotId) {
   initialSearchValues.id = route.query.disbursementLotId as string
+}
+
+async function downloadFile(file: FileType) {
+  try {
+    // Realiza la solicitud al servidor para obtener el archivo
+    const response = await fetch(file.path)
+    if (!response.ok) {
+      throw new Error(`Error al descargar el archivo: ${response.statusText}`)
+    }
+
+    // Convierte la respuesta a un blob
+    const blob = await response.blob()
+
+    // Crea un enlace para descargar el blob
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.download = file.name
+    document.body.appendChild(link)
+    link.click()
+
+    // Limpia el objeto URL y elimina el enlace
+    URL.revokeObjectURL(link.href)
+    document.body.removeChild(link)
+  } catch (error) {
+    console.error('Error al descargar el archivo:', error)
+  }
 }
 
 const openWithdrawalDetails = (row: any) => {

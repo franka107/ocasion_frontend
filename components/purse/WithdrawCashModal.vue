@@ -21,7 +21,7 @@ const formSchema = toTypedSchema(
       .number()
       .min(10, 'El monto debe ser al menos 10.00.')
       .max(1000, 'El monto no puede exceder 1,000.00.'),
-    currency: z.string().default("USD"),
+    currency: z.string().default('USD'),
     bank: z.string().min(1, 'Seleccione un banco.'),
     accountType: z.string().min(1, 'Seleccione un tipo de cuenta.'),
     destinationAccount: z
@@ -29,8 +29,8 @@ const formSchema = toTypedSchema(
       .regex(/^\d{10,20}$/, 'Ingrese un número de cuenta válido.'),
     destinationCCI: z
       .string()
-      .regex(/^\d+$/, "El CCI debe contener solo números.")
-      .length(20, "El CCI debe tener exactamente 20 dígitos."),
+      .regex(/^\d+$/, 'El CCI debe contener solo números.')
+      .length(20, 'El CCI debe tener exactamente 20 dígitos.'),
     acceptedTermsAndConditions: z
       .boolean()
       .refine((val) => val === true, 'Debe aceptar los términos y condiciones'),
@@ -40,9 +40,8 @@ const form = useForm({
   validationSchema: formSchema,
   initialValues: {
     currency: 'USD',
-  }
+  },
 })
-
 
 const { requestWithdrawal } = useWithdrawalRequests()
 const onSubmit = form.handleSubmit((values) => {
@@ -52,7 +51,7 @@ const onSubmit = form.handleSubmit((values) => {
     title: 'Solicitud de retiro',
     message: '¿Estás seguro de que deseas realizar una solicitud de retiro?',
     callback: async () => {
-      const { status, error }: any = await  requestWithdrawal(values)
+      const { status, error }: any = await requestWithdrawal(values)
 
       emit('update:modelValue', false) // Cierra el modal al enviar.
       if (status.value === 'success') {
@@ -75,8 +74,6 @@ const onSubmit = form.handleSubmit((values) => {
       }
     },
   })
-  
-
 })
 </script>
 
@@ -132,7 +129,7 @@ const onSubmit = form.handleSubmit((values) => {
                 <CustomInput
                   v-bind="componentField"
                   type="text"
-                  :disabled=true
+                  :disabled="true"
                   placeholder="Moneda"
                   static-label
                   default-value="USD"
@@ -202,7 +199,7 @@ const onSubmit = form.handleSubmit((values) => {
                   type="text"
                   placeholder="Ingrese número"
                   static-label
-                  label="Cuenta destino (CCI)"
+                  label="Cuenta daaestino (CCI)"
                 />
               </FormControl>
               <FormMessage />
@@ -230,7 +227,8 @@ const onSubmit = form.handleSubmit((values) => {
                   <a
                     target="_blank"
                     class="font-[600] text-[#F97316] hover:underline"
-                    :href="`${landingUrl}/terms-and-conditions`">
+                    :href="`${landingUrl}/terms-and-conditions`"
+                  >
                     terminos y condiciones
                   </a>
                 </label>
