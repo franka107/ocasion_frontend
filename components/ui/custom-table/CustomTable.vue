@@ -211,6 +211,7 @@ import CustomIcons from '@/components/ui/custom-icons/CustomIcons.vue'
 export interface DataItem {
   [key: string]: any
 }
+export type SearchValues = { [key: string]: string | string[] | undefined }
 export interface SearchSelectItem {
   value: string
   text: string
@@ -243,12 +244,15 @@ interface Props {
   showMoreButton?: boolean
   class?: string | object
   bgClass?: string
+  searchValues?: SearchValues
 }
+
 const props = withDefaults(defineProps<Props>(), {
   multipleSelect: false,
   showMoreButton: false,
   multipleSelectKey: 'id',
   class: '',
+  searchValues: {},
 })
 const { search } = toRefs(props)
 
@@ -265,15 +269,14 @@ const getNestedProperty = (obj: any, key: string) => {
   return key.split('.').reduce((acc, part) => acc && acc[part], obj)
 }
 
-const searchValues = reactive<{ [key: string]: string | string[] | undefined }>(
-  {},
-)
+const searchValues = reactive<SearchValues>(props.searchValues)
+
 watch(
   () => searchValues,
   (value) => {
     emit('onSearch', value)
   },
-  { deep: true },
+  { deep: true, immediate: true },
 )
 
 const useMultipleSelect = () => {

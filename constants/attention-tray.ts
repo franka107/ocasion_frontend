@@ -242,7 +242,7 @@ export const accountHeader: HeaderItem[] = [
 export const withdrawalRequeststHeader: HeaderItem[] = [
   {
     key: 'id',
-    label: 'N° Transación',
+    label: 'N° Transacción',
   },
   {
     key: 'createdAt',
@@ -268,6 +268,10 @@ export const withdrawalRequeststHeader: HeaderItem[] = [
   {
     key: 'status',
     label: 'Estado',
+  },
+  {
+    key: 'disbursementLot',
+    label: 'Lote de desembolso',
   },
   {
     key: 'actions',

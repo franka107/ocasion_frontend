@@ -64,9 +64,24 @@
               </DropdownMenu>
             </div>
           </template>
+          <template #disbursementLot="{ row }">
+            <div class="flex items-center justify-center">
+              <NuxtLink
+                v-if="row.disbursementLot"
+                :to="`/dashboard/platform/attention-tray/disbursement-lots?disbursementLotId=${row.disbursementLot.id}`"
+              >
+                <Button variant="ghost" class="border rounded-full" size="icon">
+                  <Package class="" />
+                </Button>
+              </NuxtLink>
+              <div v-else>
+                <span>-</span>
+              </div>
+            </div>
+          </template>
           <template #livelihood="{ row }">
             <div class="flex items-center justify-center" @click="">
-              <CustomIcons name="Doc-Loupe" />
+              <Layers />
             </div>
           </template>
           <template #status="{ row }">
@@ -142,6 +157,7 @@
 import { ref } from 'vue'
 import dayjs from 'dayjs'
 import { da } from 'date-fns/locale'
+import { Package } from 'lucide-vue-next'
 import CustomTable from '~/components/ui/custom-table/CustomTable.vue'
 import CustomChip from '~/components/ui/custom-chip/CustomChip.vue'
 import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue'
