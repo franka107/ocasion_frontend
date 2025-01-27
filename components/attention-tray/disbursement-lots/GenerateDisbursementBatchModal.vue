@@ -16,6 +16,7 @@ import {
   currencyType,
   paymentMediumType,
 } from '@/constants/attention-tray'
+import MoneyLabel from '~/design-system/ui/money-label/MoneyLabel.vue'
 const { generatelPreviewDisbursement, generatelDisbursement } =
   useDisbursement()
 const emit = defineEmits(['update:modelValue'])
@@ -29,7 +30,6 @@ const props = defineProps<{
   refreshTable: () => void
 }>()
 interface DetailPreviewInfo {
-  id?: string
   retireRequestsCount?: number
   sumOfAmountToBeDisbursed?: number
   bank?: string
@@ -112,8 +112,6 @@ const handlePreview = async (values: any) => {
 const handleSubmit = async () => {
   const valuesToSend = {
     ...form.values,
-    id: detailPreviewInfo.value.id,
-    // QUACK
     batchRetireRequests: props.retireRequests,
   }
   openConfirmModal({
@@ -270,29 +268,27 @@ const handleSubmit = async () => {
           </p>
         </div>
         <div class="flex flex-col items-left px-6 pb-[32px]">
+          <div class="flex font-[500] text-[14px]"></div>
           <div class="flex font-[500] text-[14px]">
-            <h3 class="text-[#225B82]">Cod Lote:</h3>
-            <p class="text-[#68686C]">{{ detailPreviewInfo.id }}</p>
-          </div>
-          <div class="flex font-[500] text-[14px]">
-            <h3 class="text-[#225B82]">N° solicitudes:</h3>
-            <p class="text-[#68686C]">
+            <h3 class="text-[#225B82] pr-2">N° solicitudes:</h3>
+            <p class="">
               {{ detailPreviewInfo.retireRequestsCount }}
             </p>
           </div>
           <div class="flex font-[500] text-[14px]">
-            <h3 class="text-[#225B82]">Suma de monto a desembolsar:</h3>
-            <p class="text-[#68686C]">
-              {{ detailPreviewInfo.sumOfAmountToBeDisbursed }}
-            </p>
+            <h3 class="text-[#225B82] pr-1">Suma de monto a desembolsar:</h3>
+            <MoneyLabel
+              class="p-0 w-auto text-[#68686C]"
+              :amount="detailPreviewInfo.sumOfAmountToBeDisbursed || 0"
+            />
           </div>
           <div class="flex font-[500] text-[14px]">
-            <h3 class="text-[#225B82]">Banco de origen:</h3>
-            <p class="text-[#68686C]">{{ detailPreviewInfo.bank }}</p>
+            <h3 class="text-[#225B82] pr-1">Banco de origen:</h3>
+            <p class="">{{ detailPreviewInfo.bank }}</p>
           </div>
           <div class="flex font-[500] text-[14px]">
-            <h3 class="text-[#225B82]">Cuenta de origen:</h3>
-            <p class="text-[#68686C]">{{ detailPreviewInfo.chargeAccount }}</p>
+            <h3 class="text-[#225B82] pr-1">Cuenta de origen:</h3>
+            <p class="">{{ detailPreviewInfo.chargeAccount }}</p>
           </div>
         </div>
         <AlertDialogFooter class="px-6">

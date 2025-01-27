@@ -28,7 +28,14 @@ const isNegative = computed(() => props.amount < 0)
 </script>
 
 <template>
-  <div class="flex justify-end items-center py-2 px-3 w-full max-w-[120px]">
+  <div
+    :class="
+      cn(
+        'flex justify-end items-center py-2 px-3 w-full max-w-[120px]',
+        $attrs.class as string,
+      )
+    "
+  >
     <span
       :class="[
         'text-sm font-medium tabular-nums',

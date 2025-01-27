@@ -48,7 +48,7 @@ export function useOfferAPI() {
 
   const getOffer = async (id: number | string) => {
     const { status, error, data } = await useAPI<OfferDto>(
-      `${OFFER_BASE_URL}/get-offer-detail`,
+      `${OFFER_BASE_URL}/view-offer-detail-for-platform`,
       {
         method: 'GET',
         query: {

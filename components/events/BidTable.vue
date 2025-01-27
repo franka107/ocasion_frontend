@@ -304,10 +304,14 @@ const handleAddBid = async (values: { type: string; ids: string[] }) => {
     title: 'Aceptar puja',
     message: `¿Está seguro de aceptar la(s) puja(s) seleccionada(s)?`,
     callback: async () => {
-      const { status, error } = await acceptOfferBids({
+      const acceptOfferBidsOptions: any = {
         ...values,
         eventId: String(route.params.eventId),
-      })
+      }
+      if (!props.offerId) {
+        acceptOfferBidsOptions.onlyWinners = true
+      }
+      const { status, error } = await acceptOfferBids(acceptOfferBidsOptions)
 
       if (status.value === 'success') {
         refresh()
