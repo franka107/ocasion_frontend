@@ -59,10 +59,22 @@
             ></CustomChip>
           </template>
 
-          <template #voucher>
-            <Button variant="ghost">
+          <template #voucher="{ row }">
+            <div class="flex items-center justify-center">
+              <NuxtLink
+                v-if="row.rechargeRequest?.voucherGeneratedFile?.path"
+                :to="row.rechargeRequest?.voucherGeneratedFile?.path"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center justify-center"
+              >
+                <CustomIcons name="Doc-Loupe" />
+              </NuxtLink>
+              <span v-else>-</span>
+            </div>
+            <!-- <Button variant="ghost">
               <CustomIcons name="fileSearch" class="w-6 h-6 text-primary" />
-            </Button>
+            </Button> -->
           </template>
         </CustomTable>
       </div>
