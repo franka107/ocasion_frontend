@@ -60,8 +60,8 @@
           @interact-outside="(e) => e.preventDefault()"
         >
           <AccountDetailsForm
-            v-model="openAccountDetailModal"
             :id="accountId"
+            v-model="openAccountDetailModal"
             :on-authorize="handleApproval"
             :on-reject="handleOpenRejectModal"
             @on-reject="handleOpenRejectModal"
@@ -72,7 +72,7 @@
           v-model="openRejectModal"
           :refresh-table="refresh"
           @update:model-value="openRejectModal = false"
-        /> 
+        />
       </div>
       <CustomPagination
         v-model:page="page"
@@ -85,6 +85,7 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
+import dayjs from 'dayjs'
 import CustomTable from '~/components/ui/custom-table/CustomTable.vue'
 import CustomChip from '~/components/ui/custom-chip/CustomChip.vue'
 import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue'
@@ -99,31 +100,33 @@ import {
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
 import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
 import AccountDetailsForm from '~/components/attention-tray/account-validation/AccountDetailsForm.vue'
-import dayjs from 'dayjs'
 import { useAccountValidation } from '@/composables/useAccountValidation'
 import type { IAccountLItem } from '~/types/Account'
 import type { IDataResponse } from '~/types/Common'
 const openRejectModal = ref(false)
 const {
-    page,
-    onSort,
-    onSearch,
-    filterOptions,
-    sortOptions,
-    approvalAccountBank,
-  } = useAccountValidation()
+  page,
+  onSort,
+  onSearch,
+  filterOptions,
+  sortOptions,
+  approvalAccountBank,
+} = useAccountValidation()
 const accountId = ref<number | undefined>(undefined)
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 
 const BASE_VAL_URL = '/finance/account-validation'
-const {  data, refresh } = await useAPI<IDataResponse<IAccountLItem>>(() => `${BASE_VAL_URL}/view-paginated-account-validations`, {
-  query: {
-    limit: 8,
-    page,
-    filterOptions,
-    sortOptions,
-  },
-} as any)
+const { data, refresh } = await useAPI<IDataResponse<IAccountLItem>>(
+  () => `${BASE_VAL_URL}/view-paginated-account-validations`,
+  {
+    query: {
+      limit: 8,
+      page,
+      filterOptions,
+      sortOptions,
+    },
+  } as any,
+)
 
 const accountData = computed(() =>
   data.value?.data.map((item: IAccountLItem) => ({
@@ -136,52 +139,52 @@ const accountData = computed(() =>
 const openAccountDetailsModal = ref(false)
 const openAccountDetailModal = ref(false)
 const openAccountDetail = (row: any) => {
-  const accountDetailId = row.id;
-  if (accountId) {
-    accountId .value = accountDetailId;
-    console.log('Abriendo detalle del participante:', accountDetailId);
-    openAccountDetailModal.value = true;
+  const accountDetailId = row.id
+  if (accountId.value) {
+    accountId.value = accountDetailId
+    console.log('Abriendo detalle del participante:', accountDetailId)
+    openAccountDetailModal.value = true
   } else {
-    console.error('No se encontró el participante para esta fila.');
+    console.error('No se encontró el participante para esta fila.')
   }
-};
+}
 const onAccountDetailSubmit = (formData: any) => {
   console.log('Detalle de solicitud enviado:', formData)
   openAccountDetailModal.value = false
 }
 // Manejo de acciones detalle solicitud
-const handleApproval = async (values:any) => {
+const handleApproval = async (values: any) => {
   openConfirmModal({
     title: 'Autorizar recarga',
-    message: '¿Estás seguro deseas confirmar este lote de desembolso?',
+    message: '¿Estás seguro deseas confirmar esta recarga?',
     callback: async () => {
-      const { status, error } = await approvalAccountBank(values);
+      const { status, error } = await approvalAccountBank(values)
       if (status.value === 'success') {
         openAccountDetailModal.value = false
-        refresh();
+        refresh()
         updateConfirmModal({
           title: 'Recarga autorizada',
           message: 'Se ha autorizado la recarga',
           type: 'success',
-        });
+        })
       } else {
         const eMsg =
           error?.value?.data?.errors?.[0]?.message ||
           error?.value?.data?.message ||
-          'La recarga no se pudo confirmar, inténtalo más tarde';
+          'La recarga no se pudo confirmar, inténtalo más tarde'
 
         updateConfirmModal({
           title: 'Error al confirmar recarga',
           message: eMsg,
           type: 'error',
-        });
+        })
       }
     },
-  });
-};
-//Modal de rechazo
+  })
+}
+// Modal de rechazo
 const selectedRejectInfo = ref<any>({
-  id:'',
+  id: '',
   rejection: null,
   comment: null,
 })
@@ -190,7 +193,7 @@ const handleOpenRejectModal = (details: any) => {
     id: details.id,
     rejection: details.rejectionReason || null,
     comment: details.comment || null,
-  };
-  openRejectModal.value = true;
-};
+  }
+  openRejectModal.value = true
+}
 </script>

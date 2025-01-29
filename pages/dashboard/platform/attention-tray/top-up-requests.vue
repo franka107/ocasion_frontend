@@ -27,6 +27,9 @@
               }}</span>
             </div>
           </template>
+          <template #amount="{ row }">
+            <MoneyLabel :amount="row.amount" />
+          </template>
 
           <template #actions="{ row }">
             <div class="flex justify-center">
@@ -177,6 +180,7 @@ import { useTopUpRequests } from '~/composables/useTopUpRequests'
 import { useAPI } from '~/composables/useAPI'
 import type { IRecharge } from '~/types/Recharge'
 import type { IDataResponse } from '~/types/Common'
+import MoneyLabel from '~/design-system/ui/money-label/MoneyLabel.vue'
 // Variables de estado para los modales
 const openDetailModal = ref(false)
 const openEditModal = ref(false)
@@ -252,7 +256,7 @@ const rechargeData = computed(() =>
 const handleAuthorize = async (values: any) => {
   openConfirmModal({
     title: 'Autorizar recarga',
-    message: '¿Estás seguro deseas confirmar este lote de desembolso?',
+    message: '¿Estás seguro deseas confirmar esta recarga?',
     callback: async () => {
       const { status, error } = await autorizationRecharge(values)
       if (status.value === 'success') {
