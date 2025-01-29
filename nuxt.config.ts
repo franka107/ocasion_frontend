@@ -60,7 +60,7 @@ export default defineNuxtConfig({
     resolve('./assets/scss/app.scss'),
   ],
   app: {
-    pageTransition: { name: 'page', mode: 'out-in' },
+    // pageTransition: { name: 'page', mode: 'out-in' },
     // layoutTransition: { name: 'layout', mode: 'out-in' },
 
     head: {

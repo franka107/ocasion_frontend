@@ -235,14 +235,17 @@ if (props.offerId) {
     value: [BidStatus.Winner, BidStatus.Accepted],
   })
 }
-const filterOptions = ref(JSON.stringify(filterOptionsRaw))
+
 const onSearch = (item: { [key: string]: string }) => {
+  const lastFilter = JSON.parse(filterOptions.value)
   filterOptions.value = JSON.stringify([
+    ...lastFilter,
     { field: 'offer.id', type: 'like', value: item.title || '' },
     { field: 'status', type: 'equal', value: item.status || '' },
     { field: 'event.id', type: 'equal', value: route.params.eventId },
   ])
 }
+const filterOptions = ref(JSON.stringify(filterOptionsRaw))
 const { data, refresh }: any = await useAPI(
   `${BID_BASE_URL}/find-bids-paginated`,
   {
