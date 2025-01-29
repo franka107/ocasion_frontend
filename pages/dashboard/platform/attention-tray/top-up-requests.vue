@@ -27,6 +27,9 @@
               }}</span>
             </div>
           </template>
+          <template #currency="{ row }">
+            <span>USD</span>
+          </template>
           <template #amount="{ row }">
             <MoneyLabel :amount="row.amount" />
           </template>

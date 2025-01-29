@@ -186,6 +186,11 @@ export const rechargeHeader: HeaderItem[] = [
     key: 'transferedAt',
     label: 'Fec. Transferencia',
   },
+
+  {
+    key: 'currency',
+    label: 'Moneda',
+  },
   {
     key: 'amount',
     label: 'Importe',
