@@ -58,6 +58,12 @@ export const transactionHistorySearch: SearchItem[] = [
 ]
 export const transactionHistoryHeader: HeaderItem[] = [
   {
+    key: 'id',
+    label: 'N°',
+    sortable: true,
+    align: 'center',
+  },
+  {
     key: 'createdAt',
     label: 'Fecha de operación',
     sortable: true,

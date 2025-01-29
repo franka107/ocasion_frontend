@@ -2,7 +2,7 @@
   <ContentLayout title="Mi monedero">
     <CustomSimpleCard title="Abonos" class="mb-6" sub-title="..." />
     <section>
-      <PurseDetails />
+      <PurseDetails :refresh-history-transaction-table="refresh" />
       <div
         class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto mt-4 pb-3"
       >
@@ -166,5 +166,4 @@ const transactionHistoryData = computed(
       currency: transactionHistoryCurrencyMap[item.currency]?.label,
     })) || [],
 )
-
 </script>

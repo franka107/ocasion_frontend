@@ -13,6 +13,7 @@ export const transactionsStatus = new Map<
 >([
   ['AUTHORIZED', { name: 'Autorizado', color: 'blue' }],
   ['REJECTED', { name: 'Rechazado', color: 'red' }],
+  ['PENDING', { name: 'Pendiente', color: 'brown' }],
 ])
 export const disbursementStatus = new Map<
   string,

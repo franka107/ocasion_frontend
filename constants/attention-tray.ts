@@ -164,7 +164,11 @@ export const disbursementSearch: SearchItem[] = [
 export const rechargeHeader: HeaderItem[] = [
   {
     key: 'id',
-    label: 'N° Transación',
+    label: 'Código',
+  },
+  {
+    key: 'transactionHistory.id',
+    label: 'N° Transacción',
   },
   {
     key: 'createdAt',

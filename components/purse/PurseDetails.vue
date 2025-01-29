@@ -83,7 +83,10 @@
     />
   </SheetContent>
   <WithdrawCashModal v-model="isWithdrawModalOpen" />
-  <RechargeBalanceModal v-model="isRechargeModalOpen" />
+  <RechargeBalanceModal
+    v-model="isRechargeModalOpen"
+    :refresh-history-transaction-table="refreshHistoryTransactionTable"
+  />
 </template>
 
 <script setup lang="ts">
@@ -94,6 +97,7 @@ import RechargeBalanceModal from '@/components/purse/RechargeBalanceModal.vue'
 import WithdrawCashModal from '@/components/purse/WithdrawCashModal.vue'
 const purseId = ref<number | undefined>(undefined)
 const appraisalHistoryModal = ref<any>({ offerId: '' })
+const props = defineProps<{ refreshHistoryTransactionTable: () => void }>()
 
 const openPurseDetailsModal = ref(false)
 const { rechargeMyWallet } = useUserParticipantAPI()

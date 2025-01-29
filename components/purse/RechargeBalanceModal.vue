@@ -17,7 +17,10 @@ import InputFile from '@/components/common/file/Input.vue'
 const emit = defineEmits(['update:modelValue'])
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const openUserModal = ref(false)
-const props = defineProps<{ modelValue: boolean }>()
+const props = defineProps<{
+  modelValue: boolean
+  refreshHistoryTransactionTable: () => void
+}>()
 const { landingUrl } = useRuntimeConfig().public
 const formSchema = toTypedSchema(
   z.object({
@@ -55,7 +58,7 @@ const onSubmit = form.handleSubmit((values) => {
       const { status, error }: any = await requestRecharge({
         ...values,
         sustentationFile: values.attachedFiles[0],
-        transferedAt: new Date(values.transferedAt).toISOString(),
+        transferedAt: values.transferedAt,
       })
       emit('update:modelValue', false) // Cierra el modal al enviar.
       if (status.value === 'success') {
@@ -65,6 +68,7 @@ const onSubmit = form.handleSubmit((values) => {
           message: 'La solicitud de recarga ha sido realizada exitosamente',
           type: 'success',
         })
+        props.refreshHistoryTransactionTable()
       } else {
         const eMsg =
           error.value.data?.errors?.[0].message ||
@@ -113,9 +117,9 @@ watch(
             >Recargar saldo</AlertDialogTitle
           >
         </AlertDialogHeader>
-        <p class="text-[18px] font-[600] text-[#152A3C] px-6">
-          Transacción N° 123456
-        </p>
+        <!-- <p class="text-[18px] font-[600] text-[#152A3C] px-6"> -->
+        <!--   Transacción N° 123456 -->
+        <!-- </p> -->
         <!-- Formulario -->
         <div class="grid grid-cols-2 gap-4 px-6">
           <!-- N° operación -->
@@ -178,13 +182,13 @@ watch(
                 /> -->
                 <CustomInput
                   v-bind="componentField"
+                  v-model="form.values.currency"
                   type="text"
                   :disabled="true"
                   static-label
                   value="USD"
                   readonly
                   label="Moneda"
-                  v-model="form.values.currency"
                 />
               </FormControl>
               <FormMessage />

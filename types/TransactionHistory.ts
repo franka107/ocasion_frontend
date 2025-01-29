@@ -5,6 +5,7 @@ import type { Color } from '~/constants/ui'
 export enum TransactionHistoryStatus {
   Authorized = 'AUTHORIZED',
   Rejected = 'REJECTED',
+  Pending = 'PENDING',
 }
 
 export enum TransactionHistoryCurrency {
@@ -46,6 +47,10 @@ export const transactionHistoryStatusMap: Record<
   [TransactionHistoryStatus.Authorized]: {
     label: 'Autorizado',
     color: 'green',
+  },
+  [TransactionHistoryStatus.Pending]: {
+    label: 'Pendiente',
+    color: 'brown',
   },
 }
 
