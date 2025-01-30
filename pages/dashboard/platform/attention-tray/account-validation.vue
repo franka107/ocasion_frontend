@@ -157,8 +157,9 @@ const handleApproval = async (values: any) => {
         openAccountDetailModal.value = false
         refresh()
         updateConfirmModal({
-          title: 'Cuenta validad',
-          message: 'Se ha validado la cuenta',
+          title: 'Cuenta validada',
+          message:
+            'Se ha validado la cuenta bancaria, ya puedes proceder con la aprobación del retiro',
           type: 'success',
         })
       } else {

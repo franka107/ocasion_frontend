@@ -62,8 +62,8 @@
           <template #voucher="{ row }">
             <div class="flex items-center justify-center">
               <NuxtLink
-                v-if="row.rechargeRequest?.voucherGeneratedFile?.path"
-                :to="row.rechargeRequest?.voucherGeneratedFile?.path"
+                v-if="row.voucherGeneratedFile?.path"
+                :to="row.voucherGeneratedFile?.path"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="flex items-center justify-center"
