@@ -209,8 +209,8 @@ watch(
                 <InputFile
                   v-model="form.values.attachedFiles"
                   title="Archivos adjuntos"
-                  instructions-text="Cargar máximo 3 elementos(xlsx, docx, pdf)"
-                  :limit-files="3"
+                  instructions-text="Cargar máximo 1 elemento(pdf, jpeg, jpg, png)"
+                  :limit-files="1"
                   v-bind="componentField"
                 />
               </FormControl>
