@@ -32,7 +32,7 @@ export function useTransactionHistoriesAPI() {
           `${BASE_TRANSACTION_URL}/view-transaction-histories-paginated`,
           {
             query: {
-              limit: 20,
+              limit: 10,
               page,
               filterOptions,
               sortOptions,

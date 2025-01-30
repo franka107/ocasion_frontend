@@ -43,7 +43,7 @@ export const transactionsSearch: SearchItem[] = [
     placeholder: 'Buscar',
     width: 'max-w-xs w-full',
     elementClass: 'w-full',
-    label: 'Buscar participante, n° transacción o  n° DNI',
+    label: 'Buscar Participante, N° transacción o operación ',
   },
   {
     key: 'createdAt',
@@ -236,7 +236,11 @@ export const balanceSearch: SearchItem[] = [
 export const transactionsHeader: HeaderItem[] = [
   {
     key: 'id',
-    label: 'N° Transación',
+    label: 'N° Transacción',
+  },
+  {
+    key: 'operationId',
+    label: 'N° Operación',
   },
   {
     key: 'fullName',

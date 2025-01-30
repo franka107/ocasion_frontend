@@ -69,7 +69,10 @@
               "
             >
               <Button
-                v-if="eventDetail?.status === EventStatus.Created"
+                v-if="
+                  eventDetail?.status === EventStatus.Created ||
+                  eventDetail?.status === EventStatus.ReadyToPublish
+                "
                 variant="default"
                 @click="
                   () => {
