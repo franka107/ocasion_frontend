@@ -59,7 +59,7 @@ export const transactionHistorySearch: SearchItem[] = [
 export const transactionHistoryHeader: HeaderItem[] = [
   {
     key: 'id',
-    label: 'N°',
+    label: 'N° Transacción',
     sortable: true,
     align: 'center',
   },
