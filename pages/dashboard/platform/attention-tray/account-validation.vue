@@ -64,7 +64,6 @@
             v-model="openAccountDetailModal"
             :on-authorize="handleApproval"
             :on-reject="handleOpenRejectModal"
-            @on-reject="handleOpenRejectModal"
           />
         </SheetContent>
         <ModalRejectAccount
@@ -140,13 +139,8 @@ const openAccountDetailsModal = ref(false)
 const openAccountDetailModal = ref(false)
 const openAccountDetail = (row: any) => {
   const accountDetailId = row.id
-  if (accountId.value) {
-    accountId.value = accountDetailId
-    console.log('Abriendo detalle del participante:', accountDetailId)
-    openAccountDetailModal.value = true
-  } else {
-    console.error('No se encontró el participante para esta fila.')
-  }
+  accountId.value = accountDetailId
+  openAccountDetailModal.value = true
 }
 const onAccountDetailSubmit = (formData: any) => {
   console.log('Detalle de solicitud enviado:', formData)
@@ -155,26 +149,26 @@ const onAccountDetailSubmit = (formData: any) => {
 // Manejo de acciones detalle solicitud
 const handleApproval = async (values: any) => {
   openConfirmModal({
-    title: 'Autorizar recarga',
-    message: '¿Estás seguro deseas confirmar esta recarga?',
+    title: 'Validar cuenta',
+    message: '¿Estás seguro que deseas validar esta cuenta bancaria?',
     callback: async () => {
       const { status, error } = await approvalAccountBank(values)
       if (status.value === 'success') {
         openAccountDetailModal.value = false
         refresh()
         updateConfirmModal({
-          title: 'Recarga autorizada',
-          message: 'Se ha autorizado la recarga',
+          title: 'Cuenta validad',
+          message: 'Se ha validado la cuenta',
           type: 'success',
         })
       } else {
         const eMsg =
           error?.value?.data?.errors?.[0]?.message ||
           error?.value?.data?.message ||
-          'La recarga no se pudo confirmar, inténtalo más tarde'
+          'La cuenta no se pudo confirmar, inténtalo más tarde'
 
         updateConfirmModal({
-          title: 'Error al confirmar recarga',
+          title: 'Error al validar la cuenta',
           message: eMsg,
           type: 'error',
         })

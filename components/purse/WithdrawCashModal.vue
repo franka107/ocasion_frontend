@@ -11,7 +11,10 @@ import {
 } from '@/components/ui/alert-dialog'
 
 const emit = defineEmits(['update:modelValue'])
-const props = defineProps<{ modelValue: boolean }>()
+const props = defineProps<{
+  modelValue: boolean
+  refreshHistoryTransactionTable: () => void
+}>()
 const { landingUrl } = useRuntimeConfig().public
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const openUserModal = ref(false)
@@ -61,6 +64,7 @@ const onSubmit = form.handleSubmit((values) => {
           message: 'La solicitud de retiro ha sido realizada exitosamente',
           type: 'success',
         })
+        props.refreshHistoryTransactionTable()
       } else {
         const eMsg =
           error.value.data?.errors?.[0].message ||
@@ -95,9 +99,9 @@ const onSubmit = form.handleSubmit((values) => {
             >Retirar saldo</AlertDialogTitle
           >
         </AlertDialogHeader>
-        <p class="text-[18px] font-[600] text-[#152A3C] px-6">
-          Transacción N° 123456
-        </p>
+        <!-- <p class="text-[18px] font-[600] text-[#152A3C] px-6"> -->
+        <!--   Transacción N° 123456 -->
+        <!-- </p> -->
         <!-- Formulario -->
         <div class="grid grid-cols-2 gap-2 xl:gap-4 px-6">
           <!-- Monto -->
@@ -199,7 +203,7 @@ const onSubmit = form.handleSubmit((values) => {
                   type="text"
                   placeholder="Ingrese número"
                   static-label
-                  label="Cuenta daaestino (CCI)"
+                  label="Cuenta destino (CCI)"
                 />
               </FormControl>
               <FormMessage />

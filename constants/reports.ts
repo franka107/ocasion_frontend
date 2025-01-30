@@ -318,7 +318,7 @@ export const disbursementHeader: HeaderItem[] = [
 export const validationHeader: HeaderItem[] = [
   {
     key: 'id',
-    label: 'N° Transación',
+    label: 'N° Transacción',
   },
   {
     key: 'createdAt',

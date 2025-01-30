@@ -213,13 +213,18 @@ export const rechargeHeader: HeaderItem[] = [
 ]
 export const accountHeader: HeaderItem[] = [
   {
-    key: 'id',
-    label: 'N° Transación',
+    key: 'retireRequest.id',
+    label: 'N° operación',
+  },
+  {
+    key: 'retireRequest.transactionHistory.id',
+    label: 'N° Transacción',
   },
   {
     key: 'createdAt',
     label: 'Fec. Solicitud',
   },
+
   {
     key: 'fullName',
     label: 'Nombres y apellidos',
@@ -251,6 +256,10 @@ export const accountHeader: HeaderItem[] = [
 export const withdrawalRequeststHeader: HeaderItem[] = [
   {
     key: 'id',
+    label: 'N° Operación',
+  },
+  {
+    key: 'transactionHistory.id',
     label: 'N° Transacción',
   },
   {

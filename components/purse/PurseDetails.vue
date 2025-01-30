@@ -82,7 +82,10 @@
       title="Detalle de saldo garantizado"
     />
   </SheetContent>
-  <WithdrawCashModal v-model="isWithdrawModalOpen" />
+  <WithdrawCashModal
+    v-model="isWithdrawModalOpen"
+    :refresh-history-transaction-table="refreshHistoryTransactionTable"
+  />
   <RechargeBalanceModal
     v-model="isRechargeModalOpen"
     :refresh-history-transaction-table="refreshHistoryTransactionTable"
