@@ -19,7 +19,9 @@
           </template>
           <template #operationId="{ row }">
             <span>{{
-              row.retireRequest ? row.retireRequest.id : row.rechargeRequest.id
+              row.retireRequest
+                ? row.retireRequest?.id
+                : row.rechargeRequest?.id
             }}</span>
           </template>
           <template #actions="{ row }">
