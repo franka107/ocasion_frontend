@@ -112,24 +112,7 @@ const handleFilesChange = (files: File[]) => {
         <!-- Formulario -->
         <div class="grid grid-cols-1 gap-2 xl:gap-4 px-6">
           <!-- Fecha de Desembolso -->
-          <!-- <FormField v-slot="{ componentField }" name="disbursedAt"> -->
-          <!--   <FormItem> -->
-          <!--     <FormControl> -->
-          <!--       <DateInput -->
-          <!--         label="Fecha de desembolso" -->
-          <!--         static-label -->
-          <!--         :value="componentField.modelValue" -->
-          <!--         :max-value=" -->
-          <!--           parseAbsolute(new Date().toISOString(), getLocalTimeZone()) -->
-          <!--         " -->
-          <!--         @update:model-value="componentField.onChange" -->
-          <!--       /> -->
-          <!--       <!-- <CustomInput staticLabel type="date" label="Fecha de desembolso" v-bind="componentField" /> -->
-          -->
-          <!--     </FormControl> -->
-          <!--     <FormMessage /> -->
-          <!--   </FormItem> -->
-          <!-- </FormField> -->
+
           <div class="flex flex-col">
             <h2 class="font-[600] text-sm text-[#152A3C] pr-[4px] mb-4">
               CARGAR SUSTENTO

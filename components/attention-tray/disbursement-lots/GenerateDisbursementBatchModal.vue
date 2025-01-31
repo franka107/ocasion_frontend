@@ -115,6 +115,7 @@ const handlePreview = async (values: any) => {
     bank: values.bank,
     chargeAccount: values.chargeAccount,
     disbursedAt: values.disbursedAt,
+    batchRetireRequests: props.retireRequests,
   }
   const { status, error, data }: any =
     await generatelPreviewDisbursement(valuesToSend)
