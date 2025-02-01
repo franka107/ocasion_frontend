@@ -288,9 +288,14 @@ export const withdrawalRequeststHeader: HeaderItem[] = [
     label: 'Estado',
   },
   {
+    key: 'accountValidationStatus',
+    label: 'Estado V. de cuenta',
+  },
+  {
     key: 'disbursementLot',
     label: 'Lote de desembolso',
   },
+
   {
     key: 'actions',
     label: '',

@@ -64,14 +64,44 @@
               </DropdownMenu>
             </div>
           </template>
+
+          <template #accountValidationStatus="{ row }">
+            <CustomChip
+              :text="
+                rechargeStatus.get(row.accountValidation.status)?.name || ''
+              "
+              :variant="
+                rechargeStatus.get(row.accountValidation.status)?.color as any
+              "
+            ></CustomChip>
+            <!-- <div class="flex items-center justify-center"> -->
+            <!--   <NuxtLink -->
+            <!--     v-if="row.accountValidation" -->
+            <!--     :to="`/dashboard/platform/attention-tray/account-validation?accountValidationId=${row.accountValidation.id}`" -->
+            <!--   > -->
+            <!--     <Button variant="ghost" class="border rounded-full"> -->
+            <!--       <Package class="" /> -->
+            <!--       <span class="ml-2"> -->
+            <!--         {{ row.accountValidation.id }} -->
+            <!--       </span> -->
+            <!--     </Button> -->
+            <!--   </NuxtLink> -->
+            <!--   <div v-else> -->
+            <!--     <span>-</span> -->
+            <!--   </div> -->
+            <!-- </div> -->
+          </template>
           <template #disbursementLot="{ row }">
             <div class="flex items-center justify-center">
               <NuxtLink
                 v-if="row.disbursementLot"
                 :to="`/dashboard/platform/attention-tray/disbursement-lots?disbursementLotId=${row.disbursementLot.id}`"
               >
-                <Button variant="ghost" class="border rounded-full" size="icon">
+                <Button variant="ghost" class="border rounded-full">
                   <Package class="" />
+                  <span class="ml-2">
+                    {{ row.disbursementLot.id }}
+                  </span>
                 </Button>
               </NuxtLink>
               <div v-else>
