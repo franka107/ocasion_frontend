@@ -177,7 +177,7 @@ export const validationSearch: SearchItem[] = [
     placeholder: 'Buscar',
     width: 'max-w-xs w-full',
     elementClass: 'w-full',
-    label: 'Buscar participaete, n° transacción o  n° DOI',
+    label: 'Buscar participante, n° transacción o  n° DOI',
   },
   {
     key: 'createdAt',
@@ -322,15 +322,15 @@ export const disbursementHeader: HeaderItem[] = [
 ]
 export const validationHeader: HeaderItem[] = [
   {
-    key: 'id',
+    key: 'retireRequest.transactionHistory.id',
     label: 'N° Transacción',
   },
   {
-    key: 'createdAt',
+    key: 'retireRequestCreatedAt',
     label: 'Fec. Solicitud',
   },
   {
-    key: 'fullName',
+    key: 'participant.commonName',
     label: 'Nombres y apellidos',
   },
   {
@@ -347,8 +347,8 @@ export const validationHeader: HeaderItem[] = [
     label: 'Moneda',
   },
   {
-    key: 'transactionNumber',
-    label: 'N° de cueta',
+    key: 'destinationAccountNumber',
+    label: 'N° de cuenta',
   },
   {
     key: 'status',

@@ -7,7 +7,7 @@
     />
 
     <div class="w-full flex flex-col">
-      <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
+      <div class="shadow-md pb-6 rounded-lg px-6 bg-white flex-grow mb-auto">
         <CustomTable
           :data="validationData"
           :header="validationHeader"
@@ -23,6 +23,9 @@
                 Exportar
               </Button>
             </div>
+          </template>
+          <template #retireRequestCreatedAt="{ row }">
+            <DateLabel :value="row.retireRequest?.createdAt" />
           </template>
           <template #status="{ row }">
             <CustomChip
@@ -57,6 +60,7 @@ import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCar
 import { useAccountValidation } from '@/composables/useAccountValidation'
 import type { IAccountLItem } from '~/types/Account'
 import type { IDataResponse } from '~/types/Common'
+import DateLabel from '~/design-system/ui/data-label/DateLabel.vue'
 
 const { page, onSort, onSearch, filterOptions, sortOptions, handleExport } =
   useAccountValidation()
@@ -75,7 +79,6 @@ const { data, refresh } = await useAPI<IDataResponse<IAccountLItem>>(
 
 const validationData = computed(() =>
   data.value?.data.map((item: IAccountLItem) => ({
-    fullName: item.participant.commonName,
     document: `${item.participant.documentType} ${item.participant.documentIdentifier}`,
     ...item,
     createdAt: dayjs(item.createdAt).format('YYYY-MM-DD'),
