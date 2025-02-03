@@ -38,7 +38,7 @@ const isNegative = computed(() => props.amount < 0)
   >
     <span
       :class="[
-        'text-sm font-medium tabular-nums',
+        'font-medium tabular-nums',
         isNegative
           ? 'text-red-600 dark:text-red-400'
           : 'text-gray-900 dark:text-gray-100',

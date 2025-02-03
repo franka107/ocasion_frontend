@@ -177,7 +177,7 @@ export const validationSearch: SearchItem[] = [
     placeholder: 'Buscar',
     width: 'max-w-xs w-full',
     elementClass: 'w-full',
-    label: 'Buscar participante, n° transacción o  n° DOI',
+    label: 'Buscar participaete, n° transacción o  n° DOI',
   },
   {
     key: 'createdAt',
@@ -224,9 +224,10 @@ export const balanceSearch: SearchItem[] = [
     elementClass: 'w-full',
     label: 'Buscar por participante o documento',
   },
+
   {
     key: 'quickSearchPeriod',
-    type: 'text',
+    type: 'date-range',
     placeholder: 'Periodo',
     width: 'w-auto',
     label: 'Buscar por periodo',
@@ -358,8 +359,16 @@ export const validationHeader: HeaderItem[] = [
 
 export const balanceHeader: HeaderItem[] = [
   {
-    key: 'fullName',
-    label: 'Nombres y apellidos',
+    key: 'user.commonName',
+    label: 'Nombres/ Razón social',
+  },
+  {
+    key: 'user.documentType',
+    label: 'Tipo de DOI',
+  },
+  {
+    key: 'user.documentIdentifier',
+    label: 'Número de DOI',
   },
   {
     key: 'chargeBalance',
