@@ -1,5 +1,5 @@
 <template>
-  <ContentLayout title="Listado de pujas">
+  <ContentLayout title="Listado de recibos">
     <div class="flex flex-col space-y-4">
       <Breadcrumb>
         <BreadcrumbList>
