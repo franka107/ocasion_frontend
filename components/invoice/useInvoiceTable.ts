@@ -38,7 +38,9 @@ export type InvoiceTableStoreRoot = (
 export const useInvoiceTableMvi = async () => {
   const page = ref(1)
   const limit = ref(5)
-  const filterOptions = ref<FilterOption[]>([])
+  const filterOptions = ref<FilterOption[]>([
+    { field: 'type', type: 'equal', value: 'RECEIPT' },
+  ])
   const sortOptions = ref<SortOption[]>([])
   const billingManagementService = useBillingManagementService()
   const organizationManagementService = useOrganization()
