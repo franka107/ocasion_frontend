@@ -57,22 +57,22 @@
                 </select>
               </div>
               <div class="flex flex-row space-x-2">
-              <Button
-                variant="default"
-                :disabled="disableMultipleSelect"
-                class="bg-white text-primary border border-primary hover:bg-accent"
-                @click="handleDeleteNotifications(selectedMultipleData)"
-              >
-                Eliminar notificaciónes
-              </Button>
-              <Button
-                variant="default"
-                :disabled="disableMultipleSelect"
-                class="bg-white text-primary border border-primary hover:bg-accent"
-                @click="handleMarkAsReadNotifications(selectedMultipleData)"
-              >
-                Marcar como leídas
-              </Button>
+                <Button
+                  variant="default"
+                  :disabled="disableMultipleSelect"
+                  class="bg-white text-primary border border-primary hover:bg-accent"
+                  @click="handleDeleteNotifications(selectedMultipleData)"
+                >
+                  Eliminar notificaciónes
+                </Button>
+                <Button
+                  variant="default"
+                  :disabled="disableMultipleSelect"
+                  class="bg-white text-primary border border-primary hover:bg-accent"
+                  @click="handleMarkAsReadNotifications(selectedMultipleData)"
+                >
+                  Marcar como leídas
+                </Button>
               </div>
             </div>
             <div
@@ -128,13 +128,13 @@
                     :key="notification.id || index"
                     :notification="notification"
                     class="bg-white hover:bg-gray-50 transition-colors duration-200 rounded-lg"
-                    @on-select="handleNotificationSelection"
-                    @on-remove="refresh"
-                    @on-readed="refresh"
                     :multiple-select="true"
                     :multiple-select-key="notification.id"
                     :on-select-item="onSelectItem"
                     :get-select-icon="getSelectIcon"
+                    @on-select="handleNotificationSelection"
+                    @on-remove="refresh"
+                    @on-readed="refresh"
                   />
                 </template>
               </div>
@@ -174,7 +174,10 @@ const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const { page } = useNotificationAPI()
 const filterOptions = ref(JSON.stringify([]))
 const sortOptions = ref('[]')
-const { removeAllNotificationsByParticipant, markAllNotificationsAsReadByParticipant } = useNotificationAPI()
+const {
+  removeAllNotificationsByParticipant,
+  markAllNotificationsAsReadByParticipant,
+} = useNotificationAPI()
 
 const [eventListData] = await Promise.all([
   useAPI<IDataResponse<Notification>>(
@@ -223,6 +226,7 @@ const disableMultipleSelect = computed(
     selectedMultipleData.value.ids.length === 0,
 )
 watch([filterType, sortType], async () => {
+  page.value = 1
   if (filterType.value === 'todas') {
     filterOptions.value = JSON.stringify([])
   } else {
@@ -252,25 +256,29 @@ watch([filterType, sortType], async () => {
   }
 })
 
-const handleMarkAsReadNotifications = async (values: { type: string; ids: string[]}) => {
+const handleMarkAsReadNotifications = async (values: {
+  type: string
+  ids: string[]
+}) => {
   openConfirmModal({
     title: 'Marcar notificaciones como leídas',
     message: `¿Está seguro de marcar las notificaciones seleccionadas como leídas?`,
     callback: async () => {
       const { status, error } = await markAllNotificationsAsReadByParticipant({
-        ...values
+        ...values,
       })
 
       if (status.value === 'success') {
         refresh()
-        selectedMultipleData.value.type = 'empty' 
-        selectedMultipleData.value.ids = [],
-        resetMultipleSelect.value = resetMultipleSelectBox
+        selectedMultipleData.value.type = 'empty'
+        ;(selectedMultipleData.value.ids = []),
+          (resetMultipleSelect.value = resetMultipleSelectBox)
         resetMultipleSelect.value?.()
-        
+
         updateConfirmModal({
           title: 'Notificacion(es) marcada(s) como leída(s)',
-          message: 'La(s) notificación(es) ha sido marcada(s) como leída(s) exitosamente',
+          message:
+            'La(s) notificación(es) ha sido marcada(s) como leída(s) exitosamente',
           type: 'success',
         })
       } else {
@@ -288,20 +296,23 @@ const handleMarkAsReadNotifications = async (values: { type: string; ids: string
   })
 }
 
-const handleDeleteNotifications = async (values: { type: string; ids: string[]}) => {
+const handleDeleteNotifications = async (values: {
+  type: string
+  ids: string[]
+}) => {
   openConfirmModal({
     title: 'Eliminar notificaciones',
     message: `¿Está seguro de eliminar las notificaciones seleccionadas?`,
     callback: async () => {
       const { status, error } = await removeAllNotificationsByParticipant({
-        ...values
+        ...values,
       })
 
       if (status.value === 'success') {
         refresh()
-        selectedMultipleData.value.type = 'empty' 
-        selectedMultipleData.value.ids = [],
-        resetMultipleSelect.value = resetMultipleSelectBox
+        selectedMultipleData.value.type = 'empty'
+        ;(selectedMultipleData.value.ids = []),
+          (resetMultipleSelect.value = resetMultipleSelectBox)
         resetMultipleSelect.value?.()
 
         updateConfirmModal({
@@ -350,7 +361,6 @@ const useMultipleSelect = () => {
       type: generalCheckbox.value,
       ids: selectedIdItems.value,
     }
-
   }
 
   const onSelectItem = (id: string) => {
@@ -395,8 +405,6 @@ const {
   onSelectItem,
   getSelectIcon,
 } = useMultipleSelect()
-
-
 </script>
 
 <style scoped>

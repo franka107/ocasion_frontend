@@ -9,7 +9,7 @@
     <div class="w-full flex flex-col">
       <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
         <CustomTable
-          :data="withDrawalRequeststData"
+          :data="data.data"
           :header="withdrawalRequeststHeader"
           :search="withdrawalRequestsSearch"
           class="mb-4"
@@ -34,6 +34,19 @@
               "
               >Generar lote</Button
             >
+          </template>
+          <template #createdAt="{ row }">
+            <DateLabel :value="row.createdAt" />
+          </template>
+          <template #amount="{ row }">
+            <MoneyLabel :amount="row.amount" />
+          </template>
+          <template #disbursementLotTransferedAt="{ row }">
+            <DateLabel
+              v-if="row.disbursementLot"
+              :value="row.disbursementLot.transferedAt"
+            />
+            <span v-else class="flex justify-center">-</span>
           </template>
           <template #actions="{ row }">
             <div class="flex justify-center">
@@ -205,6 +218,8 @@ import GenerateDisbursementBatchModal from '~/components/attention-tray/disburse
 import ModalRejectWithdrawal from '~/components/attention-tray/withdrawal-requests/ModalRejectWithdrawal.vue'
 import type { IWithdrawalItem } from '~/types/Withdrawal'
 import type { IDataResponse } from '~/types/Common'
+import DateLabel from '~/design-system/ui/data-label/DateLabel.vue'
+import MoneyLabel from '~/design-system/ui/money-label/MoneyLabel.vue'
 
 const openParticipantModal = ref(false)
 const openEditModal = ref(false)
@@ -275,13 +290,6 @@ const { data, refresh } = await useAPI<IDataResponse<IWithdrawalItem>>(
   } as any,
 )
 
-const withDrawalRequeststData = computed(() =>
-  data.value?.data.map((item: IWithdrawalItem) => ({
-    fullName: item.participant.commonName,
-    ...item,
-    createdAt: dayjs(item.createdAt).format('YYYY-MM-DD'),
-  })),
-)
 // Acciones para modal Generar Lote
 const handleGenerateDisbursement = (formData: any) => {
   console.log('Lote generado con los datos:', formData)

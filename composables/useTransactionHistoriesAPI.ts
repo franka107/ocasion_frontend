@@ -23,6 +23,7 @@ export function useTransactionHistoriesAPI() {
       filters.push({ field: 'status', type: 'equal', value: item.status })
     }
     filterOptions.value = JSON.stringify(filters)
+    page.value = 1
   }
 
   const getData = async () => {

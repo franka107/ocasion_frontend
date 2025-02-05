@@ -19,6 +19,7 @@ export function useAdmins() {
     }
 
     filterOptions.value = JSON.stringify(filters)
+    page.value = 1
   }
 
   const createUser = async (values: any) => {

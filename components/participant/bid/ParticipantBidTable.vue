@@ -437,6 +437,7 @@ const onSearch = (item: { [key: string]: string }) => {
     },
     { field: 'status', type: 'equal', value: item.status || '' },
   ])
+  page.value = 1
 }
 const currentOrganization = ref<OrganizationDto | null>(null)
 const { data, refresh }: any = await useAPI(

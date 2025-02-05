@@ -254,6 +254,7 @@ const onSearch = (item: { [key: string]: string }) => {
     })
   }
   filterOptions.value = JSON.stringify(filters)
+  page.value = 1
 }
 
 const { data, refresh }: any = await useAPI(

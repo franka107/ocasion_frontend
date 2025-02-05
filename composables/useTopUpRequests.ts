@@ -1,7 +1,14 @@
+import type { FilterOption } from './useNotificationAPI'
+
 // by convention, composable function names start with "use"
 export function useTopUpRequests() {
+  const pendingFilter: FilterOption = {
+    value: 'PENDING',
+    type: 'equal',
+    field: 'status',
+  }
   const page = ref(1)
-  const filterOptions = ref('[]')
+  const filterOptions = ref(JSON.stringify([pendingFilter]))
   const sortOptions = ref('[]')
   const onSort = (sortObject: { [key: string]: string }[]) => {
     sortOptions.value = JSON.stringify(sortObject)
@@ -10,15 +17,18 @@ export function useTopUpRequests() {
 
   const onSearch = (item: { [key: string]: string }) => {
     const filters = [
-      { field: 'id', type: 'like', value: item.id || '' },
-      { field: 'transferedA', type: 'between', value: item.transferedAt || '' },
+      pendingFilter,
+      { field: 'quickSearch', type: 'like', value: item.quickSearch || '' },
+      {
+        field: 'transferedAt',
+        type: 'between',
+        value: item.transferedAt || '',
+      },
       { field: 'createdAt', type: 'between', value: item.createdAt || '' },
-      { field: 'operationNumber', type: 'like', value: item.operationNumber || '' },
     ]
-    if (item.status) {
-      filters.push({ field: 'status', type: 'equal', value: item.status })
-    }
+
     filterOptions.value = JSON.stringify(filters)
+    page.value = 1
   }
   const requestRecharge = async (values: any) => {
     const { status, error }: any = await useAPI(

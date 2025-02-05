@@ -7,25 +7,19 @@
     />
 
     <div class="w-full flex flex-col">
-      <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
+      <div class="shadow-md rounded-lg pb-6 px-6 bg-white flex-grow mb-auto">
         <CustomTable
-          :data="rechargeData"
+          :data="data.data"
           :header="rechargeHeader"
           :search="rechargeSearch"
           @on-sort="onSort"
           @on-search="onSearch"
         >
           <template #createdAt="{ row }">
-            <div
-              class="flex-col hover:text-gray-900 transition-colors duration-200 flex items-center space-x-2"
-            >
-              <span class="">{{
-                dayjs(row.createdAt).format('YYYY-MM-DD')
-              }}</span>
-              <span class="text-xs text-gray-500">{{
-                dayjs(row.createdAt).format('hh:mm a')
-              }}</span>
-            </div>
+            <DateLabel :value="row.createdAt" />
+          </template>
+          <template #transferedAt="{ row }">
+            <DateLabel :value="row.transferedAt" hide-time />
           </template>
           <template #currency="{ row }">
             <span>USD</span>
@@ -184,6 +178,7 @@ import { useAPI } from '~/composables/useAPI'
 import type { IRecharge } from '~/types/Recharge'
 import type { IDataResponse } from '~/types/Common'
 import MoneyLabel from '~/design-system/ui/money-label/MoneyLabel.vue'
+import DateLabel from '~/design-system/ui/data-label/DateLabel.vue'
 // Variables de estado para los modales
 const openDetailModal = ref(false)
 const openEditModal = ref(false)
@@ -245,15 +240,6 @@ const { data, refresh: refreshRecharTable } = await useAPI<
     sortOptions,
   },
 } as any)
-
-const rechargeData = computed(() =>
-  data.value?.data.map((item: IRecharge) => ({
-    fullName: item.participant.commonName,
-    ...item,
-    transferedAt: dayjs(item.transferedAt).format('YYYY-MM-DD'),
-    updatedAt: dayjs(item.updatedAt).format('YYYY-MM-DD'),
-  })),
-)
 
 // Manejo de acciones detalle solicitud
 const handleAuthorize = async (values: any) => {

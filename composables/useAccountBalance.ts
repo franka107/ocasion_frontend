@@ -16,6 +16,7 @@ export function useAccountBalance() {
       },
     ]
     filterOptions.value = JSON.stringify(filters)
+    page.value = 1
   }
   const requestRecharge = async (values: any) => {
     const { status, error }: any = await useAPI(

@@ -9,7 +9,7 @@
     <div class="w-full flex flex-col">
       <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
         <CustomTable
-          :data="disbursementData"
+          :data="data.data"
           :search-values="initialSearchValues"
           :header="disbursementHeader"
           :search="disbursementSearch"
@@ -63,6 +63,13 @@
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
+          </template>
+
+          <template #createdAt="{ row }">
+            <DateLabel :value="row.createdAt" />
+          </template>
+          <template #totalAmount="{ row }">
+            <MoneyLabel :amount="row.totalAmount" />
           </template>
           <template #archive="{ row }">
             <div class="flex items-center justify-center">
@@ -142,6 +149,8 @@ import ConfirmDisbursementModal from '~/components/attention-tray/disbursement-l
 import { useDisbursement } from '@/composables/useDisbursement'
 import DisbursementDetailsForm from '~/components/attention-tray/disbursement-lots/DisbursementDetailsForm.vue'
 import type { IDataResponse } from '~/types/Common'
+import DateLabel from '~/design-system/ui/data-label/DateLabel.vue'
+import MoneyLabel from '~/design-system/ui/money-label/MoneyLabel.vue'
 const openParticipantModal = ref(false)
 const route = useRoute()
 const {
@@ -221,13 +230,6 @@ const { data, refresh } = await useAPI<IDataResponse<DisbursementLot>>(
   } as any,
 )
 
-const disbursementData = computed(() =>
-  data.value?.data.map((item: DisbursementLot) => ({
-    ...item,
-    createdAt: dayjs(item.createdAt).format('YYYY-MM-DD'),
-    totalAmount: `$ ${item.totalAmount.toFixed(2)}`,
-  })),
-)
 const confirmModalInfo = ref<any>({
   id: '',
   paymentSupportFile: {},

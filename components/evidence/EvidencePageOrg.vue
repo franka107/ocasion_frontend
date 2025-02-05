@@ -177,6 +177,7 @@ const onSearch = (item: { [key: string]: string }) => {
         ]
       : []),
   ])
+  page.value = 1
 }
 
 const { data, refresh }: any = await useAPI(

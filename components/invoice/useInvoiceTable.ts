@@ -94,6 +94,7 @@ export const useInvoiceTableMvi = async () => {
         value: item.organizationId || '',
       },
     ]
+    page.value = 1
   }
 
   const tableHeaders: HeaderItem[] = [

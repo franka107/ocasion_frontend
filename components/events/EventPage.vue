@@ -255,6 +255,7 @@ const onSearch = (item: { [key: string]: string }) => {
         ]
       : []),
   ])
+  page.value = 1
 }
 const BASE_ORG_URL = '/event-management'
 const [eventListData, organizationSummaryData] = await Promise.all([

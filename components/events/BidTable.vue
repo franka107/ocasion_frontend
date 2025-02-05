@@ -244,6 +244,7 @@ const onSearch = (item: { [key: string]: string }) => {
     { field: 'status', type: 'equal', value: item.status || '' },
     { field: 'event.id', type: 'equal', value: route.params.eventId },
   ])
+  page.value = 1
 }
 const filterOptions = ref(JSON.stringify(filterOptionsRaw))
 const { data, refresh }: any = await useAPI(

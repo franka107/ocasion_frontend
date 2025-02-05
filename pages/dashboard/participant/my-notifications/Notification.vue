@@ -195,6 +195,7 @@ const hasSelectedNotifications = computed(
 )
 
 watch([filterType, sortType], async () => {
+  page.value = 1
   if (filterType.value === 'todas') {
     filterOptions.value = JSON.stringify([])
   } else {

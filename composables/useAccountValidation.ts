@@ -1,7 +1,13 @@
 import dayjs from 'dayjs'
+import type { FilterOption } from './useNotificationAPI'
 export function useAccountValidation() {
+  const defaultFilterStatus: FilterOption = {
+    field: 'status',
+    type: 'equal',
+    value: 'PENDING',
+  }
   const page = ref(1)
-  const filterOptions = ref('[]')
+  const filterOptions = ref(JSON.stringify([defaultFilterStatus]))
   const sortOptions = ref('[]')
   const onSort = (sortObject: { [key: string]: string }[]) => {
     sortOptions.value = JSON.stringify(sortObject)
@@ -10,6 +16,7 @@ export function useAccountValidation() {
 
   const onSearch = (item: { [key: string]: string }) => {
     const filters = [
+      defaultFilterStatus,
       { field: 'quickSearch', type: 'like', value: item.quickSearch || '' },
       { field: 'createdAt', type: 'between', value: item.createdAt || '' },
     ]
@@ -20,6 +27,7 @@ export function useAccountValidation() {
       filters.push({ field: 'bank', type: 'equal', value: item.bank })
     }
     filterOptions.value = JSON.stringify(filters)
+    page.value = 1
   }
 
   const rejectAccountBank = async (values: any) => {
@@ -103,4 +111,3 @@ export function useAccountValidation() {
     handleExport,
   }
 }
-

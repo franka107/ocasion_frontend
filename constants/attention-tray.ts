@@ -45,22 +45,25 @@ export const rejectionReasonType = new Map<string, string>([
 ])
 export const rechargeSearch: SearchItem[] = [
   {
-    key: 'id',
+    key: 'quickSearch',
     type: 'text',
     placeholder: 'Buscar cliente, operación o transacción',
     width: 'max-w-xs w-full',
     elementClass: 'w-full',
+    label: 'Busqueda rápida',
   },
   {
     key: 'transferedAt',
     type: 'date-range',
     placeholder: 'Fecha de transferencia',
+    label: 'Fecha de transferencia',
     width: 'w-auto',
   },
   {
     key: 'createdAt',
     type: 'date-range',
     placeholder: 'Fecha de solicitud',
+    label: 'Fecha de solicitud',
     width: 'w-auto',
   },
 ]
@@ -70,11 +73,13 @@ export const accountSearch: SearchItem[] = [
     type: 'text',
     placeholder: 'Buscar n° de transacción o participante',
     width: 'max-w-xs w-full',
+    label: 'Busqueda rápida',
     elementClass: 'w-full',
   },
   {
     key: 'createdAt',
     type: 'date-range',
+    label: 'Fecha de solicitud',
     placeholder: 'Fecha de solicitud',
     width: 'w-auto',
   },
@@ -82,6 +87,7 @@ export const accountSearch: SearchItem[] = [
     key: 'bank',
     type: 'select',
     placeholder: 'Banco',
+    label: 'Banco',
     items: [
       ...Array.from(bankType).map(([key, value]) => ({
         text: value,
@@ -97,6 +103,7 @@ export const withdrawalRequestsSearch: SearchItem[] = [
     key: 'id',
     type: 'text',
     placeholder: 'Buscar cliente, operación o transacción',
+    label: 'Busqueda rápida',
     width: 'max-w-xs w-full',
     elementClass: 'w-full',
   },
@@ -104,12 +111,14 @@ export const withdrawalRequestsSearch: SearchItem[] = [
     key: 'createdAt',
     type: 'date-range',
     placeholder: 'Fecha de transferencia',
+    label: 'Fecha de transferencia',
     width: 'w-auto',
   },
   {
     key: 'transferedAt',
     type: 'date-range',
     placeholder: 'Fecha de solicitud',
+    label: 'Fecha de solicitud',
     width: 'w-auto',
   },
 ]
@@ -175,7 +184,7 @@ export const rechargeHeader: HeaderItem[] = [
     label: 'Fec. Solicitud',
   },
   {
-    key: 'fullName',
+    key: 'participant.commonName',
     label: 'Nombres y apellidos',
   },
   {
@@ -226,7 +235,7 @@ export const accountHeader: HeaderItem[] = [
   },
 
   {
-    key: 'fullName',
+    key: 'participant.commonName',
     label: 'Nombres y apellidos',
   },
   {
@@ -240,7 +249,7 @@ export const accountHeader: HeaderItem[] = [
   },
   {
     key: 'destinationAccountNumber',
-    label: 'N° de cueta destino',
+    label: 'N° de cuenta destino',
   },
   {
     key: 'status',
@@ -271,7 +280,7 @@ export const withdrawalRequeststHeader: HeaderItem[] = [
     label: 'Nombres y apellidos',
   },
   {
-    key: 'createdAt',
+    key: 'disbursementLotTransferedAt',
     label: 'Fec. Transferencia',
   },
   {

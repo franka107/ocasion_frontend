@@ -18,6 +18,7 @@ export function useOrganization() {
       filters.push({ field: 'status', type: 'equal', value: item.status })
     }
     filterOptions.value = JSON.stringify(filters)
+    page.value = 1
   }
 
   const suspendOrganization = async (id: string) => {

@@ -1,7 +1,13 @@
 // by convention, composable function names start with "use"
 export function useWithdrawalRequests() {
+  const defaultPendingFilter: FilterOption = {
+    value: 'PENDING',
+    type: 'equal',
+    field: 'status',
+  }
+
   const page = ref(1)
-  const filterOptions = ref('[]')
+  const filterOptions = ref(JSON.stringify([defaultPendingFilter]))
   const sortOptions = ref('[]')
   const onSort = (sortObject: { [key: string]: string }[]) => {
     sortOptions.value = JSON.stringify(sortObject)
@@ -10,11 +16,17 @@ export function useWithdrawalRequests() {
 
   const onSearch = (item: { [key: string]: string }) => {
     const filters = [
+      defaultPendingFilter,
       { field: 'id', type: 'like', value: item.id || '' },
       { field: 'createdAt', type: 'between', value: item.createdAt || '' },
-      { field: 'transferedAt', type: 'between', value: item.transferedAt || '' },
+      {
+        field: 'transferedAt',
+        type: 'between',
+        value: item.transferedAt || '',
+      },
     ]
     filterOptions.value = JSON.stringify(filters)
+    page.value = 1
   }
   const authorizeWithdrawal = async (values: any) => {
     const { status, error }: any = await useAPI(

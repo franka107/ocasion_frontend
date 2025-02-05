@@ -1,10 +1,16 @@
 import dayjs from 'dayjs'
+import type { FilterOption } from './useNotificationAPI'
 import type { Bank, DisbursementLot } from '~/types/Disbursement'
 const BASE_DIS_URL = '/finance/disbursement-management'
 
 export function useDisbursement() {
+  const defaultPendingFilter: FilterOption = {
+    field: 'status',
+    type: 'equal',
+    value: 'PENDING',
+  }
   const page = ref(1)
-  const filterOptions = ref('[]')
+  const filterOptions = ref(JSON.stringify([defaultPendingFilter]))
   const sortOptions = ref('[]')
   const onSort = (sortObject: { [key: string]: string }[]) => {
     sortOptions.value = JSON.stringify(sortObject)
@@ -12,6 +18,7 @@ export function useDisbursement() {
 
   const onSearch = (item: { [key: string]: string }) => {
     const filters = [
+      defaultPendingFilter,
       { field: 'id', type: 'like', value: item.id || '' },
       { field: 'quickSearch', type: 'like', value: item.quickSearch || '' },
       { field: 'status', type: 'equal', value: item.status || '' },
@@ -29,6 +36,7 @@ export function useDisbursement() {
       filters.push({ field: 'bank', type: 'equal', value: item.bank })
     }
     filterOptions.value = JSON.stringify(filters)
+    page.value = 1
   }
   const annulDisbursement = async (values: any) => {
     const { status, error } = await useAPI(
@@ -83,14 +91,14 @@ export function useDisbursement() {
   }
 
   const generatelDisbursement = async (values: any) => {
-    const { status, error } = await useAPI(
+    const { status, error, data } = await useAPI(
       `${BASE_DIS_URL}/generate-disbursement-lot`,
       {
         method: 'POST',
         body: values,
       } as any,
     )
-    return { status, error }
+    return { status, error, data }
   }
   const { openConfirmModal, updateConfirmModal } = useConfirmModal()
   const handleExport = async () => {

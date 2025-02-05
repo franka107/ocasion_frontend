@@ -10,12 +10,15 @@
       <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
         <CustomTable
           class="mb-4"
-          :data="accountData"
+          :data="data.data"
           :header="accountHeader"
           :search="accountSearch"
           @on-sort="onSort"
           @on-search="onSearch"
         >
+          <template #createdAt="{ row }">
+            <DateLabel :value="row.createdAt" />
+          </template>
           <template #actions="{ row }">
             <div class="flex justify-center">
               <DropdownMenu>
@@ -102,6 +105,7 @@ import AccountDetailsForm from '~/components/attention-tray/account-validation/A
 import { useAccountValidation } from '@/composables/useAccountValidation'
 import type { IAccountLItem } from '~/types/Account'
 import type { IDataResponse } from '~/types/Common'
+import DateLabel from '~/design-system/ui/data-label/DateLabel.vue'
 const openRejectModal = ref(false)
 const {
   page,
@@ -125,14 +129,6 @@ const { data, refresh } = await useAPI<IDataResponse<IAccountLItem>>(
       sortOptions,
     },
   } as any,
-)
-
-const accountData = computed(() =>
-  data.value?.data.map((item: IAccountLItem) => ({
-    fullName: item.participant.commonName,
-    ...item,
-    createdAt: dayjs(item.createdAt).format('YYYY-MM-DD'),
-  })),
 )
 
 const openAccountDetailsModal = ref(false)

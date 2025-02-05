@@ -402,6 +402,7 @@ const onSearch = (item: { [key: string]: string }) => {
     { field: 'title', type: 'like', value: item.title || '' },
     { field: 'event.id', type: 'equal', value: route.params.eventId },
   ])
+  page.value = 1
 }
 
 const [

@@ -18,7 +18,7 @@ import {
   paymentMediumType,
 } from '@/constants/attention-tray'
 import MoneyLabel from '~/design-system/ui/money-label/MoneyLabel.vue'
-import { Bank } from '~/types/Disbursement'
+import { Bank, type FileType } from '~/types/Disbursement'
 const {
   generatelPreviewDisbursement,
   generatelDisbursement,
@@ -145,12 +145,14 @@ const handleSubmit = async () => {
       ¿Está seguro de generar el lote del desembolso?
     `,
     callback: async () => {
-      const { status, error }: any = await generatelDisbursement(valuesToSend)
+      const { status, error, data }: any =
+        await generatelDisbursement(valuesToSend)
       if (status.value === 'success') {
         showDetailPreview.value = false
         detailPreviewInfo.value = {}
         emit('update:modelValue', false)
         props.refreshTable()
+        downloadFile(data.value.voucherGeneratedFile)
         updateConfirmModal({
           title: 'Desembolso generado',
           message: 'El desembolso ha sido generado exitosamente',
@@ -169,6 +171,32 @@ const handleSubmit = async () => {
       }
     },
   })
+}
+
+async function downloadFile(file: FileType) {
+  try {
+    // Realiza la solicitud al servidor para obtener el archivo
+    const response = await fetch(file.path)
+    if (!response.ok) {
+      throw new Error(`Error al descargar el archivo: ${response.statusText}`)
+    }
+
+    // Convierte la respuesta a un blob
+    const blob = await response.blob()
+
+    // Crea un enlace para descargar el blob
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.download = file.name
+    document.body.appendChild(link)
+    link.click()
+
+    // Limpia el objeto URL y elimina el enlace
+    URL.revokeObjectURL(link.href)
+    document.body.removeChild(link)
+  } catch (error) {
+    console.error('Error al descargar el archivo:', error)
+  }
 }
 </script>
 

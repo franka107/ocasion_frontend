@@ -134,6 +134,7 @@ const onSearch = (item: { [key: string]: string }) => {
     })
   }
   filterOptions.value = JSON.stringify(filters)
+  page.value = 1
 }
 
 const BID_BASE_URL = '/bid-management'

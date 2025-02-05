@@ -20,6 +20,7 @@ export function IuseRecharge() {
       { field: 'createdAt', type: 'between', value: item.createdAt || '' },
     ]
     filterOptions.value = JSON.stringify(filters)
+    page.value = 1
   }
   const autorizationRecharge = async (values: any) => {
     const { status, error } = await useAPI(
