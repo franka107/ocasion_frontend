@@ -337,6 +337,7 @@ export const validationHeader: HeaderItem[] = [
     key: 'document',
     label: 'Documento',
   },
+
   {
     key: 'bank',
     label: 'Banco',

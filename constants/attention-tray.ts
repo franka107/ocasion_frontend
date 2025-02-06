@@ -187,6 +187,7 @@ export const rechargeHeader: HeaderItem[] = [
     key: 'participant.commonName',
     label: 'Nombres y apellidos',
   },
+
   {
     key: 'operationNumber',
     label: 'N° Operación',
@@ -238,6 +239,16 @@ export const accountHeader: HeaderItem[] = [
     key: 'participant.commonName',
     label: 'Nombres y apellidos',
   },
+
+  {
+    key: 'participant.documentType',
+    label: 'Tipo de DOI',
+  },
+  {
+    key: 'participant.documentIdentifier',
+    label: 'Número de DOI',
+  },
+
   {
     key: 'bank',
     label: 'Banco',
