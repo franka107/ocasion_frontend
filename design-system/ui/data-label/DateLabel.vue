@@ -15,6 +15,7 @@
 </template>
 
 <script setup lang="tsx">
+import { computed } from 'vue'
 import dayjs from 'dayjs'
 import { ClockIcon } from 'lucide-vue-next'
 
@@ -23,5 +24,5 @@ const props = defineProps<{
   hideTime?: boolean
 }>()
 
-const parsedDate = dayjs(props.value)
+const parsedDate = computed(() => dayjs(props.value))
 </script>

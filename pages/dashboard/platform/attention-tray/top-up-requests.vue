@@ -296,7 +296,7 @@ const handleUpdate = async (values: any) => {
         refreshRecharTable()
         updateConfirmModal({
           title: 'Solicitud actualizada',
-          message: 'La solicitud ha sido actualizado exitosamente',
+          message: 'La solicitud ha sido actualizada exitosamente',
           type: 'success',
         })
       } else {
