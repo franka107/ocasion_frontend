@@ -11,11 +11,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import {
-  rejectionReasonType
-} from '@/constants/attention-tray'
-const {rejectWithdrawal} = useWithdrawalRequests()
-const openAnnulModal = ref(false) 
+import { rejectionReasonType } from '@/constants/attention-tray'
+const { rejectWithdrawal } = useWithdrawalRequests()
+const openAnnulModal = ref(false)
 const props = defineProps<{
   id: string
   modelValue: boolean
@@ -23,14 +21,16 @@ const props = defineProps<{
 }>()
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const emit = defineEmits(['update:modelValue'])
-const rejectionReasonOptions = Array.from(rejectionReasonType).map(([id, name]) => ({
-  id,
-  name,
-}))
+const rejectionReasonOptions = Array.from(rejectionReasonType).map(
+  ([id, name]) => ({
+    id,
+    name,
+  }),
+)
 const formSchema = toTypedSchema(
   z.object({
     rejection: z.string().min(1, 'Seleccione un motivo.'),
-    comment: z.string().min(1, "El comentario es requerido."),
+    comment: z.string().min(1, 'El comentario es requerido.'),
   }),
 )
 const form = useForm({
@@ -42,18 +42,18 @@ const onSubmit = form.handleSubmit((values: any) => {
   console.log('onsubmit', rejection, comment)
 })
 const cancelEdit = () => {
-  emit('update:modelValue', false); 
-};
+  emit('update:modelValue', false)
+}
 const handleReject = async (values: any) => {
   openConfirmModal({
     title: 'Rechazar solicitud de retiro',
-    message: '¿Está seguro que desea rechazar la solicitud de recarga?',
+    message: '¿Está seguro que desea rechazar la solicitud de retiro?',
     callback: async () => {
       const payload = {
-        id: props.id, 
-        rejectionReason: values.rejection, 
-        rejectionDetails: values.comment, 
-      };
+        id: props.id,
+        rejectionReason: values.rejection,
+        rejectionDetails: values.comment,
+      }
       const { status, error }: any = await rejectWithdrawal(payload)
       if (status.value === 'success') {
         openAnnulModal.value = false
@@ -97,8 +97,10 @@ const handleReject = async (values: any) => {
           </AlertDialogHeader>
         </div>
         <div class="grid grid-cols-1 gap-3 px-6">
-          <p class="text-[14px] font-[500] text-[#68686C]">¿Está seguro que desea rechazar la solicitud de retiro? 
-            Si es asi por favor ingresar el motivo de rechazo.</p>
+          <p class="text-[14px] font-[500] text-[#68686C]">
+            ¿Está seguro que desea rechazar la solicitud de retiro? Si es asi
+            por favor ingresar el motivo de rechazo.
+          </p>
           <!-- Motivo de Rechazo -->
           <FormField v-slot="{ componentField }" name="rejection">
             <FormItem>
@@ -117,9 +119,9 @@ const handleReject = async (values: any) => {
             <FormItem>
               <FormControl>
                 <Textarea
-                type="text"
-                label="Comentarios"
-                v-bind="componentField"
+                  type="text"
+                  label="Comentarios"
+                  v-bind="componentField"
                 />
                 <FormMessage />
               </FormControl>
@@ -136,7 +138,7 @@ const handleReject = async (values: any) => {
           >
           <Button
             type="submit"
-            class="text-[16px] font-[600] "
+            class="text-[16px] font-[600]"
             size="xl"
             :disabled="!form.meta.value.valid"
             >Confirmar</Button
