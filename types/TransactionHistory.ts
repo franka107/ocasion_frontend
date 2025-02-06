@@ -22,6 +22,7 @@ export enum TransactionHistoryMotive {
   PenaltyDischarge = 'PENALTY_DISCHARGE', // Cobro de penalidad
   BalanceWithdraw = 'BALANCE_WITHDRAW', // Retirod de saldo
   GuaranteeSeparation = 'GUARANTEE_SEPERATION', // Separacion de garantia (Experimental)
+  GuaranteeDevolution = 'GUARANTEE_DEVOLUTION', // Devolución de garantia (Experimental)
 }
 
 export interface TransactionHistoryDto {
@@ -92,6 +93,9 @@ export const transactionHistoryMotiveMap: Record<
   },
   [TransactionHistoryMotive.GuaranteeSeparation]: {
     label: 'Separación de garantía',
+  },
+  [TransactionHistoryMotive.GuaranteeDevolution]: {
+    label: 'Devolución de garantía',
   },
 }
 

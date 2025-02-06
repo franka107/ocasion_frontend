@@ -148,7 +148,7 @@ const parsedTransactionHistoryList = computed(() =>
       document: `${item.wallet.user.documentType} ${item.wallet.user.documentIdentifier}`,
       motive:
         transactionHistoryMotiveMap[item.motive as TransactionHistoryMotive]
-          .label,
+          ?.label,
       dateOfOperation: dayjs(item.createdAt).format('YYYY-MM-DD'),
       amount: formatCurrency(item.amount, item.currency),
       status: item.status,
