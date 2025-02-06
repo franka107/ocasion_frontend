@@ -18,6 +18,7 @@ export const paymentsSearch = (globalType: GlobalType): SearchItem[] => [
   {
     key: 'quickSearch',
     type: 'text',
+    label: 'Búsqueda rápida',
     placeholder:
       globalType === GlobalType.Platform
         ? 'Buscar por Org./Cód./Tít. Oferta'
@@ -29,6 +30,7 @@ export const paymentsSearch = (globalType: GlobalType): SearchItem[] => [
     key: 'status',
     type: 'select',
     placeholder: 'Filtrar estados',
+    label: 'Estados',
     items: [
       ...Array.from(paymentStatus).map(([key, value]) => ({
         text: value.name,

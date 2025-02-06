@@ -56,10 +56,12 @@ export const transactionsSearch: SearchItem[] = [
     key: 'status',
     type: 'select',
     items: [
-      ...Array.from(transactionsStatus).map(([key, value]) => ({
-        text: value.name,
-        value: key,
-      })),
+      ...Array.from(transactionsStatus)
+        .filter((e) => e[0] !== 'PENDING')
+        .map(([key, value]) => ({
+          text: value.name,
+          value: key,
+        })),
       { text: 'Todos', value: ' ' },
     ],
     placeholder: 'Estado',
@@ -87,6 +89,7 @@ export const transactionsParticipantSearch: SearchItem[] = [
     key: 'quickSearch',
     type: 'text',
     placeholder: 'Buscar cliente, evento o n° de transacción',
+    label: 'Busqueda rápida',
     width: 'max-w-xs w-full',
     elementClass: 'w-full',
   },
@@ -94,6 +97,7 @@ export const transactionsParticipantSearch: SearchItem[] = [
     key: 'createdAt',
     type: 'date-range',
     placeholder: 'Periodo de transacción',
+    label: 'Periodo de transacción',
     width: 'w-auto',
   },
   {
@@ -108,19 +112,23 @@ export const transactionsParticipantSearch: SearchItem[] = [
       { text: 'Todos', value: ' ' },
     ],
     placeholder: 'Tipo de operación',
+    label: 'Tipo de operación',
   },
   {
     key: 'status',
     type: 'select',
     items: [
-      ...Array.from(transactionsStatus).map(([key, value]) => ({
-        text: value.name,
-        value: key,
-      })),
+      ...Array.from(transactionsStatus)
+        .filter((e) => e[0] !== 'PENDING')
+        .map(([key, value]) => ({
+          text: value.name,
+          value: key,
+        })),
       { text: 'Todos', value: ' ' },
     ],
     isHidden: true,
     placeholder: 'Estado',
+    label: 'Estado',
   },
 ]
 

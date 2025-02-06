@@ -23,7 +23,7 @@ const {
   generatelPreviewDisbursement,
   generatelDisbursement,
   viewAvailableBankAccounts,
-} = useDisbursement()
+} = useDisbursement('all')
 
 const availableBankAccounts = ref<string[]>([])
 

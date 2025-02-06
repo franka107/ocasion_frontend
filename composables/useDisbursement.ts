@@ -3,14 +3,28 @@ import type { FilterOption } from './useNotificationAPI'
 import type { Bank, DisbursementLot } from '~/types/Disbursement'
 const BASE_DIS_URL = '/finance/disbursement-management'
 
-export function useDisbursement() {
-  const defaultPendingFilter: FilterOption = {
+export function useDisbursement(
+  type: 'all' | 'only-pendings' | 'not-pendings',
+) {
+  const onlyPendingsSearch: FilterOption = {
     field: 'status',
     type: 'equal',
     value: 'PENDING',
   }
+  const notPendingsSearch: FilterOption = {
+    field: 'status',
+    type: 'not',
+    value: 'PENDING',
+  }
+
+  const baseTypeSearch: FilterOption[] =
+    type === 'not-pendings'
+      ? [notPendingsSearch]
+      : type === 'only-pendings'
+        ? [onlyPendingsSearch]
+        : []
   const page = ref(1)
-  const filterOptions = ref(JSON.stringify([defaultPendingFilter]))
+  const filterOptions = ref(JSON.stringify(baseTypeSearch))
   const sortOptions = ref('[]')
   const onSort = (sortObject: { [key: string]: string }[]) => {
     sortOptions.value = JSON.stringify(sortObject)
@@ -18,7 +32,7 @@ export function useDisbursement() {
 
   const onSearch = (item: { [key: string]: string }) => {
     const filters = [
-      defaultPendingFilter,
+      ...baseTypeSearch,
       { field: 'id', type: 'like', value: item.id || '' },
       { field: 'quickSearch', type: 'like', value: item.quickSearch || '' },
       { field: 'status', type: 'equal', value: item.status || '' },

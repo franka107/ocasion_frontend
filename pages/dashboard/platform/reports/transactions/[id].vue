@@ -2,7 +2,7 @@
   <ContentLayout show-arrow title="Estado de cuenta participante">
     <TransactionPaticipantDetails />
     <div class="w-full flex flex-col">
-      <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
+      <div class="shadow-md rounded-lg px-6 pb-6 bg-white flex-grow mb-auto">
         <h2 class="pt-6 text-[#262F45] font-[700] text-[18px]">
           Historial de transacciones
         </h2>
@@ -94,8 +94,9 @@ const route = useRoute()
 const filterOptionsRaw = ref([
   { field: 'wallet.user.id', type: 'equal', value: route.params.id || '' },
 ])
+
 const { page, onSort, onSearch, filterOptions, sortOptions, handleExport } =
-  useTransactionParticipant()
+  useTransactionParticipant('not-pendings')
 const BASE_TRANS_URL = '/finance/transaction-history-management'
 
 const { data, refresh } = await useAPI<
@@ -120,4 +121,3 @@ const transactionsData = computed(() =>
   })),
 )
 </script>
-

@@ -114,7 +114,7 @@ const {
   filterOptions,
   sortOptions,
   approvalAccountBank,
-} = useAccountValidation()
+} = useAccountValidation('only-pendings')
 const accountId = ref<number | undefined>(undefined)
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 

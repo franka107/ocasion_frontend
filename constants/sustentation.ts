@@ -42,11 +42,12 @@ export const evidencePlatfSearch = (globalType: GlobalType): SearchItem[] => [
   {
     key: 'quickSearch',
     type: 'text',
+    label: 'Búsqueda rápida',
     placeholder:
       globalType === GlobalType.Platform
-        ? 'Buscar por Org./Cód./Tít. Oferta'
-        : 'Buscar por Cód./Tít. Oferta',
-    elementClass: 'min-w-[400px]',
+        ? 'Org o Cód/Tít de Oferta'
+        : 'Cód/Tít de Oferta',
+    elementClass: 'min-w-[500px]',
     position: 1,
   },
   // {

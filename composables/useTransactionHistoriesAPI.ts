@@ -1,11 +1,17 @@
 import dayjs from 'dayjs'
+import type { FilterOption } from './useNotificationAPI'
 import type { IDataResponse } from '~/types/Common'
 import type { TransactionHistoryListItem } from '~/types/TransactionHistory'
 
 // by convention, composable function names start with "use"
 export function useTransactionHistoriesAPI() {
+  const defaultStatusSearch: FilterOption = {
+    field: 'status',
+    type: 'not',
+    value: 'PENDING',
+  }
   const page = ref(1)
-  const filterOptions = ref('[]')
+  const filterOptions = ref(JSON.stringify([defaultStatusSearch]))
   const sortOptions = ref('[]')
   const onSort = (sortObject: { [key: string]: string }[]) => {
     sortOptions.value = JSON.stringify(sortObject)
@@ -14,6 +20,7 @@ export function useTransactionHistoriesAPI() {
 
   const onSearch = (item: { [key: string]: string }) => {
     const filters = [
+      defaultStatusSearch,
       { field: 'quickSearch', type: 'like', value: item.quickSearch || '' },
       { field: 'status', type: 'equal', value: item.status || '' },
       { field: 'createdAt', type: 'between', value: item.createdAt || '' },

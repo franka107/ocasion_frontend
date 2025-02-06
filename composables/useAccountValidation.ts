@@ -1,13 +1,26 @@
 import dayjs from 'dayjs'
 import type { FilterOption } from './useNotificationAPI'
-export function useAccountValidation() {
-  const defaultFilterStatus: FilterOption = {
+export function useAccountValidation(
+  type: 'all' | 'only-pendings' | 'not-pendings' = 'all',
+) {
+  const notPendingsSearch: FilterOption = {
+    field: 'status',
+    type: 'not',
+    value: 'PENDING',
+  }
+  const onlyPendingsSearch: FilterOption = {
     field: 'status',
     type: 'equal',
     value: 'PENDING',
   }
+  const baseTypeSearch: FilterOption[] =
+    type === 'not-pendings'
+      ? [notPendingsSearch]
+      : type === 'only-pendings'
+        ? [onlyPendingsSearch]
+        : []
   const page = ref(1)
-  const filterOptions = ref(JSON.stringify([defaultFilterStatus]))
+  const filterOptions = ref(JSON.stringify(baseTypeSearch))
   const sortOptions = ref('[]')
   const onSort = (sortObject: { [key: string]: string }[]) => {
     sortOptions.value = JSON.stringify(sortObject)
@@ -16,7 +29,7 @@ export function useAccountValidation() {
 
   const onSearch = (item: { [key: string]: string }) => {
     const filters = [
-      defaultFilterStatus,
+      ...baseTypeSearch,
       { field: 'quickSearch', type: 'like', value: item.quickSearch || '' },
       { field: 'createdAt', type: 'between', value: item.createdAt || '' },
     ]

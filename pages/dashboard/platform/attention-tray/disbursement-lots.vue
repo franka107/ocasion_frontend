@@ -160,7 +160,7 @@ const {
   filterOptions,
   sortOptions,
   annulDisbursement,
-} = useDisbursement()
+} = useDisbursement('only-pendings')
 const openModalConfirm = ref(false)
 const openAnnulModal = ref(false)
 const openWithdrawalDetailsModal = ref(false)

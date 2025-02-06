@@ -20,7 +20,7 @@ const props = defineProps<{
   refreshTable: () => void
 }>()
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
-const { confirmDisbursement } = useDisbursement()
+const { confirmDisbursement } = useDisbursement('all')
 const emit = defineEmits(['update:modelValue'])
 const formSchema = toTypedSchema(
   z.object({

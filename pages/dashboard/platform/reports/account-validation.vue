@@ -63,7 +63,7 @@ import type { IDataResponse } from '~/types/Common'
 import DateLabel from '~/design-system/ui/data-label/DateLabel.vue'
 
 const { page, onSort, onSearch, filterOptions, sortOptions, handleExport } =
-  useAccountValidation()
+  useAccountValidation('not-pendings')
 const BASE_VAL_URL = '/finance/account-validation'
 const { data, refresh } = await useAPI<IDataResponse<IAccountLItem>>(
   () => `${BASE_VAL_URL}/view-paginated-account-validations`,

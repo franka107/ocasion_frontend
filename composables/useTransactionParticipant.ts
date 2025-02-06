@@ -3,9 +3,27 @@ import type { IDataResponse } from '~/types/Common'
 import type { TransactionHistoryListItem } from '~/types/TransactionHistory'
 
 // by convention, composable function names start with "use"
-export function useTransactionParticipant() {
+export function useTransactionParticipant(
+  type: 'all' | 'only-pendings' | 'not-pendings',
+) {
+  const notPendingsSearch: FilterOption = {
+    field: 'status',
+    type: 'not',
+    value: 'PENDING',
+  }
+  const onlyPendingsSearch: FilterOption = {
+    field: 'status',
+    type: 'equal',
+    value: 'PENDING',
+  }
+  const baseTypeSearch: FilterOption[] =
+    type === 'not-pendings'
+      ? [notPendingsSearch]
+      : type === 'only-pendings'
+        ? [onlyPendingsSearch]
+        : []
   const page = ref(1)
-  const filterOptions = ref('[]')
+  const filterOptions = ref(JSON.stringify(baseTypeSearch))
   const sortOptions = ref('[]')
   const onSort = (sortObject: { [key: string]: string }[]) => {
     sortOptions.value = JSON.stringify(sortObject)
@@ -14,6 +32,7 @@ export function useTransactionParticipant() {
 
   const onSearch = (item: { [key: string]: string }) => {
     const filters = [
+      ...baseTypeSearch,
       { field: 'quickSearch', type: 'like', value: item.quickSearch || '' },
       { field: 'status', type: 'equal', value: item.status || '' },
       { field: 'createdAt', type: 'between', value: item.createdAt || '' },
