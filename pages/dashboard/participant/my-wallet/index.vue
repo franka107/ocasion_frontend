@@ -117,7 +117,6 @@ const { getMyGrants } = useAuthManagement()
 const limit = ref(10)
 
 const filterOptions = ref(JSON.stringify([]))
-
 const onSearch = (item: { [key: string]: string }) => {
   const filters = []
   if (item.type) {

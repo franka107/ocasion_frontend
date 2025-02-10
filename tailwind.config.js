@@ -10,6 +10,7 @@ module.exports = {
     'bg-[#EFF6FF]',
     'text-[#2563EB]', // Azul para EVENTO
     'bg-[#E0F2FE]',
+    'bg-muted',
     'text-yellow-500',
     'text-green-500',
     'text-blue-500',

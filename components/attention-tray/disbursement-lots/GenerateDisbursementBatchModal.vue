@@ -16,9 +16,17 @@ import {
   paymentMethodType,
   currencyType,
   paymentMediumType,
+  withdrawalRequeststHeaderShortly,
+  withdrawalRequestsSearch,
+  rechargeStatus,
 } from '@/constants/attention-tray'
 import MoneyLabel from '~/design-system/ui/money-label/MoneyLabel.vue'
-import { Bank, type FileType } from '~/types/Disbursement'
+import { Bank, type DisbursementLot, type FileType } from '~/types/Disbursement'
+import type { IDataResponse } from '~/types/Common'
+import type { IWithdrawalItem } from '~/types/Withdrawal'
+import type { SearchValues } from '~/components/ui/custom-table/CustomTable.vue'
+import CustomChip from '~/components/ui/custom-chip/CustomChip.vue'
+import DateLabel from '~/design-system/ui/data-label/DateLabel.vue'
 const {
   generatelPreviewDisbursement,
   generatelDisbursement,
@@ -41,7 +49,7 @@ const props = defineProps<{
   id?: string
   modelValue: boolean
   bank: string
-  retireRequests: { type: string; ids: string[] }
+  // retireRequests: { type: string; ids: string[] }
   onSubmit: (values: any) => void
   refreshTable: () => void
 }>()
@@ -96,6 +104,31 @@ const formSchema = toTypedSchema(
 const form = useForm({
   validationSchema: formSchema,
 })
+const BASE_DIS_URL = '/finance/disbursement-management'
+
+const {
+  page,
+  onSort,
+  onSearch,
+  filterOptions,
+  sortOptions,
+  requestWithdrawal,
+  authorizeWithdrawal,
+  rejectWithdrawal,
+} = useWithdrawalRequests('not-pendings')
+
+const BASE_WITH_URL = '/finance/withdrawal-request-management'
+const { data, refresh } = await useAPI<IDataResponse<IWithdrawalItem>>(
+  () => `${BASE_WITH_URL}/view-paginated-withdrawal-requests`,
+  {
+    query: {
+      limit: 8,
+      page,
+      filterOptions,
+      sortOptions,
+    },
+  } as any,
+)
 
 const onSubmit = form.handleSubmit((values) => {
   const { paymentMethod, bank, currency, chargeAccount, paymentMedium } = values
@@ -115,7 +148,7 @@ const handlePreview = async (values: any) => {
     bank: values.bank,
     chargeAccount: values.chargeAccount,
     disbursedAt: values.disbursedAt,
-    batchRetireRequests: props.retireRequests,
+    batchRetireRequests: selectedMultipleData,
   }
   const { status, error, data }: any =
     await generatelPreviewDisbursement(valuesToSend)
@@ -137,7 +170,7 @@ const handlePreview = async (values: any) => {
 const handleSubmit = async () => {
   const valuesToSend = {
     ...form.values,
-    batchRetireRequests: props.retireRequests,
+    batchRetireRequests: selectedMultipleData,
   }
   openConfirmModal({
     title: 'Resumen del desembolso',
@@ -173,6 +206,13 @@ const handleSubmit = async () => {
   })
 }
 
+const initialSearchValues: SearchValues = {}
+
+const selectedMultipleData = ref<{ type: string; ids: string[] }>({
+  type: 'empty',
+  ids: [],
+})
+const resetMultipleSelect = ref<Function | undefined>(undefined)
 async function downloadFile(file: FileType) {
   try {
     // Realiza la solicitud al servidor para obtener el archivo
@@ -208,7 +248,7 @@ async function downloadFile(file: FileType) {
   >
     <AlertDialogContent
       class="z-[98] h-auto w-full px-0"
-      :class="[showDetailPreview ? 'max-w-[450px]' : 'max-w-[670px]']"
+      :class="[showDetailPreview ? 'max-w-[550px]' : 'max-w-[770px]']"
     >
       <form
         v-show="!showDetailPreview"
@@ -267,20 +307,6 @@ async function downloadFile(file: FileType) {
               <FormMessage />
             </FormItem>
           </FormField>
-          <!-- Cuenta cargo -->
-          <!-- <FormField v-slot="{ componentField }" name="chargeAccount"> -->
-          <!--   <FormItem> -->
-          <!--     <FormControl> -->
-          <!--       <CustomInput -->
-          <!--         v-bind="componentField" -->
-          <!--         type="text" -->
-          <!--         placeholder="0000 0000 0000 0000" -->
-          <!--         label="Cuenta cargo" -->
-          <!--       /> -->
-          <!--     </FormControl> -->
-          <!--     <FormMessage /> -->
-          <!--   </FormItem> -->
-          <!-- </FormField> -->
 
           <FormField v-slot="{ componentField }" name="chargeAccount">
             <FormItem class="">
@@ -332,6 +358,38 @@ async function downloadFile(file: FileType) {
               <FormMessage />
             </FormItem>
           </FormField>
+          <!-- Table -->
+          <div class="col-span-2">
+            <CustomTable
+              :data="data.data"
+              :header="withdrawalRequeststHeaderShortly"
+              :search="withdrawalRequestsSearch"
+              class="mb-4"
+              multiple-select
+              @on-sort="onSort"
+              @on-search="onSearch"
+              @on-multiple-select="
+                ({ ids, type, resetMultipleSelect: onResetMultipleSelect }) => {
+                  selectedMultipleData = { ids, type }
+                  resetMultipleSelect = onResetMultipleSelect
+                }
+              "
+            >
+              <template #createdAt="{ row }">
+                <DateLabel :value="row.createdAt" />
+              </template>
+              <template #amount="{ row }">
+                <MoneyLabel :amount="row.amount" />
+              </template>
+
+              <template #status="{ row }">
+                <CustomChip
+                  :text="rechargeStatus.get(row.status)?.name || ''"
+                  :variant="rechargeStatus.get(row.status)?.color as any"
+                ></CustomChip>
+              </template>
+            </CustomTable>
+          </div>
         </div>
         <!-- Botones -->
         <AlertDialogFooter class="px-6">
@@ -367,9 +425,7 @@ async function downloadFile(file: FileType) {
           <div class="flex font-[500] text-[14px]"></div>
           <div class="flex font-[500] text-[14px]">
             <h3 class="text-[#225B82] pr-2">N° solicitudes:</h3>
-            <p class="">
-              {{ detailPreviewInfo.retireRequestsCount }}
-            </p>
+            <p class="">{{ detailPreviewInfo.retireRequestsCount }}</p>
           </div>
           <div class="flex font-[500] text-[14px]">
             <h3 class="text-[#225B82] pr-1">Suma de monto a desembolsar:</h3>

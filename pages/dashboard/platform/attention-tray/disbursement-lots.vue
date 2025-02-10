@@ -91,7 +91,25 @@
               :variant="disbursementStatus.get(row.status)?.color as any"
             ></CustomChip>
           </template>
+          <template #action-button>
+            <Button
+              variant="default"
+              @click="
+                () => {
+                  openModalGenerate = true
+                }
+              "
+              >Generar lote</Button
+            >
+          </template>
         </CustomTable>
+        <GenerateDisbursementBatchModal
+          :id="generateDisbursementForm.id"
+          v-model="openModalGenerate"
+          :bank="generateDisbursementForm.bank"
+          :on-submit="handleGenerateDisbursement"
+          :refresh-table="refresh"
+        />
         <SheetContent
           v-model:open="openWithdrawalDetailsModal"
           class="flex flex-col h-full"
@@ -163,6 +181,7 @@ const {
 } = useDisbursement('only-pendings')
 const openModalConfirm = ref(false)
 const openAnnulModal = ref(false)
+const openModalGenerate = ref(false)
 const openWithdrawalDetailsModal = ref(false)
 const disbursementId = ref<number | undefined>(undefined)
 const selectedRequestId = ref<string | null>(null)
@@ -171,6 +190,20 @@ const selectedRequestId = ref<string | null>(null)
 // sync disbursementLotId query param with
 
 const initialSearchValues: SearchValues = {}
+
+const handleGenerateDisbursement = (formData: any) => {
+  console.log('Lote generado con los datos:', formData)
+  openModalGenerate.value = false
+}
+
+const generateDisbursementForm = ref<any>({
+  id: '',
+  paymentMethod: '',
+  currency: '',
+  bank: '',
+  chargeAccount: '',
+  paymentMedium: '',
+})
 
 if (route.query.disbursementLotId) {
   initialSearchValues.id = route.query.disbursementLotId as string

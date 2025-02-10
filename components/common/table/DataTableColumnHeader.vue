@@ -46,26 +46,25 @@
 </template>
 
 <script setup lang="ts">
-import type { Column } from "@tanstack/vue-table";
+import type { Column } from '@tanstack/vue-table'
 
 import {
   ArrowDownIcon,
   ArrowUpIcon,
   CaretSortIcon,
   EyeNoneIcon,
-} from "@radix-icons/vue";
-
+} from '@radix-icons/vue'
 
 interface DataTableColumnHeaderProps<TData, TValue> {
   column: Column<TData, TValue>
   title: string
 }
 
-defineProps<DataTableColumnHeaderProps<any, any>>();
+defineProps<DataTableColumnHeaderProps<any, any>>()
 </script>
 
 <script lang="ts">
 export default {
   inheritAttrs: false,
-};
+}
 </script>

@@ -273,6 +273,34 @@ export const accountHeader: HeaderItem[] = [
     align: 'center',
   },
 ]
+
+export const withdrawalRequeststHeaderShortly: HeaderItem[] = [
+  {
+    key: 'id',
+    label: 'N° Operación',
+  },
+  {
+    key: 'transactionHistory.id',
+    label: 'N° Transacción',
+  },
+  {
+    key: 'createdAt',
+    label: 'Fec. Solicitud',
+  },
+  {
+    key: 'participant.commonName',
+    label: 'Nombres y apellidos',
+  },
+  {
+    key: 'amount',
+    label: 'Importe',
+  },
+
+  {
+    key: 'status',
+    label: 'Estado',
+  },
+]
 export const withdrawalRequeststHeader: HeaderItem[] = [
   {
     key: 'id',

@@ -1,13 +1,32 @@
 // by convention, composable function names start with "use"
-export function useWithdrawalRequests() {
-  const defaultPendingFilter: FilterOption = {
-    value: 'PENDING',
-    type: 'equal',
+export function useWithdrawalRequests(
+  type: 'all' | 'only-pendings' | 'not-pendings' = 'all',
+) {
+  const onlyPendingsSearch: FilterOption = {
     field: 'status',
+    type: 'equal',
+    value: 'PENDING',
+  }
+  const notPendingsSearch: FilterOption = {
+    field: 'status',
+    type: 'equal',
+    value: 'APPROVED',
+  }
+  const notPendingsAccountSearch: FilterOption = {
+    field: 'accountValidation.status',
+    type: 'equal',
+    value: 'APPROVED',
   }
 
+  const baseTypeSearch: FilterOption[] =
+    type === 'not-pendings'
+      ? [notPendingsSearch, notPendingsAccountSearch]
+      : type === 'only-pendings'
+        ? [onlyPendingsSearch]
+        : []
+
   const page = ref(1)
-  const filterOptions = ref(JSON.stringify([defaultPendingFilter]))
+  const filterOptions = ref(JSON.stringify(baseTypeSearch))
   const sortOptions = ref('[]')
   const onSort = (sortObject: { [key: string]: string }[]) => {
     sortOptions.value = JSON.stringify(sortObject)
@@ -16,7 +35,7 @@ export function useWithdrawalRequests() {
 
   const onSearch = (item: { [key: string]: string }) => {
     const filters = [
-      defaultPendingFilter,
+      ...baseTypeSearch,
       { field: 'id', type: 'like', value: item.id || '' },
       { field: 'createdAt', type: 'between', value: item.createdAt || '' },
       {

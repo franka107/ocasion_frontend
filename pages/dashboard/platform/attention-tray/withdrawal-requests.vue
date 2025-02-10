@@ -13,7 +13,6 @@
           :header="withdrawalRequeststHeader"
           :search="withdrawalRequestsSearch"
           class="mb-4"
-          multiple-select
           @on-sort="onSort"
           @on-search="onSearch"
           @on-multiple-select="
@@ -23,18 +22,6 @@
             }
           "
         >
-          <template #action-button>
-            <Button
-              variant="default"
-              :disabled="disableMultipleSelect"
-              @click="
-                () => {
-                  openModalGenerate = true
-                }
-              "
-              >Generar lote</Button
-            >
-          </template>
           <template #createdAt="{ row }">
             <DateLabel :value="row.createdAt" />
           </template>
@@ -237,7 +224,7 @@ const {
   requestWithdrawal,
   authorizeWithdrawal,
   rejectWithdrawal,
-} = useWithdrawalRequests()
+} = useWithdrawalRequests('only-pendings')
 const selectedMultipleData = ref<{ type: string; ids: string[] }>({
   type: 'empty',
   ids: [],

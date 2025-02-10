@@ -1,4 +1,5 @@
 const PUBLIC_ROUTES = [
+  '/auth/test',
   '/auth/login',
   '/auth/sign-in',
   '/auth/validate-otp',
