@@ -22,6 +22,17 @@
               :variant="offerStatusRecord[row.offer.status]?.color as any"
             ></CustomChip>
           </template>
+          <template #amount="{ row }">
+            <MoneyLabel :amount="row.amount" />
+          </template>
+
+          <template #taxes="{ row }">
+            <MoneyLabel :amount="row.taxes" />
+          </template>
+
+          <template #total="{ row }">
+            <MoneyLabel :amount="row.total" />
+          </template>
           <template #transferenceSustentation="{ row }">
             <div
               v-if="row.sustentation"
@@ -366,6 +377,7 @@ import {
 import { offerStatusRecord } from '~/constants/offer'
 import { PaymentStatus, paymentStatusRecord } from '~/types/Payment'
 import DeliverySustentationForm from '~/components/evidence/DeliverySustentationForm.vue'
+import MoneyLabel from '~/design-system/ui/money-label/MoneyLabel.vue'
 const selectedId = ref('') // Define el id que necesitas pasar
 const selectedPersonStatus = ref<'single' | 'married' | 'legal'>('legal')
 const openTransferModal = ref(false)

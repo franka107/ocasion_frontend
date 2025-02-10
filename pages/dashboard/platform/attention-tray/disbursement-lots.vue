@@ -7,7 +7,7 @@
     />
 
     <div class="w-full flex flex-col">
-      <div class="shadow-md rounded-lg px-6 bg-white flex-grow mb-auto">
+      <div class="shadow-md rounded-lg px-6 bg-white pb-6 flex-grow mb-auto">
         <CustomTable
           :data="data.data"
           :search-values="initialSearchValues"

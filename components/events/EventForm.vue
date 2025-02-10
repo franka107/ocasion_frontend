@@ -24,7 +24,7 @@ import {
 } from '@internationalized/date'
 import Textarea from '../ui/textarea/Textarea.vue'
 import type { Item } from '../ui/custom-select/CustomSelect.vue'
-import { eventType, goodType, eventTimes } from '@/constants/events'
+import { eventType, goodType, eventTimes, GoodType } from '@/constants/events'
 import type { EventDto } from '@/types/Event'
 import InputFile from '@/components/common/file/Input.vue'
 const EVENT_BASE_URL = '/event-management'
@@ -192,7 +192,10 @@ if (props.id) {
     initialValues: organizationData.value,
   })
 } else {
-  form = useForm({ validationSchema: formSchema })
+  form = useForm({
+    validationSchema: formSchema,
+    initialValues: { goodType: GoodType.CarsAndMotorcycles },
+  })
 }
 
 watch(form.values, (newValues) => {
@@ -305,11 +308,22 @@ const handleFilesChange = (files: File[]) => {
         </FormItem>
       </FormField>
       <FormField v-slot="{ componentField }" name="goodType">
+        <!-- <FormItem> -->
+        <!--   <FormControl> -->
+        <!--     <CustomSelect -->
+        <!--       v-bind="componentField" -->
+        <!--       :disabled="!!props.id" -->
+        <!--       :items="goodTypeOptions" -->
+        <!--       placeholder="Tipo de bien" -->
+        <!--     /> -->
+        <!--   </FormControl> -->
+        <!--   <FormMessage /> -->
+        <!-- </FormItem> -->
         <FormItem>
           <FormControl>
             <CustomSelect
               v-bind="componentField"
-              :disabled="!!props.id"
+              disabled
               :items="goodTypeOptions"
               placeholder="Tipo de bien"
             />

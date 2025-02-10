@@ -252,7 +252,7 @@ export const transactionsHeader: HeaderItem[] = [
     label: 'N° Operación',
   },
   {
-    key: 'fullName',
+    key: 'wallet.user.commonName',
     label: 'Nombres y apellidos',
   },
   {

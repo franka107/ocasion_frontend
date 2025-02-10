@@ -1,3 +1,4 @@
+import { transactionsStatus } from './reports'
 import type {
   HeaderItem,
   SearchItem,
@@ -54,6 +55,20 @@ export const transactionHistorySearch: SearchItem[] = [
       },
     ],
     elementClass: 'min-w-[250px]',
+  },
+  {
+    key: 'status',
+    type: 'select',
+    items: [
+      ...Array.from(transactionsStatus).map(([key, value]) => ({
+        text: value.name,
+        value: key,
+      })),
+      { text: 'Todos', value: ' ' },
+    ],
+    isHidden: false,
+    placeholder: 'Estado',
+    label: 'Estado',
   },
 ]
 export const transactionHistoryHeader: HeaderItem[] = [

@@ -119,6 +119,10 @@ const limit = ref(10)
 const filterOptions = ref(JSON.stringify([]))
 const onSearch = (item: { [key: string]: string }) => {
   const filters = []
+
+  if (item.status) {
+    filters.push({ field: 'status', type: 'equal', value: item.status })
+  }
   if (item.type) {
     filters.push({ field: 'type', type: 'equal', value: item.type })
   }

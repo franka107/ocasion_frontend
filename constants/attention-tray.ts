@@ -182,10 +182,13 @@ export const rechargeHeader: HeaderItem[] = [
   {
     key: 'createdAt',
     label: 'Fec. Solicitud',
+    sortable: true,
   },
   {
     key: 'participant.commonName',
     label: 'Nombres y apellidos',
+
+    sortable: true,
   },
 
   {
@@ -195,6 +198,7 @@ export const rechargeHeader: HeaderItem[] = [
   {
     key: 'transferedAt',
     label: 'Fec. Transferencia',
+    sortable: true,
   },
 
   {

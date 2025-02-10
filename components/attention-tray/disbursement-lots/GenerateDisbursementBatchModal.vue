@@ -160,6 +160,7 @@ const handlePreview = async (values: any) => {
       error.value.data?.errors?.[0].message ||
       error.value.data.message ||
       'El desembolso no se pudo generar, intentalo más tarde'
+    openConfirmModal({ title: '', message: '', callback: async () => {} })
     updateConfirmModal({
       title: 'Error al generar desembolso',
       message: eMsg,
@@ -248,150 +249,155 @@ async function downloadFile(file: FileType) {
   >
     <AlertDialogContent
       class="z-[98] h-auto w-full px-0"
-      :class="[showDetailPreview ? 'max-w-[550px]' : 'max-w-[770px]']"
+      :class="[showDetailPreview ? 'max-w-[450px]' : 'max-w-[770px]']"
     >
-      <form
+      <div
         v-show="!showDetailPreview"
         class="flex flex-col gap-6 flex-grow max-h-[calc(100vh-4rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-primary/50"
-        @submit="onSubmit"
       >
-        <!-- Título -->
-        <AlertDialogHeader class="border-b border-primary">
-          <AlertDialogTitle
-            class="text-xl tracking-[-0.5px] text-primary text-start font-[600] px-6 pb-[18px]"
-            >Generar lote de desembolso</AlertDialogTitle
-          >
-        </AlertDialogHeader>
-        <div class="grid grid-cols-2 gap-2 xl:gap-4 px-6">
-          <!-- Forma de pago -->
-          <FormField v-slot="{ componentField }" name="paymentMethod">
-            <FormItem>
-              <FormControl>
-                <CustomSelect
-                  v-bind="componentField"
-                  :items="paymentMethodOptions"
-                  placeholder="Forma de pago"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-          <!-- Banco -->
-          <FormField v-slot="{ componentField }" name="bank">
-            <FormItem>
-              <FormControl>
-                <CustomSelect
-                  v-bind="componentField"
-                  :items="banksOptions"
-                  placeholder="Banco"
-                  @update:model-value="
-                    (value) => {
-                      handleBankChange(value)
-                    }
-                  "
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-          <!-- Moneda -->
-          <FormField v-slot="{ componentField }" name="currency">
-            <FormItem>
-              <FormControl>
-                <CustomSelect
-                  v-bind="componentField"
-                  :items="currencyOptions"
-                  placeholder="Moneda"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-
-          <FormField v-slot="{ componentField }" name="chargeAccount">
-            <FormItem class="">
-              <FormControl>
-                <CustomSelect
-                  v-bind="componentField"
-                  :disabled="!form.values.bank"
-                  :items="
-                    availableBankAccounts.map((e) => ({
-                      id: e,
-                      name: e,
-                    })) || []
-                  "
-                  placeholder="Cuenta cargo"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-          <!-- Medio de pago -->
-          <FormField v-slot="{ componentField }" name="paymentMedium">
-            <FormItem>
-              <FormControl>
-                <div class="mt-[6px]">
+        <form v-show="!showDetailPreview" class="" @submit="onSubmit">
+          <!-- Título -->
+          <AlertDialogHeader class="border-b border-primary">
+            <AlertDialogTitle
+              class="text-xl tracking-[-0.5px] text-primary text-start font-[600] px-6 pb-[18px]"
+              >Generar lote de desembolso</AlertDialogTitle
+            >
+          </AlertDialogHeader>
+          <div class="grid grid-cols-2 gap-2 xl:gap-4 px-6 pt-6">
+            <!-- Forma de pago -->
+            <FormField v-slot="{ componentField }" name="paymentMethod">
+              <FormItem>
+                <FormControl>
                   <CustomSelect
                     v-bind="componentField"
-                    :items="paymentMediumOptions"
-                    placeholder="Medio de pago"
+                    :items="paymentMethodOptions"
+                    placeholder="Forma de pago"
                   />
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+            <!-- Banco -->
+            <FormField v-slot="{ componentField }" name="bank">
+              <FormItem>
+                <FormControl>
+                  <CustomSelect
+                    v-bind="componentField"
+                    :items="banksOptions"
+                    placeholder="Banco"
+                    @update:model-value="
+                      (value) => {
+                        handleBankChange(value)
+                      }
+                    "
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+            <!-- Moneda -->
+            <FormField v-slot="{ componentField }" name="currency">
+              <FormItem>
+                <FormControl>
+                  <CustomSelect
+                    v-bind="componentField"
+                    :items="currencyOptions"
+                    placeholder="Moneda"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
 
-          <FormField v-slot="{ componentField }" name="disbursedAt">
-            <FormItem>
-              <FormControl>
-                <DateInput
-                  label="Fecha de desembolso"
-                  :value="componentField.modelValue"
-                  :min-value="
-                    parseAbsolute(new Date().toISOString(), getLocalTimeZone())
-                  "
-                  @update:model-value="componentField.onChange"
-                />
-                <!-- <CustomInput staticLabel type="date" label="Fecha de desembolso" v-bind="componentField" /> -->
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-          <!-- Table -->
-          <div class="col-span-2">
-            <CustomTable
-              :data="data.data"
-              :header="withdrawalRequeststHeaderShortly"
-              :search="withdrawalRequestsSearch"
-              class="mb-4"
-              multiple-select
-              @on-sort="onSort"
-              @on-search="onSearch"
-              @on-multiple-select="
-                ({ ids, type, resetMultipleSelect: onResetMultipleSelect }) => {
-                  selectedMultipleData = { ids, type }
-                  resetMultipleSelect = onResetMultipleSelect
-                }
-              "
-            >
-              <template #createdAt="{ row }">
-                <DateLabel :value="row.createdAt" />
-              </template>
-              <template #amount="{ row }">
-                <MoneyLabel :amount="row.amount" />
-              </template>
+            <FormField v-slot="{ componentField }" name="chargeAccount">
+              <FormItem class="">
+                <FormControl>
+                  <CustomSelect
+                    v-bind="componentField"
+                    :disabled="!form.values.bank"
+                    :items="
+                      availableBankAccounts.map((e) => ({
+                        id: e,
+                        name: e,
+                      })) || []
+                    "
+                    placeholder="Cuenta cargo"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+            <!-- Medio de pago -->
+            <FormField v-slot="{ componentField }" name="paymentMedium">
+              <FormItem>
+                <FormControl>
+                  <div class="mt-[6px]">
+                    <CustomSelect
+                      v-bind="componentField"
+                      :items="paymentMediumOptions"
+                      placeholder="Medio de pago"
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
 
-              <template #status="{ row }">
-                <CustomChip
-                  :text="rechargeStatus.get(row.status)?.name || ''"
-                  :variant="rechargeStatus.get(row.status)?.color as any"
-                ></CustomChip>
-              </template>
-            </CustomTable>
+            <FormField v-slot="{ componentField }" name="disbursedAt">
+              <FormItem>
+                <FormControl>
+                  <DateInput
+                    label="Fecha de desembolso"
+                    :value="componentField.modelValue"
+                    :min-value="
+                      parseAbsolute(
+                        new Date().toISOString(),
+                        getLocalTimeZone(),
+                      )
+                    "
+                    @update:model-value="componentField.onChange"
+                  />
+                  <!-- <CustomInput staticLabel type="date" label="Fecha de desembolso" v-bind="componentField" /> -->
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+            <!-- Table -->
           </div>
+          <!-- Botones -->
+        </form>
+        <div class="px-6">
+          <CustomTable
+            :data="data.data"
+            :header="withdrawalRequeststHeaderShortly"
+            :search="withdrawalRequestsSearch"
+            class="mb-4"
+            multiple-select
+            @on-sort="onSort"
+            @on-search="onSearch"
+            @on-multiple-select="
+              ({ ids, type, resetMultipleSelect: onResetMultipleSelect }) => {
+                selectedMultipleData = { ids, type }
+                resetMultipleSelect = onResetMultipleSelect
+              }
+            "
+          >
+            <template #createdAt="{ row }">
+              <DateLabel :value="row.createdAt" />
+            </template>
+            <template #amount="{ row }">
+              <MoneyLabel :amount="row.amount" />
+            </template>
+
+            <template #status="{ row }">
+              <CustomChip
+                :text="rechargeStatus.get(row.status)?.name || ''"
+                :variant="rechargeStatus.get(row.status)?.color as any"
+              ></CustomChip>
+            </template>
+          </CustomTable>
         </div>
-        <!-- Botones -->
+
         <AlertDialogFooter class="px-6">
           <Button
             type="button"
@@ -402,15 +408,20 @@ async function downloadFile(file: FileType) {
             Cancelar
           </Button>
           <Button
-            type="submit"
             size="xl"
             class="text-[16px] font-[600] mt-[16px]"
             :disabled="!form.meta.value.valid"
+            @click="
+              () => {
+                onSubmit()
+              }
+            "
           >
             Generar
           </Button>
         </AlertDialogFooter>
-      </form>
+      </div>
+
       <div v-show="showDetailPreview" class="mx-auto">
         <div class="flex flex-col items-center px-6">
           <CustomIcons name="Icon-USD" class="w-[48px] h-[48px] pb-[16px]" />
