@@ -265,7 +265,7 @@ export const transactionsHeader: HeaderItem[] = [
     sortable: true,
   },
   {
-    key: 'dateOfOperation',
+    key: 'createdAt',
     label: 'Fecha de operación',
   },
   {
@@ -275,6 +275,11 @@ export const transactionsHeader: HeaderItem[] = [
   {
     key: 'livelihood',
     label: 'Sustento',
+    align: 'center',
+  },
+  {
+    key: 'voucher',
+    label: 'Comprobante',
     align: 'center',
   },
   {
@@ -411,7 +416,19 @@ export const balanceHeader: HeaderItem[] = [
 export const transactionsParticipantHeader: HeaderItem[] = [
   {
     key: 'id',
-    label: 'N° Transación',
+    label: 'N° Transacción',
+  },
+  {
+    key: 'operationId',
+    label: 'N° Operación',
+  },
+  {
+    key: 'wallet.user.commonName',
+    label: 'Nombres y apellidos',
+  },
+  {
+    key: 'document',
+    label: 'Documento',
   },
   {
     key: 'motive',
@@ -421,7 +438,6 @@ export const transactionsParticipantHeader: HeaderItem[] = [
   {
     key: 'createdAt',
     label: 'Fecha de operación',
-    sortable: true,
   },
   {
     key: 'amount',

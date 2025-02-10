@@ -20,39 +20,31 @@
               Exportar
             </Button>
           </template>
+
           <template #livelihood="{ row }">
             <div class="flex items-center justify-center">
-              <component
-                :is="row.rechargeRequest?.sustentationFile?.path ? 'a' : 'span'"
-                :href="row.rechargeRequest?.sustentationFile?.path || undefined"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="flex items-center justify-center"
-              >
-                <CustomIcons
-                  v-if="row.rechargeRequest?.sustentationFile?.path"
-                  name="Doc-Loupe"
-                />
-                <span v-else>-</span>
-              </component>
+              <FileLabel :value="row.rechargeRequest?.sustentationFile" />
             </div>
           </template>
+
           <template #voucher="{ row }">
-            <div class="flex items-center justify-center">
-              <component
-                :is="row.voucherGeneratedFile?.path ? 'a' : 'span'"
-                :href="row.voucherGeneratedFile?.path || undefined"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="flex items-center justify-center"
-              >
-                <CustomIcons
-                  v-if="row.voucherGeneratedFile?.path"
-                  name="Doc-Loupe"
-                />
-                <span v-else>-</span>
-              </component>
-            </div>
+            <FileLabel :value="row.voucherGeneratedFile" />
+          </template>
+
+          <template #amount="{ row }">
+            <MoneyLabel :amount="row.amount" />
+          </template>
+          <template #operationId="{ row }">
+            <TextLabel
+              :value="
+                row.retireRequest
+                  ? row.retireRequest?.id
+                  : row.rechargeRequest?.id
+              "
+            />
+          </template>
+          <template #createdAt="{ row }">
+            <DateLabel :value="row.createdAt" />
           </template>
           <template #status="{ row }">
             <CustomChip
@@ -90,6 +82,10 @@ import {
   type TransactionHistoryListItem,
 } from '~/types/TransactionHistory'
 import type { IDataResponse } from '~/types/Common'
+import TextLabel from '~/design-system/ui/text-label/TextLabel.vue'
+import DateLabel from '~/design-system/ui/data-label/DateLabel.vue'
+import MoneyLabel from '~/design-system/ui/money-label/MoneyLabel.vue'
+import FileLabel from '~/design-system/ui/file-label/FileLabel.vue'
 const route = useRoute()
 const filterOptionsRaw = ref([
   { field: 'wallet.user.id', type: 'equal', value: route.params.id || '' },
@@ -114,10 +110,12 @@ const { data, refresh } = await useAPI<
 const transactionsData = computed(() =>
   data.value?.data.map((item: TransactionHistoryListItem) => ({
     ...item,
-    createdAt: dayjs(item.createdAt).format('YYYY-MM-DD'),
+    fullName: item.wallet.user.firstName + ' ' + item.wallet.user.lastName,
+    document: `${item.wallet.user.documentType} ${item.wallet.user.documentIdentifier}`,
     motive:
       transactionHistoryMotiveMap[item.motive as TransactionHistoryMotive]
-        .label,
+        ?.label,
+    status: item.status,
   })),
 )
 </script>

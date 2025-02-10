@@ -233,4 +233,3 @@ const handleRestorePasswordClick = () => {
     </form>
   </div>
 </template>
-

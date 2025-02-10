@@ -17,13 +17,7 @@
               Exportar
             </Button>
           </template>
-          <template #operationId="{ row }">
-            <span>{{
-              row.retireRequest
-                ? row.retireRequest?.id
-                : row.rechargeRequest?.id
-            }}</span>
-          </template>
+
           <template #actions="{ row }">
             <div class="flex justify-center">
               <DropdownMenu>
@@ -55,25 +49,28 @@
           </template>
           <template #livelihood="{ row }">
             <div class="flex items-center justify-center">
-              <component
-                :is="
-                  row.rechargeRequest?.sustentationFile?.path ? 'a' : 'NuxtLink'
-                "
-                :href="
-                  row.rechargeRequest?.sustentationFile?.path ||
-                  '/fallback-route'
-                "
-                target="_blank"
-                rel="noopener noreferrer"
-                class="flex items-center justify-center"
-              >
-                <CustomIcons
-                  v-if="row.rechargeRequest?.sustentationFile?.path"
-                  name="Doc-Loupe"
-                />
-                <span v-else>-</span>
-              </component>
+              <FileLabel :value="row.rechargeRequest?.sustentationFile" />
             </div>
+          </template>
+
+          <template #voucher="{ row }">
+            <FileLabel :value="row.voucherGeneratedFile" />
+          </template>
+
+          <template #amount="{ row }">
+            <MoneyLabel :amount="row.amount" />
+          </template>
+          <template #operationId="{ row }">
+            <TextLabel
+              :value="
+                row.retireRequest
+                  ? row.retireRequest?.id
+                  : row.rechargeRequest?.id
+              "
+            />
+          </template>
+          <template #createdAt="{ row }">
+            <DateLabel :value="row.createdAt" />
           </template>
           <template #status="{ row }">
             <CustomChip
@@ -111,6 +108,10 @@ import {
   transactionHistoryMotiveMap,
   type TransactionHistoryListItem,
 } from '~/types/TransactionHistory'
+import MoneyLabel from '~/design-system/ui/money-label/MoneyLabel.vue'
+import FileLabel from '~/design-system/ui/file-label/FileLabel.vue'
+import TextLabel from '~/design-system/ui/text-label/TextLabel.vue'
+import DateLabel from '~/design-system/ui/data-label/DateLabel.vue'
 const { page, onSort, onSearch, getData, handleExport } =
   useTransactionHistoriesAPI()
 const { transactionHistoryList, transactionHistoryResume } = await getData()
@@ -149,8 +150,6 @@ const parsedTransactionHistoryList = computed(() =>
       motive:
         transactionHistoryMotiveMap[item.motive as TransactionHistoryMotive]
           ?.label,
-      dateOfOperation: dayjs(item.createdAt).format('YYYY-MM-DD'),
-      amount: formatCurrency(item.amount, item.currency),
       status: item.status,
     }
   }),
