@@ -66,13 +66,18 @@
             :id="accountId"
             v-model="openAccountDetailModal"
             :on-authorize="handleApproval"
-            :on-reject="handleOpenRejectModal"
+            @reject="handleOpenRejectModal"
           />
         </SheetContent>
         <ModalRejectAccount
           :id="selectedRejectInfo.id"
           v-model="openRejectModal"
           :refresh-table="refresh"
+          @success-rejection="
+            () => {
+              openRejectModal = false
+            }
+          "
           @update:model-value="openRejectModal = false"
         />
       </div>
@@ -88,6 +93,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import dayjs from 'dayjs'
+import consola from 'consola'
 import CustomTable from '~/components/ui/custom-table/CustomTable.vue'
 import CustomChip from '~/components/ui/custom-chip/CustomChip.vue'
 import CustomIcons from '~/components/ui/custom-icons/CustomIcons.vue'
@@ -114,6 +120,7 @@ const {
   filterOptions,
   sortOptions,
   approvalAccountBank,
+  rejectAccountBank,
 } = useAccountValidation('only-pendings')
 const accountId = ref<number | undefined>(undefined)
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
@@ -180,6 +187,7 @@ const selectedRejectInfo = ref<any>({
   comment: null,
 })
 const handleOpenRejectModal = (details: any) => {
+  consola.info('handleOpenRejectModal', details)
   selectedRejectInfo.value = {
     id: details.id,
     rejection: details.rejectionReason || null,

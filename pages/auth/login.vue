@@ -8,8 +8,8 @@
       :submit-class="submitButtonClass"
       :is-active="isActive"
       :is-loading="isLoading"
-      @submit="handleSubmit"
       class="px-4 sm:px-6 md:px-8"
+      @submit="handleSubmit"
     >
       <div class="mb-6 relative">
         <InputWithLabel
@@ -62,10 +62,7 @@
             </a>
           </div>
         </div>
-
       </div>
-
-
     </BaseForm>
 
     <ForgotPasswordForm v-else @back="toggleForgotPassword" />
@@ -168,7 +165,6 @@ const messageIconSrc = messageIcon
 </script>
 
 <style scoped>
-
 @media (max-width: 640px) {
   .auth-form {
     padding-left: 1rem;

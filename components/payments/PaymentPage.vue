@@ -575,8 +575,8 @@ const handleComissionObserve = async (values: any) => {
         openModalObserveComissionPayment.value = false
         refresh()
         updateConfirmModal({
-          title: 'Abono de comisión',
-          message: 'El abono de comisión  ha sido actualizado exitosamente',
+          title: 'Observación de abono',
+          message: 'El abono de comisión se ha sido observado exitosamente',
           type: 'success',
         })
       } else {

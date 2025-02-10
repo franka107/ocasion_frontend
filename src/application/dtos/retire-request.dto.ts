@@ -1,4 +1,5 @@
 import type { Currency } from '~/src/domain/types/currency'
+import type { Bank } from '~/types/Disbursement'
 
 export type RetireRequest = {
   id: string

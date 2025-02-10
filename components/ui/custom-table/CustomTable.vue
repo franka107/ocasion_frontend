@@ -142,61 +142,70 @@
           </tr>
         </thead>
         <tbody>
-          <template v-if="props.multipleSelect">
-            <tr
-              v-for="item in props.data"
-              :key="item.id"
-              class="h-12 border-b-[1px] border-[#E2E8F0]"
-            >
-              <td>
-                <button @click="onSelectItem(item[props.multipleSelectKey])">
-                  <CustomIcons
-                    :name="getSelectIcon(item[props.multipleSelectKey])"
-                    class="w-12 h-12"
-                  />
-                </button>
-              </td>
-              <td
-                v-for="headerItem in props.header"
-                :key="headerItem.key"
-                class="px-[16px] min-w-[140px]"
-                :class="
-                  headerItem.align === 'center'
-                    ? 'text-center'
-                    : headerItem.align === 'right'
-                      ? 'text-right'
-                      : 'text-left'
-                "
+          <template v-if="props.data.length > 0">
+            <template v-if="props.multipleSelect">
+              <tr
+                v-for="item in props.data"
+                :key="item.id"
+                class="h-12 border-b-[1px] border-[#E2E8F0]"
               >
-                <slot :name="headerItem.key" :row="item">
-                  {{ getNestedProperty(item, headerItem.key) }}
-                </slot>
-              </td>
-            </tr>
+                <td>
+                  <button @click="onSelectItem(item[props.multipleSelectKey])">
+                    <CustomIcons
+                      :name="getSelectIcon(item[props.multipleSelectKey])"
+                      class="w-12 h-12"
+                    />
+                  </button>
+                </td>
+                <td
+                  v-for="headerItem in props.header"
+                  :key="headerItem.key"
+                  class="px-[16px] min-w-[140px]"
+                  :class="
+                    headerItem.align === 'center'
+                      ? 'text-center'
+                      : headerItem.align === 'right'
+                        ? 'text-right'
+                        : 'text-left'
+                  "
+                >
+                  <slot :name="headerItem.key" :row="item">
+                    {{ getNestedProperty(item, headerItem.key) }}
+                  </slot>
+                </td>
+              </tr>
+            </template>
+            <template v-else>
+              <tr
+                v-for="item in props.data"
+                :key="item.id"
+                class="h-12 border-b-[1px] border-[#E2E8F0]"
+              >
+                <td
+                  v-for="headerItem in props.header"
+                  :key="headerItem.key"
+                  class="px-[16px] min-w-[140px]"
+                  :class="
+                    headerItem.align === 'center'
+                      ? 'text-center'
+                      : headerItem.align === 'right'
+                        ? 'text-right'
+                        : 'text-left'
+                  "
+                >
+                  <slot :name="headerItem.key" :row="item">
+                    {{ getNestedProperty(item, headerItem.key) }}
+                  </slot>
+                </td>
+              </tr>
+            </template>
           </template>
           <template v-else>
-            <tr
-              v-for="item in props.data"
-              :key="item.id"
-              class="h-12 border-b-[1px] border-[#E2E8F0]"
-            >
-              <td
-                v-for="headerItem in props.header"
-                :key="headerItem.key"
-                class="px-[16px] min-w-[140px]"
-                :class="
-                  headerItem.align === 'center'
-                    ? 'text-center'
-                    : headerItem.align === 'right'
-                      ? 'text-right'
-                      : 'text-left'
-                "
-              >
-                <slot :name="headerItem.key" :row="item">
-                  {{ getNestedProperty(item, headerItem.key) }}
-                </slot>
-              </td>
-            </tr>
+            <TableRow>
+              <TableCell :colspan="header.length" class="h-24 text-center">
+                <EmptyScreen />
+              </TableCell>
+            </TableRow>
           </template>
         </tbody>
       </table>
@@ -206,7 +215,9 @@
 <script setup lang="ts">
 import { cva } from 'class-variance-authority'
 import consola from 'consola'
+import TableCell from '../table/TableCell.vue'
 import CustomIcons from '@/components/ui/custom-icons/CustomIcons.vue'
+import EmptyScreen from '~/design-system/berlin/screens/empty-screen/EmptyScreen.vue'
 
 export interface DataItem {
   [key: string]: any

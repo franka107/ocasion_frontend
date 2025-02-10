@@ -4,9 +4,7 @@ import { useForm } from 'vee-validate'
 import { z } from 'zod'
 import { ExclamationTriangleIcon } from '@radix-icons/vue'
 import { X } from 'lucide-vue-next'
-import {
-  rejectionReasonType
-} from '@/constants/attention-tray'
+import { rejectionReasonType } from '@/constants/attention-tray'
 import {
   AlertDialog,
   AlertDialogContent,
@@ -14,22 +12,25 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-const {rejectAccountBank} = useAccountValidation()
-const openAnnulModal = ref(false) 
+const { rejectAccountBank } = useAccountValidation()
+const openAnnulModal = ref(false)
 const props = defineProps<{
   id: string
   modelValue: boolean
   refreshTable: () => void
+  onSuccessRejection: () => void
 }>()
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
-const rejectionReasonOptions = Array.from(rejectionReasonType).map(([id, name]) => ({
-  id,
-  name,
-}))
+const rejectionReasonOptions = Array.from(rejectionReasonType).map(
+  ([id, name]) => ({
+    id,
+    name,
+  }),
+)
 const formSchema = toTypedSchema(
   z.object({
     rejection: z.string().min(1, 'Seleccione un motivo.'),
-    comment: z.string().min(1, "El comentario es requerido."),
+    comment: z.string().min(1, 'El comentario es requerido.'),
   }),
 )
 const emit = defineEmits(['update:modelValue'])
@@ -42,43 +43,44 @@ const onSubmit = form.handleSubmit((values: any) => {
   console.log('onsubmit', props.id, comment)
 })
 const cancelEdit = () => {
-  emit('update:modelValue', false); 
-};
+  emit('update:modelValue', false)
+}
 const handleReject = async (values: any) => {
   openConfirmModal({
     title: 'Rechazar la cuenta bancaria',
     message: '¿Está seguro que desea rechazar la cuenta bancaria? ',
     callback: async () => {
       const payload = {
-        id: props.id, 
-        rejectionReason: values.rejection, 
+        id: props.id,
+        rejectionReason: values.rejection,
         rejectionDetails: values.comment,
-      };
+      }
 
-      const { status, error }: any = await rejectAccountBank(payload);
+      const { status, error }: any = await rejectAccountBank(payload)
 
       if (status.value === 'success') {
-        openAnnulModal.value = false;
-        props.refreshTable();
+        openAnnulModal.value = false
+        props.refreshTable()
         updateConfirmModal({
           title: 'Solicitud de cuenta bancaria rechazada',
           message: 'Se ha rechazado la solicitud de cuenta bancaria',
           type: 'success',
-        });
+        })
+        props.onSuccessRejection()
       } else {
         const eMsg =
           error.value.data?.errors?.[0]?.message ||
           error.value.data?.message ||
-          'La solicitud de cuenta bancaria no se pudo rechazar, inténtalo más tarde.';
+          'La solicitud de cuenta bancaria no se pudo rechazar, inténtalo más tarde.'
         updateConfirmModal({
           title: 'Error al rechazar la solicitud de cuenta bancaria',
           message: eMsg,
           type: 'error',
-        });
+        })
       }
     },
-  });
-};
+  })
+}
 </script>
 
 <template>
@@ -99,8 +101,10 @@ const handleReject = async (values: any) => {
           </AlertDialogHeader>
         </div>
         <div class="grid grid-cols-1 gap-3 px-6">
-          <p class="text-[14px] font-[500] text-[#68686C]">¿Está seguro que desea rechazar la cuenta bancaria? 
-            Si es asi por favor ingresar el motivo de rechazo.</p>
+          <p class="text-[14px] font-[500] text-[#68686C]">
+            ¿Está seguro que desea rechazar la cuenta bancaria? Si es asi por
+            favor ingresar el motivo de rechazo.
+          </p>
           <!-- Motivo de Rechazo -->
           <FormField v-slot="{ componentField }" name="rejection">
             <FormItem>
@@ -119,9 +123,9 @@ const handleReject = async (values: any) => {
             <FormItem>
               <FormControl>
                 <Textarea
-                type="text"
-                label="Comentarios"
-                v-bind="componentField"
+                  type="text"
+                  label="Comentarios"
+                  v-bind="componentField"
                 />
                 <FormMessage />
               </FormControl>
@@ -138,7 +142,7 @@ const handleReject = async (values: any) => {
           >
           <Button
             type="submit"
-            class="text-[16px] font-[600] "
+            class="text-[16px] font-[600]"
             size="xl"
             :disabled="!form.meta.value.valid"
             >Confirmar</Button

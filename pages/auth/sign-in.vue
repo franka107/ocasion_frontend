@@ -360,6 +360,7 @@ const showJuridicPersonFields = computed(
 
         <template v-if="showJuridicPersonFields">
           <!-- Razón Social -->
+
           <FormField v-slot="{ componentField }" name="businessName">
             <FormItem>
               <FormControl>
@@ -407,6 +408,18 @@ const showJuridicPersonFields = computed(
               <FormMessage />
             </FormItem>
           </FormField>
+          <FormField v-slot="{ componentField }" name="birthDate">
+            <FormItem>
+              <FormControl>
+                <DateInput
+                  label="Fecha de Nacimiento"
+                  :value="componentField.modelValue"
+                  @update:model-value="componentField.onChange"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
         </template>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -448,6 +461,7 @@ const showJuridicPersonFields = computed(
                     { id: 'DNI', name: 'DNI' },
                     { id: 'CE', name: 'CE' },
                     { id: 'PT', name: 'PT' },
+                    { id: 'RUC', name: 'RUC' },
                   ]"
                   placeholder="Tipo de DOI"
                 />

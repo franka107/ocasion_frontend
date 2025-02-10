@@ -38,6 +38,7 @@ export function useLoginForm() {
     MAX_ATTEMPTS_LIMIT_EXCEED: 'AUTH.MAX_ATTEMPTS_LIMIT_EXCEED',
     USER_IS_SUSPENDED: 'AUTH.USER_IS_SUSPENDED',
     PASSWORD_EXPIRED: 'AUTH.PASSWORD_EXPIRED',
+    USER_NOT_VERIFIED: 'AUTH.USER_NOT_VERIFIED',
   }
 
   const validate = () => {
@@ -121,6 +122,9 @@ export function useLoginForm() {
     switch (errorBack.code) {
       case AUTH_ERRORS.INVALID_CREDENTIALS:
         dialogState.value.isIncorrectCredentialsOpen = true
+        break
+      case AUTH_ERRORS.USER_NOT_VERIFIED:
+        router.push(`/auth/validate-otp?id=${metadata.userId}`)
         break
       case AUTH_ERRORS.MAX_ATTEMPTS_LIMIT_EXCEED:
         dialogState.value.isMaxAttemptsDialogOpen = true

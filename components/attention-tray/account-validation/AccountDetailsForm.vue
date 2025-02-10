@@ -72,8 +72,8 @@ if (props.id) {
   )
   const formattedValues = {
     ...data.value,
-    accountType: data.value.retireRequest.accountType,
-    destinationCCI: data.value.retireRequest.destinationCCI,
+    accountType: data.value.retireRequest?.accountType,
+    destinationCCI: data.value.retireRequest?.destinationCCI,
     amount: data.value.retireRequest.amount,
   }
   form.setValues(formattedValues)
@@ -111,7 +111,8 @@ const onSubmit = async (e: any) => {
   }
 }
 const handleReject = () => {
-  emit('on-reject', { id: props.id, reason: 'Rechazo manual' })
+  props.onReject({ id: props.id, reason: 'Rechazo manual' })
+  // emit('on-reject', { id: props.id, reason: 'Rechazo manual' })
 }
 </script>
 
