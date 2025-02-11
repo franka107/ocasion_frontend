@@ -1,22 +1,4 @@
 <script setup lang="ts">
-import { Button, buttonVariants } from '@/components/ui/button'
-
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
-import {
-  RangeCalendarCell,
-  RangeCalendarCellTrigger,
-  RangeCalendarGrid,
-  RangeCalendarGridBody,
-  RangeCalendarGridHead,
-  RangeCalendarGridRow,
-  RangeCalendarHeadCell,
-} from '@/components/ui/range-calendar'
-
-import { cn } from '@/lib/utils'
 import {
   CalendarDate,
   type DateValue,
@@ -31,14 +13,34 @@ import {
 import { type DateRange, RangeCalendarRoot, useDateFormatter } from 'radix-vue'
 import { createMonth, type Grid, toDate } from 'radix-vue/date'
 import { type Ref, ref, watch } from 'vue'
-const props = withDefaults(defineProps<{
-  placeholder?: string,
-  modelValue: undefined | string[],
-  locale?: string
-}>(),{
-  placeholder: 'Selecciona un rango de fechas',
-  locale: 'en-US'
-})
+import { endOfDay } from 'date-fns'
+import { cn } from '@/lib/utils'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import {
+  RangeCalendarCell,
+  RangeCalendarCellTrigger,
+  RangeCalendarGrid,
+  RangeCalendarGridBody,
+  RangeCalendarGridHead,
+  RangeCalendarGridRow,
+  RangeCalendarHeadCell,
+} from '@/components/ui/range-calendar'
+import { Button, buttonVariants } from '@/components/ui/button'
+const props = withDefaults(
+  defineProps<{
+    placeholder?: string
+    modelValue: undefined | string[]
+    locale?: string
+  }>(),
+  {
+    placeholder: 'Selecciona un rango de fechas',
+    locale: 'en-US',
+  },
+)
 const emit = defineEmits<{
   (e: 'update:modelValue', payload: string[] | undefined): void
 }>()
@@ -51,27 +53,33 @@ const value = ref({
   end: new CalendarDate(nowYear, nowMonth, nowDay).add({ days: 20 }),
 }) as Ref<DateRange>
 
-watch(() => props.modelValue, (newValue) => {
-  if (newValue) {
-    const initDate = dayjs(newValue[0])
-    const endDate = dayjs(newValue[1])
-    value.value = {
-      start: new CalendarDate(
-        initDate.year(),
-        initDate.month() + 1,
-        initDate.date(),
-      ),
-      end: new CalendarDate(
-        endDate.year(),
-        endDate.month() + 1,
-        endDate.date(),
-      ),
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    if (newValue) {
+      const initDate = dayjs(newValue[0])
+      const endDate = dayjs(newValue[1])
+      value.value = {
+        start: new CalendarDate(
+          initDate.year(),
+          initDate.month() + 1,
+          initDate.date(),
+        ),
+        end: new CalendarDate(
+          endDate.year(),
+          endDate.month() + 1,
+          endDate.date(),
+        ),
+      }
     }
-  }
-})
+  },
+)
 const emitValue = (newValue: DateRange) => {
-  if(newValue.start && newValue.end){
-    emit('update:modelValue', [toDate(newValue.start).toISOString(), toDate(newValue.end).toISOString()])
+  if (newValue.start && newValue.end) {
+    emit('update:modelValue', [
+      toDate(newValue.start).toISOString(),
+      endOfDay(toDate(newValue.end)).toISOString(),
+    ])
   } else {
     emit('update:modelValue', undefined)
   }
@@ -102,8 +110,7 @@ const secondMonth = ref(
 function updateMonth(reference: 'first' | 'second', months: number) {
   if (reference === 'first') {
     placeholder.value = placeholder.value.add({ months })
-  }
-  else {
+  } else {
     secondMonthPlaceholder.value = secondMonthPlaceholder.value.add({
       months,
     })
@@ -148,33 +155,33 @@ watch(secondMonthPlaceholder, (_secondMonthPlaceholder) => {
           )
         "
       >
-      <template v-if="props.modelValue">
-        <template v-if="value.start">
-          <template v-if="value.end">
-            {{
-              formatter.custom(toDate(value.start), {
-                dateStyle: "medium",
-              })
-            }}
-            -
-            {{
-              formatter.custom(toDate(value.end), {
-                dateStyle: "medium",
-              })
-            }}
-          </template>
+        <template v-if="props.modelValue">
+          <template v-if="value.start">
+            <template v-if="value.end">
+              {{
+                formatter.custom(toDate(value.start), {
+                  dateStyle: 'medium',
+                })
+              }}
+              -
+              {{
+                formatter.custom(toDate(value.end), {
+                  dateStyle: 'medium',
+                })
+              }}
+            </template>
 
-          <template v-else>
-            {{
-              formatter.custom(toDate(value.start), {
-                dateStyle: "medium",
-              })
-            }}
+            <template v-else>
+              {{
+                formatter.custom(toDate(value.start), {
+                  dateStyle: 'medium',
+                })
+              }}
+            </template>
           </template>
-        </template>
-        <template v-else>
-          {{ props.placeholder }}
-        </template>
+          <template v-else>
+            {{ props.placeholder }}
+          </template>
         </template>
         <template v-else>
           {{ props.placeholder }}
@@ -182,7 +189,13 @@ watch(secondMonthPlaceholder, (_secondMonthPlaceholder) => {
       </Button>
     </PopoverTrigger>
     <PopoverContent class="w-auto p-0">
-      <RangeCalendarRoot v-slot="{ weekDays }" v-model="value" @update:model-value="emitValue" v-model:placeholder="placeholder" class="p-3">
+      <RangeCalendarRoot
+        v-slot="{ weekDays }"
+        v-model="value"
+        v-model:placeholder="placeholder"
+        class="p-3"
+        @update:model-value="emitValue"
+      >
         <div
           class="flex flex-col gap-y-4 mt-4 sm:flex-row sm:gap-x-4 sm:gap-y-0"
         >
@@ -199,14 +212,8 @@ watch(secondMonthPlaceholder, (_secondMonthPlaceholder) => {
               >
                 <ChevronLeft class="h-4 w-4" />
               </button>
-              <div
-                :class="cn('text-sm font-medium')"
-              >
-                {{
-                  formatter.fullMonthAndYear(
-                    toDate(firstMonth.value),
-                  )
-                }}
+              <div :class="cn('text-sm font-medium')">
+                {{ formatter.fullMonthAndYear(toDate(firstMonth.value)) }}
               </div>
               <button
                 :class="
@@ -234,9 +241,7 @@ watch(secondMonthPlaceholder, (_secondMonthPlaceholder) => {
               </RangeCalendarGridHead>
               <RangeCalendarGridBody>
                 <RangeCalendarGridRow
-                  v-for="(
-                    weekDates, index
-                  ) in firstMonth.rows"
+                  v-for="(weekDates, index) in firstMonth.rows"
                   :key="`weekDate-${index}`"
                   class="mt-2 w-full"
                 >
@@ -267,14 +272,8 @@ watch(secondMonthPlaceholder, (_secondMonthPlaceholder) => {
               >
                 <ChevronLeft class="h-4 w-4" />
               </button>
-              <div
-                :class="cn('text-sm font-medium')"
-              >
-                {{
-                  formatter.fullMonthAndYear(
-                    toDate(secondMonth.value),
-                  )
-                }}
+              <div :class="cn('text-sm font-medium')">
+                {{ formatter.fullMonthAndYear(toDate(secondMonth.value)) }}
               </div>
 
               <button
@@ -303,9 +302,7 @@ watch(secondMonthPlaceholder, (_secondMonthPlaceholder) => {
               </RangeCalendarGridHead>
               <RangeCalendarGridBody>
                 <RangeCalendarGridRow
-                  v-for="(
-                    weekDates, index
-                  ) in secondMonth.rows"
+                  v-for="(weekDates, index) in secondMonth.rows"
                   :key="`weekDate-${index}`"
                   class="mt-2 w-full"
                 >
