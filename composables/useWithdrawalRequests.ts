@@ -17,10 +17,15 @@ export function useWithdrawalRequests(
     type: 'equal',
     value: 'APPROVED',
   }
+  const notRelationWithLot: FilterOption = {
+    field: 'disbursementLot',
+    type: 'equal',
+    value: null,
+  }
 
   const baseTypeSearch: FilterOption[] =
     type === 'not-pendings'
-      ? [notPendingsSearch, notPendingsAccountSearch]
+      ? [notPendingsSearch, notPendingsAccountSearch, notRelationWithLot]
       : type === 'only-pendings'
         ? [onlyPendingsSearch]
         : []

@@ -81,10 +81,11 @@
               <DialogContent class="sm:max-w-md">
                 <DialogHeader>
                   <DialogTitle class="text-lg font-semibold text-gray-900">
-                    Confirm Archive
+                    Confirmar archivado
                   </DialogTitle>
                   <DialogDescription class="mt-2 text-sm text-gray-500">
-                    ¿Estás seguro de que deseas archivar todas las notificaciones?
+                    ¿Estás seguro de que deseas archivar las últimas 7
+                    notificaciones?
                   </DialogDescription>
                 </DialogHeader>
                 <div class="mt-4 flex justify-end space-x-2">
@@ -116,6 +117,7 @@ import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useWebNotification } from '@vueuse/core'
 // import { useSound } from '@vueuse/sound'
+import { playNotificationSound } from './SoundManager'
 import {
   Popover,
   PopoverTrigger,
@@ -137,7 +139,6 @@ import {
   domainEvents,
   type NotificationCreatedDomainEvent,
 } from '~/types/DomainEvent'
-import { playNotificationSound } from './SoundManager'
 import { UserType } from '~/types/Administrators'
 
 const router = useRouter()
@@ -240,11 +241,11 @@ const confirmArchive = async () => {
 
 watch(notificationCreatedListener.data, (newValue, oldValue) => {
   if (newValue !== oldValue) {
-    console.log('Notificación creada, reproduciendo sonido...');
-    playNotificationSound();
-    webNotification.show();
-    refresh();
-    refreshCount();
+    console.log('Notificación creada, reproduciendo sonido...')
+    playNotificationSound()
+    webNotification.show()
+    refresh()
+    refreshCount()
   }
-});
+})
 </script>

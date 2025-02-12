@@ -217,7 +217,7 @@ import { cva } from 'class-variance-authority'
 import consola from 'consola'
 import TableCell from '../table/TableCell.vue'
 import CustomIcons from '@/components/ui/custom-icons/CustomIcons.vue'
-import EmptyScreen from '~/design-system/berlin/screens/empty-screen/EmptyScreen.vue'
+import EmptyScreen from '~/design-system/berlin/screens/empty-screen/BerlinEmptyScreen.vue'
 
 export interface DataItem {
   [key: string]: any

@@ -38,9 +38,12 @@ export type InvoiceTableStoreRoot = (
 export const useInvoiceTableMvi = async () => {
   const page = ref(1)
   const limit = ref(5)
-  const filterOptions = ref<FilterOption[]>([
-    { field: 'type', type: 'equal', value: 'RECEIPT' },
-  ])
+  const receiptFilter: FilterOption = {
+    field: 'type',
+    type: 'equal',
+    value: 'RECEIPT',
+  }
+  const filterOptions = ref<FilterOption[]>([receiptFilter])
   const sortOptions = ref<SortOption[]>([])
   const billingManagementService = useBillingManagementService()
   const organizationManagementService = useOrganization()
@@ -82,6 +85,7 @@ export const useInvoiceTableMvi = async () => {
 
   const onSearch = (item: { [key: string]: string }) => {
     filterOptions.value = [
+      receiptFilter,
       { field: 'quickSearch', type: 'like', value: item.quickSearch || '' },
       {
         field: 'event.goodType',

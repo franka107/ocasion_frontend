@@ -5,18 +5,38 @@
         <ReusableIconMenu icon-src="icon" @open-sheet="openModal" />
       </div>
       <div>
-        <ActivityCard
-          title="Actividades pendientes"
-          :icon1="'calendar_today'"
-          :value1="pendingActivities.eventsInDebate"
-          label1="Envíos debate"
-          :icon2="'pending'"
-          :value2="pendingActivities.pendingDepositReviewOffers"
-          label2="Ofertas pendientes de revisión de saldo"
-          :icon3="'save'"
-          :value3="pendingActivities.pendingDeliveryOffers"
-          label3="Ofertas pendientes de entrega"
-        />
+        <BerlinSimpleCard title="Actividades pendientes" class="mb-6">
+          <div class="w-full flex flex-wrap gap-4">
+            <BerlinActivityCard
+              v-if="userSessionExtended.globalType === GlobalType.Platform"
+              class="flex-1 min-w-[250px]"
+              custom-icon-name="calendar_today"
+              :kpi-value="pendingActivities.eventsInDebate.toString()"
+              :description="'Eventos en debate'"
+            />
+            <!-- <BerlinActivityCard -->
+            <!--   class="flex-1 min-w-[250px]" -->
+            <!--   custom-icon-name="calendar_today" -->
+            <!--   :kpi-value="pendingActivities.eventsInDebate.toString()" -->
+            <!--   :description="'Ofertas en transferencia de bienes'" -->
+            <!-- /> -->
+            <!-- <BerlinActivityCard -->
+            <!--   class="flex-1 min-w-[250px]" -->
+            <!--   custom-icon-name="pending" -->
+            <!--   :kpi-value=" -->
+            <!--     pendingActivities.pendingDepositReviewOffers.toString() -->
+            <!--   " -->
+            <!--   :description="'Ofertas pendientes de revisión de abono'" -->
+            <!-- /> -->
+            <!---->
+            <!-- <BerlinActivityCard -->
+            <!--   class="flex-1 min-w-[250px]" -->
+            <!--   custom-icon-name="save" -->
+            <!--   :kpi-value="pendingActivities.pendingDeliveryOffers.toString()" -->
+            <!--   :description="'Ofertas pendientes de entrega'" -->
+            <!-- /> -->
+          </div>
+        </BerlinSimpleCard>
       </div>
       <div class="mb-8">
         <DashboardCharts :filter-form-values="filterFormValues" />
@@ -62,10 +82,13 @@ import type { FilterFormSchema } from './components/filter-form-schema'
 import DashboardCharts from './components/DashboardCharts.vue'
 import { useEventManagementAPI } from '~/composables/useEventManagementAPI'
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
-import ActivityCard from '~/layouts/default/ActivityCard.vue'
+import ActivityCard from '~/layouts/default/ActivityCardDeprecated.vue'
 import ReusableIconMenu from '~/layouts/default/ReusableIconMenu.vue'
 import type { Organization } from '~/models/organizations'
 import { GlobalType } from '~/types/Common'
+import ActivityCardDeprecated from '~/layouts/default/ActivityCardDeprecated.vue'
+import BerlinSimpleCard from '~/design-system/berlin/cards/simple-card/BerlinSimpleCard.vue'
+import BerlinActivityCard from '~/design-system/berlin/cards/activity-card/BerlinActivityCard.vue'
 
 const allOrganizations = ref<Organization[]>([])
 const fetchOrganizations = async () => {
