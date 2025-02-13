@@ -127,8 +127,10 @@
                   class="w-4 h-4 ml-2 cursor-pointer"
                   :class="{
                     'rotate-180':
-                      sortStates[header.key]?.localeCompare('asc') === 0,
-                    [sortStates[header.key]
+                      sortStates[header.realKey || header.key]?.localeCompare(
+                        'asc',
+                      ) === 0,
+                    [sortStates[header.realKey || header.key]
                       ? 'text-secondary'
                       : 'text-primary']: true,
                   }"
