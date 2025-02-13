@@ -175,7 +175,7 @@ export const useInvoiceTableMvi = async () => {
     {
       key: 'eventGoodType',
       type: 'select',
-      placeholder: 'Filtrar estados',
+      placeholder: 'Tipo de activo',
       items: [
         ...goodTypeOptions,
         { text: 'Todos', value: ' ' },
@@ -186,10 +186,14 @@ export const useInvoiceTableMvi = async () => {
       key: 'organizationId',
       type: 'select',
       placeholder: 'Organización',
-      items: organizationList.map((org) => ({
-        value: org.id,
-        text: org.name,
-      })) as SearchSelectItem[],
+      items: [
+        ...(organizationList.map((org) => ({
+          value: org.id,
+          text: org.name,
+        })) as SearchSelectItem[]),
+
+        { text: 'Todos', value: ' ' },
+      ],
       position: 3,
     },
   ]

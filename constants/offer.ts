@@ -80,7 +80,7 @@ export const offerStatusRecord: Record<
     flowPosition: 15,
   },
   [OfferStatus.Concreted]: {
-    name: 'Contretado',
+    name: 'Concretado',
     color: 'green',
     flowPosition: 16,
   },
