@@ -41,7 +41,7 @@ export function useWithdrawalRequests(
   const onSearch = (item: { [key: string]: string }) => {
     const filters = [
       ...baseTypeSearch,
-      { field: 'id', type: 'like', value: item.id || '' },
+      { field: 'quickSearch', type: 'equal', value: item.id || '' },
       { field: 'createdAt', type: 'between', value: item.createdAt || '' },
       {
         field: 'disbursementLot.transferedAt',

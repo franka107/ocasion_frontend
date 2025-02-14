@@ -11,8 +11,100 @@
               v-if="userSessionExtended.globalType === GlobalType.Platform"
               class="flex-1 min-w-[250px]"
               custom-icon-name="calendar_today"
-              :kpi-value="pendingActivities.eventsInDebate.toString()"
+              :kpi-value="
+                rechargeRequestAdvicesForPlatform.retireRequestPendingCount.toString()
+              "
+              :description="'Solicitudes de retiro pendientes'"
+            />
+
+            <BerlinActivityCard
+              v-if="userSessionExtended.globalType === GlobalType.Platform"
+              class="flex-1 min-w-[250px]"
+              custom-icon-name="calendar_today"
+              :kpi-value="
+                rechargeRequestAdvicesForPlatform.retireRequestApprovedCount.toString()
+              "
+              :description="'Solicitudes de retiro aprobadas'"
+            />
+
+            <BerlinActivityCard
+              v-if="userSessionExtended.globalType === GlobalType.Platform"
+              class="flex-1 min-w-[250px]"
+              custom-icon-name="calendar_today"
+              :kpi-value="
+                rechargeRequestAdvicesForPlatform.rechargeRequestPendingCount.toString()
+              "
+              :description="'Solicitudes de recarga pendientes'"
+            />
+
+            <BerlinActivityCard
+              v-if="userSessionExtended.globalType === GlobalType.Platform"
+              class="flex-1 min-w-[250px]"
+              custom-icon-name="calendar_today"
+              :kpi-value="
+                rechargeRequestAdvicesForPlatform.accountValidationPendingCount.toString()
+              "
+              :description="'Validaciones de cuenta pendientes'"
+            />
+
+            <BerlinActivityCard
+              v-if="userSessionExtended.globalType === GlobalType.Platform"
+              class="flex-1 min-w-[250px]"
+              custom-icon-name="calendar_today"
+              :kpi-value="
+                offerAdvicesForPlatform.offersInDepositReviewCount.toString()
+              "
+              :description="'Ofertas en revisión de deposito'"
+            />
+
+            <BerlinActivityCard
+              v-if="userSessionExtended.globalType === GlobalType.Platform"
+              class="flex-1 min-w-[250px]"
+              custom-icon-name="calendar_today"
+              :kpi-value="
+                offerAdvicesForPlatform.offersPendingOfDeliveryCount.toString()
+              "
+              :description="'Ofertas pendientes de envio'"
+            />
+
+            <BerlinActivityCard
+              v-if="userSessionExtended.globalType === GlobalType.Platform"
+              class="flex-1 min-w-[250px]"
+              custom-icon-name="calendar_today"
+              :kpi-value="
+                eventAdvicesForPlatform.eventsInDebateCount.toString()
+              "
               :description="'Eventos en debate'"
+            />
+
+            <BerlinActivityCard
+              v-if="userSessionExtended.globalType === GlobalType.Organization"
+              class="flex-1 min-w-[250px]"
+              custom-icon-name="calendar_today"
+              :kpi-value="
+                offerAdvicesForOrganization.offersPendingOfDeliveryCount.toString()
+              "
+              :description="'Ofertas pendientes de delivery'"
+            />
+
+            <BerlinActivityCard
+              v-if="userSessionExtended.globalType === GlobalType.Organization"
+              class="flex-1 min-w-[250px]"
+              custom-icon-name="calendar_today"
+              :kpi-value="
+                offerAdvicesForOrganization.offersInDepositReviewCount.toString()
+              "
+              :description="'Ofertas en revisión de abono'"
+            />
+
+            <BerlinActivityCard
+              v-if="userSessionExtended.globalType === GlobalType.Organization"
+              class="flex-1 min-w-[250px]"
+              custom-icon-name="calendar_today"
+              :kpi-value="
+                offerAdvicesForOrganization.offersInTransferOfGoodCount.toString()
+              "
+              :description="'Ofertas en transferencia de bienes'"
             />
             <!-- <BerlinActivityCard -->
             <!--   class="flex-1 min-w-[250px]" -->
@@ -101,8 +193,99 @@ const fetchOrganizations = async () => {
 
 const userSessionExtended = useUserSessionExtended()
 
+const offerAdvicesForOrganization = ref({
+  offersInDepositReviewCount: 0,
+  offersPendingOfDeliveryCount: 0,
+  offersInTransferOfGoodCount: 0,
+})
+
+const fetchOfferAdvicesForOrganization = async () => {
+  const { data, error } = await useAPI(
+    `offer-management/view-offer-advices-for-organization`,
+    {
+      method: 'GET',
+      default: () => {
+        return {
+          offersInDepositReviewCount: 0,
+          offersPendingOfDeliveryCount: 0,
+        }
+      },
+    },
+  )
+  offerAdvicesForOrganization.value = data.value
+}
+
+const rechargeRequestAdvicesForPlatform = ref({
+  rechargeRequestPendingCount: 0,
+  accountValidationPendingCount: 0,
+  retireRequestPendingCount: 0,
+  retireRequestApprovedCount: 0,
+})
+
+const fetchRechargeRequestAdvicesForPlatform = async () => {
+  const { data, error } = await useAPI(
+    `offer-management/view-recharge-request-advices-for-platform`,
+    {
+      method: 'GET',
+      default: () => {
+        return {
+          rechargeRequestPendingCount: 0,
+          accountValidationPendingCount: 0,
+          retireRequestPendingCount: 0,
+          retireRequestApprovedCount: 0,
+        }
+      },
+    },
+  )
+  rechargeRequestAdvicesForPlatform.value = data.value
+}
+
+const eventAdvicesForPlatform = ref({
+  eventsInDebateCount: 0,
+})
+const fetchEventAdvicesForPlatform = async () => {
+  const { data, error } = await useAPI(
+    `offer-management/view-event-advices-for-platform`,
+    {
+      method: 'GET',
+      default: () => {
+        return {
+          eventsInDebateCount: 0,
+        }
+      },
+    },
+  )
+  eventAdvicesForPlatform.value = data.value
+}
+
+const offerAdvicesForPlatform = ref({
+  offersInDepositReviewCount: 0,
+  offersPendingOfDeliveryCount: 0,
+})
+
+const fetchOfferAdvicesForPlatform = async () => {
+  const { data, error } = await useAPI(
+    `offer-management/view-offer-advices-for-platform`,
+    {
+      method: 'GET',
+      default: () => {
+        return {
+          offersInDepositReviewCount: 0,
+          offersPendingOfDeliveryCount: 0,
+        }
+      },
+    },
+  )
+  offerAdvicesForPlatform.value = data.value
+}
+
 if (userSessionExtended.globalType === GlobalType.Platform) {
   await fetchOrganizations()
+  await fetchOfferAdvicesForPlatform()
+  await fetchEventAdvicesForPlatform()
+  await fetchRechargeRequestAdvicesForPlatform()
+} else {
+  await fetchOfferAdvicesForOrganization()
 }
 
 const filterFormValues = ref<FilterFormSchema>({
