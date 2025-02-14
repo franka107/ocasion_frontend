@@ -44,7 +44,7 @@ export function useWithdrawalRequests(
       { field: 'quickSearch', type: 'equal', value: item.id || '' },
       { field: 'createdAt', type: 'between', value: item.createdAt || '' },
       {
-        field: 'disbursementLot.transferedAt',
+        field: 'disbursementLot.disbursedAt',
         type: 'between',
         value: item.transferedAt || '',
       },
