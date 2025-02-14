@@ -9,8 +9,7 @@
           <div class="w-full flex flex-wrap gap-4">
             <BerlinActivityCard
               v-if="userSessionExtended.globalType === GlobalType.Platform"
-              class="flex-1 min-w-[250px]"
-              custom-icon-name="calendar_today"
+              class="flex-1 min-w-[150px]"
               :kpi-value="
                 rechargeRequestAdvicesForPlatform.retireRequestPendingCount.toString()
               "
@@ -19,8 +18,7 @@
 
             <BerlinActivityCard
               v-if="userSessionExtended.globalType === GlobalType.Platform"
-              class="flex-1 min-w-[250px]"
-              custom-icon-name="calendar_today"
+              class="flex-1 min-w-[150px]"
               :kpi-value="
                 rechargeRequestAdvicesForPlatform.retireRequestApprovedCount.toString()
               "
@@ -29,8 +27,7 @@
 
             <BerlinActivityCard
               v-if="userSessionExtended.globalType === GlobalType.Platform"
-              class="flex-1 min-w-[250px]"
-              custom-icon-name="calendar_today"
+              class="flex-1 min-w-[150px]"
               :kpi-value="
                 rechargeRequestAdvicesForPlatform.rechargeRequestPendingCount.toString()
               "
@@ -39,8 +36,7 @@
 
             <BerlinActivityCard
               v-if="userSessionExtended.globalType === GlobalType.Platform"
-              class="flex-1 min-w-[250px]"
-              custom-icon-name="calendar_today"
+              class="flex-1 min-w-[150px]"
               :kpi-value="
                 rechargeRequestAdvicesForPlatform.accountValidationPendingCount.toString()
               "
@@ -49,8 +45,7 @@
 
             <BerlinActivityCard
               v-if="userSessionExtended.globalType === GlobalType.Platform"
-              class="flex-1 min-w-[250px]"
-              custom-icon-name="calendar_today"
+              class="flex-1 min-w-[150px]"
               :kpi-value="
                 offerAdvicesForPlatform.offersInDepositReviewCount.toString()
               "
@@ -59,8 +54,7 @@
 
             <BerlinActivityCard
               v-if="userSessionExtended.globalType === GlobalType.Platform"
-              class="flex-1 min-w-[250px]"
-              custom-icon-name="calendar_today"
+              class="flex-1 min-w-[150px]"
               :kpi-value="
                 offerAdvicesForPlatform.offersPendingOfDeliveryCount.toString()
               "
@@ -69,8 +63,7 @@
 
             <BerlinActivityCard
               v-if="userSessionExtended.globalType === GlobalType.Platform"
-              class="flex-1 min-w-[250px]"
-              custom-icon-name="calendar_today"
+              class="flex-1 min-w-[150px]"
               :kpi-value="
                 eventAdvicesForPlatform.eventsInDebateCount.toString()
               "
@@ -79,8 +72,7 @@
 
             <BerlinActivityCard
               v-if="userSessionExtended.globalType === GlobalType.Organization"
-              class="flex-1 min-w-[250px]"
-              custom-icon-name="calendar_today"
+              class="flex-1 min-w-[150px]"
               :kpi-value="
                 offerAdvicesForOrganization.offersPendingOfDeliveryCount.toString()
               "
@@ -89,8 +81,7 @@
 
             <BerlinActivityCard
               v-if="userSessionExtended.globalType === GlobalType.Organization"
-              class="flex-1 min-w-[250px]"
-              custom-icon-name="calendar_today"
+              class="flex-1 min-w-[150px]"
               :kpi-value="
                 offerAdvicesForOrganization.offersInDepositReviewCount.toString()
               "
@@ -99,34 +90,69 @@
 
             <BerlinActivityCard
               v-if="userSessionExtended.globalType === GlobalType.Organization"
-              class="flex-1 min-w-[250px]"
-              custom-icon-name="calendar_today"
+              class="flex-1 min-w-[150px]"
               :kpi-value="
                 offerAdvicesForOrganization.offersInTransferOfGoodCount.toString()
               "
               :description="'Ofertas en transferencia de bienes'"
             />
-            <!-- <BerlinActivityCard -->
-            <!--   class="flex-1 min-w-[250px]" -->
-            <!--   custom-icon-name="calendar_today" -->
-            <!--   :kpi-value="pendingActivities.eventsInDebate.toString()" -->
-            <!--   :description="'Ofertas en transferencia de bienes'" -->
-            <!-- /> -->
-            <!-- <BerlinActivityCard -->
-            <!--   class="flex-1 min-w-[250px]" -->
-            <!--   custom-icon-name="pending" -->
-            <!--   :kpi-value=" -->
-            <!--     pendingActivities.pendingDepositReviewOffers.toString() -->
-            <!--   " -->
-            <!--   :description="'Ofertas pendientes de revisión de abono'" -->
-            <!-- /> -->
-            <!---->
-            <!-- <BerlinActivityCard -->
-            <!--   class="flex-1 min-w-[250px]" -->
-            <!--   custom-icon-name="save" -->
-            <!--   :kpi-value="pendingActivities.pendingDeliveryOffers.toString()" -->
-            <!--   :description="'Ofertas pendientes de entrega'" -->
-            <!-- /> -->
+          </div>
+        </BerlinSimpleCard>
+
+        <BerlinSimpleCard
+          v-if="userSessionExtended.globalType === GlobalType.Platform"
+          title="Finanzas"
+          class="mb-6"
+        >
+          <div class="w-full flex flex-wrap gap-4">
+            <BerlinActivityCard
+              v-if="userSessionExtended.globalType === GlobalType.Platform"
+              class="flex-1 min-w-[150px]"
+              :kpi-value="
+                kpiFinanceForPlatform.participantsWithGuaranteeSeparatedCount.toString()
+              "
+              :description="'Cantidad de participantes con garantía separada'"
+            />
+
+            <BerlinActivityCard
+              v-if="userSessionExtended.globalType === GlobalType.Platform"
+              class="flex-1 min-w-[150px]"
+              type="money"
+              :kpi-value="kpiFinanceForPlatform.guaranteeSeparatedAmount"
+              :description="'Total de garantía separada'"
+            />
+
+            <BerlinActivityCard
+              v-if="userSessionExtended.globalType === GlobalType.Platform"
+              class="flex-1 min-w-[150px]"
+              :kpi-value="
+                kpiFinanceForPlatform.numberOfParticipantsPerOfferAverage.toString()
+              "
+              :description="'Promedio de cantidad de participantes por oferta'"
+            />
+
+            <BerlinActivityCard
+              v-if="userSessionExtended.globalType === GlobalType.Platform"
+              class="flex-1 min-w-[150px]"
+              :kpi-value="kpiFinanceForPlatform.bidsPerOfferAverage.toString()"
+              :description="'Promedio de pujas por oferta'"
+            />
+
+            <BerlinActivityCard
+              v-if="userSessionExtended.globalType === GlobalType.Platform"
+              class="flex-1 min-w-[150px]"
+              :kpi-value="
+                kpiFinanceForPlatform.comissionsChargedCount.toString()
+              "
+              :description="'Total de comisiones cobradas'"
+            />
+
+            <BerlinActivityCard
+              v-if="userSessionExtended.globalType === GlobalType.Platform"
+              class="flex-1 min-w-[150px]"
+              :kpi-value="kpiFinanceForPlatform.penaltyChargedCount.toString()"
+              :description="'Total de penalidades cobradas'"
+            />
           </div>
         </BerlinSimpleCard>
       </div>
@@ -208,6 +234,7 @@ const fetchOfferAdvicesForOrganization = async () => {
         return {
           offersInDepositReviewCount: 0,
           offersPendingOfDeliveryCount: 0,
+          offersInTransferOfGoodCount: 0,
         }
       },
     },
@@ -263,6 +290,35 @@ const offerAdvicesForPlatform = ref({
   offersPendingOfDeliveryCount: 0,
 })
 
+const kpiFinanceForPlatform = ref({
+  participantsWithGuaranteeSeparatedCount: 0,
+  guaranteeSeparatedAmount: 0,
+  numberOfParticipantsPerOfferAverage: 0,
+  bidsPerOfferAverage: 0,
+  comissionsChargedCount: 0,
+  penaltyChargedCount: 0,
+})
+
+const fetchKpiFinanceForPlatform = async () => {
+  const { data, error } = await useAPI(
+    `kpi-management/view-finance-for-platform`,
+    {
+      method: 'GET',
+      default: () => {
+        return {
+          participantsWithGuaranteeSeparatedCount: 0,
+          guaranteeSeparatedAmount: 0,
+          numberOfParticipantsPerOfferAverage: 0,
+          bidsPerOfferAverage: 0,
+          comissionsChargedCount: 0,
+          penaltyChargedCount: 0,
+        }
+      },
+    },
+  )
+  kpiFinanceForPlatform.value = data.value
+}
+
 const fetchOfferAdvicesForPlatform = async () => {
   const { data, error } = await useAPI(
     `offer-management/view-offer-advices-for-platform`,
@@ -284,6 +340,7 @@ if (userSessionExtended.globalType === GlobalType.Platform) {
   await fetchOfferAdvicesForPlatform()
   await fetchEventAdvicesForPlatform()
   await fetchRechargeRequestAdvicesForPlatform()
+  await fetchKpiFinanceForPlatform()
 } else {
   await fetchOfferAdvicesForOrganization()
 }

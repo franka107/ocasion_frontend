@@ -1,23 +1,24 @@
 <template>
   <div class="p-6 bg-white shadow-md rounded-lg">
     <!-- Header section con mejor espaciado -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+    <div
+      class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4"
+    >
       <h2 class="text-xl font-semibold text-gray-900">Módulo de comparación</h2>
       <div class="flex gap-3">
         <!-- Settings Popover -->
         <div class="relative">
           <button
-            @click.stop="toggleSettings"
-            class="p-2.5 hover:bg-gray-100 rounded-lg  flex items-center justify-center focus:outline-none "
             ref="settingsButtonRef"
+            class="p-2.5 hover:bg-gray-100 rounded-lg flex items-center justify-center focus:outline-none"
+            @click.stop="toggleSettings"
           >
             <Settings class="w-5 h-5 text-gray-600" />
           </button>
           <nav
             v-show="isSettingsOpen"
             id="settings-menu"
-            class="absolute mt-3 w-72 bg-white rounded-lg shadow-lg border border-gray-200 z-50 settings-menu
-                  left-0 sm:left-auto sm:right-0"
+            class="absolute mt-3 w-72 bg-white rounded-lg shadow-lg border border-gray-200 z-50 settings-menu left-0 sm:left-auto sm:right-0"
             aria-label="Column settings"
           >
             <fieldset class="p-4 space-y-3">
@@ -29,25 +30,26 @@
               >
                 <label class="relative flex items-center cursor-pointer group">
                   <input
-                    type="checkbox"
                     :id="column.key"
                     v-model="column.visible"
+                    type="checkbox"
                     class="sr-only peer"
                     :aria-label="`Mostrar columna ${column.label}`"
                   />
                   <div
                     class="w-6 h-6 border rounded-sm flex items-center justify-center transition-colors peer-checked:bg-primary-500 peer-checked:border-primary-500 group-hover:border-primary-300 border-gray-300"
-                    :class="{ 'bg-primary-500 border-primary-500': column.visible }"
+                    :class="{
+                      'bg-primary-500 border-primary-500': column.visible,
+                    }"
                     role="checkbox"
                     :aria-checked="column.visible"
                   >
-                    <Check
-                      v-if="column.visible"
-                      class="w-4 h-4 text-black"
-                    />
+                    <Check v-if="column.visible" class="w-4 h-4 text-black" />
                   </div>
                   <!-- Label text -->
-                  <span class="ml-3 text-sm text-gray-700 group-hover:text-gray-900">
+                  <span
+                    class="ml-3 text-sm text-gray-700 group-hover:text-gray-900"
+                  >
                     {{ column.label }}
                   </span>
                 </label>
@@ -57,8 +59,8 @@
         </div>
 
         <button
-          @click="isModalOpen = true"
           class="p-2.5 hover:bg-gray-100 rounded-lg transition-colors"
+          @click="isModalOpen = true"
         >
           <Maximize2 class="w-5 h-5 text-gray-600" />
         </button>
@@ -121,13 +123,17 @@
       class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
       @click.self="isModalOpen = false"
     >
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] flex flex-col">
+      <div
+        class="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] flex flex-col"
+      >
         <!-- Modal Header -->
         <div class="flex justify-between items-center p-6 border-b">
-          <h3 class="text-xl font-semibold text-gray-900">Módulo de comparación</h3>
+          <h3 class="text-xl font-semibold text-gray-900">
+            Módulo de comparación
+          </h3>
           <button
-            @click="isModalOpen = false"
             class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            @click="isModalOpen = false"
           >
             <X class="w-5 h-5 text-gray-600" />
           </button>
@@ -140,8 +146,7 @@
               <table class="w-full divide-y divide-[#2E7AB8]">
                 <thead class="bg-[#2E7AB8] text-white">
                   <tr>
-                    <th class="px-6 py-4 text-left text-sm font-medium">
-                    </th>
+                    <th class="px-6 py-4 text-left text-sm font-medium"></th>
                     <th
                       v-for="column in visibleColumns"
                       :key="column.key"
@@ -166,7 +171,9 @@
                       class="py-4 text-center"
                     >
                       <div class="w-full space-y-2">
-                        <span class="text-sm text-gray-900 font-bold block px-6">
+                        <span
+                          class="text-sm text-gray-900 font-bold block px-6"
+                        >
                           {{ org[column.key].value }}
                         </span>
                         <KpisComponentsPercentageChange
@@ -188,31 +195,39 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { Settings, Maximize2, X , Check } from 'lucide-vue-next'
+import { Settings, Maximize2, X, Check } from 'lucide-vue-next'
 
 const isSettingsOpen = ref(false)
 const isModalOpen = ref(false)
 const settingsButtonRef = ref<HTMLButtonElement | null>(null)
 
 const toggleSettings = () => {
-  isSettingsOpen.value = !isSettingsOpen.value;
-};
+  isSettingsOpen.value = !isSettingsOpen.value
+}
 
 const columns = ref([
   { key: 'events', label: 'Nº eventos', visible: true },
   { key: 'offers', label: 'Nº ofertas', visible: true },
   { key: 'averageTicketOffers', label: 'Ticket prom. ofertas', visible: true },
   { key: 'averageBidOffers', label: 'Pujas prom. ofertas', visible: true },
-  { key: 'uniqueMonthlyParticipants', label: 'N° participantes únicos al mes', visible: true },
+  {
+    key: 'uniqueMonthlyParticipants',
+    label: 'N° participantes únicos al mes',
+    visible: true,
+  },
   { key: 'amountRaised', label: 'Monto recaudado', visible: true },
-  { key: 'commissionsCollected', label: 'Comisiones recaudadas', visible: true },
+  {
+    key: 'commissionsCollected',
+    label: 'Comisiones recaudadas',
+    visible: true,
+  },
   { key: 'penalties', label: 'Penalidades', visible: true },
   { key: 'cancelledOffers', label: 'N° ofertas canceladas', visible: true },
   { key: 'averageOfferTime', label: 'Tiempo prom. de oferta', visible: true },
 ])
 
 const visibleColumns = computed(() =>
-  columns.value.filter((column) => column.visible)
+  columns.value.filter((column) => column.visible),
 )
 
 const generateRandomMockedData = (organizationName: string) => {

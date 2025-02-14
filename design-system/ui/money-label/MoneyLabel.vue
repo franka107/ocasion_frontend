@@ -31,14 +31,14 @@ const isNegative = computed(() => props.amount < 0)
   <div
     :class="
       cn(
-        'flex justify-end items-center py-2 px-3 w-full max-w-[120px]',
+        'flex justify-end items-center py-2 px-3 w-full max-w-[120px] font-medium',
         $attrs.class as string,
       )
     "
   >
     <span
       :class="[
-        'font-medium tabular-nums',
+        'tabular-nums',
         isNegative
           ? 'text-red-600 dark:text-red-400'
           : 'text-gray-900 dark:text-gray-100',
