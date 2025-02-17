@@ -16,6 +16,14 @@
                 )
               "
               :description="'Solicitudes de retiro pendientes'"
+              @view-detail-button-pressed="
+                () => {
+                  console.log('view-detail-button-pressed')
+                  router.push(
+                    '/dashboard/platform/attention-tray/withdrawal-requests',
+                  )
+                }
+              "
             />
 
             <BerlinActivityCard
@@ -27,6 +35,11 @@
                 )
               "
               :description="'Solicitudes de retiro aprobadas'"
+              @view-detail-button-pressed="
+                () => {
+                  router.push('/dashboard/platform/reports/transactions')
+                }
+              "
             />
 
             <BerlinActivityCard
@@ -38,6 +51,13 @@
                 )
               "
               :description="'Solicitudes de recarga pendientes'"
+              @view-detail-button-pressed="
+                () => {
+                  router.push(
+                    '/dashboard/platform/attention-tray/top-up-requests',
+                  )
+                }
+              "
             />
 
             <BerlinActivityCard
@@ -49,6 +69,13 @@
                 )
               "
               :description="'Validaciones de cuenta pendientes'"
+              @view-detail-button-pressed="
+                () => {
+                  router.push(
+                    '/dashboard/platform/attention-tray/account-validation',
+                  )
+                }
+              "
             />
 
             <BerlinActivityCard
@@ -76,6 +103,11 @@
                 eventAdvicesForPlatform.eventsInDebateCount.toFixed(2)
               "
               :description="'Eventos en debate'"
+              @view-detail-button-pressed="
+                () => {
+                  router.push('/dashboard/platform/events')
+                }
+              "
             />
 
             <BerlinActivityCard
@@ -86,7 +118,7 @@
                   2,
                 )
               "
-              :description="'Ofertas pendientes de delivery'"
+              :description="'Ofertas pendientes de envío'"
             />
 
             <BerlinActivityCard
@@ -225,6 +257,8 @@ import { GlobalType } from '~/types/Common'
 import ActivityCardDeprecated from '~/layouts/default/ActivityCardDeprecated.vue'
 import BerlinSimpleCard from '~/design-system/berlin/cards/simple-card/BerlinSimpleCard.vue'
 import BerlinActivityCard from '~/design-system/berlin/cards/activity-card/BerlinActivityCard.vue'
+
+const router = useRouter()
 
 const allOrganizations = ref<Organization[]>([])
 const fetchOrganizations = async () => {

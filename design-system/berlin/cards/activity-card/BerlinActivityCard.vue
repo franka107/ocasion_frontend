@@ -14,7 +14,7 @@ const props = withDefaults(defineProps<BerlinActivityCardProps>(), {
   description: 'Lorem ipsum dolor sit amet',
 })
 const emit = defineEmits<{
-  onViewDetailButtonPressed: []
+  viewDetailButtonPressed: []
 }>()
 
 const hasClickEventListener = computed(
@@ -51,7 +51,12 @@ const hasClickEventListener = computed(
       <button
         v-if="hasClickEventListener"
         class="text-orange-500 text-xs mb-12 hover:text-orange-700"
-        @click="emit('onViewDetailButtonPressed')"
+        @click="
+          () => {
+            console.log('from componente')
+            emit('viewDetailButtonPressed')
+          }
+        "
       >
         Ver detalle
       </button>
