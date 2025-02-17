@@ -11,7 +11,9 @@
               v-if="userSessionExtended.globalType === GlobalType.Platform"
               class="flex-1 min-w-[150px]"
               :kpi-value="
-                rechargeRequestAdvicesForPlatform.retireRequestPendingCount.toString()
+                rechargeRequestAdvicesForPlatform.retireRequestPendingCount.toFixed(
+                  2,
+                )
               "
               :description="'Solicitudes de retiro pendientes'"
             />
@@ -20,7 +22,9 @@
               v-if="userSessionExtended.globalType === GlobalType.Platform"
               class="flex-1 min-w-[150px]"
               :kpi-value="
-                rechargeRequestAdvicesForPlatform.retireRequestApprovedCount.toString()
+                rechargeRequestAdvicesForPlatform.retireRequestApprovedCount.toFixed(
+                  2,
+                )
               "
               :description="'Solicitudes de retiro aprobadas'"
             />
@@ -29,7 +33,9 @@
               v-if="userSessionExtended.globalType === GlobalType.Platform"
               class="flex-1 min-w-[150px]"
               :kpi-value="
-                rechargeRequestAdvicesForPlatform.rechargeRequestPendingCount.toString()
+                rechargeRequestAdvicesForPlatform.rechargeRequestPendingCount.toFixed(
+                  2,
+                )
               "
               :description="'Solicitudes de recarga pendientes'"
             />
@@ -38,7 +44,9 @@
               v-if="userSessionExtended.globalType === GlobalType.Platform"
               class="flex-1 min-w-[150px]"
               :kpi-value="
-                rechargeRequestAdvicesForPlatform.accountValidationPendingCount.toString()
+                rechargeRequestAdvicesForPlatform.accountValidationPendingCount.toFixed(
+                  2,
+                )
               "
               :description="'Validaciones de cuenta pendientes'"
             />
@@ -47,7 +55,7 @@
               v-if="userSessionExtended.globalType === GlobalType.Platform"
               class="flex-1 min-w-[150px]"
               :kpi-value="
-                offerAdvicesForPlatform.offersInDepositReviewCount.toString()
+                offerAdvicesForPlatform.offersInDepositReviewCount.toFixed(2)
               "
               :description="'Ofertas en revisión de deposito'"
             />
@@ -56,7 +64,7 @@
               v-if="userSessionExtended.globalType === GlobalType.Platform"
               class="flex-1 min-w-[150px]"
               :kpi-value="
-                offerAdvicesForPlatform.offersPendingOfDeliveryCount.toString()
+                offerAdvicesForPlatform.offersPendingOfDeliveryCount.toFixed(2)
               "
               :description="'Ofertas pendientes de envio'"
             />
@@ -65,7 +73,7 @@
               v-if="userSessionExtended.globalType === GlobalType.Platform"
               class="flex-1 min-w-[150px]"
               :kpi-value="
-                eventAdvicesForPlatform.eventsInDebateCount.toString()
+                eventAdvicesForPlatform.eventsInDebateCount.toFixed(2)
               "
               :description="'Eventos en debate'"
             />
@@ -74,7 +82,9 @@
               v-if="userSessionExtended.globalType === GlobalType.Organization"
               class="flex-1 min-w-[150px]"
               :kpi-value="
-                offerAdvicesForOrganization.offersPendingOfDeliveryCount.toString()
+                offerAdvicesForOrganization.offersPendingOfDeliveryCount.toFixed(
+                  2,
+                )
               "
               :description="'Ofertas pendientes de delivery'"
             />
@@ -83,7 +93,9 @@
               v-if="userSessionExtended.globalType === GlobalType.Organization"
               class="flex-1 min-w-[150px]"
               :kpi-value="
-                offerAdvicesForOrganization.offersInDepositReviewCount.toString()
+                offerAdvicesForOrganization.offersInDepositReviewCount.toFixed(
+                  2,
+                )
               "
               :description="'Ofertas en revisión de abono'"
             />
@@ -92,7 +104,9 @@
               v-if="userSessionExtended.globalType === GlobalType.Organization"
               class="flex-1 min-w-[150px]"
               :kpi-value="
-                offerAdvicesForOrganization.offersInTransferOfGoodCount.toString()
+                offerAdvicesForOrganization.offersInTransferOfGoodCount.toFixed(
+                  2,
+                )
               "
               :description="'Ofertas en transferencia de bienes'"
             />
@@ -109,7 +123,9 @@
               v-if="userSessionExtended.globalType === GlobalType.Platform"
               class="flex-1 min-w-[150px]"
               :kpi-value="
-                kpiFinanceForPlatform.participantsWithGuaranteeSeparatedCount.toString()
+                kpiFinanceForPlatform.participantsWithGuaranteeSeparatedCount.toFixed(
+                  2,
+                )
               "
               :description="'Cantidad de participantes con garantía separada'"
             />
@@ -126,7 +142,9 @@
               v-if="userSessionExtended.globalType === GlobalType.Platform"
               class="flex-1 min-w-[150px]"
               :kpi-value="
-                kpiFinanceForPlatform.numberOfParticipantsPerOfferAverage.toString()
+                kpiFinanceForPlatform.numberOfParticipantsPerOfferAverage.toFixed(
+                  2,
+                )
               "
               :description="'Promedio de cantidad de participantes por oferta'"
             />
@@ -134,7 +152,7 @@
             <BerlinActivityCard
               v-if="userSessionExtended.globalType === GlobalType.Platform"
               class="flex-1 min-w-[150px]"
-              :kpi-value="kpiFinanceForPlatform.bidsPerOfferAverage.toString()"
+              :kpi-value="kpiFinanceForPlatform.bidsPerOfferAverage.toFixed(2)"
               :description="'Promedio de pujas por oferta'"
             />
 
@@ -142,7 +160,7 @@
               v-if="userSessionExtended.globalType === GlobalType.Platform"
               class="flex-1 min-w-[150px]"
               :kpi-value="
-                kpiFinanceForPlatform.comissionsChargedCount.toString()
+                kpiFinanceForPlatform.comissionsChargedCount.toFixed(2)
               "
               :description="'Total de comisiones cobradas'"
             />
@@ -150,7 +168,7 @@
             <BerlinActivityCard
               v-if="userSessionExtended.globalType === GlobalType.Platform"
               class="flex-1 min-w-[150px]"
-              :kpi-value="kpiFinanceForPlatform.penaltyChargedCount.toString()"
+              :kpi-value="kpiFinanceForPlatform.penaltyChargedCount.toFixed(2)"
               :description="'Total de penalidades cobradas'"
             />
           </div>

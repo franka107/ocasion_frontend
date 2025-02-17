@@ -4,7 +4,7 @@ import MoneyLabel from '~/design-system/ui/money-label/MoneyLabel.vue'
 export type BerlinActivityCardProps = {
   customIconName?: string
   kpiValue?: string | number
-  type: 'text' | 'money'
+  type?: 'text' | 'money'
   description?: string
 }
 const props = withDefaults(defineProps<BerlinActivityCardProps>(), {

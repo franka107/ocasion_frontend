@@ -110,15 +110,15 @@ export const withdrawalRequestsSearch: SearchItem[] = [
   {
     key: 'createdAt',
     type: 'date-range',
-    placeholder: 'Fecha de transferencia',
-    label: 'Fecha de transferencia',
+    placeholder: 'Fecha de solicitud',
+    label: 'Fecha de solicitud',
     width: 'w-auto',
   },
   {
     key: 'transferedAt',
     type: 'date-range',
-    placeholder: 'Fecha de solicitud',
-    label: 'Fecha de solicitud',
+    placeholder: 'Fecha de transferencia',
+    label: 'Fecha de transferencia',
     width: 'w-auto',
   },
 ]
