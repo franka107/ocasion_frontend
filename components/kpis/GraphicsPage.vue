@@ -12,7 +12,7 @@
               class="flex-1 min-w-[150px]"
               :kpi-value="
                 rechargeRequestAdvicesForPlatform.retireRequestPendingCount.toFixed(
-                  2,
+                  0,
                 )
               "
               :description="'Solicitudes de retiro pendientes'"
@@ -31,7 +31,7 @@
               class="flex-1 min-w-[150px]"
               :kpi-value="
                 rechargeRequestAdvicesForPlatform.retireRequestApprovedCount.toFixed(
-                  2,
+                  0,
                 )
               "
               :description="'Solicitudes de retiro aprobadas'"
@@ -47,7 +47,7 @@
               class="flex-1 min-w-[150px]"
               :kpi-value="
                 rechargeRequestAdvicesForPlatform.rechargeRequestPendingCount.toFixed(
-                  2,
+                  0,
                 )
               "
               :description="'Solicitudes de recarga pendientes'"
@@ -65,7 +65,7 @@
               class="flex-1 min-w-[150px]"
               :kpi-value="
                 rechargeRequestAdvicesForPlatform.accountValidationPendingCount.toFixed(
-                  2,
+                  0,
                 )
               "
               :description="'Validaciones de cuenta pendientes'"
@@ -82,25 +82,35 @@
               v-if="userSessionExtended.globalType === GlobalType.Platform"
               class="flex-1 min-w-[150px]"
               :kpi-value="
-                offerAdvicesForPlatform.offersInDepositReviewCount.toFixed(2)
+                offerAdvicesForPlatform.offersInDepositReviewCount.toFixed(0)
               "
-              :description="'Ofertas en revisión de deposito'"
+              :description="'Ofertas en revisión de abono'"
+              @view-detail-button-pressed="
+                () => {
+                  router.push('/dashboard/platform/payments')
+                }
+              "
             />
 
             <BerlinActivityCard
               v-if="userSessionExtended.globalType === GlobalType.Platform"
               class="flex-1 min-w-[150px]"
               :kpi-value="
-                offerAdvicesForPlatform.offersPendingOfDeliveryCount.toFixed(2)
+                offerAdvicesForPlatform.offersPendingOfDeliveryCount.toFixed(0)
               "
-              :description="'Ofertas pendientes de envio'"
+              :description="'Ofertas pendientes de entrega'"
+              @view-detail-button-pressed="
+                () => {
+                  router.push('/dashboard/platform/sustentation')
+                }
+              "
             />
 
             <BerlinActivityCard
               v-if="userSessionExtended.globalType === GlobalType.Platform"
               class="flex-1 min-w-[150px]"
               :kpi-value="
-                eventAdvicesForPlatform.eventsInDebateCount.toFixed(2)
+                eventAdvicesForPlatform.eventsInDebateCount.toFixed(0)
               "
               :description="'Eventos en debate'"
               @view-detail-button-pressed="
@@ -115,10 +125,17 @@
               class="flex-1 min-w-[150px]"
               :kpi-value="
                 offerAdvicesForOrganization.offersPendingOfDeliveryCount.toFixed(
-                  2,
+                  0,
                 )
               "
-              :description="'Ofertas pendientes de envío'"
+              :description="'Ofertas pendientes de entrega'"
+              @view-detail-button-pressed="
+                () => {
+                  router.push(
+                    `/dashboard/organization/${route.params.organizationId}/sustentation`,
+                  )
+                }
+              "
             />
 
             <BerlinActivityCard
@@ -126,10 +143,17 @@
               class="flex-1 min-w-[150px]"
               :kpi-value="
                 offerAdvicesForOrganization.offersInDepositReviewCount.toFixed(
-                  2,
+                  0,
                 )
               "
               :description="'Ofertas en revisión de abono'"
+              @view-detail-button-pressed="
+                () => {
+                  router.push(
+                    `/dashboard/organization/${route.params.organizationId}/payments`,
+                  )
+                }
+              "
             />
 
             <BerlinActivityCard
@@ -137,10 +161,17 @@
               class="flex-1 min-w-[150px]"
               :kpi-value="
                 offerAdvicesForOrganization.offersInTransferOfGoodCount.toFixed(
-                  2,
+                  0,
                 )
               "
               :description="'Ofertas en transferencia de bienes'"
+              @view-detail-button-pressed="
+                () => {
+                  router.push(
+                    `/dashboard/organization/${route.params.organizationId}/sustentation`,
+                  )
+                }
+              "
             />
           </div>
         </BerlinSimpleCard>
@@ -156,7 +187,7 @@
               class="flex-1 min-w-[150px]"
               :kpi-value="
                 kpiFinanceForPlatform.participantsWithGuaranteeSeparatedCount.toFixed(
-                  2,
+                  0,
                 )
               "
               :description="'Cantidad de participantes con garantía separada'"
@@ -192,7 +223,7 @@
               v-if="userSessionExtended.globalType === GlobalType.Platform"
               class="flex-1 min-w-[150px]"
               :kpi-value="
-                kpiFinanceForPlatform.comissionsChargedCount.toFixed(2)
+                kpiFinanceForPlatform.comissionsChargedCount.toFixed(0)
               "
               :description="'Total de comisiones cobradas'"
             />
@@ -200,7 +231,7 @@
             <BerlinActivityCard
               v-if="userSessionExtended.globalType === GlobalType.Platform"
               class="flex-1 min-w-[150px]"
-              :kpi-value="kpiFinanceForPlatform.penaltyChargedCount.toFixed(2)"
+              :kpi-value="kpiFinanceForPlatform.penaltyChargedCount.toFixed(0)"
               :description="'Total de penalidades cobradas'"
             />
           </div>
@@ -259,6 +290,7 @@ import BerlinSimpleCard from '~/design-system/berlin/cards/simple-card/BerlinSim
 import BerlinActivityCard from '~/design-system/berlin/cards/activity-card/BerlinActivityCard.vue'
 
 const router = useRouter()
+const route = useRoute()
 
 const allOrganizations = ref<Organization[]>([])
 const fetchOrganizations = async () => {
