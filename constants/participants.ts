@@ -78,7 +78,7 @@ export const participantsHeader: HeaderItem[] = [
   },
   {
     key: 'actions',
-    label: '',
+    label: 'Acciones',
     sortable: false,
     align: 'center',
   },
