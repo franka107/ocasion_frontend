@@ -472,9 +472,9 @@ const bidsData = computed(
       offerEndTime: item.offer.endTime
         ? dayjs(item.offer.endTime).format('DD/MM/YYYY')
         : '-',
-      taxes: 200,
+      taxes: item.amount * 0.1,
       type: '-',
-      total: item.amount + 200,
+      total: item.amount + item.amount * 0.1,
       ...item,
     })) || [],
 )

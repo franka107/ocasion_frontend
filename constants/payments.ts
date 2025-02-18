@@ -88,7 +88,7 @@ export const paymentsHeader = (viewType: ViewType): HeaderItem[] => [
     : []),
 
   {
-    key: 'date',
+    key: 'createdAt',
     label: 'Fecha de envio',
     sortable: true,
   },

@@ -35,26 +35,11 @@
                 <CustomIcons class="cursor-pointer" name="Clip" />
               </div>
             </template>
-            <template #compostPropertyPaymentFile="{ row }">
-              <!-- <Button -->
-              <!--   variant="ghost" -->
-              <!--   size="icon" -->
-              <!--   class="flex items-center justify-center rounded-full" -->
-              <!--   :disabled="!row.compostPropertyPaymentFile" -->
-              <!--   @click="handleCompostPropertyPaymentFile(row)" -->
-              <!-- > -->
-              <!--   <CustomIcons -->
-              <!--     :name=" -->
-              <!--       compostPaymentStatus.get(row.compostPropertyPaymentStatus) -->
-              <!--         ?.icon || 'Doc-Loupe' -->
-              <!--     " -->
-              <!--     :class=" -->
-              <!--       compostPaymentStatus.get(row.compostPropertyPaymentStatus) -->
-              <!--         ?.class || 'text-gray-500' -->
-              <!--     " -->
-              <!--   /> -->
-              <!-- </Button> -->
 
+            <template #createdAt="{ row }">
+              <DateLabel :value="row.createdAt" />
+            </template>
+            <template #compostPropertyPaymentFile="{ row }">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
@@ -221,6 +206,12 @@
                 :variant="paymentStatus.get(row.status)?.color as any"
               ></CustomChip>
             </template>
+            <template #comissionAmount="{ row }">
+              <MoneyLabel :amount="row.comissionAmount"></MoneyLabel>
+            </template>
+            <template #propertyAmount="{ row }">
+              <MoneyLabel :amount="row.propertyAmount"></MoneyLabel>
+            </template>
           </CustomTable>
 
           <BidModal
@@ -315,6 +306,8 @@ import { GrantId } from '~/types/Grant'
 import { compostPaymentStatus } from '~/constants/evidenceOrg'
 import type { BidDto } from '~/types/Bids'
 import { GlobalType } from '~/types/Common'
+import DateLabel from '~/design-system/ui/data-label/DateLabel.vue'
+import MoneyLabel from '~/design-system/ui/money-label/MoneyLabel.vue'
 const userSession = useUserSessionExtended()
 const props = defineProps<{
   type: 'organization' | 'platform'
@@ -420,13 +413,6 @@ const onObservePropertyButtonPressed = (row: any) => {
 
 const paymentsData = computed(() =>
   data.value.data.map((item: PaymentDto, index: number) => ({
-    date: new Date(item.createdAt).toLocaleString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }),
     ...item,
     event: item.event?.name || '-',
   })),
