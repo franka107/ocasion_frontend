@@ -30,7 +30,6 @@ const { data, status } = await useAPI<{
 }>(`/auction-management/subscribe-to-offer-preview/?eventId=${props.eventId}`, {
   method: 'GET',
 } as any)
-console.log('data', data, status)
 
 // if (status.value !== 'success') {
 //   toast({
@@ -93,18 +92,26 @@ const resetForm = () => {
         la separación de garantía.
       </p>
       <ul v-if="data" class="mb-6 text-sm font-medium">
-        <li>
-          <span class="text-primary-700">Saldo disponible: </span
-          ><span>$ {{ data.availableBalance }}</span>
-        </li>
-        <li>
-          <span class="text-primary-700">monto a separar: </span
-          ><span>$ {{ data.amountToBeSeparated }}</span>
-        </li>
-        <li>
-          <span class="text-primary-700">Saldo restante: </span
-          ><span>$ {{ data.remainingBalance }}</span>
-        </li>
+        <div v-if="data.remainingBalance >= 0">
+          <li>
+            <span class="text-primary-700">Saldo disponible: </span
+            ><span>$ {{ data.availableBalance }}</span>
+          </li>
+          <li>
+            <span class="text-primary-700">monto a separar: </span
+            ><span>$ {{ data.amountToBeSeparated }}</span>
+          </li>
+          <li>
+            <span class="text-primary-700">Saldo restante: </span
+            ><span>$ {{ data.remainingBalance }}</span>
+          </li>
+        </div>
+        <div v-else class="flex justify-start align-middle items-center">
+          <p>
+            No cuentas con saldo suficiente, por favor realiza una recarga en tu
+            monedero
+          </p>
+        </div>
       </ul>
       <div class="flex gap-x-[10px] w-full">
         <Button
@@ -113,7 +120,18 @@ const resetForm = () => {
           @click="emit('update:modelValue', false)"
           >Cancelar</Button
         >
-        <Button class="w-full" @click="onSubmit">Separar</Button>
+        <Button
+          v-if="data.remainingBalance >= 0"
+          class="w-full"
+          @click="onSubmit"
+          >Separar</Button
+        >
+        <Button
+          v-if="data.remainingBalance < 0"
+          class="w-full"
+          @click="navigateTo(`/dashboard/participant/my-wallet`)"
+          >Recargar saldo</Button
+        >
       </div>
     </template>
     <template v-else>
