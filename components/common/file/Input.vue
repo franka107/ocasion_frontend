@@ -184,9 +184,12 @@ onMounted(() => {
         :key="index"
         class="border-2 border-[#22c55d] rounded-lg flex items-center justify-between p-2"
       >
-        <span class="text-gray-400 text-sm font-normal leading-5">{{
-          file.name
-        }}</span>
+        <span
+          class="text-gray-400 text-sm font-normal leading-5 truncate max-w-[150px]"
+          :title="file.name"
+        >
+          {{ file.name }}
+        </span>
         <div class="flex items-center space-x-2">
           <ExternalLink
             class="h-6 w-6 text-blue-500 cursor-pointer"
