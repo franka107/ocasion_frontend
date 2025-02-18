@@ -22,8 +22,8 @@
           </template>
           <template #status="{ row }">
             <CustomChip
-              :text="row.status === 'ACTIVE' ? 'Activo' : 'Suspendido'"
-              :variant="row.status === 'ACTIVE' ? 'default' : 'destructive'"
+              :text="userStatusMap[row.status as UserStatus].name"
+              :variant="userStatusMap[row.status as UserStatus].color"
             ></CustomChip>
           </template>
 
@@ -83,6 +83,7 @@ import { participantSearch, participantsHeader } from '~/constants/participants'
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
 import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
 import { GrantId } from '~/types/Grant'
+import { UserStatus, userStatusMap } from '~/models/user'
 
 const route = useRoute()
 const { getMyGrants } = useAuthManagement()
