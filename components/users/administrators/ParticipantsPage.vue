@@ -92,8 +92,7 @@ const { page, sortOptions, onSort } = useAdmins()
 const filterOptions = ref(
   `[{"field":"type","type":"equal","value": "PARTICIPANT"}]`,
 )
-const openModal = ref(false)
-const admsUserId = ref<number | undefined>(undefined)
+
 const BASE_ADM_URL = '/user-management'
 const onSearch = (item: { [key: string]: string }) => {
   const filters = [
@@ -104,7 +103,7 @@ const onSearch = (item: { [key: string]: string }) => {
     { field: 'status', type: 'equal', value: item.status || '' },
     {
       field: 'createdAt',
-      type: 'equal',
+      type: 'between',
       value: item.createdAt || '',
     },
   ]

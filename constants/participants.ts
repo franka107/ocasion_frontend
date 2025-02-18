@@ -16,25 +16,30 @@ export const participantSearch = (): SearchItem[] => [
     key: 'commonName',
     type: 'text',
     placeholder: 'Buscar por Nombre, Razón Social',
+    label: 'Busqueda rápida',
     position: 1,
   },
   {
     key: 'email',
     type: 'text',
     placeholder: 'Buscar por email',
+    label: 'Email',
     position: 1,
   },
   {
     key: 'phoneNumber',
     type: 'text',
     placeholder: 'N. Celular',
+    label: 'Celular',
     position: 1,
   },
+
   {
     key: 'createdAt',
-    type: 'date',
-    placeholder: 'Fecha de creación',
-    position: 1,
+    type: 'date-range',
+    placeholder: 'Periodo',
+    width: 'w-auto',
+    label: 'Buscar por fecha de registro',
   },
   {
     key: 'status',
@@ -46,6 +51,7 @@ export const participantSearch = (): SearchItem[] => [
       { text: 'Todos', value: ' ' },
     ],
     elementClass: 'min-w-[400px]',
+    label: 'Estado',
     position: 3,
   },
 ]
