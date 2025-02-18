@@ -1,5 +1,6 @@
 export enum GrantId {
   /* Platform */
+  PlatformUsersCanReactivateParticipant = 'PLATFORM_USERS_CAN_REACTIVATE_PARTICIPANT',
   PlatformKpisManagement = 'PLATFORM_KPIS_MANAGEMENT',
   PlatformUsersManagement = 'PLATFORM_USERS_MANAGEMENT',
   PlatformUsersCanCreate = 'PLATFORM_USERS_CAN_CREATE',
