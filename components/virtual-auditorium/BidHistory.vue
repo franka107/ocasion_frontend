@@ -3,82 +3,103 @@ import type { BidDto } from '~/types/Bids'
 
 const props = defineProps<{
   bids: BidDto[]
-  type?: 'complete' | 'resumed' // La propiedad 'type' ahora es opcional
+  type?: 'complete' | 'resumed'
 }>()
 
 const { user } = useUserSession()
 const { bids, type } = toRefs(props)
 
 const finalType = computed(() => type.value ?? 'resumed')
+const showAllBids = ref(false)
 
 const additionalBidsCount = computed(() =>
-  finalType.value === 'resumed' ? bids.value.length - 4 : 0,
+  finalType.value === 'resumed' && !showAllBids.value
+    ? Math.max(bids.value.length - 5, 0)
+    : 0,
 )
 
-// Excluir la puja ganadora de la lista de "Pujas anteriores"
-const bidsToShow = computed(() =>
-  finalType.value === 'resumed' ? bids.value.slice(1, 5) : bids.value.slice(1),
-)
+const bidsToShow = computed(() => {
+  if (finalType.value === 'complete' || showAllBids.value) {
+    return bids.value.slice(1)
+  }
+  return bids.value.slice(1, 5)
+})
+
+const handleShowAllBids = () => {
+  showAllBids.value = true
+}
 </script>
 
 <template>
   <div class="text-primary-950 text-sm">
     <!-- Puja ganadora -->
-    <p class="uppercase font-bold">Puja ganadora</p>
-    <p
-      class="my-4 flex justify-between items-center bg-primary-100 p-2 rounded-lg"
-    >
-      <!-- <span class="uppercase font-bold text-lg">{{ -->
-      <!--   bids[0].guaranteedAmount.pseudonym -->
-      <!-- }}</span> -->
-      <span
-        :class="{
-          'font-bold': user?.user.id === bids[0].userId,
-          uppercase: true,
-          'text-lg': true,
-        }"
+    <div class="mb-6">
+      <p class="uppercase font-bold text-lg text-primary-700">Puja ganadora</p>
+      <div
+        class="my-4 flex justify-between items-center bg-primary-100 p-4 rounded-xl border-2 border-primary-500 shadow-lg"
       >
-        {{
-          `${bids[0].guaranteedAmount?.pseudonym || 'PUJA BASE'} ${user?.user.id === bids[0].userId ? '(YO)' : ''}`
-        }}
-      </span>
-      <span class="text-xl font-semibold text-primary-700"
-        >USD ${{ bids[0].amount }}</span
-      >
-    </p>
-
-    <!-- Lista de pujas -->
-    <ul class="overflow-y-auto max-h-[300px]">
-      <li class="uppercase font-bold">Pujas anteriores</li>
-
-      <!-- Pujas anteriores según el tipo -->
-      <li
-        v-for="(item, i) in bidsToShow"
-        :key="i"
-        class="flex justify-between items-center w-full !py-1"
-      >
-        <span :class="{ 'font-bold': user?.user.id === item.userId }">
+        <span
+          :class="{
+            'font-bold': user?.user.id === bids[0].userId,
+            'uppercase text-xl': true,
+          }"
+        >
           {{
-            `${item.guaranteedAmount?.pseudonym || 'PUJA BASE'} ${user?.user.id === item.userId ? '(YO)' : ''}`
+            `${bids[0].guaranteedAmount?.pseudonym || 'PUJA BASE'} ${user?.user.id === bids[0].userId ? '(YO)' : ''}`
           }}
         </span>
-        <span class="text-sm font-semibold text-right">
-          USD ${{ item.amount }}
+        <span class="text-2xl font-extrabold text-primary-700">
+          USD ${{ bids[0].amount }}
         </span>
-      </li>
+      </div>
+    </div>
 
-      <!-- Indicación de más pujas solo si es 'resumed' -->
-      <li
+    <!-- Lista de pujas anteriores -->
+    <div class="max-h-[300px] overflow-y-auto">
+      <p class="uppercase font-bold mb-2 text-primary-600 border-b pb-1">
+        Pujas anteriores
+      </p>
+
+      <ul>
+        <li
+          v-for="(item, i) in bidsToShow"
+          :key="i"
+          class="flex justify-between items-center w-full py-2 border-b last:border-b-0"
+        >
+          <span
+            :class="{
+              'font-bold': user?.user.id === item.userId,
+              'flex items-center': true,
+            }"
+          >
+            {{
+              `${item.guaranteedAmount?.pseudonym || 'PUJA BASE'} ${user?.user.id === item.userId ? '(YO)' : ''}`
+            }}
+            <span
+              v-if="user?.user.id === item.userId"
+              class="ml-2 text-primary-500"
+              >✔️</span
+            >
+          </span>
+          <span class="text-sm font-semibold text-right"
+            >USD ${{ item.amount }}</span
+          >
+        </li>
+      </ul>
+
+      <!-- Botón para mostrar más pujas -->
+      <button
         v-if="finalType === 'resumed' && additionalBidsCount > 0"
-        class="text-center text-primary-600 mt-3 cursor-pointer"
+        class="mt-3 text-primary-600 hover:underline cursor-pointer w-full text-center"
+        @click="handleShowAllBids"
       >
-        <span>{{ additionalBidsCount }} pujas más...</span>
-      </li>
-    </ul>
+        Ver todas las pujas ({{ additionalBidsCount }} más)
+      </button>
+    </div>
 
     <!-- Total de pujas -->
     <div
-      v-if="finalType === 'resumed' && additionalBidsCount > 0"
+      v-if="finalType === 'resumed' && bids.length > 5"
       class="mt-4 text-center text-sm text-gray-500"
     >
       <span>{{ bids.length }} pujas en total</span>
@@ -87,9 +108,6 @@ const bidsToShow = computed(() =>
 </template>
 
 <style scoped>
-/* Mejorar la visualización de la puja ganadora */
-
-/* Añadir separación y mejorar legibilidad de la lista de pujas */
 li {
   padding: 8px 0;
 }
