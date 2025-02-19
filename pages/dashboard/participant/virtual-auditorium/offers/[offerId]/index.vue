@@ -81,148 +81,154 @@ const openAttachmentsModal = () => {
     show-arrow
     custom-class="lg:px-[16px]"
   >
-    <div class="flex text-[12px] font-[400] mb-[16px]">
-      <h1 class="text-[#86868A] hover:text-[#225B82] cursor-pointer">
-        Auditorio Virtual/
-      </h1>
-      <h1 class="text-[#86868A] hover:text-[#225B82] cursor-pointer">
-        Mis ofertas/
-      </h1>
-      <h1 class="text-[#86868A] hover:text-[#225B82] cursor-pointer">
-        Detalle de Oferta
-      </h1>
-    </div>
-    <section class="w-full max-w-[1324px] mx-auto h-full">
-      <div class="w-full mx-auto grid gap-[16px] mt-[16px] mb-[24px]">
-        <div
-          class="bg-white border border-[#F3F8FC] rounded-lg px-[16px] pt-[24px] pb-[26px] w-full shadow-[0px_0px_4px_0px_#0000001A]"
-        >
-          <div class="flex flex-wrap justify-between items-center gap-y-[20px]">
-            <div>
-              <h3
-                class="font-[700] text-[#262F45] text-[20px] leading-[28px] mb-[16px]"
-              >
-                {{ offerDetail.event?.name }}
-              </h3>
-              <div class="flex items-center">
-                <CustomIcons name="calendar-today" class="mb-[1px]" />
+    <div class="h-full">
+      <div class="flex text-[12px] font-[400] mb-[16px]">
+        <h1 class="text-[#86868A] hover:text-[#225B82] cursor-pointer">
+          Auditorio Virtual/
+        </h1>
+        <h1 class="text-[#86868A] hover:text-[#225B82] cursor-pointer">
+          Mis ofertas/
+        </h1>
+        <h1 class="text-[#86868A] hover:text-[#225B82] cursor-pointer">
+          Detalle de Oferta
+        </h1>
+      </div>
+      <section class="w-full mx-auto">
+        <div class="w-full mx-auto grid gap-[16px] mt-[16px] mb-[24px]">
+          <div
+            class="bg-white border border-[#F3F8FC] rounded-lg px-[16px] pb-6 pt-[24px] w-full shadow-[0px_0px_4px_0px_#0000001A]"
+          >
+            <div
+              class="flex flex-wrap justify-between items-center gap-y-[20px]"
+            >
+              <div>
                 <h3
-                  class="gap-x-[6px] text-[#68686C] text-[14px] leading-[20px] ml-[6px] mr-[4px] font-[400]"
+                  class="font-[700] text-[#262F45] text-[20px] leading-[28px] mb-[16px]"
                 >
-                  <span class="font-[700] text-[#20445E] mr-[4px]"
-                    >Fecha y hora de cierre
-                  </span>
-                  {{ eventEndDate }}
+                  {{ offerDetail.event?.name }}
                 </h3>
-                <CustomIcons name="time" class="mb-[1px] stroke-[#20445E]" />
+                <div class="flex items-center">
+                  <CustomIcons name="calendar-today" class="mb-[1px]" />
+                  <h3
+                    class="gap-x-[6px] text-[#68686C] text-[14px] leading-[20px] ml-[6px] mr-[4px] font-[400]"
+                  >
+                    <span class="font-[700] text-[#20445E] mr-[4px]"
+                      >Fecha y hora de cierre
+                    </span>
+                    {{ eventEndDate }}
+                  </h3>
+                  <CustomIcons name="time" class="mb-[1px] stroke-[#20445E]" />
+                </div>
               </div>
-            </div>
-            <div class="flex flex-col md:flex-row gap-x-4 w-auto">
-              <Button
-                type="button"
-                class="font-[600] text-sm md:text-base text-[#F97316] bg-white px-4 py-2 rounded hover:bg-[#F97316] hover:text-white"
-                @click="openAttachmentsModal"
-                >Términos y condiciones</Button
-              >
+              <div class="flex flex-col md:flex-row gap-x-4 w-auto">
+                <Button
+                  type="button"
+                  class="font-[600] text-sm md:text-base text-[#F97316] bg-white px-4 py-2 rounded hover:bg-[#F97316] hover:text-white"
+                  @click="openAttachmentsModal"
+                  >Términos y condiciones</Button
+                >
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <AttachmentsModal
-        v-model:is-open="showAttachmentsModal"
-        :attachments="offerDetail.event?.termsAndConditionsFiles"
-        description="Visualiza los terminos y condiciones cargado para esta oferta"
-      />
-    </section>
-    <section class="w-full max-w-[1324px] h-full max-h-[625px] mx-auto">
-      <div
-        class="h-full md:h-[625px] bg-white border border-[#F3F8FC] rounded-lg px-[16px] pt-[24px] pb-[26px] w-full shadow-[0px_0px_4px_0px_#0000001A] mb-[24px]"
-      >
-        <section class="flex justify-center mx-auto">
-          <div class="max-w-7xl w-full">
-            <div class="flex flex-col md:flex-row gap-[24px]">
-              <!-- Columna Izquierda-->
-              <!-- <Album -->
-              <!--   orientation="vertical" -->
-              <!--   :files="offerDetail.attachedFiles" -->
-              <!-- /> -->
-              <Thumbnails class="w-full" :files="offerDetail.attachedFiles" />
-              <!-- Columna Derecha: Información -->
-              <div
-                class="w-full h-full md:w-[40%] flex flex-col shadow-[0px_0px_4px_0px_#0000001A] p-[16px] rounded-[12px]"
-              >
-                <!-- Tabs -->
+        <AttachmentsModal
+          v-model:is-open="showAttachmentsModal"
+          :attachments="offerDetail.event?.termsAndConditionsFiles"
+          description="Visualiza los terminos y condiciones cargado para esta oferta"
+        />
+      </section>
+      <section class="w-full mx-auto">
+        <div
+          class="h-full bg-white border border-[#F3F8FC] rounded-lg px-[16px] pt-[24px] pb-[26px] w-full shadow-[0px_0px_4px_0px_#0000001A]"
+        >
+          <section class="flex justify-center mx-auto">
+            <div class="max-w-7xl w-full">
+              <div class="flex flex-col md:flex-row gap-[24px]">
+                <!-- Columna Izquierda-->
+                <!-- <Album -->
+                <!--   orientation="vertical" -->
+                <!--   :files="offerDetail.attachedFiles" -->
+                <!-- /> -->
+                <Thumbnails class="w-full" :files="offerDetail.attachedFiles" />
+                <!-- Columna Derecha: Información -->
                 <div
-                  class="flex font-[500] text-[14px] md:text-[16px] gap-4 border-b-[2px] pt-[8px] pb-[16px] border-[#D0D0D1]"
+                  class="w-full h-full md:w-[40%] flex flex-col shadow-[0px_0px_4px_0px_#0000001A] p-[16px] rounded-[12px]"
                 >
-                  <button
-                    :class="
-                      activeTab === 'info'
-                        ? 'text-bluePrimary'
-                        : 'text-[#D0D0D1]'
-                    "
-                    class="hover:underline hover:underline-offset-[22px] hover:text-bluePrimary leading-[24px]"
-                    @click="activeTab = 'info'"
+                  <!-- Tabs -->
+                  <div
+                    class="flex font-[500] text-[14px] md:text-[16px] gap-4 border-b-[2px] pt-[8px] pb-[16px] border-[#D0D0D1]"
                   >
-                    Información
-                  </button>
-                  <button
-                    :class="
-                      activeTab === 'description'
-                        ? 'text-bluePrimary'
-                        : 'text-[#D0D0D1]'
-                    "
-                    class="hover:underline hover:underline-offset-[22px] hover:text-bluePrimary leading-[24px]"
-                    @click="activeTab = 'description'"
-                  >
-                    Descripción
-                  </button>
-                  <button
-                    :class="
-                      activeTab === 'annex'
-                        ? 'text-bluePrimary'
-                        : 'text-[#D0D0D1]'
-                    "
-                    class="hover:underline hover:underline-offset-[22px] hover:text-bluePrimary leading-[24px]"
-                    @click="activeTab = 'annex'"
-                  >
-                    Anexos
-                  </button>
-                </div>
-                <div>
-                  <div v-if="activeTab === 'info'">
-                    <DetailOfferAuditoriumItem :offer-detail="offerDetail" />
-                  </div>
-                  <div v-if="activeTab === 'description'">
-                    <p
-                      class="my-[16px] text-[14px] text-[#000000] text-justify"
+                    <button
+                      :class="
+                        activeTab === 'info'
+                          ? 'text-bluePrimary'
+                          : 'text-[#D0D0D1]'
+                      "
+                      class="hover:underline hover:underline-offset-[22px] hover:text-bluePrimary leading-[24px]"
+                      @click="activeTab = 'info'"
                     >
-                      {{ offerDetail.description }}
-                    </p>
-                  </div>
-                  <div v-if="activeTab === 'annex'">
-                    <div
-                      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-x-[16px] mt-[16px] gap-y-[16px] text-[14px] font-[600] text-[#20445E]"
+                      Información
+                    </button>
+                    <button
+                      :class="
+                        activeTab === 'description'
+                          ? 'text-bluePrimary'
+                          : 'text-[#D0D0D1]'
+                      "
+                      class="hover:underline hover:underline-offset-[22px] hover:text-bluePrimary leading-[24px]"
+                      @click="activeTab = 'description'"
                     >
-                      <div
-                        v-for="(file, index) in offerDetail.annexesFiles"
-                        :key="file.id"
-                        class="text-ellipsis overflow-hidden flex items-center justify-between rounded-[8px] bg-[#F3F8FC] w-full max-w-[389px] h-[70px] p-[12px]"
+                      Descripción
+                    </button>
+                    <button
+                      :class="
+                        activeTab === 'annex'
+                          ? 'text-bluePrimary'
+                          : 'text-[#D0D0D1]'
+                      "
+                      class="hover:underline hover:underline-offset-[22px] hover:text-bluePrimary leading-[24px]"
+                      @click="activeTab = 'annex'"
+                    >
+                      Anexos
+                    </button>
+                  </div>
+                  <div>
+                    <div v-if="activeTab === 'info'">
+                      <DetailOfferAuditoriumItem :offer-detail="offerDetail" />
+                    </div>
+                    <div v-if="activeTab === 'description'">
+                      <p
+                        class="my-[16px] text-[14px] text-[#000000] text-justify"
                       >
-                        <p class="truncate-2-lines w-[80%]">{{ file.name }}</p>
-                        <button @click="downloadFile(file.path, file.name)">
-                          <CustomIcons name="Download-white" />
-                        </button>
+                        {{ offerDetail.description }}
+                      </p>
+                    </div>
+                    <div v-if="activeTab === 'annex'">
+                      <div
+                        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-x-[16px] mt-[16px] gap-y-[16px] text-[14px] font-[600] text-[#20445E]"
+                      >
+                        <div
+                          v-for="(file, index) in offerDetail.annexesFiles"
+                          :key="file.id"
+                          class="text-ellipsis overflow-hidden flex items-center justify-between rounded-[8px] bg-[#F3F8FC] w-full max-w-[389px] h-[70px] p-[12px]"
+                        >
+                          <p class="truncate-2-lines w-[80%]">
+                            {{ file.name }}
+                          </p>
+                          <button @click="downloadFile(file.path, file.name)">
+                            <CustomIcons name="Download-white" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
-      </div>
-    </section>
+          </section>
+        </div>
+      </section>
+    </div>
   </ContentLayout>
 </template>
 <style scoped>
