@@ -11,14 +11,44 @@
         <CustomTable
           :data="adminsData"
           :header="participantsHeader"
-          :search="participantSearch()"
+          :search="
+            myGrants.data.value.includes(
+              GrantId.PlatformUsersCanFilterParticipants,
+            )
+              ? participantSearch()
+              : []
+          "
           @on-sort="onSort"
           @on-search="onSearch"
         >
-          <template #type="{ row }">
-            <span class="whitespace-nowrap">{{
-              userType.get(row.type) || ''
-            }}</span>
+          <template #action-button>
+            <div class="flex flex-row space-x-2">
+              <Button
+                v-if="
+                  myGrants.data.value.includes(
+                    GrantId.PlatformUsersCanExportParticipants,
+                  )
+                "
+                variant="default"
+                class="bg-white text-primary border border-[#052339]"
+                @click="handleExport"
+              >
+                <CustomIcons name="Download" class="ml-auto" />
+                Exportar
+              </Button>
+            </div>
+          </template>
+
+          <template #documentIdentifier="{ row }">
+            <div class="flex gap-2">
+              <Badge variant="outline">
+                {{ row.documentType }}
+              </Badge>
+
+              <span class="whitespace-nowrap">{{
+                row.documentIdentifier
+              }}</span>
+            </div>
           </template>
           <template #status="{ row }">
             <Popover>
@@ -136,6 +166,7 @@ import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCar
 import { GrantId } from '~/types/Grant'
 import { UserStatus, userStatusMap } from '~/models/user'
 import PropertyLabel from '~/design-system/berlin/labels/property-label/PropertyLabel.vue'
+import Badge from '~/design-system/ui/badge/Badge.vue'
 
 const route = useRoute()
 const { getMyGrants } = useAuthManagement()
@@ -151,10 +182,7 @@ const filterOptions = ref(
 const BASE_ADM_URL = '/user-management'
 const onSearch = (item: { [key: string]: string }) => {
   const filters = [
-    { field: 'type', type: 'equal', value: 'PARTICIPANT' || '' },
-    { field: 'commonName', type: 'like', value: item.commonName || '' },
-    { field: 'email', type: 'like', value: item.email || '' },
-    { field: 'phoneNumber', type: 'like', value: item.phoneNumber || '' },
+    { field: 'quickSearch', type: 'like', value: item.quickSearch || '' },
     { field: 'status', type: 'equal', value: item.status || '' },
     {
       field: 'createdAt',
@@ -162,6 +190,21 @@ const onSearch = (item: { [key: string]: string }) => {
       value: item.createdAt || '',
     },
   ]
+  if (item.status && item.status.length > 0) {
+    filters.push({
+      field: 'status',
+      type: 'in',
+      value: item.status,
+    })
+  }
+  if (item.documentType && item.documentType.length > 0) {
+    filters.push({
+      field: 'documentType',
+      type: 'in',
+      value: item.documentType,
+    })
+  }
+
   filterOptions.value = JSON.stringify(filters)
   page.value = 1
 }
@@ -188,6 +231,79 @@ const reactivateParticipantAccount = async (userId: string) => {
     },
   } as any)
   return data
+}
+
+const userSession = useUserSession()
+
+const handleExport = async () => {
+  openConfirmModal({
+    title: 'Exportar usuarios',
+    message: '¿Estás seguro de que deseas exportar los usuarios?',
+    callback: async () => {
+      try {
+        const { apiUrl } = useRuntimeConfig().public
+        const response = await fetch(
+          `${apiUrl}/user-management/export-participants?filterOptions=${filterOptions.value}`,
+          {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${userSession.user.value?.token}`,
+              'Content-Type': 'application/json',
+            },
+          },
+        )
+        // Convertir la respuesta en un blob
+        const blob = await response.blob()
+
+        // Crear un enlace temporal para la descarga
+        const link = document.createElement('a')
+        link.href = URL.createObjectURL(blob)
+        link.setAttribute('download', 'participantes.csv')
+        document.body.appendChild(link)
+        link.click()
+        link.remove()
+
+        // Liberar la URL del blob
+        URL.revokeObjectURL(link.href)
+
+        if (!response.ok) {
+          const error = await response.json()
+          const eMsg =
+            error.errors?.[0].message ||
+            error.message ||
+            'Error al exportar usuarios. Inténtalo de nuevo más tarde.'
+          updateConfirmModal({
+            title: 'Error al exportar usuarios',
+            message: String(eMsg),
+            type: 'error',
+          })
+        }
+
+        // ------------------------------------------------
+        // const { apiUrl } = useRuntimeConfig().public
+        // const link = document.createElement('a')
+        // link.href = `${apiUrl}/user-management/export-users`
+        // link.setAttribute('download', 'usuarios.csv')
+        // document.body.appendChild(link)
+        // link.click()
+        // link.remove()
+      } catch (error) {
+        const eMsg =
+          error || 'Error al exportar usuarios. Inténtalo de nuevo más tarde.'
+        updateConfirmModal({
+          title: 'Error al exportar usuarios',
+          message: String(eMsg),
+          type: 'error',
+        })
+      }
+
+      updateConfirmModal({
+        title: 'Exportación exitosa',
+        message: 'Los usuarios han sido exportados exitosamente.',
+        type: 'success',
+      })
+    },
+  })
 }
 
 const onReactivateButtonPressed = (userId: string) => {

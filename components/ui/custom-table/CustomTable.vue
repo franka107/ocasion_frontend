@@ -21,6 +21,24 @@
                   :placeholder="item.placeholder"
                 />
               </template>
+
+              <template v-else-if="item.type === 'select-multiple'">
+                <BerlinMultipleSelect
+                  :model-value="(searchValues[item.key] as string[]) || []"
+                  :placeholder="item.placeholder"
+                  :options="
+                    item.items?.map((e) => ({
+                      label: e.text,
+                      value: e.value,
+                    })) || []
+                  "
+                  @update:model-value="
+                    (event) => {
+                      updateSearchValue(item.key, event)
+                    }
+                  "
+                />
+              </template>
               <template v-else-if="item.type === 'select'">
                 <Select
                   :model-value="searchValues[item.key] as string | undefined"
@@ -220,6 +238,7 @@ import consola from 'consola'
 import TableCell from '../table/TableCell.vue'
 import CustomIcons from '@/components/ui/custom-icons/CustomIcons.vue'
 import EmptyScreen from '~/design-system/berlin/screens/empty-screen/BerlinEmptyScreen.vue'
+import BerlinMultipleSelect from '~/design-system/berlin/inputs/multiple-select/BerlinMultipleSelect.vue'
 
 export interface DataItem {
   [key: string]: any
@@ -230,7 +249,7 @@ export interface SearchSelectItem {
   text: string
 }
 export interface SearchItem {
-  type: 'text' | 'select' | 'date' | 'number' | 'date-range'
+  type: 'text' | 'select' | 'date' | 'number' | 'date-range' | 'select-multiple'
   placeholder?: string
   position?: number
   items?: SearchSelectItem[]
@@ -292,6 +311,14 @@ watch(
   { deep: true, immediate: true },
 )
 
+const updateSearchValue = (key: string, value: any[]) => {
+  if (!searchValues[key]) {
+    searchValues[key] = []
+  }
+  if (JSON.stringify(searchValues[key]) !== JSON.stringify(value)) {
+    searchValues[key] = value
+  }
+}
 const useMultipleSelect = () => {
   const selectedIdItems = ref<string[]>([])
   const generalCheckbox = ref<'empty' | 'all'>('empty')
@@ -365,6 +392,7 @@ const {
 
 const sortStates = reactive<{ [key: string]: string | undefined }>({})
 const sortObject = reactive<{ [key: string]: string }[]>([])
+const testRef = ref([])
 const onSort = (item: HeaderItem) => {
   const baseKey = item.realKey || item.key
   consola.info('onSort', baseKey)

@@ -1,5 +1,6 @@
 export enum GrantId {
   /* Platform */
+  PlatformUsersCanFilterParticipants = 'PLATFORM_USERS_CAN_FILTER_PARTICIPANTS',
   PlatformUsersCanReactivateParticipant = 'PLATFORM_USERS_CAN_REACTIVATE_PARTICIPANT',
   PlatformUsersCanSuspendParticipant = 'PLATFORM_USERS_CAN_SUSPEND_PARTICIPANT',
   PlatformKpisManagement = 'PLATFORM_KPIS_MANAGEMENT',
@@ -24,6 +25,7 @@ export enum GrantId {
   PlatformUsersCanViewAdministrators = 'PLATFORM_USERS_CAN_VIEW_ADMINISTRATORS',
   PlatformOfferCanRetire = 'PLATFORM_OFFER_CAN_RETIRE',
   PlatformUsersCanExportAdministrators = 'PLATFORM_USERS_CAN_EXPORT_ADMINISTRATORS',
+  PlatformUsersCanExportParticipants = 'PLATFORM_USERS_CAN_EXPORT_PARTICIPANTS',
   PlatformPaymentManagement = 'PLATFORM_PAYMENT_MANAGEMENT',
   // PlatformPaymentCanConfirm = 'PLATFORM_PAYMENT_CAN_CONFIRM',
   // PlatformPaymentCanObserve = 'PLATFORM_PAYMENT_CAN_OBSERVE',

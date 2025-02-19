@@ -13,38 +13,17 @@ export const userType = new Map<string, string>([
 
 export const participantSearch = (): SearchItem[] => [
   {
-    key: 'commonName',
+    key: 'quickSearch',
     type: 'text',
-    placeholder: 'Buscar por Nombre, Razón Social',
+    placeholder: 'Buscar por Nombre, Razón Social, Email, Teléfono o Documento',
     label: 'Busqueda rápida',
-    position: 1,
-  },
-  {
-    key: 'email',
-    type: 'text',
-    placeholder: 'Buscar por email',
-    label: 'Email',
-    position: 1,
-  },
-  {
-    key: 'phoneNumber',
-    type: 'text',
-    placeholder: 'N. Celular',
-    label: 'Celular',
     position: 1,
   },
 
   {
-    key: 'createdAt',
-    type: 'date-range',
-    placeholder: 'Periodo',
-    width: 'w-auto',
-    label: 'Buscar por fecha de registro',
-  },
-  {
     key: 'status',
     type: 'select',
-    placeholder: 'Filtrar estados',
+    placeholder: 'Estados',
     items: [
       { text: 'Activo', value: 'ACTIVE' },
       { text: 'Suspendido', value: 'SUSPENDED' },
@@ -53,6 +32,28 @@ export const participantSearch = (): SearchItem[] => [
     elementClass: 'min-w-[400px]',
     label: 'Estado',
     position: 3,
+  },
+
+  {
+    key: 'documentType',
+    type: 'select-multiple',
+    placeholder: 'Tipo de documento',
+    items: [
+      { text: 'DNI', value: 'DNI' },
+      { text: 'CE', value: 'CE' },
+      { text: 'PT', value: 'PT' },
+      { text: 'RUC', value: 'RUC' },
+    ],
+    label: 'Tipo de documento',
+    position: 4,
+  },
+  {
+    key: 'createdAt',
+    type: 'date-range',
+    placeholder: 'Periodo',
+    width: 'w-auto',
+    label: 'Buscar por fecha de registro',
+    position: 5,
   },
 ]
 
