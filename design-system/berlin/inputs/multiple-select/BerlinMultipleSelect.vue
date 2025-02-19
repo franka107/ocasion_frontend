@@ -14,11 +14,12 @@ import {
   CommandItem,
   CommandList,
 } from '~/design-system/ui/command'
-import { TagsInput, TagsInputInput } from '~/design-system/ui/tags-input'
 import { Badge } from '~/design-system/ui/badge'
 import TagsInputItemText from '~/design-system/ui/tags-input/TagsInputItemText.vue'
 import TagsInputItemDelete from '~/design-system/ui/tags-input/TagsInputItemDelete.vue'
 import TagsInputItem from '~/design-system/ui/tags-input/TagsInputItem.vue'
+import TagsInput from '~/design-system/ui/tags-input/TagsInput.vue'
+import TagsInputInput from '~/design-system/ui/tags-input/TagsInputInput.vue'
 
 // Tipado de las opciones
 interface Option {
@@ -73,15 +74,23 @@ const toggleOpen = () => {
 
 <template>
   <div>
-    <TagsInput
-      class="px-0 gap-0 w-full cursor-pointer relative"
-      :model-value="modelValue"
-    >
+    <TagsInput class="px-0 gap-0" :model-value="modelValue">
+      <div class="flex gap-2 flex-wrap items-center px-3">
+        <TagsInputItem
+          v-for="item in modelValue"
+          :key="item"
+          :value="item"
+          class="bg-primary text-white"
+        >
+          <span
+            class="py-1 px-2 text-sm rounded bg-transparent whitespace-nowrap"
+          >
+            {{ findLabelById(item) }}
+          </span>
+          <TagsInputItemDelete />
+        </TagsInputItem>
+      </div>
       <!-- Icono desplegable -->
-      <ChevronDownIcon
-        class="cursor-pointer size-4 mr-3 absolute right-0"
-        @click="toggleOpen"
-      />
 
       <ComboboxRoot
         v-model="modelValue"
@@ -90,31 +99,20 @@ const toggleOpen = () => {
         class="w-full"
       >
         <ComboboxAnchor as-child>
-          <div class="flex items-center justify-start w-full">
-            <ComboboxInput :placeholder="props.placeholder" as-child>
-              <div
-                class="mr-8 ml-2 min-h-6 flex overflow-x-auto max-w-full gap-2 scrollbar-hide"
-              >
-                <TagsInputItem
-                  v-for="item in modelValue"
-                  :key="item"
-                  :value="item"
-                  class="bg-primary text-white"
-                >
-                  <span
-                    class="py-1 px-2 text-sm rounded bg-transparent whitespace-nowrap"
-                  >
-                    {{ findLabelById(item) }}
-                  </span>
-                  <TagsInputItemDelete />
-                </TagsInputItem>
-                <TagsInputInput
-                  v-if="modelValue.length === 0"
-                  :placeholder="props.placeholder"
-                />
-              </div>
-            </ComboboxInput>
-          </div>
+          <ComboboxInput :placeholder="props.placeholder" as-child>
+            <div class="flex items-center w-full relative">
+              <TagsInputInput
+                class="w-full px-3"
+                :placeholder="props.placeholder"
+                :class="modelValue.length > 0 ? 'mt-2' : ''"
+                @keydown.enter.prevent
+              />
+              <ChevronDownIcon
+                class="cursor-pointer size-4 absolute right-3"
+                @click="toggleOpen"
+              />
+            </div>
+          </ComboboxInput>
         </ComboboxAnchor>
         <ComboboxPortal>
           <ComboboxContent>
@@ -138,23 +136,6 @@ const toggleOpen = () => {
         </ComboboxPortal>
       </ComboboxRoot>
     </TagsInput>
-
-    <!-- Etiquetas seleccionadas -->
-    <!-- <div -->
-    <!--   v-if="modelValue?.length > 0" -->
-    <!--   class="flex gap-2 flex-wrap items-center px-3 py-3" -->
-    <!-- > -->
-    <!--   <div -->
-    <!--     v-for="item in modelValue" -->
-    <!--     :key="item" -->
-    <!--     class="flex items-center gap-2" -->
-    <!--   > -->
-    <!--     <Badge class="gap-2 py-1 px-2 bg-green1"> -->
-    <!--       {{ findLabelById(item) }} -->
-    <!--       <X class="cursor-pointer size-3" @click="handleRemove(item)" /> -->
-    <!--     </Badge> -->
-    <!--   </div> -->
-    <!-- </div> -->
   </div>
 </template>
 
