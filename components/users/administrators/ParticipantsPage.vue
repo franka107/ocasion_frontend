@@ -111,8 +111,13 @@
 
     <ModalSuspendParticipant
       :id="participantToSuspendId"
-      v-model="isSuspendParticipantModalOpened"
-      :refresh-table="refresh"
+      :is-opened="isSuspendParticipantModalOpened"
+      :refresh-table="
+        () => {
+          refresh()
+          isSuspendParticipantModalOpened = false
+        }
+      "
       @update:model-value="isSuspendParticipantModalOpened = false"
     />
   </ContentLayout>

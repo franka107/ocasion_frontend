@@ -15,10 +15,9 @@ import {
 import type { OfferDto } from '~/types/Offer'
 import OfferOption from '~/components/offers/offer-option/OfferOption.vue'
 const { rejectRechargeRequest } = useTopUpRequests()
-const openAnnulModal = ref(false)
 const props = defineProps<{
   id: string
-  modelValue: boolean
+  isOpened: boolean
   refreshTable: () => void
 }>()
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
@@ -86,7 +85,6 @@ const handleReject = async (params: { suspensionReason: string }) => {
       )
 
       if (status.value === 'success') {
-        openAnnulModal.value = false
         props.refreshTable()
         updateConfirmModal({
           title: 'Participante suspendido',
@@ -111,7 +109,7 @@ const handleReject = async (params: { suspensionReason: string }) => {
 
 <template>
   <AlertDialog
-    :open="modelValue"
+    :open="isOpened"
     class="z-[30]"
     @update:open="(event) => emit('update:modelValue', event)"
   >
@@ -131,7 +129,7 @@ const handleReject = async (params: { suspensionReason: string }) => {
         </div>
         <div class="grid grid-cols-1 gap-3 px-6">
           <p class="text-[14px] font-[500] text-[#68686C]">
-            ¿Está seguro que desea suspender a este partcipante? Si es asi por
+            ¿Está seguro que desea suspender a este participante? Si es asi por
             favor ingresar el motivo de la suspensión.
           </p>
           <!-- Comentario -->
