@@ -1,6 +1,7 @@
 <template>
   <div
-    class="flex-col hover:text-gray-900 transition-colors duration-200 flex items-center space-x-2"
+    class="hover:text-gray-900 transition-colors duration-200 flex items-center space-x-2"
+    :class="{ 'flex-col': oneLine }"
   >
     <span class="text-sm font-medium text-gray-900">{{
       parsedDate.format('DD-MM-YYYY')
@@ -21,6 +22,7 @@ import { ClockIcon } from 'lucide-vue-next'
 
 const props = defineProps<{
   value: string
+  oneLine?: boolean
   hideTime?: boolean
 }>()
 

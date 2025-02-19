@@ -21,10 +21,33 @@
             }}</span>
           </template>
           <template #status="{ row }">
-            <CustomChip
-              :text="userStatusMap[row.status as UserStatus].name"
-              :variant="userStatusMap[row.status as UserStatus].color"
-            ></CustomChip>
+            <Popover>
+              <div class="flex flex-row gap-2">
+                <CustomChip
+                  :text="userStatusMap[row.status as UserStatus].name"
+                  :variant="userStatusMap[row.status as UserStatus].color"
+                ></CustomChip>
+                <PopoverTrigger as-child>
+                  <Button
+                    v-if="row.status === 'SUSPENDED'"
+                    size="icon"
+                    variant="outline"
+                    class="rounded-full size-6"
+                  >
+                    <EyeIcon class="size-4" />
+                  </Button>
+                </PopoverTrigger>
+              </div>
+
+              <PopoverContent class-name="w-80">
+                <div>
+                  <PropertyLabel
+                    label="Razón de suspensión"
+                    :description="row.suspensionReason"
+                  />
+                </div>
+              </PopoverContent>
+            </Popover>
           </template>
 
           <template #actions="{ row }">
@@ -58,6 +81,20 @@
                       <UnlockIcon class="size-5" />
                     </span>
                   </DropdownMenuItem>
+                  <DropdownMenuItem
+                    :disabled="
+                      row.status !== 'ACTIVE' ||
+                      !myGrants.data.value.includes(
+                        GrantId.PlatformUsersCanSuspendParticipant,
+                      )
+                    "
+                    @click="onSuspendButtonPressed(row.id)"
+                  >
+                    <span class="flex justify-between w-full">
+                      Suspender
+                      <UserX2 class="size-5" />
+                    </span>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -71,10 +108,18 @@
         :limit="data.limit"
       />
     </div>
+
+    <ModalSuspendParticipant
+      :id="participantToSuspendId"
+      v-model="isSuspendParticipantModalOpened"
+      :refresh-table="refresh"
+      @update:model-value="isSuspendParticipantModalOpened = false"
+    />
   </ContentLayout>
 </template>
 <script setup lang="ts">
-import { UnlockIcon } from 'lucide-vue-next'
+import { EyeIcon, LockIcon, UnlockIcon, UserX2 } from 'lucide-vue-next'
+import ModalSuspendParticipant from '../participants/ModalSuspendParticipant.vue'
 import CustomTable from '@/components/ui/custom-table/CustomTable.vue'
 import CustomChip from '@/components/ui/custom-chip/CustomChip.vue'
 import CustomPagination from '@/components/ui/custom-pagination/CustomPagination.vue'
@@ -85,9 +130,12 @@ import ContentLayout from '~/layouts/default/ContentLayout.vue'
 import CustomSimpleCard from '~/components/ui/custom-simple-card/CustomSimpleCard.vue'
 import { GrantId } from '~/types/Grant'
 import { UserStatus, userStatusMap } from '~/models/user'
+import PropertyLabel from '~/design-system/berlin/labels/property-label/PropertyLabel.vue'
 
 const route = useRoute()
 const { getMyGrants } = useAuthManagement()
+const isSuspendParticipantModalOpened = ref(false)
+const participantToSuspendId = ref('')
 
 const myGrants = await getMyGrants()
 const { page, sortOptions, onSort } = useAdmins()
@@ -165,14 +213,9 @@ const onReactivateButtonPressed = (userId: string) => {
   })
 }
 
-const adminsData = computed(
-  () => data.value.data,
-  // data.value.data.map((item: IAdminsLItem) => ({
-  //   fullName: `${item.firstName} ${item.lastName}`,
-  //   document: `${item.documentType} - ${item.documentIdentifier}`,
-  //   cellphone: item.phoneNumber,
-  //   organization: item.organizations.map((org) => org.name).join(', '),
-  //   ...item,
-  // })),
-)
+const onSuspendButtonPressed = (userId: string) => {
+  participantToSuspendId.value = userId
+  isSuspendParticipantModalOpened.value = true
+}
+const adminsData = computed(() => data.value.data)
 </script>
