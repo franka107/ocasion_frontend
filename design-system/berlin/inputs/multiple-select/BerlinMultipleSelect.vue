@@ -101,7 +101,11 @@ const toggleOpen = () => {
                   :value="item"
                   class="bg-primary text-white"
                 >
-                  <TagsInputItemText />
+                  <span
+                    class="py-1 px-2 text-sm rounded bg-transparent whitespace-nowrap"
+                  >
+                    {{ findLabelById(item) }}
+                  </span>
                   <TagsInputItemDelete />
                 </TagsInputItem>
                 <TagsInputInput

@@ -22,12 +22,13 @@ export const participantSearch = (): SearchItem[] => [
 
   {
     key: 'status',
-    type: 'select',
+    type: 'select-multiple',
     placeholder: 'Estados',
     items: [
       { text: 'Activo', value: 'ACTIVE' },
       { text: 'Suspendido', value: 'SUSPENDED' },
-      { text: 'Todos', value: ' ' },
+      { text: 'Bloqueado', value: 'BLOCKED' },
+      { text: 'No verificado', value: 'NOT_VERIFIED' },
     ],
     elementClass: 'min-w-[400px]',
     label: 'Estado',

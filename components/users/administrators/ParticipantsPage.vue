@@ -183,7 +183,6 @@ const BASE_ADM_URL = '/user-management'
 const onSearch = (item: { [key: string]: string }) => {
   const filters = [
     { field: 'quickSearch', type: 'like', value: item.quickSearch || '' },
-    { field: 'status', type: 'equal', value: item.status || '' },
     {
       field: 'createdAt',
       type: 'between',
