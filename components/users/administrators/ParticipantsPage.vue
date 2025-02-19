@@ -45,7 +45,8 @@
                 >
                   <DropdownMenuItem
                     :disabled="
-                      row.status !== 'SUSPENDED' ||
+                      (row.status !== 'SUSPENDED' &&
+                        row.status !== 'BLOCKED') ||
                       !myGrants.data.value.includes(
                         GrantId.PlatformUsersCanReactivateParticipant,
                       )
