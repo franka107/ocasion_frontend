@@ -119,18 +119,18 @@ const openAttachmentsModal = () => {
             </div>
             <div class="flex flex-col md:flex-row gap-x-4 w-auto">
               <Button
-              type="button"
-              @click="openAttachmentsModal"
-              class="font-[600] text-sm md:text-base text-[#F97316] bg-white px-4 py-2 rounded hover:bg-[#F97316] hover:text-white"
-              >Términos y condiciones</Button
-            >     
+                type="button"
+                class="font-[600] text-sm md:text-base text-[#F97316] bg-white px-4 py-2 rounded hover:bg-[#F97316] hover:text-white"
+                @click="openAttachmentsModal"
+                >Términos y condiciones</Button
+              >
             </div>
           </div>
         </div>
       </div>
       <AttachmentsModal
         v-model:is-open="showAttachmentsModal"
-        :attachments="selectAnnexesFiles"
+        :attachments="offerDetail.event?.termsAndConditionsFiles"
         description="Visualiza los terminos y condiciones cargado para esta oferta"
       />
     </section>
@@ -205,7 +205,7 @@ const openAttachmentsModal = () => {
                       class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-x-[16px] mt-[16px] gap-y-[16px] text-[14px] font-[600] text-[#20445E]"
                     >
                       <div
-                        v-for="(file, index) in selectAnnexesFiles"
+                        v-for="(file, index) in offerDetail.annexesFiles"
                         :key="file.id"
                         class="text-ellipsis overflow-hidden flex items-center justify-between rounded-[8px] bg-[#F3F8FC] w-full max-w-[389px] h-[70px] p-[12px]"
                       >
