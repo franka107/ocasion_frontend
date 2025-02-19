@@ -38,6 +38,18 @@
               </Button>
             </div>
           </template>
+          <template #createdAt="{ row }">
+            <DateLabel :value="row.createdAt" />
+          </template>
+          <template #connectedAt="{ row }">
+            <DateLabel :value="row.connectedAt" />
+          </template>
+          <template #walletAvailableBalance="{ row }">
+            <MoneyLabel :amount="row.wallet.availableBalance" />
+          </template>
+          <template #walletGuaranteedBalance="{ row }">
+            <MoneyLabel :amount="row.wallet.guaranteedBalance" />
+          </template>
 
           <template #documentIdentifier="{ row }">
             <div class="flex gap-2">
@@ -167,6 +179,8 @@ import { GrantId } from '~/types/Grant'
 import { UserStatus, userStatusMap } from '~/models/user'
 import PropertyLabel from '~/design-system/berlin/labels/property-label/PropertyLabel.vue'
 import Badge from '~/design-system/ui/badge/Badge.vue'
+import DateLabel from '~/design-system/ui/data-label/DateLabel.vue'
+import MoneyLabel from '~/design-system/ui/money-label/MoneyLabel.vue'
 
 const route = useRoute()
 const { getMyGrants } = useAuthManagement()

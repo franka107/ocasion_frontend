@@ -1,7 +1,7 @@
 <template>
   <div
     class="hover:text-gray-900 transition-colors duration-200 flex items-center space-x-2"
-    :class="{ 'flex-col': oneLine }"
+    :class="{ 'flex-col': !oneLine }"
   >
     <span class="text-sm font-medium text-gray-900">{{
       parsedDate.format('DD-MM-YYYY')

@@ -15,7 +15,7 @@ export const participantSearch = (): SearchItem[] => [
   {
     key: 'quickSearch',
     type: 'text',
-    placeholder: 'Buscar por Nombre, Razón Social, Email, Teléfono o Documento',
+    placeholder: 'Nombre, Email, Teléfono o Documento',
     label: 'Busqueda rápida',
     position: 1,
   },
@@ -60,8 +60,13 @@ export const participantSearch = (): SearchItem[] => [
 
 export const participantsHeader: HeaderItem[] = [
   {
+    key: 'id',
+    label: 'Identificador',
+    sortable: true,
+  },
+  {
     key: 'commonName',
-    label: 'Nombre y apellidos',
+    label: 'Nombre o Razón social',
     sortable: true,
   },
   {
@@ -80,8 +85,31 @@ export const participantsHeader: HeaderItem[] = [
     sortable: true,
   },
   {
+    key: 'createdAt',
+    label: 'Fecha de creación',
+    sortable: true,
+  },
+  {
+    key: 'connectedAt',
+    label: 'Ult. conexión',
+    sortable: true,
+  },
+
+  {
     key: 'status',
     label: 'Estado',
+    sortable: true,
+  },
+  {
+    key: 'walletAvailableBalance',
+    realKey: 'wallet.availableBalance',
+    label: 'Saldo disponible',
+    sortable: true,
+  },
+  {
+    key: 'walletGuaranteedBalance',
+    realKey: 'wallet.guaranteedBalance',
+    label: 'Saldo garantizado',
     sortable: true,
   },
   {
