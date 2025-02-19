@@ -97,7 +97,7 @@
                   ) || myGrants.data.value.includes(GrantId.PlatformBidCanView)
                 "
                 variant="default"
-                >Ver pujas
+                >Ver pujas ganadoras
               </Button>
             </NuxtLink>
           </div>

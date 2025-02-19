@@ -6,8 +6,10 @@
           :data="bidsData"
           :header="bidsHeader"
           class="rounded-lg mb-4"
-          :search="bidsSearch"
-          multiple-select
+          :search="bidsSearch(props.offerId)"
+          :multiple-select="
+            userSessionExpanded.globalType === GlobalType.Organization
+          "
           @on-sort="onSort"
           @on-search="onSearch"
           @on-multiple-select="
@@ -189,6 +191,8 @@ import { GlobalType } from '~/types/Common'
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const { rejectOfferBids, acceptOfferBids, page, sortOptions, onSort } =
   useBidService()
+
+const userSessionExpanded = useUserSessionExtended()
 const findBidHistories = '/audit/find-bid-histories'
 const { getMyGrants } = useAuthManagement()
 const myGrants = await getMyGrants()
@@ -237,9 +241,8 @@ if (props.offerId) {
 }
 
 const onSearch = (item: { [key: string]: string }) => {
-  const lastFilter = JSON.parse(filterOptions.value)
   filterOptions.value = JSON.stringify([
-    ...lastFilter,
+    ...filterOptionsRaw,
     { field: 'offer.id', type: 'like', value: item.title || '' },
     { field: 'status', type: 'equal', value: item.status || '' },
     { field: 'event.id', type: 'equal', value: route.params.eventId },

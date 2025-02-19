@@ -16,14 +16,19 @@ export const bidStatus = new Map<string, { name: string; color: string }>([
   ['BASE', { name: 'Puja Base', color: 'brown' }],
 ])
 
-export const bidsSearch: SearchItem[] = [
-  {
-    key: 'title',
-    type: 'text',
-    placeholder: 'Buscar oferta',
-    elementClass: 'min-w-[400px]',
-    position: 1,
-  },
+export const bidsSearch = (offerId?: string | null): SearchItem[] => [
+  ...(!offerId
+    ? ([
+        {
+          key: 'title',
+          type: 'text',
+          placeholder: 'Buscar oferta',
+          elementClass: 'min-w-[400px]',
+          position: 1,
+        },
+      ] as SearchItem[])
+    : []),
+
   {
     key: 'status',
     type: 'select',
