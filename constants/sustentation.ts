@@ -15,7 +15,7 @@ export const evidencePlatfStatus = new Map<
   ['IN_PROGRESS', { name: 'En curso', color: 'purple' }], // En curso (usando color de 'Nuevo')
   ['CANCELLED', { name: 'Cancelado', color: 'brown' }], // Cancelado
   ['IN_REVIEW', { name: 'En revisión', color: 'orange' }], // En revisión (usando color de 'Debatido')
-  ['DEBATED_BID', { name: 'Puja debatida', color: 'orange' }], // Puja debatida PSD-63
+  ['DEBATED_BID', { name: 'Puja debatida', color: 'red' }], // Puja debatida PSD-63
   ['REJECTED', { name: 'Rechazado', color: 'red' }], // Rechazado
   ['IN_DEPOSIT_REVIEW', { name: 'En revisión de depósito', color: 'red' }], // Rechazado (similar)
   ['PENDING_DEPOSIT', { name: 'Abono pendiente', color: 'blue' }], // Abono pendiente (usando color de 'Pendiente de pago')

@@ -83,23 +83,55 @@
                 >Crear oferta
               </Button>
             </div>
-            <NuxtLink
-              :href="
-                globalType === GlobalType.Platform
-                  ? `/dashboard/platform/events/${route.params.eventId}/bids`
-                  : `/dashboard/organization/${route.params.organizationId}/events/${route.params.eventId}/bids`
+
+            <Button
+              v-if="
+                myGrants.data.value.includes(GrantId.OrganizationBidCanView) ||
+                myGrants.data.value.includes(GrantId.PlatformBidCanView)
               "
+              :disabled="
+                eventStatusCheckPosition(
+                  eventDetail.status,
+                  EventStatus.Published,
+                  ComparisonOperator.Less,
+                )
+              "
+              variant="default"
+              class="p-0"
             >
-              <Button
-                v-if="
-                  myGrants.data.value.includes(
-                    GrantId.OrganizationBidCanView,
-                  ) || myGrants.data.value.includes(GrantId.PlatformBidCanView)
+              <NuxtLink
+                class="p-2"
+                :href="
+                  globalType === GlobalType.Platform
+                    ? `/dashboard/platform/events/${route.params.eventId}/bids`
+                    : `/dashboard/organization/${route.params.organizationId}/events/${route.params.eventId}/bids`
                 "
-                variant="default"
-                >Ver pujas ganadoras
-              </Button>
-            </NuxtLink>
+              >
+                Ver pujas ganadoras
+              </NuxtLink>
+            </Button>
+
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <div class="flex justify-center align-middle items-center">
+                    <Button
+                      class="rounded-full size-5"
+                      size="icon"
+                      variant="outline"
+                    >
+                      <InfoIcon />
+                    </Button>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>
+                    Podras visualizar las pujas una vez el evento haya sido
+                    publicado
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </template>
         <template #attachedFiles="{ row }">
@@ -309,6 +341,7 @@
 </template>
 
 <script setup lang="ts">
+import { InfoIcon } from 'lucide-vue-next'
 import AppraisalHistoryForm from '../history/AppraisalHistoryForm.vue'
 import AttachmentsModal from './AttachmentsModal.vue'
 import {
@@ -334,6 +367,13 @@ import { GrantId } from '~/types/Grant'
 import { EventStatus } from '~/types/Event'
 import { GlobalType } from '~/types/Common'
 import { eventStatusCheckPosition } from '~/constants/events'
+import {
+  Tooltip,
+  TooltipProvider,
+  TooltipTrigger,
+} from '~/design-system/ui/tooltip'
+import Button from '~/design-system/ui/button/Button.vue'
+import TooltipContent from '~/design-system/ui/tooltip/TooltipContent.vue'
 const { getMyGrants } = useAuthManagement()
 const myGrants = await getMyGrants()
 const { user, globalType } = useUserSessionExtended()

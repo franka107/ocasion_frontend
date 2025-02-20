@@ -242,11 +242,7 @@
                   @click="
                     () => {
                       openModalCounterOffer = true
-                      selectedCounterOfferInfo = {
-                        currentAmount: row.amount,
-                        counterOfferAmount: row.counterOffer.amount,
-                        id: row.id,
-                      }
+                      counterOfferId = row.counterOffer.id
                     }
                   "
                 >
@@ -331,11 +327,24 @@
           />
         </SheetContent>
         <CounterOfferInboundModal
-          :id="selectedCounterOfferInfo.id"
-          v-model="openModalCounterOffer"
-          :current-amount="selectedCounterOfferInfo.currentAmount"
-          :counter-offer-amount="selectedCounterOfferInfo.counterOfferAmount"
-          :refresh-table="refresh"
+          :counter-offer-id="counterOfferId"
+          @counter-offer-dialog-changed="
+            (value: boolean) => {
+              if (!value) {
+                counterOfferId = null
+              }
+            }
+          "
+          @accepted-success="
+            () => {
+              refresh()
+            }
+          "
+          @rejected-success="
+            () => {
+              refresh()
+            }
+          "
         />
       </div>
       <CustomPagination
@@ -433,11 +442,7 @@ const disableMultipleSelect = computed(
     selectedMultipleData.value.ids.length === 0,
 )
 const openModalCounterOffer = ref(false)
-const selectedCounterOfferInfo = ref({
-  currentAmount: 0,
-  counterOfferAmount: 0,
-  id: '',
-})
+const counterOfferId = ref<string | null>(null)
 const filterOptions = ref(`[]`)
 const onSearch = (item: { [key: string]: string }) => {
   filterOptions.value = JSON.stringify([

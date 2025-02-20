@@ -17,7 +17,7 @@ export const evidenceStatus = new Map<string, { name: string; color: string }>([
   ['OBSERVED_DEPOSIT', { name: 'Abono observado', color: 'orange' }], // Abono observado (similar a 'Debatido')
   ['CONFIRMED_DEPOSIT', { name: 'Depósito confirmado', color: 'green' }], // Depósito confirmado (usando color de 'Confirmado')
 
-  ['DEBATED_BID', { name: 'Puja debatida', color: 'orange' }], // Puja debatida PSD-63
+  ['DEBATED_BID', { name: 'Puja debatida', color: 'red' }], // Puja debatida PSD-63
   [
     'IN_TRANSFER_OF_GOOD',
     { name: 'En transferencia de bienes', color: 'purple' },

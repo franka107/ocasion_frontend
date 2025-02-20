@@ -9,7 +9,7 @@ export const bidStatus = new Map<string, { name: string; color: string }>([
   ['DISCARDED', { name: 'Puja Descartada', color: 'brown' }],
   ['REJECTED', { name: 'Puja Rechazada', color: 'red' }],
   ['CANCELLED', { name: 'Puja Cancelada', color: 'red' }],
-  ['DEBATED', { name: 'Puja Debatida', color: 'yellow' }],
+  ['DEBATED', { name: 'Puja Debatida', color: 'orange' }],
   ['RESERVED', { name: 'Puja Reservada', color: 'blue' }],
   ['ACCEPTED', { name: 'Puja Aceptada', color: 'purple' }],
   ['WINNER', { name: 'Puja Ganadora', color: 'green' }],
@@ -73,7 +73,8 @@ export const bidsHeader: HeaderItem[] = [
     sortable: true,
   },
   {
-    key: 'offer.appraisal',
+    key: 'offerAppraisal',
+    realKey: 'offer.appraisal',
     label: 'Tasación',
     align: 'right',
     sortable: true,

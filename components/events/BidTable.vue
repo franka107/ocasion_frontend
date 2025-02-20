@@ -55,13 +55,6 @@
                 >Aceptar puja
               </Button>
             </div>
-
-            <!-- <Button -->
-            <!--   @click="" -->
-            <!--   :disabled="disableMultipleSelect" -->
-            <!--   variant="default" -->
-            <!--   >Contraofertar -->
-            <!-- </Button> -->
           </template>
           <template #actions="{ row }">
             <div class="flex justify-center">
@@ -130,6 +123,13 @@
           <template #pseudonym="{ row }">
             <p>{{ row.pseudonym || '-' }}</p>
           </template>
+          <template #amount="{ row }">
+            <MoneyLabel :amount="row.amount" />
+          </template>
+          <template #offerAppraisal="{ row }">
+            <MoneyLabel :amount="row.offer.appraisal" />
+          </template>
+
           <template #status="{ row }">
             <CustomChip
               :text="bidStatus.get(row.status)?.name || ''"
@@ -187,6 +187,7 @@ import { ComparisonOperator, offerStatusCheckPosition } from '~/constants/offer'
 import { eventStatusCheckPosition } from '~/constants/events'
 import { EventStatus } from '~/types/Event'
 import { GlobalType } from '~/types/Common'
+import MoneyLabel from '~/design-system/ui/money-label/MoneyLabel.vue'
 
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
 const { rejectOfferBids, acceptOfferBids, page, sortOptions, onSort } =

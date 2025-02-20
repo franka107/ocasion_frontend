@@ -1,65 +1,92 @@
 <script setup lang="ts">
-import { toTypedSchema } from '@vee-validate/zod'
-import { useForm } from 'vee-validate'
-import { z } from 'zod'
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+import type { CounterOfferDto } from '~/composables/useCounterOffer'
+import BerlinStatusDialog, {
+  type BerlinStatusDialogOpen,
+} from '~/design-system/berlin/dialog/status/BerlinStatusDialog.vue'
+import BerlinLoader from '~/design-system/berlin/loader/BerlinLoader.vue'
 
 const props = defineProps<{
-  id: string
-  currentAmount: number
-  counterOfferAmount: number
-  modelValue: boolean
-  refreshTable: () => void
+  counterOfferId: string | null
+  onCounterOfferDialogChanged: (value: boolean) => void
+  onAcceptedSuccess: () => void
+  onRejectedSuccess: () => void
 }>()
+
+const counterOfferService = useCounterOffer()
+const counterOffer = ref<CounterOfferDto | null>(null)
+const isSubmitting = ref<boolean>(false)
+const statusDialogOpen = ref<BerlinStatusDialogOpen | null>(null)
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
-const { counterOfferBid } = useBidService()
-const formSchema = toTypedSchema(
-  z.object({
-    counterOfferAmount: z
-      .number()
-      .gte(1, { message: 'La contraoferta es requerida.' })
-      .lte(999999, { message: 'El campo no puede exceder los 6 dígitos.' }),
-  }),
+
+watch(
+  () => props.counterOfferId,
+  async (value, oldValue) => {
+    if (value) {
+      const response = await counterOfferService.viewDetail(value)
+      counterOffer.value = response.data.value
+    }
+  },
 )
-const emit = defineEmits(['update:modelValue'])
-const form = useForm({
-  validationSchema: formSchema,
-})
-const onSubmit = form.handleSubmit((values: any) => {
-  const { counterOfferAmount } = values
-  handleSubmit({ id: props.id, counterOfferAmount })
-  console.log('counterOfferAmount', counterOfferAmount)
-})
-const handleSubmit = async (values: any) => {
+
+const onAcceptButtonPressed = async () => {
+  if (!props.counterOfferId) return
   openConfirmModal({
-    title: 'Enviar Contraoferta de puja',
-    message: '¿Estás seguro de que deseas enviar esta contraoferta?',
+    title: 'Aceptar contraoferta',
+    message: `¿Está seguro que desea aceptar la contraoferta?`,
     callback: async () => {
-      const { status, error }: any = await counterOfferBid(values)
+      if (!props.counterOfferId) return
+      isSubmitting.value = true
+      const { status, error } = await counterOfferService.acceptToParticipant(
+        props.counterOfferId,
+      )
       if (status.value === 'success') {
-        emit('update:modelValue', false)
-        props.refreshTable()
         updateConfirmModal({
-          title: 'Contraoferta de puja enviada',
-          message: 'La contraoferta ha sido enviada exitosamente',
+          title: '¡Proceso exitoso!',
+          message: 'La contraoferta fue aceptada.',
           type: 'success',
         })
+        isSubmitting.value = false
+        props.onAcceptedSuccess()
       } else {
-        const eMsg =
-          error.value.data?.errors?.[0].message ||
-          error.value.data.message ||
-          'La contraoferta no se pudo enviar, intentalo más tarde'
+        const eMsg = getBackendError(error.value)
         updateConfirmModal({
-          title: 'Error al enviar la contraoferta',
+          title: 'Problema al aceptar contraoferta',
           message: eMsg,
           type: 'error',
         })
+        isSubmitting.value = false
+      }
+    },
+  })
+}
+
+const onRejectButtonPressed = async () => {
+  if (!props.counterOfferId) return
+  openConfirmModal({
+    title: 'Rechazar contraoferta',
+    message: `¿Está seguro que desea rechazar la contraoferta?`,
+    callback: async () => {
+      if (!props.counterOfferId) return
+      isSubmitting.value = true
+      const { status, error } = await counterOfferService.rejectToParticipant(
+        props.counterOfferId,
+      )
+      if (status.value === 'success') {
+        updateConfirmModal({
+          title: '¡Proceso exitoso!',
+          message: 'La contraoferta fue rechazada',
+          type: 'success',
+        })
+        isSubmitting.value = false
+        props.onRejectedSuccess()
+      } else {
+        const eMsg = getBackendError(error.value)
+        updateConfirmModal({
+          title: 'Problema al rechazar contraoferta',
+          message: eMsg,
+          type: 'error',
+        })
+        isSubmitting.value = false
       }
     },
   })
@@ -68,24 +95,24 @@ const handleSubmit = async (values: any) => {
 
 <template>
   <AlertDialog
-    :open="modelValue"
+    :open="props.counterOfferId !== null"
     class="z-[30]"
-    @update:open="(event) => emit('update:modelValue', event)"
+    @update:open="(event) => props.onCounterOfferDialogChanged(event)"
   >
     <AlertDialogContent class="z-[98] max-w-[600px] px-0">
-      <form class="flex flex-col gap-10 flex-grow" @submit="onSubmit">
+      <div v-if="counterOffer">
         <AlertDialogHeader class="border-b border-primary">
           <AlertDialogTitle
             class="text-xl tracking-[-0.5px] text-primary text-start mb-[18px] font-[600] px-6"
             >Contraofertar puja</AlertDialogTitle
           >
         </AlertDialogHeader>
-        <div class="grid grid-cols-2 gap-3 px-6">
+        <div class="grid grid-cols-2 gap-3 px-6 pt-6">
           <CustomInput
             class="h-14 w-full"
             type="number"
             label="Monto actual"
-            :model-value="props.currentAmount"
+            :model-value="counterOffer.bid.amount"
             :disabled="true"
             label-offset
           />
@@ -93,24 +120,10 @@ const handleSubmit = async (values: any) => {
             class="h-14 w-full"
             type="number"
             label="Monto de la contraoferta"
-            :model-value="props.counterOfferAmount"
+            :model-value="counterOffer.amount"
             :disabled="true"
             label-offset
           />
-          <!-- <FormField v-slot="{ componentField }" name="counterOfferAmount"> -->
-          <!--   <FormItem> -->
-          <!--     <FormControl> -->
-          <!--       <CustomInput -->
-          <!--         class="h-14 w-full" -->
-          <!--         type="number" -->
-          <!--         label="Monto de contraoferta" -->
-          <!--         v-bind="componentField" -->
-          <!--         label-offset -->
-          <!--       /> -->
-          <!--     </FormControl> -->
-          <!--     <FormMessage /> -->
-          <!--   </FormItem> -->
-          <!-- </FormField> -->
         </div>
 
         <AlertDialogFooter class="px-6">
@@ -120,7 +133,7 @@ const handleSubmit = async (values: any) => {
             class="text-[16px] font-[600] bg-white text-primary border border-primary hover:bg-accent mt-[16px]"
             @click="
               () => {
-                emit('update:modelValue', false)
+                props.onCounterOfferDialogChanged(false)
               }
             "
             >Cancelar</Button
@@ -129,19 +142,37 @@ const handleSubmit = async (values: any) => {
             type="submit"
             class="text-[16px] font-[600] mt-[16px]"
             variant="destructive"
+            :disabled="isSubmitting"
             size="xl"
-            :disabled="!form.meta.value.valid"
-            >Rechazar</Button
+            @click="onRejectButtonPressed"
           >
+            <LoaderIcon v-if="isSubmitting" class="mr-2 h-4 w-4 animate-spin" />
+            Rechazar
+          </Button>
+
           <Button
             type="submit"
             class="text-[16px] font-[600] mt-[16px]"
+            :disabled="isSubmitting"
             size="xl"
-            :disabled="!form.meta.value.valid"
-            >Aceptar</Button
+            @click="onAcceptButtonPressed"
           >
+            <LoaderIcon v-if="isSubmitting" class="mr-2 h-4 w-4 animate-spin" />
+            Aceptar
+          </Button>
         </AlertDialogFooter>
-      </form>
+      </div>
+      <div v-else>
+        <BerlinLoader />
+      </div>
     </AlertDialogContent>
   </AlertDialog>
+  <BerlinStatusDialog
+    :open="statusDialogOpen"
+    @close="
+      () => {
+        statusDialogOpen = null
+      }
+    "
+  />
 </template>
