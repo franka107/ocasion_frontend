@@ -142,11 +142,13 @@ export const bidsParticipantHeader: HeaderItem[] = [
   },
   {
     key: 'offerEndTime',
+    realKey: 'offer.endTime',
     sortable: true,
     label: 'Fec. cierre oferta',
   },
   {
     key: 'eventGoodType',
+    realKey: 'event.goodType',
     label: 'Tipo de activo',
     sortable: true,
   },
@@ -158,13 +160,14 @@ export const bidsParticipantHeader: HeaderItem[] = [
   {
     key: 'taxes',
     label: 'Comisión',
-    sortable: true,
+    align: 'center',
+    sortable: false,
   },
   {
     key: 'total',
     label: 'Total',
-    align: 'right',
-    sortable: true,
+    align: 'center',
+    sortable: false,
   },
   // {
   //   key: 'offerStatus',
