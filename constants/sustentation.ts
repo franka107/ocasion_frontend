@@ -124,6 +124,12 @@ export const sustentationHeaderList = (viewType: GlobalType): HeaderItem[] => [
     label: 'Sub Categoría del bien',
     sortable: false,
   },
+  {
+    key: 'createdAt',
+    label: 'Fecha de evidencia',
+    align: 'center',
+    sortable: true,
+  },
   // {
   //   key: 'paymentStatus',
   //   label: 'Estado abono',
@@ -132,14 +138,28 @@ export const sustentationHeaderList = (viewType: GlobalType): HeaderItem[] => [
   ...(viewType === GlobalType.Platform
     ? ([
         {
+          key: 'transferenceSustentationUpdatedAt',
+          label: 'F. de actualización S. de transferencia',
+          align: 'center',
+
+          sortable: false,
+        },
+        {
           key: 'transferenceSustentation',
-          label: 'D. Sustento de transferencia',
+          label: 'S. de transferencia',
+          align: 'center',
+
+          sortable: false,
+        },
+        {
+          key: 'deliverySustentationUpdatedAt',
+          label: 'F. de actualización S. de entrega',
           align: 'center',
           sortable: false,
         },
         {
           key: 'deliverySustentation',
-          label: 'D. Sustento de entrega',
+          label: 'S. de entrega',
           // align: 'center',
           sortable: true,
         },
@@ -148,8 +168,20 @@ export const sustentationHeaderList = (viewType: GlobalType): HeaderItem[] => [
   ...(viewType === GlobalType.Organization
     ? ([
         {
+          key: 'transferenceSustentationUpdatedAt',
+          label: 'F. de actualización S. de transferencia',
+          align: 'center',
+          sortable: false,
+        },
+        {
           key: 'transferenceSustentation',
-          label: 'D. Sustento de transferencia',
+          label: 'S. de transferencia',
+          align: 'center',
+          sortable: false,
+        },
+        {
+          key: 'deliverySustentationUpdatedAt',
+          label: 'F. de actualización S. de entrega',
           align: 'center',
           sortable: false,
         },

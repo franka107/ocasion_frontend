@@ -24,6 +24,7 @@ module.exports = {
     'bg-[#FEF3F2]',
     'text-[#B91C1C]', // Rojo claro para SUSTENTO
     'bg-[#F0FDF4]',
+    'w-[400px]',
     'text-[#16A34A]', // Verde para SUSTENTO DE ENTREGA
   ],
   prefix: '',

@@ -126,11 +126,37 @@
               <!--   /> -->
               <!-- </div> -->
             </template>
+            <template #createdAt="{ row }">
+              <DateLabel :value="row.createdAt" />
+            </template>
+
+            <template #transferenceSustentationUpdatedAt="{ row }">
+              <DateLabel
+                v-if="
+                  row.transferenceSustentation &&
+                  row.transferenceSustentation.status !==
+                    ChildSustentationStatus.Pending
+                "
+                :value="row.transferenceSustentation.updatedAt"
+              />
+              <BerlinNullLabel v-else />
+            </template>
+            <template #deliverySustentationUpdatedAt="{ row }">
+              <DateLabel
+                v-if="
+                  row.deliverySustentation &&
+                  row.deliverySustentation.status !==
+                    ChildSustentationStatus.Pending
+                "
+                :value="row.deliverySustentation.updatedAt"
+              />
+              <BerlinNullLabel v-else />
+            </template>
             <template #transferenceSustentation="{ row }">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
-                    <div>
+                    <div class="flex flex-col gap-2">
                       <Button
                         variant="ghost"
                         @click="
@@ -269,6 +295,8 @@ import { GrantId } from '~/types/Grant'
 import { paymentStatus } from '~/constants/payments'
 import { goodType } from '~/constants/events'
 import { GlobalType } from '~/types/Common'
+import DateLabel from '~/design-system/ui/data-label/DateLabel.vue'
+import BerlinNullLabel from '~/design-system/berlin/labels/null-label/BerlinNullLabel.vue'
 
 const session = useUserSessionExtended()
 const filterOptions = ref(
