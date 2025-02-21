@@ -147,6 +147,12 @@
               "
             ></CustomChip>
           </template>
+          <template #expectedAmount="{ row }">
+            <MoneyLabel :amount="row.expectedAmount" />
+          </template>
+          <template #createdAt="{ row }">
+            <DateLabel :value="row.createdAt" />
+          </template>
           <template #goodType="{ row }">
             <CustomChip
               :text="goodType.get(row?.goodType) || ''"
@@ -209,6 +215,8 @@ import type { IDataResponse } from '@/types/Common'
 import EventForm from '@/components/events/EventForm.vue'
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
 import { GrantId } from '~/types/Grant'
+import MoneyLabel from '~/design-system/ui/money-label/MoneyLabel.vue'
+import DateLabel from '~/design-system/ui/data-label/DateLabel.vue'
 const bidsId = ref<number | undefined>(undefined)
 const openModal = ref(false)
 const { page, sortOptions, onSort, createEvent, editEvent, cancelEvent } =
@@ -279,7 +287,6 @@ const organizationSummary = organizationSummaryData.data.value
 const eventsData = computed(() =>
   data.value?.data.map((item: any) => ({
     ...item,
-    createdAt: dayjs(item.createdAt).format('YYYY-MM-DD'),
   })),
 )
 

@@ -1,4 +1,4 @@
-<script lang="ts">
+<script lang="ts" setup>
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import { z } from 'zod'
@@ -15,7 +15,7 @@ const props = defineProps<{
   mode: 'create' | 'edit' | 'readonly'
 }>()
 
-export const UserSchema = z.object({
+const UserSchema = z.object({
   id: z.string().uuid(),
   email: z.string().email(),
   password: z.string().nullable(),
@@ -87,7 +87,7 @@ const titleFromMode = computed(() => {
 })
 </script>
 <template>
-  <BerlinFormSheet :title="titleFromMode">
+  <BerlinFormSheet :title="titleFromMode" :is-open="false" @close="() => {}">
     <template #content> </template>
     <template #footer>
       <div class="w-full flex flex-row gap-2">

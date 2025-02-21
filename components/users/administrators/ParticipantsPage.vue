@@ -42,7 +42,8 @@
             <DateLabel :value="row.createdAt" />
           </template>
           <template #connectedAt="{ row }">
-            <DateLabel :value="row.connectedAt" />
+            <DateLabel v-if="row.connectedAt" :value="row.connectedAt" />
+            <BerlinNullLabel v-else />
           </template>
           <template #walletAvailableBalance="{ row }">
             <MoneyLabel :amount="row.wallet.availableBalance" />
@@ -165,7 +166,7 @@
       />
     </div>
 
-    <ParticipantForm mode="readonly" :user-id="participantToViewDetailId" />
+    <!-- <ParticipantForm mode="readonly" :user-id="participantToViewDetailId" /> -->
     <ModalSuspendParticipant
       :id="participantToSuspendId"
       :is-opened="isSuspendParticipantModalOpened"
@@ -196,6 +197,7 @@ import PropertyLabel from '~/design-system/berlin/labels/property-label/Property
 import Badge from '~/design-system/ui/badge/Badge.vue'
 import DateLabel from '~/design-system/ui/data-label/DateLabel.vue'
 import MoneyLabel from '~/design-system/ui/money-label/MoneyLabel.vue'
+import BerlinNullLabel from '~/design-system/berlin/labels/null-label/BerlinNullLabel.vue'
 
 const route = useRoute()
 const { getMyGrants } = useAuthManagement()
