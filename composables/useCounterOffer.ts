@@ -21,12 +21,9 @@ export type CounterOfferDto = {
 export const useCounterOffer = () => {
   const viewDetail = async (id: string) => {
     const request = await useAPI<CounterOfferDto>(
-      `bid-management/counteroffer-management`,
+      `bid-management/counteroffer-management/${id}`,
       {
         method: 'GET',
-        params: {
-          id,
-        },
       } as any,
     )
     return request

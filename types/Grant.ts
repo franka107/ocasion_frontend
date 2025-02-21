@@ -3,6 +3,8 @@ export enum GrantId {
   PlatformUsersCanFilterParticipants = 'PLATFORM_USERS_CAN_FILTER_PARTICIPANTS',
   PlatformUsersCanReactivateParticipant = 'PLATFORM_USERS_CAN_REACTIVATE_PARTICIPANT',
   PlatformUsersCanSuspendParticipant = 'PLATFORM_USERS_CAN_SUSPEND_PARTICIPANT',
+  PlatformUsersCanEditParticipant = 'PLATFORM_USERS_CAN_EDIT_PARTICIPANT',
+  PlatformUsersCanViewDetailParticipant = 'PLATFORM_USERS_CAN_VIEW_DETAIL_PARTICIPANT',
   PlatformKpisManagement = 'PLATFORM_KPIS_MANAGEMENT',
   PlatformUsersManagement = 'PLATFORM_USERS_MANAGEMENT',
   PlatformUsersCanCreate = 'PLATFORM_USERS_CAN_CREATE',

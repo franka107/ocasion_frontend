@@ -1,5 +1,6 @@
 export enum DocumentType {
-  Dni = "DNI",
-  Ce = "CE",
-  Pt = "PT",
+  Dni = 'DNI',
+  Ruc = 'Ruc',
+  Ce = 'CE',
+  Pt = 'PT',
 }

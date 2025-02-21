@@ -137,6 +137,20 @@
                       <UserX2 class="size-5" />
                     </span>
                   </DropdownMenuItem>
+
+                  <DropdownMenuItem
+                    :disabled="
+                      !myGrants.data.value.includes(
+                        GrantId.PlatformUsersCanEditParticipant,
+                      )
+                    "
+                    @click="onViewParticipantDetailButtonPressed(row.id)"
+                  >
+                    <span class="flex justify-between w-full">
+                      Ver detalle
+                      <EyeIcon class="size-5" />
+                    </span>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -151,6 +165,7 @@
       />
     </div>
 
+    <ParticipantForm mode="readonly" :user-id="participantToViewDetailId" />
     <ModalSuspendParticipant
       :id="participantToSuspendId"
       :is-opened="isSuspendParticipantModalOpened"
@@ -186,6 +201,11 @@ const route = useRoute()
 const { getMyGrants } = useAuthManagement()
 const isSuspendParticipantModalOpened = ref(false)
 const participantToSuspendId = ref('')
+const participantToViewDetailId = ref<string | null>()
+
+const onViewParticipantDetailButtonPressed = (userId: string) => {
+  participantToViewDetailId.value = userId
+}
 
 const myGrants = await getMyGrants()
 const { page, sortOptions, onSort } = useAdmins()
