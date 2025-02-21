@@ -157,11 +157,13 @@ export const offerHeader: HeaderItem[] = [
   },
   {
     key: 'brandName',
+    realKey: 'carBrand.name',
     sortable: true,
     label: 'Marca',
   },
   {
     key: 'modelName',
+    realKey: 'carModel.name',
     label: 'Modelo',
     sortable: true,
   },

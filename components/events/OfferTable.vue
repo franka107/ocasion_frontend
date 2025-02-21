@@ -142,6 +142,12 @@
             <CustomIcons class="cursor-pointer" name="Clip" />
           </div>
         </template>
+        <template #appraisal="{ row }">
+          <MoneyLabel :amount="row.appraisal" />
+        </template>
+        <template #initialValue="{ row }">
+          <MoneyLabel :amount="row.initialValue" />
+        </template>
         <template #actions="{ row }">
           <div class="flex justify-center">
             <DropdownMenu>
@@ -374,6 +380,7 @@ import {
 } from '~/design-system/ui/tooltip'
 import Button from '~/design-system/ui/button/Button.vue'
 import TooltipContent from '~/design-system/ui/tooltip/TooltipContent.vue'
+import MoneyLabel from '~/design-system/ui/money-label/MoneyLabel.vue'
 const { getMyGrants } = useAuthManagement()
 const myGrants = await getMyGrants()
 const { user, globalType } = useUserSessionExtended()
