@@ -29,6 +29,7 @@ export const useCounterOffer = () => {
     return request
   }
 
+  // test
   const acceptToParticipant = async (id: string) => {
     const request = await useAPI(
       `bid-management/counteroffer-management/accept`,
