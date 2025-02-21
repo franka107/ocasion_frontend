@@ -21,9 +21,10 @@ const bidService = useBidService()
 
 const OFFER_BASE_URL = '/offer-management'
 const options = ['Todos', 'Finalizado', 'Por vencer']
-const props = defineProps({
-  apiUrl: String,
-})
+const props = defineProps<{
+  apiUrl: string
+  onAnyBidPlace: () => void
+}>()
 const { apiUrl } = toRefs(props)
 const { page, sortOptions } = useOfferAPI()
 const filterOptions = ref('[]')
@@ -98,63 +99,8 @@ watch([apiUrl], () => {
   refresh()
 })
 
-// socket.on('error', (data) => {
-//   const mainError = data.errors[0]
-//   if (mainError.code === 'AUCTION_MANAGEMENT.USER_NOT_SUBSCRIBED') {
-//     return
-//   }
-//   toast({
-//     title: 'Problema al pujar',
-//     description: mainError.message,
-//     variant: 'default',
-//     class: 'border-red',
-//     // action: h(
-//     //   ToastAction,
-//     //   {
-//     //     altText: 'Try again',
-//     //   },
-//     //   {
-//     //     default: () => 'Try again',
-//     //   },
-//     // ),
-//   })
-// })
-// socket.on('offerUpdated', (newOffer: OfferListItem) => {
-//   const offerIndex = offerList.value.findIndex(
-//     (offerItem) => offerItem.id === newOffer.id,
-//   )
-//   console.log(newOffer)
-//   if (offerIndex !== -1) {
-//     offerList.value[offerIndex] = newOffer
-//     if (selectedOffer.value?.id === offerList.value[offerIndex].id) {
-//       selectedOffer.value = newOffer
-//     }
-//   }
-// })
-
-// socketPlaceBidService.onNewBidPlaced((newBid) => {
-//   const offerIndex = offerList.value.findIndex(
-//     (offerItem) => offerItem.id === newBid.offerId,
-//   )
-//   if (offerIndex !== -1) {
-//     offerList.value[offerIndex].bids.unshift(newBid)
-//     if (selectedOffer.value?.id === offerList.value[offerIndex].id) {
-//       selectedOffer.value = offerList.value[offerIndex]
-//     }
-//   }
-// })
-
-// props.socket.on('error', (data) => {
-//   const ERROR_NOT_SUBSCRIBED = data.errors.find(
-//     (error: { code: string }) =>
-//       error.code === 'AUCTION_MANAGEMENT.USER_NOT_SUBSCRIBED',
-//   )
-//   if (ERROR_NOT_SUBSCRIBED) {
-//     showModal.value = true
-//     subscribeError.value = true
-//   }
-// })
 socketPlaceBidService.onNewBidPlaced((offer) => {
+  props.onAnyBidPlace()
   const offerIndex = offerList.value.findIndex(
     (offerItem) => offerItem.id === offer.id,
   )
@@ -191,6 +137,8 @@ const closeModal = () => {
 }
 
 const openDetails = (offer: OfferListItem) => {
+  console.log(`open-details`)
+  console.log(offer)
   selectedOffer.value = offer
   if (isMobile.value) {
     isModalOpen.value = true

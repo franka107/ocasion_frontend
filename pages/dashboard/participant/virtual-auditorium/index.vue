@@ -55,7 +55,7 @@
               >
                 <ul class="text-[14px] text-[#68686C] leading-[20px]">
                   <li>
-                    <strong>Ofertas:</strong> Son todas a las que puedes
+                    <strong>Ofertas Activas:</strong> Son todas a las que puedes
                     acceder.
                   </li>
                   <li>
@@ -67,7 +67,7 @@
                     participando.
                   </li>
                   <li>
-                    <strong>Ganas:</strong> Todas las ofertas que ganaste.
+                    <strong>Ganadas:</strong> Todas las ofertas que ganaste.
                   </li>
                   <li>
                     <strong>Vencidas:</strong> Ofertas que caducaron o se
@@ -78,7 +78,7 @@
             </Tooltip>
           </TooltipProvider>
         </div>
-        <OffersPage :api-url="currentApiUrl" />
+        <OffersPage :api-url="currentApiUrl" @any-bid-place="onAnyBidPlaced" />
       </div>
     </section>
   </ContentLayout>
@@ -96,33 +96,39 @@ interface IOfferTypeCount {
   expiredCount: number
 }
 
-const { data } = await useAPI<IOfferTypeCount>(
-  () => `/offer-management/view-offers-type-count`,
-  {} as any,
-)
+const { data: offerHeaderData, refresh: refreshOfferHeaderData } =
+  await useAPI<IOfferTypeCount>(
+    () => `/offer-management/view-offers-type-count`,
+    {} as any,
+  )
+
+const onAnyBidPlaced = () => {
+  refreshOfferHeaderData()
+}
 
 const activeTab = ref(0)
-const currentApiUrl = computed(() => tabs[activeTab.value].apiUrl)
-const tabs = [
+const currentApiUrl = computed(() => tabs.value[activeTab.value].apiUrl)
+
+const tabs = computed(() => [
   {
-    label: `Ofertas Activas ${data.value.inProgressCount}`,
+    label: `Ofertas Activas ${offerHeaderData.value?.inProgressCount ?? 0}`,
     apiUrl: 'find-offers-paginated-for-participant',
   },
   {
-    label: `Garantizadas ${data.value.guarantedCount}`,
+    label: `Garantizadas ${offerHeaderData.value?.guarantedCount ?? 0}`,
     apiUrl: 'find-offers-paginated-for-participant-guaranted',
   },
   {
-    label: `Participando ${data.value.participatingCount}`,
+    label: `Participando ${offerHeaderData.value?.participatingCount ?? 0}`,
     apiUrl: 'find-offers-paginated-for-participant-participating',
   },
   {
-    label: `Ganadas ${data.value.wonCount}`,
+    label: `Ganadas ${offerHeaderData.value?.wonCount ?? 0}`,
     apiUrl: 'find-offers-paginated-for-participant-won',
   },
   {
-    label: `Vencidas ${data.value.expiredCount}`,
+    label: `Vencidas ${offerHeaderData.value?.expiredCount ?? 0}`,
     apiUrl: 'find-offers-paginated-for-participant-expired',
   },
-]
+])
 </script>
