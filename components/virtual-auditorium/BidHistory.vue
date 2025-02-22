@@ -49,7 +49,7 @@ const handleShowAllBids = () => {
           }}
         </span>
         <span class="text-2xl font-extrabold text-primary-700">
-          USD ${{ bids[0].amount }}
+          ${{ bids[0].amount }}
         </span>
       </div>
     </div>

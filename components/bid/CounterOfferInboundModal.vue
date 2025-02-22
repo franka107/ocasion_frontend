@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import { InfoIcon } from 'lucide-vue-next'
+import AlertDescription from '../ui/alert/AlertDescription.vue'
 import type { CounterOfferDto } from '~/composables/useCounterOffer'
 import BerlinStatusDialog, {
   type BerlinStatusDialogOpen,
 } from '~/design-system/berlin/dialog/status/BerlinStatusDialog.vue'
 import BerlinLoader from '~/design-system/berlin/loader/BerlinLoader.vue'
+import { BidStatus } from '~/types/Bids'
 
 const props = defineProps<{
   counterOfferId: string | null
@@ -14,16 +17,72 @@ const props = defineProps<{
 
 const counterOfferService = useCounterOffer()
 const counterOffer = ref<CounterOfferDto | null>(null)
-const isSubmitting = ref<boolean>(false)
+const isActionsDisabled = ref<boolean>(false)
 const statusDialogOpen = ref<BerlinStatusDialogOpen | null>(null)
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
+
+const counterOfferWasRejected = computed(() => {
+  return counterOffer.value && counterOffer.value.status === 'REJECTED'
+})
+
+const counterOfferWasConfirmed = computed(() => {
+  return counterOffer.value && counterOffer.value.status === 'ACCEPTED'
+})
+
+const cannotBeActioned = computed(() => {
+  return (
+    counterOfferWasRejected.value ||
+    counterOfferWasConfirmed.value ||
+    bidWasActioned.value
+  )
+})
+
+const bidWasActioned = computed(() => {
+  return (
+    counterOffer.value && counterOffer.value.bid.status !== BidStatus.Debated
+  )
+})
+
+const alertTitle = computed(() => {
+  if (counterOfferWasRejected.value) {
+    return 'Contraoferta rechazada o expirada'
+  }
+  if (counterOfferWasConfirmed.value) {
+    return 'Contraoferta confirmada'
+  }
+  if (bidWasActioned.value) {
+    return 'Puja expirada'
+  }
+  return 'Contraofertar puja'
+})
+
+const alertMessage = computed(() => {
+  if (counterOfferWasConfirmed.value) {
+    return 'Esta contraoferta ya ha sido confirmada y ya no puede ser accionada.'
+  }
+  if (counterOfferWasRejected.value) {
+    return 'Esta contraoferta ha sido rechazada o expiró.'
+  }
+  if (bidWasActioned.value) {
+    return 'Esta puja ha expirado y no puede ser contraofertada.'
+  }
+  return 'Esta contraoferta ha expirado y no puede ser aceptada o rechazada.'
+})
+
+const fetchCounterOffer = async (id: string) => {
+  counterOffer.value = null
+  if (!props.counterOfferId) return
+  const response = await counterOfferService.viewDetail(id)
+  counterOffer.value = response.data.value
+}
 
 watch(
   () => props.counterOfferId,
   async (value, oldValue) => {
     if (value) {
-      const response = await counterOfferService.viewDetail(value)
-      counterOffer.value = response.data.value
+      fetchCounterOffer(value)
+    } else {
+      counterOffer.value = null
     }
   },
 )
@@ -35,7 +94,7 @@ const onAcceptButtonPressed = async () => {
     message: `¿Está seguro que desea aceptar la contraoferta?`,
     callback: async () => {
       if (!props.counterOfferId) return
-      isSubmitting.value = true
+      isActionsDisabled.value = true
       const { status, error } = await counterOfferService.acceptToParticipant(
         props.counterOfferId,
       )
@@ -45,7 +104,8 @@ const onAcceptButtonPressed = async () => {
           message: 'La contraoferta fue aceptada.',
           type: 'success',
         })
-        isSubmitting.value = false
+        isActionsDisabled.value = false
+        fetchCounterOffer(props.counterOfferId)
         props.onAcceptedSuccess()
       } else {
         const eMsg = getBackendError(error.value)
@@ -54,7 +114,7 @@ const onAcceptButtonPressed = async () => {
           message: eMsg,
           type: 'error',
         })
-        isSubmitting.value = false
+        isActionsDisabled.value = false
       }
     },
   })
@@ -67,7 +127,7 @@ const onRejectButtonPressed = async () => {
     message: `¿Está seguro que desea rechazar la contraoferta?`,
     callback: async () => {
       if (!props.counterOfferId) return
-      isSubmitting.value = true
+      isActionsDisabled.value = true
       const { status, error } = await counterOfferService.rejectToParticipant(
         props.counterOfferId,
       )
@@ -77,7 +137,8 @@ const onRejectButtonPressed = async () => {
           message: 'La contraoferta fue rechazada',
           type: 'success',
         })
-        isSubmitting.value = false
+        isActionsDisabled.value = false
+        fetchCounterOffer(props.counterOfferId)
         props.onRejectedSuccess()
       } else {
         const eMsg = getBackendError(error.value)
@@ -86,7 +147,7 @@ const onRejectButtonPressed = async () => {
           message: eMsg,
           type: 'error',
         })
-        isSubmitting.value = false
+        isActionsDisabled.value = false
       }
     },
   })
@@ -104,9 +165,25 @@ const onRejectButtonPressed = async () => {
         <AlertDialogHeader class="border-b border-primary">
           <AlertDialogTitle
             class="text-xl tracking-[-0.5px] text-primary text-start mb-[18px] font-[600] px-6"
-            >Contraofertar puja</AlertDialogTitle
-          >
+            >Contraofertar puja
+          </AlertDialogTitle>
         </AlertDialogHeader>
+        <div class="pt-6 px-6">
+          <Alert
+            v-if="
+              counterOfferWasRejected ||
+              counterOfferWasConfirmed ||
+              bidWasActioned
+            "
+          >
+            <InfoIcon />
+            <AlertTitle> {{ alertTitle }} </AlertTitle>
+            <AlertDescription>
+              {{ alertMessage }}
+            </AlertDescription>
+          </Alert>
+        </div>
+
         <div class="grid grid-cols-2 gap-3 px-6 pt-6">
           <CustomInput
             class="h-14 w-full"
@@ -142,22 +219,28 @@ const onRejectButtonPressed = async () => {
             type="submit"
             class="text-[16px] font-[600] mt-[16px]"
             variant="destructive"
-            :disabled="isSubmitting"
+            :disabled="isActionsDisabled || cannotBeActioned"
             size="xl"
             @click="onRejectButtonPressed"
           >
-            <LoaderIcon v-if="isSubmitting" class="mr-2 h-4 w-4 animate-spin" />
+            <LoaderIcon
+              v-if="isActionsDisabled"
+              class="mr-2 h-4 w-4 animate-spin"
+            />
             Rechazar
           </Button>
 
           <Button
             type="submit"
             class="text-[16px] font-[600] mt-[16px]"
-            :disabled="isSubmitting"
+            :disabled="isActionsDisabled || cannotBeActioned"
             size="xl"
             @click="onAcceptButtonPressed"
           >
-            <LoaderIcon v-if="isSubmitting" class="mr-2 h-4 w-4 animate-spin" />
+            <LoaderIcon
+              v-if="isActionsDisabled"
+              class="mr-2 h-4 w-4 animate-spin"
+            />
             Aceptar
           </Button>
         </AlertDialogFooter>
