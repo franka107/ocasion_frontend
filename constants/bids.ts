@@ -95,7 +95,8 @@ export const bidsParticipantSearch: SearchItem[] = [
   {
     key: 'title',
     type: 'text',
-    placeholder: 'Buscar titulo oferta',
+    placeholder: 'Buscar',
+    label: 'Titulo de oferta',
     elementClass: 'min-w-[400px]',
     position: 1,
   },
@@ -103,6 +104,7 @@ export const bidsParticipantSearch: SearchItem[] = [
     key: 'status',
     type: 'select',
     placeholder: 'Estado',
+    label: 'Estado',
     items: [
       ...Array.from(bidStatus).map(([key, value]) => ({
         text: value.name,
@@ -116,6 +118,7 @@ export const bidsParticipantSearch: SearchItem[] = [
   {
     key: 'eventGoodType',
     type: 'select',
+    label: 'Tipo de activo',
     placeholder: 'Tipo de activo',
     items: [
       ...Array.from(goodType).map(([key, value]) => ({

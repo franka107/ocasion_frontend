@@ -31,7 +31,7 @@
           </div>
         </div>
         <div class="text-center">
-          <div class="text-[#64748B] text-sm">Cerrados</div>
+          <div class="text-[#64748B] text-sm">Finalizados</div>
           <div class="text-primary text-4xl mt-2">
             {{ data.status.finishedCount }}
           </div>

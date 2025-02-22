@@ -53,6 +53,12 @@ export const transactionHistorySearch: SearchItem[] = [
         ].label,
         value: TransactionHistoryMotive.PenaltyDischarge,
       },
+      {
+        text: transactionHistoryMotiveMap[
+          TransactionHistoryMotive.GuaranteeSeparation
+        ].label,
+        value: TransactionHistoryMotive.GuaranteeSeparation,
+      },
     ],
     elementClass: 'min-w-[250px]',
   },
