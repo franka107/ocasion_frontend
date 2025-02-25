@@ -106,11 +106,6 @@ const closeMenu = () => {
 }
 
 const markAsRead = async () => {
-  // console.log(`Marcando la notificación ${props.notification.id} como leída`)
-  // props.notification.isRead = true
-  // emit('onReaded')
-  // closeMenu()
-
   try {
     const { status } = await readNotification(props.notification.id)
     if (status.value === 'success') {
