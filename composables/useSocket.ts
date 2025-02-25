@@ -19,6 +19,7 @@ export function useSocket(
   if (socketPath && socketPath !== '') {
     socketOptions.path = socketPath
   }
+  // Old implementation
   // const socket: Socket = io(`https://api.dev.deocasion.pe/place-bid`, {
   //  path: '/auction_central/socket.io',
   //  transports: ['websocket'],
