@@ -13,12 +13,13 @@ export function useSocket(
 ) {
   const { socketApiUrl, socketUri, socketPath, apiUrl } =
     useRuntimeConfig().public
-  const socketOptions = {
-    ...options,
-  }
-  if (socketPath && socketPath !== '') {
-    socketOptions.path = socketPath
-  }
+  // const socketOptions = {
+  //   ...options,
+  // }
+  console.log(JSON.stringify(options))
+  // if (socketPath && socketPath !== '') {
+  //   socketOptions.path = socketPath
+  // }
   // Old implementation
   // const socket: Socket = io(`https://api.dev.deocasion.pe/place-bid`, {
   //  path: '/auction_central/socket.io',
@@ -30,7 +31,7 @@ export function useSocket(
     upgrade: false,
     forceNew: true,
     transports: ['websocket'],
-    ...socketOptions,
+    ...options,
   })
 
   const isConnected = ref(false)
@@ -39,7 +40,7 @@ export function useSocket(
   onMounted(() => {
     socket.on('connect', () => {
       isConnected.value = true
-      console.info(`Connected to namespace: ${namespace}`)
+      console.info(`Connected to websocket`)
     })
 
     socket.on('disconnect', () => {
