@@ -7,10 +7,12 @@ WORKDIR /usr/src/app
 RUN apk add --no-cache bash
 
 # Copia solo los archivos necesarios para instalar dependencias.
-COPY package.json yarn.lock ./
+#COPY package.json yarn.lock ./
+COPY package.json ./
 
 # Instala dependencias de la aplicación.
 RUN yarn install
+#RUN yarn install --frozen-lockfile
 
 COPY . .
 
