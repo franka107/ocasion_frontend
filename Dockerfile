@@ -10,7 +10,7 @@ RUN apk add --no-cache bash
 COPY package.json yarn.lock ./
 
 # Instala dependencias de la aplicación.
-RUN yarn install --frozen-lockfile
+RUN yarn install
 
 COPY . .
 
