@@ -13,6 +13,8 @@ export default defineNuxtConfig({
       uploadApiUrl: process.env.NUXT_UPLOAD_API_URL,
       socketApiUrl: process.env.NUXT_SOCKET_API_URL,
       landingUrl: process.env.NUXT_LANDING_URL,
+      socketUri: process.env.NUXT_SOCKET_URI,
+      socketPath: process.env.NUXT_SOCKET_PATH,
     },
   },
 

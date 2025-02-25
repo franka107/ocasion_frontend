@@ -5,15 +5,29 @@ import {
   type ManagerOptions,
   type SocketOptions,
 } from 'socket.io-client'
+import { socket } from '~/components/socket'
 
 export function useSocket(
   namespace: string,
   options: Partial<ManagerOptions & SocketOptions> = {},
 ) {
-  const { socketApiUrl } = useRuntimeConfig().public
-  const socket: Socket = io(`${socketApiUrl}/${namespace}`, {
-    transports: ['websocket'], // Usa WebSocket como transporte principal
+  const { socketApiUrl, socketUri, socketPath, apiUrl } =
+    useRuntimeConfig().public
+  const socketOptions = {
     ...options,
+  }
+  if (socketPath && socketPath !== '') {
+    socketOptions.path = socketPath
+  }
+  // const socket: Socket = io(`https://api.dev.deocasion.pe/place-bid`, {
+  //  path: '/auction_central/socket.io',
+  //  transports: ['websocket'],
+  //  ...socketOptions,
+  // })
+  const socket: Socket = io(`https://api.dev.deocasion.pe`, {
+    path: '/websocket-place-bid',
+    transports: ['websocket'],
+    ...socketOptions,
   })
 
   const isConnected = ref(false)

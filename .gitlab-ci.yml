@@ -1,8 +1,8 @@
 image: tiangolo/docker-with-compose
 
 include:
-  - project: "miguel.rodriguez/template-ci"
-    file: "install.yml"
+  - project: 'miguel.rodriguez/template-ci'
+    file: 'install.yml'
 
 stages:
   - build
