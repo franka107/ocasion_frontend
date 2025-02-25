@@ -27,6 +27,8 @@ export function useSocket(
   // })
   const socket: Socket = io(`https://api.dev.deocasion.pe`, {
     path: '/websocket-place-bid',
+    upgrade: false,
+    forceNew: true,
     transports: ['websocket'],
     ...socketOptions,
   })
