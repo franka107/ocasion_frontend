@@ -191,6 +191,11 @@
                 )
               "
               :description="'Cantidad de participantes con garantía separada'"
+              @view-detail-button-pressed="
+                () => {
+                  router.push(`/dashboard/platform/reports/account-balance`)
+                }
+              "
             />
 
             <BerlinActivityCard
@@ -199,6 +204,11 @@
               type="money"
               :kpi-value="kpiFinanceForPlatform.guaranteeSeparatedAmount"
               :description="'Total de garantía separada'"
+              @view-detail-button-pressed="
+                () => {
+                  router.push(`/dashboard/platform/reports/account-balance`)
+                }
+              "
             />
 
             <BerlinActivityCard
@@ -217,6 +227,11 @@
               class="flex-1 min-w-[150px]"
               :kpi-value="kpiFinanceForPlatform.bidsPerOfferAverage.toFixed(2)"
               :description="'Promedio de pujas por oferta'"
+              @view-detail-button-pressed="
+                () => {
+                  router.push(`/dashboard/platform/events`)
+                }
+              "
             />
 
             <BerlinActivityCard
@@ -226,6 +241,11 @@
                 kpiFinanceForPlatform.comissionsChargedCount.toFixed(0)
               "
               :description="'Total de comisiones cobradas'"
+              @view-detail-button-pressed="
+                () => {
+                  router.push(`/dashboard/platform/payments`)
+                }
+              "
             />
 
             <BerlinActivityCard
@@ -233,6 +253,11 @@
               class="flex-1 min-w-[150px]"
               :kpi-value="kpiFinanceForPlatform.penaltyChargedCount.toFixed(0)"
               :description="'Total de penalidades cobradas'"
+              @view-detail-button-pressed="
+                () => {
+                  router.push(`/dashboard/platform/reports/transactions`)
+                }
+              "
             />
           </div>
         </BerlinSimpleCard>
