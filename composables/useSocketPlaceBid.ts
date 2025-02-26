@@ -10,13 +10,17 @@ import type { OfferDto } from '~/types/Offer'
 
 export function useSocketPlaceBidService() {
   const { user } = useUserSession()
+  const config = useRuntimeConfig()
   const socketOptions: Partial<ManagerOptions & SocketOptions> = {}
   if (user.value) {
     socketOptions.extraHeaders = {
       Authorization: `Bearer ${user.value.token}`,
     }
   }
-  const socketService = useSocket('place-bid', socketOptions)
+  const socketService = useSocket(
+    config.public.socketPathPlaceBid,
+    socketOptions,
+  )
 
   const onNewBidPlaced = (callback: (payload: OfferDto) => void) => {
     socketService.onEvent('new-bid-placed', (offer: OfferDto) => {
@@ -25,13 +29,11 @@ export function useSocketPlaceBidService() {
     })
   }
 
-  // Método para unirse a una sala
   function joinOfferRoom(roomId: string) {
     socketService.socket.emit('place-bid-join', roomId)
     consola.info(`Joined room: ${roomId}`)
   }
 
-  // Método para salir de una sala
   function leaveOfferRoom(roomId: string) {
     socketService.socket.emit('place-bid-leave', roomId)
     consola.info(`Left room: ${roomId}`)

@@ -8,16 +8,11 @@ import {
 import { socket } from '~/components/socket'
 
 export function useSocket(
-  namespace: string,
+  path: string,
   options: Partial<ManagerOptions & SocketOptions> = {},
 ) {
-  const { socketApiUrl, socketUri, socketPath, apiUrl } =
-    useRuntimeConfig().public
-  // const socketOptions = {
-  //   ...options,
-  // }
-  console.log(JSON.stringify(options))
-  // if (socketPath && socketPath !== '') {
+  const { socketUri } = useRuntimeConfig().public
+  // if (socketPath && socamericoketPath !== '') {
   //   socketOptions.path = socketPath
   // }
   // Old implementation
@@ -26,8 +21,8 @@ export function useSocket(
   //  transports: ['websocket'],
   //  ...socketOptions,
   // })
-  const socket: Socket = io(`https://api.dev.deocasion.pe`, {
-    path: '/websocket-place-bid',
+  const socket: Socket = io(socketUri, {
+    path,
     upgrade: false,
     forceNew: true,
     transports: ['websocket'],
