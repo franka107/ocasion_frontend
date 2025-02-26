@@ -53,7 +53,6 @@ const hasClickEventListener = computed(
         class="text-orange-500 text-xs mb-12 hover:text-orange-700"
         @click="
           () => {
-            console.log('from componente')
             emit('viewDetailButtonPressed')
           }
         "
