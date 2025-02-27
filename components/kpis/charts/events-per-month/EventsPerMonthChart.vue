@@ -2,6 +2,7 @@
 import type { ChartOptions } from 'chart.js'
 import { ref, computed, onMounted } from 'vue'
 import { ExpandIcon } from 'lucide-vue-next' // Icono de expansión
+import { Bar } from 'vue-chartjs'
 import BerlinActivityCard from '~/design-system/berlin/cards/activity-card/BerlinActivityCard.vue'
 import BerlinChart from '~/design-system/berlin/chart/BerlinChart.vue'
 import BerlinLoader from '~/design-system/berlin/loader/BerlinLoader.vue'
@@ -11,6 +12,7 @@ import DialogContent from '~/design-system/ui/dialog/DialogContent.vue'
 import DialogHeader from '~/design-system/ui/dialog/DialogHeader.vue'
 import DialogClose from '~/design-system/ui/dialog/DialogClose.vue'
 import BerlinZoomableCard from '~/design-system/berlin/cards/zoomable-card/BerlinZoomableCard.vue'
+import BerlinChartLabel from '~/design-system/berlin/labels/chart-label/BerlinChartLabel.vue'
 
 const props = defineProps<{
   organizationIds: string[]
@@ -23,18 +25,23 @@ const graphicsService = useGraphicsService()
 const chartResponse = ref<ChartResponse | null>(null)
 const isDialogOpen = ref(false)
 
-onMounted(async () => {
+watchEffect(async () => {
+  chartResponse.value = null
+  if (!props.organizationIds.length || !props.startDate || !props.endDate)
+    return
+
   const response = await graphicsService.viewEventsPerMonth({
     organizationIds: props.organizationIds,
     startDate: props.startDate,
     endDate: props.endDate,
   })
+
   chartResponse.value = response.data.value
 })
 
-const chartOptions = ref<ChartOptions>({
+const chartOptions = ref<ChartOptions<any>>({
   responsive: true,
-  maintainAspectRatio: false,
+  maintainAspectRatio: true,
   scales: {
     y: {
       stacked: true,
@@ -186,13 +193,21 @@ const chartOptions = ref<ChartOptions>({
 
 <template>
   <BerlinZoomableCard title="Eventos por mes">
-    <BerlinChart
-      v-if="chartResponse"
-      chart-type="bar"
-      chart-id="events-per-month"
-      :chart-data="chartResponse.data"
-      :chart-options="chartOptions"
-    />
+    <div v-if="chartResponse">
+      <BerlinChartLabel
+        v-if="chartResponse"
+        title="Eventos por mes"
+        :value="chartResponse.metadata.totalEvents"
+      />
+      <div class="flex w-full justify-between">
+        <div></div>
+      </div>
+      <Bar
+        v-if="chartResponse"
+        :data="chartResponse.data"
+        :options="chartOptions"
+      />
+    </div>
     <BerlinLoader v-else />
   </BerlinZoomableCard>
 </template>
