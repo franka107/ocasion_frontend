@@ -99,7 +99,7 @@ const chartOptions = ref<ChartOptions<any>>({
 </script>
 
 <template>
-  <BerlinZoomableCard title="Eventos por mes">
+  <BerlinZoomableCard title="Valor promedio ofertas">
     <div v-if="chartResponse">
       <div class="flex mb-2 w-full flex-row-reverse justify-between">
         <BerlinChartLabel

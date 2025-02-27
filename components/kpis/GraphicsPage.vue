@@ -274,7 +274,7 @@
           filterFormValues.rangeStart
         "
       >
-        <div class="mb-8 flex flex-wrap">
+        <div class="mb-8 flex gap-4 flex-wrap">
           <div class="flex-1">
             <EventsPerMonthChart
               :organization-ids="filterFormValues.organizations || []"
@@ -283,7 +283,11 @@
             />
           </div>
           <div class="flex-1">
-            <p>Valor promedio ofertas</p>
+            <AverageOfferValueChart
+              :organization-ids="filterFormValues.organizations || []"
+              :start-date="new Date(filterFormValues.rangeStart)"
+              :end-date="new Date(filterFormValues.rangeEnd)"
+            />
           </div>
         </div>
       </div>
@@ -327,6 +331,7 @@ import {
 import type { FilterFormSchema } from './components/filter-form-schema'
 import DashboardCharts from './components/DashboardCharts.vue'
 import EventsPerMonthChart from './charts/events-per-month/EventsPerMonthChart.vue'
+import AverageOfferValueChart from './charts/average-offer-value/AverageOfferValueChart.vue'
 import { useEventManagementAPI } from '~/composables/useEventManagementAPI'
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
 import ActivityCard from '~/layouts/default/ActivityCardDeprecated.vue'
