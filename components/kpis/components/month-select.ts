@@ -26,7 +26,7 @@ export function getCalculatedFilterFormSchema(
 ): FilterFormSchema {
   const today = new Date()
 
-  const formatDate = (date: Date) => format(date, 'yyyy-MM-dd')
+  const formatDate = (date: Date) => date.toISOString()
 
   switch (monthSelect) {
     case MonthSelect.ThisMonth:

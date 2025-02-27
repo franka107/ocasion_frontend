@@ -263,7 +263,29 @@
         </BerlinSimpleCard>
       </div>
       <div class="mb-8">
-        <DashboardCharts :filter-form-values="filterFormValues" />
+        <!-- <p>Deprecado</p> -->
+        <!-- <DashboardCharts :filter-form-values="filterFormValues" /> -->
+      </div>
+
+      <div
+        v-if="
+          filterFormValues.organizations &&
+          filterFormValues.rangeEnd &&
+          filterFormValues.rangeStart
+        "
+      >
+        <div class="mb-8 flex flex-wrap">
+          <div class="flex-1">
+            <EventsPerMonthChart
+              :organization-ids="filterFormValues.organizations || []"
+              :start-date="new Date(filterFormValues.rangeStart)"
+              :end-date="new Date(filterFormValues.rangeEnd)"
+            />
+          </div>
+          <div class="flex-1">
+            <p>Valor promedio ofertas</p>
+          </div>
+        </div>
       </div>
     </div>
     <SheetContent
@@ -304,6 +326,7 @@ import {
 } from './components/month-select'
 import type { FilterFormSchema } from './components/filter-form-schema'
 import DashboardCharts from './components/DashboardCharts.vue'
+import EventsPerMonthChart from './charts/events-per-month/EventsPerMonthChart.vue'
 import { useEventManagementAPI } from '~/composables/useEventManagementAPI'
 import ContentLayout from '~/layouts/default/ContentLayout.vue'
 import ActivityCard from '~/layouts/default/ActivityCardDeprecated.vue'

@@ -1,4 +1,7 @@
 <script setup lang="ts">
+/**
+ * Implementacion muy defectuosa, eliminar
+ */
 import { ref, onMounted, nextTick, watch } from 'vue'
 import Chart, { Legend, plugins } from 'chart.js/auto'
 import { JsxEmit, transform } from 'typescript'
