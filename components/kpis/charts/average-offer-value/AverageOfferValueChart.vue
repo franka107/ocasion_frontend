@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import type { ChartOptions } from 'chart.js'
-import { ref, computed, onMounted } from 'vue'
-import { ExpandIcon } from 'lucide-vue-next' // Icono de expansión
-import { Bar } from 'vue-chartjs'
+import { Bar, Line } from 'vue-chartjs'
 import BerlinActivityCard from '~/design-system/berlin/cards/activity-card/BerlinActivityCard.vue'
 import BerlinChart from '~/design-system/berlin/chart/BerlinChart.vue'
 import BerlinLoader from '~/design-system/berlin/loader/BerlinLoader.vue'
@@ -23,6 +21,26 @@ const props = defineProps<{
 const graphicsService = useGraphicsService()
 
 const chartResponse = ref<ChartResponse | null>(null)
+// const chartResponse = ref<ChartOptions<any>>({
+//  labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo'],
+//  datasets: [
+//    {
+//      label: 'Valor Promedio Ofertas (en miles)',
+//      data: [12.45, 10.32, 14.88, 11.56, 13.75],
+//      borderColor: 'blue',
+//      backgroundColor: 'rgba(0, 0, 255, 0.2)',
+//      yAxisID: 'y1',
+//    },
+//    {
+//      label: 'Cantidad Total Ofertas',
+//      data: [150, 180, 210, 190, 170],
+//      borderColor: 'green',
+//      backgroundColor: 'rgba(0, 255, 0, 0.2)',
+//      yAxisID: 'y2',
+//    },
+//  ],
+// })
+
 const isDialogOpen = ref(false)
 
 watchEffect(async () => {
@@ -30,7 +48,7 @@ watchEffect(async () => {
   if (!props.organizationIds.length || !props.startDate || !props.endDate)
     return
 
-  const response = await graphicsService.viewEventsPerMonth({
+  const response = await graphicsService.viewOfferPerEventAverage({
     organizationIds: props.organizationIds,
     startDate: props.startDate,
     endDate: props.endDate,
@@ -39,58 +57,55 @@ watchEffect(async () => {
   chartResponse.value = response.data.value
 })
 
-const chartOptions = ref<ChartOptions<any>>({
+const chartOptions = ref({
   responsive: true,
   maintainAspectRatio: true,
   scales: {
-    y: {
-      stacked: true,
-      beginAtZero: true,
-      ticks: {
-        stepSize: 1,
-        precision: 0,
-      },
-      suggestedMax: (context) => {
-        const maxValue = Math.max(
-          ...context.chart.data.datasets.flatMap((d) => d.data),
-        )
-        return maxValue + 1
-      },
-      grid: {
-        drawBorder: false,
+    x: {
+      title: {
+        display: true,
+        text: 'Mes',
       },
     },
-    x: {
-      stacked: true,
-      grid: {
+    y1: {
+      type: 'linear',
+      position: 'left',
+      title: {
         display: true,
-        drawBorder: false,
+        text: 'Monto (en miles)',
+      },
+      ticks: {
+        callback: (value) => `${value.toFixed(2)}k`,
+      },
+    },
+    y2: {
+      type: 'linear',
+      position: 'right',
+      title: {
+        display: true,
+        text: 'Cantidad de Ofertas',
+      },
+      grid: {
+        drawOnChartArea: false,
       },
     },
   },
   plugins: {
-    tooltip: {
-      enabled: true,
-      position: 'nearest',
-    },
     legend: {
       position: 'top',
-      align: 'center',
       labels: {
-        generateLabels: function (chart) {
-          return chart.data.datasets.map((dataset, i) => {
-            // Calcular la suma total del dataset
-            const total = dataset.data.reduce((sum, value) => sum + value, 0)
-
-            return {
-              text: `${dataset.label} (${total})`, // Agregamos el total al nombre
-              fillStyle: dataset.backgroundColor,
-              strokeStyle: dataset.borderColor,
-              lineWidth: 0,
-              hidden: !chart.isDatasetVisible(i),
-              datasetIndex: i,
-            }
-          })
+        boxWidth: 16,
+        boxHeight: 10,
+      },
+    },
+    tooltip: {
+      enabled: true,
+      callbacks: {
+        label: (tooltipItem) => {
+          if (tooltipItem.dataset.yAxisID === 'y1') {
+            return `${tooltipItem.dataset.label}: ${tooltipItem.raw.toFixed(2)}k`
+          }
+          return `${tooltipItem.dataset.label}: ${tooltipItem.raw}`
         },
       },
     },
@@ -104,11 +119,11 @@ const chartOptions = ref<ChartOptions<any>>({
       <div class="flex mb-2 w-full flex-row-reverse justify-between">
         <BerlinChartLabel
           v-if="chartResponse"
-          title="Eventos por mes"
-          :value="chartResponse.metadata.totalEvents"
+          title="Valor promedio total"
+          :value="`${chartResponse.metadata.totalAverage}k`"
         />
       </div>
-      <Bar
+      <Line
         v-if="chartResponse"
         :data="chartResponse.data"
         :options="chartOptions"
