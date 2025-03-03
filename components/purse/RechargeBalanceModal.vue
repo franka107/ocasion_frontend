@@ -13,6 +13,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import InputFile from '@/components/common/file/Input.vue'
+import { bankType } from '~/constants/attention-tray'
 
 const emit = defineEmits(['update:modelValue'])
 const { openConfirmModal, updateConfirmModal } = useConfirmModal()
@@ -21,7 +22,28 @@ const props = defineProps<{
   modelValue: boolean
   refreshHistoryTransactionTable: () => void
 }>()
+
+const {
+  generatelPreviewDisbursement,
+  generatelDisbursement,
+  viewAvailableBankAccounts,
+} = useDisbursement('all')
+
+const availableBankAccounts = ref<string[]>([])
+
+const handleBankChange = async (bank: string) => {
+  const viewAvailableBankAccountsResponse = await viewAvailableBankAccounts(
+    bank as Bank,
+  )
+  availableBankAccounts.value = viewAvailableBankAccountsResponse?.data
+    .value as string[]
+}
 const { landingUrl } = useRuntimeConfig().public
+
+const banksOptions = Array.from(bankType).map(([id, name]) => ({
+  id,
+  name,
+}))
 const formSchema = toTypedSchema(
   z.object({
     operationNumber: z
@@ -40,6 +62,12 @@ const formSchema = toTypedSchema(
     termsAndConditions: z
       .boolean()
       .refine((val) => val === true, 'Debe aceptar los términos y condiciones'),
+
+    bank: z.string().min(1, 'Seleccione un banco'),
+
+    bankAccountNumber: z
+      .string()
+      .regex(/^\d{10,20}$/, 'Ingrese un número de cuenta válido.'),
   }),
 )
 const form = useForm({
@@ -60,6 +88,8 @@ const onSubmit = form.handleSubmit((values) => {
         ...values,
         sustentationFile: values.attachedFiles[0],
         transferedAt: values.transferedAt,
+        bank: values.bank,
+        bankAccountNumber: values.bankAccountNumber,
       })
       emit('update:modelValue', false) // Cierra el modal al enviar.
       if (status.value === 'success') {
@@ -190,6 +220,45 @@ watch(
                   value="USD"
                   readonly
                   label="Moneda"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="bank">
+            <FormItem>
+              <FormControl>
+                <CustomSelect
+                  v-bind="componentField"
+                  :items="banksOptions"
+                  static-label
+                  placeholder="Banco"
+                  @update:model-value="
+                    (value) => {
+                      handleBankChange(value)
+                    }
+                  "
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="bankAccountNumber">
+            <FormItem class="">
+              <FormControl>
+                <CustomSelect
+                  v-bind="componentField"
+                  :disabled="!form.values.bank"
+                  static-label
+                  :items="
+                    availableBankAccounts.map((e) => ({
+                      id: e,
+                      name: e,
+                    })) || []
+                  "
+                  placeholder="Cuenta cargo"
                 />
               </FormControl>
               <FormMessage />
